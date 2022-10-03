@@ -46,7 +46,7 @@
     },
 
     async created() {
-      const path = `http://localhost:5000/monograph_list`;
+      const path = `http://http://v2626umcth819.rtord.epa.gov:9415/monograph_list`;
       const response = await axios.get(path)
       this.names = response.data.names
       this.source_path = response.data.source_path
@@ -60,7 +60,7 @@
       onRowSelected(event){
         if (event.event){
           console.log(event)
-          this.target_pdf_url = `http://localhost:5000/get_pdf/${event.data.record_source}/${event.data.filename}.pdf`
+          this.target_pdf_url = `http://http://v2626umcth819.rtord.epa.gov:9415/get_pdf/${event.data.record_source}/${event.data.filename}.pdf`
         }
       },
       loadMonograph(event){
