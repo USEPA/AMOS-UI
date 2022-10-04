@@ -60,7 +60,7 @@
       onRowSelected(event){
         if (event.event){
           console.log(event)
-          this.target_pdf_url = `http://http://v2626umcth819.rtord.epa.gov:9415/get_pdf/${event.data.record_source}/${event.data.filename}.pdf`
+          this.target_pdf_url = `http://http://v2626umcth819.rtord.epa.gov:9415git/get_pdf/${event.data.record_source}/${event.data.filename}.pdf`
         }
       },
       loadMonograph(event){

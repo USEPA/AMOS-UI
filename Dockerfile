@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 COPY . .
-RUN npm run build
+RUN npm run dev -- --host
 
 # Build server
 FROM nginx:1.19.0 AS prod-stage
