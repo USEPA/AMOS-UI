@@ -117,7 +117,7 @@
       }
     },
     async created() {
-      const path = `http://http://v2626umcth819.rtord.epa.gov:9415/search/${this.$route.params.search_term}`;
+      const path = `http://v2626umcth819.rtord.epa.gov:9415/search/${this.$route.params.search_term}`;
       const response = await axios.get(path)
       this.results = response.data.results
       this.id_info = response.data.id_info

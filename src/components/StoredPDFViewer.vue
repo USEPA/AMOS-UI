@@ -78,15 +78,15 @@
 
     methods: {
       async loadPDF(){
-        this.target_pdf_url = encodeURI(`http://http://v2626umcth819.rtord.epa.gov:9415/get_pdf/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
-        const response = await axios.get(`http://http://v2626umcth819.rtord.epa.gov:9415/get_pdf_metadata/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
+        this.target_pdf_url = encodeURI(`http://v2626umcth819.rtord.epa.gov:9415/get_pdf/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
+        const response = await axios.get(`http://v2626umcth819.rtord.epa.gov:9415/get_pdf_metadata/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
         this.pdf_name = response.data.pdf_name
         this.pdf_metadata = response.data.pdf_metadata
         this.metadata_rows = response.data.metadata_rows
         console.log(response)
       },
       async findDTXSIDs(){
-        const response = await axios.get(`http://http://v2626umcth819.rtord.epa.gov:9415/find_dtxsids/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
+        const response = await axios.get(`http://v2626umcth819.rtord.epa.gov:9415/find_dtxsids/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
         this.compoundList = response.data.chemical_ids
       },
       updateTab(tabName) {
