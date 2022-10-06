@@ -24,7 +24,7 @@
       }
     },
     async created() {
-      const response = await axios.get(`http://localhost:5000/find_inchikeys/${this.$route.params.inchikey}`)
+      const response = await axios.get(`http://v2626umcth819.rtord.epa.gov:9415/find_inchikeys/${this.$route.params.inchikey}`)
       this.search_complete = true
       if (response.data.unique_inchikeys.length == 1 & response.data.inchikey_present){
         this.$router.push({path: `/search/${this.$route.params.inchikey}`})
