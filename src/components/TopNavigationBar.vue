@@ -1,7 +1,7 @@
 <template>
   <div class="nav-bar">
     <div class="nav-bar-left">
-      <label for="search-term">Search Term</label>
+      <label for="search-term">Search</label> &nbsp;
       <input type="text" v-model="searchTerm" name="search-term">
       <button @click="go()">Search</button>
     </div>
@@ -23,7 +23,13 @@
   export default {
     methods: {
       go() {
-        this.$router.push(`/search/${this.searchTerm}`)
+        const inchikeyRegex = /^([A-Z]{14})-[A-Z]{8}[SN][A-Z]-[A-Z]$/
+        var matchResult = this.searchTerm.match(inchikeyRegex)
+        if (matchResult) {
+          this.$router.push(`/find_inchikeys/${this.searchTerm}`)
+        } else {
+          this.$router.push(`/search/${this.searchTerm}`)
+        }
       }
     },
     data() {
@@ -39,5 +45,13 @@
     padding: 10px;
     display: flex;
     justify-content: space-between;
+    background: #0e6993;
+    color: white;
+  }
+
+  .nav-bar-right a{
+    color: white;
+    /*font-family: 'Roboto';*/
+    text-decoration: none;
   }
 </style>

@@ -8,8 +8,8 @@
     <p>Information</p>
     <ul style="list-style-type: none;">
         <li><strong>Number of Points:</strong> {{ spectrum.length }}</li>
-        <li><strong>Spectral Entropy:</strong> {{ spectrum.length == 1 ? "Undefined" : spectral_entropy }}</li>
-        <li><strong>Normalized Entropy:</strong> {{ spectrum.length == 1 ? "Undefined" : normalized_entropy }}</li>
+        <li><strong>Spectral Entropy:</strong> {{ spectral_entropy ? spectral_entropy.toFixed(6) : "Undefined" }}</li>
+        <li><strong>Normalized Entropy:</strong> {{ normalized_entropy ? normalized_entropy.toFixed(6) : "Undefined" }}</li>
         <li><strong>Rating:</strong> {{ spectrum.length == 1 ? "N/A" : (spectral_entropy <= 3.0 & normalized_entropy <= 0.8 ? "Clean" : "Noisy") }}</li>
         <li><strong>SPLASH:</strong> <a :href="`https://www.google.com/search?q=${splash}`">{{ splash }}</a></li>
     </ul>
@@ -54,17 +54,32 @@
         this.normalized_entropy = response.data.normalized_entropy
         this.splash = response.data.splash
         console.log(this.spectrum)
-        const g = new Dygraph(document.getElementById("graph"), this.spectrum, {
-          plotter: this.barChartPlotter,
-          includeZero: true,
-          labels: ["m/z", "Relative Intensity"],
-          title: "Mass Spectrum",
-          xlabel: "m/z",
-          ylabel: "Relative Intensity",
-          width: 600,
-          height: 400,
-          xRangePad: 10
-        })
+        if (this.spectrum.length == 1){
+          const padded_spectrum = [[this.spectrum[0][0] - 1, 0], this.spectrum[0], [this.spectrum[0][0] + 1, 0]]
+          const g = new Dygraph(document.getElementById("graph"), padded_spectrum, {
+            plotter: this.barChartPlotter,
+            includeZero: true,
+            labels: ["m/z", "Relative Intensity"],
+            title: "Mass Spectrum",
+            xlabel: "m/z",
+            ylabel: "Relative Intensity",
+            width: 600,
+            height: 400,
+            xRangePad: 100
+          })
+        } else {
+          const g = new Dygraph(document.getElementById("graph"), this.spectrum, {
+            plotter: this.barChartPlotter,
+            includeZero: true,
+            labels: ["m/z", "Relative Intensity"],
+            title: "Mass Spectrum",
+            xlabel: "m/z",
+            ylabel: "Relative Intensity",
+            width: 600,
+            height: 400,
+            xRangePad: 10
+          })
+        }
       },
       barChartPlotter(e) {
         const ctx = e.drawingContext

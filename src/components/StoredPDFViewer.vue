@@ -11,8 +11,7 @@
       <a :class="viewerMode == 'CompoundGrid' ? 'active' : ''" @click="updateTab('CompoundGrid')">Compounds (grid)</a>
       <a :class="viewerMode == 'CompoundTable' ? 'active' : ''" @click="updateTab('CompoundTable')">Compounds (table)</a>
     </div>
-    <iframe v-if="viewerMode == 'PDF'" class="monograph-box" :src="`${target_pdf_url}`" type="application/pdf"></iframe>
-    <!--p v-else-if="viewerMode == 'CompoundGrid'">Compound grid view</p-->
+    <iframe v-if="viewerMode == 'PDF'" class="pdf-viewer-box" :src="`${target_pdf_url}`" type="application/pdf"></iframe>
 
     <div class="compound-grid" v-else-if="viewerMode == 'CompoundGrid'">
       <div v-for="cl in compoundList">
@@ -59,8 +58,17 @@
         viewerMode: "PDF",
         compoundList: [],
         columnDefs: [
-          {field: 'dtxsid', headerName: 'DTXSID'},
-          {field: 'preferred_name', headerName:'Compound Name'}
+          {field:'image', headerName:'Structure', autoHeight: true, width: 120, cellRenderer: (params) => {
+            var image = document.createElement('img');
+            image.src = 'https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/'+params.data.dtxsid;
+            image.style = "width:70px;height:70px;";
+            return image;
+          }},
+          {field: 'dtxsid', headerName: 'DTXSID', width: 140, cellRenderer: params => {
+            return "<a href='https://comptox.epa.gov/dashboard/chemical/details/" + params.data.dtxsid + "' target='_blank'>" + params.data.dtxsid + "</a>"
+          }},
+          {field: 'casrn', headerName: 'CASRN', width: 100},
+          {field: 'preferred_name', headerName:'Compound Name', flex: 1}
         ]
       }
     },
@@ -68,10 +76,10 @@
     watch: {
       selectedRowData(){
         this.loadPDF()
+        this.findDTXSIDs()
       }
     },
     async created() {
-      console.log(this.selectedRowData)
       this.loadPDF()
       this.findDTXSIDs()
     },
@@ -83,7 +91,7 @@
         this.pdf_name = response.data.pdf_name
         this.pdf_metadata = response.data.pdf_metadata
         this.metadata_rows = response.data.metadata_rows
-        console.log(response)
+        //console.log(this.metadata_rows)
       },
       async findDTXSIDs(){
         const response = await axios.get(`http://localhost:5000/find_dtxsids/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
@@ -91,7 +99,6 @@
       },
       updateTab(tabName) {
         this.viewerMode = tabName
-        console.log(tabName)
       }
     },
     components: { AgGridVue, CompoundTile }
@@ -99,7 +106,7 @@
 </script>
 
 <style>
-  .monograph-box{
+  .pdf-viewer-box{
     height: 90vh;
     width: 50vw;
     overflow: scroll;
@@ -124,5 +131,10 @@
     display: flex;
     flex-wrap: wrap;
     justify-content: left;
+  }
+
+  .ag-row .ag-cell {
+    display: flex;
+    align-items: center;
   }
 </style>

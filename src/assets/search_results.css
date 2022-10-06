@@ -31,6 +31,9 @@
 .results-header {
   height: 280px;
   padding: 10px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: normal;
 }
 
 .results-header h1 {
