@@ -56,6 +56,7 @@
   import '@/assets/search_results.css'
   import SpectrumViewer from '@/components/SpectrumViewer.vue'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
+  import { BACKEND_LOCATION } from '@/assets/store';
 
   export default {
     data(){
@@ -65,6 +66,7 @@
         results: [],
         id_info: {},
         still_searching: true,
+        BACKEND_LOCATION,
         columnDefs: [
           //{field: 'dtxsid', headerName: 'DTXSID'},
           //{field: 'name', headerName:'Compound Name'},
@@ -140,7 +142,8 @@
       }
     },
     async created() {
-      const path = `http://v2626umcth819.rtord.epa.gov:9415/search/${this.$route.params.search_term}`;
+      //const path = `http://v2626umcth819.rtord.epa.gov:9415/search/${this.$route.params.search_term}`;
+      const path = `${this.BACKEND_LOCATION}/search/${this.$route.params.search_term}`;
       const response = await axios.get(path)
       this.results = response.data.results
       this.id_info = response.data.id_info

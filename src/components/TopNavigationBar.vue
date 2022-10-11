@@ -2,7 +2,7 @@
   <div class="nav-bar">
     <div class="nav-bar-left">
       <label for="search-term">Search</label> &nbsp;
-      <input type="text" v-model="searchTerm" name="search-term">
+      <input @keyup.enter="go()" type="text" v-model="searchTerm" name="search-term">
       <button @click="go()">Search</button>
     </div>
     <div class="nav-bar-right">

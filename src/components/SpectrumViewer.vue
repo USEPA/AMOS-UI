@@ -22,6 +22,7 @@
   import Dygraph from 'dygraphs';
   
   import '@/assets/search_results.css'
+  import { BACKEND_LOCATION } from '@/assets/store';
 
   export default {
     data(){
@@ -30,7 +31,8 @@
         spectrum: [],
         spectral_entropy: 0,
         normalized_entropy: 0,
-        splash: ""
+        splash: "",
+        BACKEND_LOCATION
       }
     },
     props: ['selectedRowData'],
@@ -47,7 +49,8 @@
         console.log(this.selectedRowData)
       },
       async getSpectrumData() {
-        const path = `http://v2626umcth819.rtord.epa.gov:9415/get_spectrum/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`;
+        //const path = `http://v2626umcth819.rtord.epa.gov:9415/get_spectrum/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`;
+        const path = `${this.BACKEND_LOCATION}/get_spectrum/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`;
         const response = await axios.get(path)
         this.spectrum = response.data.spectrum
         this.spectral_entropy = response.data.spectral_entropy

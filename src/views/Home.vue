@@ -6,7 +6,7 @@
       <p>This app will perform searches on a collection of publicly available data from several sources, and return a mixture of mass spectra, monographs, and methods concerning the searched compound.  Searches can be made on compound name, InChIKey, CAS number, or DTXSID.</p>
       <p>The database contains a mixture of data consisting of mass spectra, monograph reports, and writeups of analytical methods.  The search will return records of all three types, however certain ones can be hidden by default using the checkboxes below the search bar.</p>
       <div>
-        <input id="big-search-bar" name="big-search-bar" placeholder="Search name, InChIKey, DTXSID, or CASRN..." size="60" v-model="bigBarSearchTerm">
+        <input @keyup.enter="go_big_bar()" id="big-search-bar" name="big-search-bar" placeholder="Search name, InChIKey, DTXSID, or CASRN..." size="60" v-model="bigBarSearchTerm">
         <button @click="go_big_bar()">Search</button>
       </div>
       <div>

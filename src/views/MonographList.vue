@@ -29,6 +29,7 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
+  import { BACKEND_LOCATION } from '@/assets/store';
 
   export default {
     data(){
@@ -37,7 +38,8 @@
         sourcePath: "",
         selectedRowData: {},
         monographInfo: [],
-        anyMonographSelected: false,  // used to avoid having a box with an error pop up if nothing's been selected yet
+        anyMonographSelected: false,  // used to avoid having a box with an error pop up if nothing's been selected yet,
+        BACKEND_LOCATION,
         columnDefs: [
           {field: 'name', headerName: 'Monograph Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true},
           {field: 'info_source', headerName: 'Source', sortable: true},
@@ -47,11 +49,13 @@
     },
 
     async created() {
-      const path = `http://v2626umcth819.rtord.epa.gov:9415/monograph_list`;
+      //const path = `http://v2626umcth819.rtord.epa.gov:9415/monograph_list`;
+      const path = `${this.BACKEND_LOCATION}/monograph_list`;
       const response = await axios.get(path)
       this.names = response.data.names
       this.sourcePath = response.data.source_path
       this.monographInfo = response.data.monograph_info
+      console.log(this.BACKEND_LOCATION)
     },
 
     methods: {
@@ -63,7 +67,8 @@
           console.log(event)
           this.selectedRowData = event.data
           this.anyMonographSelected = true
-          this.target_pdf_url = `http://v2626umcth819.rtord.epa.gov:9415/get_pdf/${event.data.record_source}/${event.data.filename}.pdf`
+          //this.target_pdf_url = `http://v2626umcth819.rtord.epa.gov:9415/get_pdf/${event.data.record_source}/${event.data.filename}.pdf`
+          this.target_pdf_url = `${this.BACKEND_LOCATION}/get_pdf/${event.data.record_source}/${event.data.filename}.pdf`
         }
       }
     },

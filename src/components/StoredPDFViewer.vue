@@ -35,6 +35,7 @@
   import axios from 'axios';
 
   import '@/assets/search_results.css';
+  import { BACKEND_LOCATION } from '@/assets/store';
 
   import CompoundTile from '@/components/CompoundTile.vue';
 
@@ -57,6 +58,7 @@
         metadata_rows: {},
         viewerMode: "PDF",
         compoundList: [],
+        BACKEND_LOCATION,
         columnDefs: [
           {field:'image', headerName:'Structure', autoHeight: true, width: 120, cellRenderer: (params) => {
             var image = document.createElement('img');
@@ -86,15 +88,18 @@
 
     methods: {
       async loadPDF(){
-        this.target_pdf_url = encodeURI(`http://v2626umcth819.rtord.epa.gov:9415/get_pdf/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
-        const response = await axios.get(`http://v2626umcth819.rtord.epa.gov:9415/get_pdf_metadata/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
+        //this.target_pdf_url = encodeURI(`http://v2626umcth819.rtord.epa.gov:9415/get_pdf/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
+        //const response = await axios.get(`http://v2626umcth819.rtord.epa.gov:9415/get_pdf_metadata/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
+        this.target_pdf_url = encodeURI(`${this.BACKEND_LOCATION}/get_pdf/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
+        const response = await axios.get(`${this.BACKEND_LOCATION}/get_pdf_metadata/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
         this.pdf_name = response.data.pdf_name
         this.pdf_metadata = response.data.pdf_metadata
         this.metadata_rows = response.data.metadata_rows
         //console.log(this.metadata_rows)
       },
       async findDTXSIDs(){
-        const response = await axios.get(`http://v2626umcth819.rtord.epa.gov:9415/find_dtxsids/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
+        //const response = await axios.get(`http://v2626umcth819.rtord.epa.gov:9415/find_dtxsids/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
+        const response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
         this.compoundList = response.data.chemical_ids
       },
       updateTab(tabName) {
