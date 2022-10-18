@@ -28,6 +28,7 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
+  import '@/assets/style.css'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
   import { BACKEND_LOCATION } from '@/assets/store';
 
@@ -55,7 +56,6 @@
       this.names = response.data.names
       this.sourcePath = response.data.source_path
       this.monographInfo = response.data.monograph_info
-      console.log(this.BACKEND_LOCATION)
     },
 
     methods: {
@@ -67,7 +67,6 @@
           console.log(event)
           this.selectedRowData = event.data
           this.anyMonographSelected = true
-          //this.target_pdf_url = `http://v2626umcth819.rtord.epa.gov:9415/get_pdf/${event.data.record_source}/${event.data.filename}.pdf`
           this.target_pdf_url = `${this.BACKEND_LOCATION}/get_pdf/${event.data.record_source}/${event.data.filename}.pdf`
         }
       }

@@ -10,6 +10,8 @@
       &emsp;
       <router-link to="/monograph_list">Monograph List</router-link>
       &emsp;
+      <router-link to="/similar_method_search">Similar Method Search</router-link>
+      &emsp;
       <router-link to="/about">About this App</router-link>
       &emsp;
       <button @click="store.showHeaderAndFooter = !store.showHeaderAndFooter">Toggle Header/Footer</button>
@@ -51,7 +53,6 @@
 
   .nav-bar-right a{
     color: white;
-    /*font-family: 'Roboto';*/
     text-decoration: none;
   }
 </style>

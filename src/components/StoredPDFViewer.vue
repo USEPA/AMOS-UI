@@ -34,6 +34,7 @@
 <script>
   import axios from 'axios';
 
+  import '@/assets/style.css'
   import '@/assets/search_results.css';
   import { BACKEND_LOCATION } from '@/assets/store';
 
@@ -115,21 +116,6 @@
     height: 90vh;
     width: 50vw;
     overflow: scroll;
-  }
-
-  .tab-bar {
-    margin-bottom: 0px;
-    display: flex;
-    justify-content: space-around;
-  }
-
-  .tab-bar a{
-    padding: 12px 24px;
-    border: 1px solid #CCC;
-  }
-
-  .tab-bar a.active {
-    background-color: #ccc;
   }
 
   .compound-grid {

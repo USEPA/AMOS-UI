@@ -2,8 +2,8 @@
   <div class="full-results-page">
     <div class="search-results">
       <div class="results-header">
-        <h1 v-if="still_searching">Searching for "{{$route.params.search_term}}"...</h1>
-        <h1 v-else>Search Results for "{{$route.params.search_term}}"</h1>
+        <h1 v-if="still_searching" class="text-that-can-overflow">Searching for "{{$route.params.search_term}}"...</h1>
+        <h1 v-else class="text-that-can-overflow">Search Results for "{{$route.params.search_term}}"</h1>
         <br/>
         <div class="chemical-box">
           <div class="chemical-image-highlight">
@@ -22,6 +22,14 @@
             </ul>
           </div>
         </div>
+        <input type="checkbox" id="single-point-spectra" v-model="includeSinglePointSpectra" @change="updateCheckboxFilters">
+        <label for="single-point-spectra">Include Single Point Spectra</label>
+      </div>
+      <div class="tab-bar">
+        <a :class="resultTableViewMode == 'all' ? 'active' : ''" @click="updateTab('all')">All Results</a>
+        <a :class="resultTableViewMode == 'spectrum' ? 'active' : ''" @click="updateTab('spectrum')">Spectra</a>
+        <a :class="resultTableViewMode == 'monograph' ? 'active' : ''" @click="updateTab('monograph')">Monographs</a>
+        <a :class="resultTableViewMode == 'method' ? 'active' : ''" @click="updateTab('method')">Methods</a>
       </div>
       <ag-grid-vue
         class="ag-theme-balham"
@@ -32,6 +40,8 @@
         rowSelection="single"
         @first-data-rendered="onGridReady"
         @row-selected="onRowSelected"
+        :isExternalFilterPresent="isExternalFilterPresent"
+        :doesExternalFilterPass="doesExternalFilterPass"
       ></ag-grid-vue>
     </div>
     <div class="information-viewer">
@@ -45,14 +55,15 @@
 
 <script>
   import axios from 'axios';
+
   import '/node_modules/ag-grid-community/dist/styles/ag-grid.css';
   import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css';
   import { AgGridVue } from "ag-grid-vue3";
-
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
+  import '@/assets/style.css'
   import '@/assets/search_results.css'
   import SpectrumViewer from '@/components/SpectrumViewer.vue'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
@@ -67,6 +78,8 @@
         id_info: {},
         still_searching: true,
         BACKEND_LOCATION,
+        includeSinglePointSpectra: true,
+        resultTableViewMode: "all",
         columnDefs: [
           //{field: 'dtxsid', headerName: 'DTXSID'},
           //{field: 'name', headerName:'Compound Name'},
@@ -139,6 +152,37 @@
         anchor.target = '_blank';
         anchor.download = 'nameYourFileHere.csv';
         anchor.click();
+      },
+      isExternalFilterPresent() {
+        return true
+      },
+      doesExternalFilterPass(node) {
+        console.log(node.data)
+
+        let singlePointSpectrum = false
+        if (node.data.comment) {
+          if (!this.includeSinglePointSpectra & (node.data.comment.includes("# PEAKS=1;") | node.data.comment.endsWith("# PEAKS=1"))) {
+            singlePointSpectrum = true
+          }
+        }
+
+        // filter out result types based on selected 
+        let correctResultType = true
+        if (this.resultTableViewMode != "all") {
+          if (node.data.record_type.toLowerCase() != this.resultTableViewMode) {
+            correctResultType = false
+          }
+        }
+
+        return (!singlePointSpectrum) & correctResultType;
+      },
+      updateCheckboxFilters() {
+        console.log(this.includeSinglePointSpectra)
+        this.gridApi.onFilterChanged()
+      },
+      updateTab(tabName) {
+        this.resultTableViewMode = tabName
+        this.gridApi.onFilterChanged()
       }
     },
     async created() {
@@ -178,11 +222,5 @@
 .fake-link {
   color: #0000EE;
   text-decoration: underline;
-}
-
-.description-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
 }
 </style>
