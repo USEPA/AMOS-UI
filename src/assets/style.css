@@ -1,10 +1,10 @@
 /***** GENERAL-USE STYLES *****/
 
 .text-that-can-overflow {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
 
 /***** STYLES FOR TAB BARS *****/
@@ -24,6 +24,11 @@
   background: rgb(14, 105, 147, 0.25);
 }
 
+.tab-bar a.disabled{
+  border: 1px solid #87b4c9;
+  color: #87b4c9;
+  pointer-events: none;
+}
 
 
 /***** AG-GRID TABLE FORMATTING *****/

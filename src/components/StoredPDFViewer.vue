@@ -7,27 +7,27 @@
       </ul>
     </div>
     <div class="tab-bar">
-      <a :class="viewerMode == 'PDF' ? 'active' : ''" @click="updateTab('PDF')">PDF Viewer</a>
-      <a :class="viewerMode == 'CompoundGrid' ? 'active' : ''" @click="updateTab('CompoundGrid')">Compounds (grid)</a>
-      <a :class="viewerMode == 'CompoundTable' ? 'active' : ''" @click="updateTab('CompoundTable')">Compounds (table)</a>
+      <a :class="viewer_mode == 'PDF' ? 'active' : ''" @click="updateTab('PDF')">PDF Viewer</a>
+      <a :class="viewer_mode == 'CompoundGrid' ? 'active' : ''" @click="updateTab('CompoundGrid')">Compounds (grid)</a>
+      <a :class="viewer_mode == 'CompoundTable' ? 'active' : ''" @click="updateTab('CompoundTable')">Compounds (table)</a>
     </div>
-    <iframe v-if="viewerMode == 'PDF'" class="pdf-viewer-box" :src="`${target_pdf_url}`" type="application/pdf"></iframe>
+    <iframe v-if="viewer_mode == 'PDF'" class="pdf-viewer-box" :src="`${target_pdf_url}`" type="application/pdf"></iframe>
 
-    <div class="compound-grid" v-else-if="viewerMode == 'CompoundGrid'">
-      <div v-for="cl in compoundList">
+    <div class="compound-grid" v-else-if="viewer_mode == 'CompoundGrid'">
+      <div v-for="cl in compound_list">
         <CompoundTile :dtxsid="`${cl.dtxsid}`" :preferred_name="`${cl.preferred_name}`" />
       </div>
     </div>
 
     <ag-grid-vue
-      v-else-if="viewerMode == 'CompoundTable'"
+      v-else-if="viewer_mode == 'CompoundTable'"
       class="ag-theme-balham"
       style="height:500px; width:100%"
-      :columnDefs="columnDefs"
-      :rowData="compoundList"
+      :columnDefs="column_defs"
+      :rowData="compound_list"
       rowSelection="single"
     ></ag-grid-vue>
-    <p v-else>Illegal value for 'viewerMode' selected.  Current value is {{viewerMode}}.</p>
+    <p v-else>Illegal value for 'viewer_mode' selected.  Current value is {{viewer_mode}}.</p>
   </div>
 </template>
 
@@ -57,10 +57,10 @@
         pdf_name: "",
         pdf_metadata: "",
         metadata_rows: {},
-        viewerMode: "PDF",
-        compoundList: [],
+        viewer_mode: "PDF",
+        compound_list: [],
         BACKEND_LOCATION,
-        columnDefs: [
+        column_defs: [
           {field:'image', headerName:'Structure', autoHeight: true, width: 120, cellRenderer: (params) => {
             var image = document.createElement('img');
             image.src = 'https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/'+params.data.dtxsid;
@@ -89,22 +89,18 @@
 
     methods: {
       async loadPDF(){
-        //this.target_pdf_url = encodeURI(`http://v2626umcth819.rtord.epa.gov:9415/get_pdf/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
-        //const response = await axios.get(`http://v2626umcth819.rtord.epa.gov:9415/get_pdf_metadata/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
         this.target_pdf_url = encodeURI(`${this.BACKEND_LOCATION}/get_pdf/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
         const response = await axios.get(`${this.BACKEND_LOCATION}/get_pdf_metadata/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
         this.pdf_name = response.data.pdf_name
         this.pdf_metadata = response.data.pdf_metadata
         this.metadata_rows = response.data.metadata_rows
-        //console.log(this.metadata_rows)
       },
       async findDTXSIDs(){
-        //const response = await axios.get(`http://v2626umcth819.rtord.epa.gov:9415/find_dtxsids/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
         const response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
-        this.compoundList = response.data.chemical_ids
+        this.compound_list = response.data.chemical_ids
       },
       updateTab(tabName) {
-        this.viewerMode = tabName
+        this.viewer_mode = tabName
       }
     },
     components: { AgGridVue, CompoundTile }

@@ -1,20 +1,25 @@
 <template>
   <div class="wrap">
     <div class="monograph-box">
-      <p>This is a list of monographs available in the database.  All monographs currently originate from one of two sources:
-      the <a href="https://www.swgdrug.org/monographs.htm">Scientific Working Group</a> and the <a href="https://www.npsdiscovery.org/reports/monographs/">Center for Forensic 
-      Science Reserach & Education</a>.</p>
+      <p>
+        This is a list of monographs available in the database. All monographs currently originate
+        from four sources: the <a href="https://www.swgdrug.org/monographs.htm">Scientific Working 
+        Group</a> (SWG), the <a href="https://www.npsdiscovery.org/reports/monographs/">Center for 
+        Forensic Science Research & Education</a> (CFRSE), <a href="https://www.nmslabs.com/">NMS 
+        Labs</a>, and the <a href="https://www.kgi.edu/academics/schools/school-of-pharmacy-and-health-sciences/">
+        KGI School of Pharmacy and Health Sciences</a>.
+      </p>
       <ag-grid-vue
         class="ag-theme-balham"
         style="height:800px; width:100%"
-        :columnDefs="columnDefs"
-        :rowData="monographInfo"
+        :columnDefs="column_defs"
+        :rowData="monograph_info"
         rowSelection="single"
         @first-data-rendered="onGridReady"
         @row-selected="onRowSelected"
       ></ag-grid-vue>
     </div>
-    <StoredPDFViewer style="width: 48vw;" v-if="anyMonographSelected" :selectedRowData="selectedRowData"/>
+    <StoredPDFViewer style="width: 48vw;" v-if="any_monograph_selected" :selectedRowData="selected_row_data"/>
   </div>
 </template>
 
@@ -36,15 +41,14 @@
     data(){
       return {
         names: [],
-        sourcePath: "",
-        selectedRowData: {},
-        monographInfo: [],
-        anyMonographSelected: false,  // used to avoid having a box with an error pop up if nothing's been selected yet,
+        selected_row_data: {},
+        monograph_info: [],
+        any_monograph_selected: false,  // used to avoid having a box with an error pop up if nothing's been selected yet,
         BACKEND_LOCATION,
-        columnDefs: [
-          {field: 'name', headerName: 'Monograph Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true},
-          {field: 'info_source', headerName: 'Source', sortable: true},
-          {field: 'year_published', headerName: 'Year', sortable: true}
+        column_defs: [
+          {field: 'name', headerName: 'Monograph Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, sort: "asc", flex: 1},
+          {field: 'info_source', headerName: 'Source', sortable: true, width: 250},
+          {field: 'year_published', headerName: 'Year', sortable: true, width: 70}
         ]
       }
     },
@@ -54,8 +58,7 @@
       const path = `${this.BACKEND_LOCATION}/monograph_list`;
       const response = await axios.get(path)
       this.names = response.data.names
-      this.sourcePath = response.data.source_path
-      this.monographInfo = response.data.monograph_info
+      this.monograph_info = response.data.monograph_info
     },
 
     methods: {
@@ -65,8 +68,8 @@
       onRowSelected(event){
         if (event.event){
           console.log(event)
-          this.selectedRowData = event.data
-          this.anyMonographSelected = true
+          this.selected_row_data = event.data
+          this.any_monograph_selected = true
           this.target_pdf_url = `${this.BACKEND_LOCATION}/get_pdf/${event.data.record_source}/${event.data.filename}.pdf`
         }
       }

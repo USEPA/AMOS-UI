@@ -8,48 +8,42 @@
         <button @click="go_big_bar()">Search</button>
       </div>
       <div>
-        <input type="checkbox" id="methods-check" v-model="methods">
-        <label for="methods-check">Methods</label> &emsp;
-        <input type="checkbox" id="mongraph-check" v-model="monographs">
-        <label for="monograph-check">Monographs</label> &emsp;
-        <input type="checkbox" id="spectra-check" v-model="spectra">
-        <label for="spectra-check">Spectra</label>
+        <label><input type="radio" id="all-tab" v-model="initial_results_tab" value="all">All</label>
+        &emsp;
+        <label><input type="radio" id="methods-tab" v-model="initial_results_tab" value="method">Methods</label>
+        &emsp;
+        <label><input type="radio" id="mongraph-tab" v-model="initial_results_tab" value="monograph">Monographs</label>
+        &emsp;
+        <label><input type="radio" id="spectrum-tab" v-model="initial_results_tab" value="spectrum">Spectra</label>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-
-  import axios from 'axios';
-
   export default {
     methods: {
       go_big_bar() {
+        const search_term = this.bigBarSearchTerm.trim()
         const inchikeyRegex = /^([A-Z]{14})-[A-Z]{8}[SN][A-Z]-[A-Z]$/
-        var matchResult = this.bigBarSearchTerm.match(inchikeyRegex)
+        var matchResult = search_term.match(inchikeyRegex)
         if (matchResult) {
           this.$router.push({
-            path: `/find_inchikeys/${this.bigBarSearchTerm}`,
-            query: {methods: this.methods, monographs: this.monographs, spectra: this.spectra}
+            path: `/find_inchikeys/${search_term}`,
+            query: {initial_results_tab: this.initial_results_tab}
           })
           
         } else {
-          this.go_to_search_page()
+          this.$router.push({
+            path: `/search/${search_term}`,
+            query: {initial_results_tab: this.initial_results_tab}
+          })
         }
-      },
-      go_to_search_page() {
-        this.$router.push({
-          path: `/search/${this.bigBarSearchTerm}`,
-          query: {methods: this.methods, monographs: this.monographs, spectra: this.spectra}
-        })
       }
     },
     data() {
       return {
-        methods: true,
-        monographs: true,
-        spectra: true
+        initial_results_tab: "all"
       }
     }
   }

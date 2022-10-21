@@ -25,6 +25,8 @@
   export default {
     methods: {
       go() {
+        this.searchTerm = this.searchTerm.trim()
+        console.log(this.searchTerm)
         const inchikeyRegex = /^([A-Z]{14})-[A-Z]{8}[SN][A-Z]-[A-Z]$/
         var matchResult = this.searchTerm.match(inchikeyRegex)
         if (matchResult) {

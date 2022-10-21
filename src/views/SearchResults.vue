@@ -3,7 +3,7 @@
     <div class="search-results">
       <div class="results-header">
         <h1 v-if="still_searching" class="text-that-can-overflow">Searching for "{{$route.params.search_term}}"...</h1>
-        <h1 v-else class="text-that-can-overflow">Search Results for "{{$route.params.search_term}}"</h1>
+        <h1 v-else class="text-that-can-overflow">{{ results.length }} Results for "{{$route.params.search_term}}"</h1>
         <br/>
         <div class="chemical-box">
           <div class="chemical-image-highlight">
@@ -22,14 +22,14 @@
             </ul>
           </div>
         </div>
-        <input type="checkbox" id="single-point-spectra" v-model="includeSinglePointSpectra" @change="updateCheckboxFilters">
+        <input type="checkbox" id="single-point-spectra" v-model="include_single_point_spectra" @change="updateCheckboxFilters">
         <label for="single-point-spectra">Include Single Point Spectra</label>
       </div>
       <div class="tab-bar">
-        <a :class="resultTableViewMode == 'all' ? 'active' : ''" @click="updateTab('all')">All Results</a>
-        <a :class="resultTableViewMode == 'spectrum' ? 'active' : ''" @click="updateTab('spectrum')">Spectra</a>
-        <a :class="resultTableViewMode == 'monograph' ? 'active' : ''" @click="updateTab('monograph')">Monographs</a>
-        <a :class="resultTableViewMode == 'method' ? 'active' : ''" @click="updateTab('method')">Methods</a>
+        <a :class="result_table_view_mode == 'all' ? 'active' : ''" @click="updateTab('all')">All Results ({{results.length}})</a>
+        <a :class="determineTabBarClass('spectrum')" @click="updateTab('spectrum')">Spectra ({{record_type_counts.spectrum}})</a>
+        <a :class="determineTabBarClass('monograph')" @click="updateTab('monograph')">Monographs ({{record_type_counts.monograph}})</a>
+        <a :class="determineTabBarClass('method')" @click="updateTab('method')">Methods ({{record_type_counts.method}})</a>
       </div>
       <ag-grid-vue
         class="ag-theme-balham"
@@ -46,9 +46,9 @@
     </div>
     <div class="information-viewer">
       <p class="info-paragraph" v-if="view_type == 'none'">Click on a row in the table to the left to display either a spectrum (if available) or a PDF file in this space.</p>
-      <SpectrumViewer v-else-if="view_type == 'Spectrum'" :selectedRowData="selectedRowData"/>
-      <StoredPDFViewer v-else-if="view_type == 'PDF'" style="width: 50vw;" :selectedRowData="selectedRowData"/>
-      <p class="info-paragraph" v-else>This database does not contain anything for this record.  Click the "External Link" text to be directed to the source.</p>
+      <SpectrumViewer v-else-if="view_type == 'Spectrum'" :selectedRowData="selected_row_data"/>
+      <StoredPDFViewer v-else-if="view_type == 'PDF'" style="width: 50vw;" :selectedRowData="selected_row_data"/>
+      <p class="info-paragraph" v-else>This database does not contain anything for this record.  Click the hyperlink in the "Record Type" column to be directed to the source.</p>
     </div>
   </div>
 </template>
@@ -73,32 +73,29 @@
     data(){
       return {
         view_type: "none",
-        selectedRowData: {},
+        selected_row_data: {},
         results: [],
         id_info: {},
         still_searching: true,
         BACKEND_LOCATION,
-        includeSinglePointSpectra: true,
-        resultTableViewMode: "all",
+        include_single_point_spectra: true,
+        result_table_view_mode: "all",
+        record_type_counts: {method: 0, monograph: 0, spectrum: 0},
         columnDefs: [
-          //{field: 'dtxsid', headerName: 'DTXSID'},
-          //{field: 'name', headerName:'Compound Name'},
-          //{field: 'cas_number', headerName:'CASRN'},
-          //{field: 'inchikey', headerName: 'InChIKey'},
-          {field: 'spectrum_type', headerName: 'Spectrum Type', sortable: true, sort: 'asc', filter: 'agSetColumnFilter', width: 170, suppressSizeToFit: true},
+          {field: 'spectrum_type', headerName: 'Spectrum Type', sortable: true, sort: 'asc', filter: 'agSetColumnFilter', width: 150, suppressSizeToFit: true},
           {field: 'source', headerName: 'Source', sortable: true, width: 220, suppressSizeToFit: true, cellRenderer: params => {
             return "<a href='" + params.data.link + "' target='_blank'>" + params.data.source + "</a>";
           }},
           {field: 'record_type', headerName: 'Record Type', filter: 'agSetColumnFilter', width: 150, suppressSizeToFit: true,
             cellRenderer: params => {
               if (params.data.data_type !== null) {
-                return params.data.record_type + " (<span class='fake-link'>" + params.data.data_type + "</span>)"
+                return "<span class='fake-link'>" + params.data.record_type + "</span>"
               } else {
-                return params.data.record_type + " (<a href='" + params.data.link + "' target='_blank'>External Link</a>)"
+                return "<a href='" + params.data.link + "' target='_blank'>" + params.data.record_type + " Link</a>"
               }
             }
           },
-          {field: 'comment', headerName: 'Information',
+          {field: 'comment', headerName: 'Information', flex: 1,
             cellRenderer: params => {
               if (params.data.comment) {
                 return '<span title="' + params.data.comment + '">' + params.data.comment + '</span>'
@@ -133,11 +130,9 @@
         if (event.event){
           this.view_type = event.data.data_type
           if (event.data.data_type == "Spectrum"){
-            this.selectedRowData = event.data
-            console.log(this.selectedRowData)
+            this.selected_row_data = event.data
           } else if (event.data.data_type == "PDF"){
-            this.selectedRowData = event.data
-            console.log(this.selectedRowData)
+            this.selected_row_data = event.data
           }
         }
       },
@@ -157,19 +152,17 @@
         return true
       },
       doesExternalFilterPass(node) {
-        console.log(node.data)
-
         let singlePointSpectrum = false
         if (node.data.comment) {
-          if (!this.includeSinglePointSpectra & (node.data.comment.includes("# PEAKS=1;") | node.data.comment.endsWith("# PEAKS=1"))) {
+          if (!this.include_single_point_spectra & (node.data.comment.includes("# PEAKS=1;") | node.data.comment.endsWith("# PEAKS=1"))) {
             singlePointSpectrum = true
           }
         }
 
         // filter out result types based on selected 
         let correctResultType = true
-        if (this.resultTableViewMode != "all") {
-          if (node.data.record_type.toLowerCase() != this.resultTableViewMode) {
+        if (this.result_table_view_mode != "all") {
+          if (node.data.record_type.toLowerCase() != this.result_table_view_mode) {
             correctResultType = false
           }
         }
@@ -177,21 +170,41 @@
         return (!singlePointSpectrum) & correctResultType;
       },
       updateCheckboxFilters() {
-        console.log(this.includeSinglePointSpectra)
         this.gridApi.onFilterChanged()
       },
       updateTab(tabName) {
-        this.resultTableViewMode = tabName
+        this.result_table_view_mode = tabName
         this.gridApi.onFilterChanged()
+      },
+      determineTabBarClass(tab_label) {
+        if (this.record_type_counts[tab_label] == 0) {
+          return "disabled"
+        } else if (this.result_table_view_mode == tab_label) {
+          return "active"
+        } else {
+          return ""
+        }
       }
     },
     async created() {
-      //const path = `http://v2626umcth819.rtord.epa.gov:9415/search/${this.$route.params.search_term}`;
       const path = `${this.BACKEND_LOCATION}/search/${this.$route.params.search_term}`;
       const response = await axios.get(path)
       this.results = response.data.results
       this.id_info = response.data.id_info
       this.still_searching = false
+
+      console.log(response.data.record_type_counts)
+      this.record_type_counts = response.data.record_type_counts
+      //for(record_type in ["Method", "Monograph", "Spectrum"]) {
+      //  if (this.record_type_counts)
+      //}
+
+      if (this.$route.query.initial_results_tab) {
+        const initial_tab = this.$route.query.initial_results_tab
+        if (["spectrum", "monograph", "method"].includes(initial_tab.toLowerCase())) {
+          this.result_table_view_mode = initial_tab
+        }
+      }
     },
     components: {
       AgGridVue,

@@ -4,22 +4,22 @@
       <p></p>
       <div>
         <label for="search-dtxsid">DTXSID</label> &nbsp;
-        <input @keyup.enter="methodSearch()" type="text" v-model="methodSearchDTXSID" name="search-dtxsid">
+        <input @keyup.enter="methodSearch()" type="text" v-model="method_search_DTXSID" name="search-dtxsid">
         <button @click="methodSearch()">Method Search</button>
       </div>
-      <p>The table below lists methods for compounds that are similar to {{ currentDTXSID }}.</p>
+      <p>The table below lists methods for compounds that are similar to {{ current_DTXSID }}.</p>
       <div id="grid-theme-wrapper" class="modded-theme">
         <ag-grid-vue
           class="ag-theme-balham"
           style="height:600px; width:100%"
-          :columnDefs="columnDefs"
+          :columnDefs="column_defs"
           :rowData="results"
           rowSelection="single"
           @row-selected="onRowSelected"
         ></ag-grid-vue>
       </div>
     </div>
-    <StoredPDFViewer style="width: 48vw;" v-if="anyMethodSelected" :selectedRowData="selectedRowData"/>
+    <StoredPDFViewer style="width: 48vw;" v-if="any_method_selected" :selectedRowData="selected_row_data"/>
   </div>
 </template>
 
@@ -42,10 +42,11 @@
       return {
         BACKEND_LOCATION,
         results: [],
-        anyMethodSelected: false,
-        selectedRowData: {},
-        methodSearchDTXSID: "",
-        columnDefs: [
+        any_method_selected: false,
+        selected_row_data: {},
+        method_search_DTXSID: "",
+        current_DTXSID: "",
+        column_defs: [
           {field: "method_name", headerName: "Method Name", cellClass: "text-that-can-overflow"},
           {field: "source", headerName: "Source", suppressSizeToFit: true},
           {field: "dtxsid", headerName: "Similar DTXSID", width: 125, suppressSizeToFit: true},
@@ -63,9 +64,10 @@
     },
     methods: {
       async methodSearch() {
-        const path = `${this.BACKEND_LOCATION}/get_similar_methods/${this.methodSearchDTXSID}`;
+        this.method_search_DTXSID = this.method_search_DTXSID.trim()
+        const path = `${this.BACKEND_LOCATION}/get_similar_methods/${this.method_search_DTXSID}`;
         const response = await axios.get(path)
-        this.currentDTXSID = this.methodSearchDTXSID
+        this.current_DTXSID = this.method_search_DTXSID
         this.results = response.data.results
       },
       onGridReady(params) {
@@ -74,8 +76,8 @@
       onRowSelected(event){
         if (event.event){
           console.log(event)
-          this.selectedRowData = event.data
-          this.anyMethodSelected = true
+          this.selected_row_data = event.data
+          this.any_method_selected = true
           this.target_pdf_url = `${this.BACKEND_LOCATION}/get_pdf/${event.data.source}/${event.data.internal_id}`
           console.log(this.target_pdf_url)
         }
