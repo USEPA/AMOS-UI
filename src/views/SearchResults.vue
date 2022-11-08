@@ -83,10 +83,16 @@
         record_type_counts: {method: 0, monograph: 0, spectrum: 0},
         columnDefs: [
           {field: 'spectrum_type', headerName: 'Spectrum Type', sortable: true, sort: 'asc', filter: 'agSetColumnFilter', width: 150, suppressSizeToFit: true},
-          {field: 'source', headerName: 'Source', sortable: true, width: 220, suppressSizeToFit: true, cellRenderer: params => {
-            return "<a href='" + params.data.link + "' target='_blank'>" + params.data.source + "</a>";
+          {field: 'source', headerName: 'Source', sortable: true, width: 110, suppressSizeToFit: true, cellRenderer: params => {
+            if (params.data.source == "SWG") {
+              return "<a href='" + params.data.link + "' target='_blank' title='Scientific Working Group' class='has-hover-text'>" + params.data.source + "</a>";
+            } else if (params.data.source == "ECM") {
+              return "<a href='" + params.data.link + "' target='_blank' title='Environmental Chemistry Methods' class='has-hover-text'>" + params.data.source + "</a>";
+            } else {
+              return "<a href='" + params.data.link + "' target='_blank'>" + params.data.source + "</a>";
+            }
           }},
-          {field: 'record_type', headerName: 'Record Type', filter: 'agSetColumnFilter', width: 150, suppressSizeToFit: true,
+          {field: 'record_type', headerName: 'Record Type', filter: 'agSetColumnFilter', width: 110, suppressSizeToFit: true,
             cellRenderer: params => {
               if (params.data.data_type !== null) {
                 return "<span class='fake-link'>" + params.data.record_type + "</span>"
@@ -236,4 +242,9 @@
   color: #0000EE;
   text-decoration: underline;
 }
+
+.has-hover-text {
+  text-decoration: underline dashed;
+}
+
 </style>

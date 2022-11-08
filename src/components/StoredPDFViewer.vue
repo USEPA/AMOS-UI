@@ -61,16 +61,26 @@
         compound_list: [],
         BACKEND_LOCATION,
         column_defs: [
-          {field:'image', headerName:'Structure', autoHeight: true, width: 120, cellRenderer: (params) => {
+          {field:'image', headerName:'Structure', autoHeight: true, width: 100, cellRenderer: (params) => {
             var image = document.createElement('img');
             image.src = 'https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/'+params.data.dtxsid;
             image.style = "width:70px;height:70px;";
             return image;
           }},
-          {field: 'dtxsid', headerName: 'DTXSID', width: 140, cellRenderer: params => {
+          {field: 'dtxsid', headerName: 'DTXSID', width: 120, cellRenderer: params => {
             return "<a href='https://comptox.epa.gov/dashboard/chemical/details/" + params.data.dtxsid + "' target='_blank'>" + params.data.dtxsid + "</a>"
           }},
-          {field: 'casrn', headerName: 'CASRN', width: 100},
+          {field: 'links', headerName: 'Links', cellRenderer: params => {
+            const link = document.createElement("a");
+            link.href = this.$router.resolve(`/search/${params.data.dtxsid}`).href;
+            link.innerText = "Search";
+            link.addEventListener("click", e => {
+              e.preventDefault();
+              this.$router.push(`/search/${params.data.dtxsid}`);
+            });
+            return link;
+          }},
+          {field: 'casrn', headerName: 'CASRN', width: 90},
           {field: 'preferred_name', headerName:'Compound Name', flex: 1}
         ]
       }
@@ -78,6 +88,8 @@
     props: ['selectedRowData'],
     watch: {
       selectedRowData(){
+        this.metadata_rows = {}
+        this.pdf_name = ""
         this.loadPDF()
         this.findDTXSIDs()
       }
@@ -92,7 +104,6 @@
         this.target_pdf_url = encodeURI(`${this.BACKEND_LOCATION}/get_pdf/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
         const response = await axios.get(`${this.BACKEND_LOCATION}/get_pdf_metadata/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
         this.pdf_name = response.data.pdf_name
-        this.pdf_metadata = response.data.pdf_metadata
         this.metadata_rows = response.data.metadata_rows
       },
       async findDTXSIDs(){

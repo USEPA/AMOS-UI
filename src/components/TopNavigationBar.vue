@@ -10,6 +10,8 @@
       &emsp;
       <router-link to="/monograph_list">Monograph List</router-link>
       &emsp;
+      <router-link to="/methods_list">Methods List</router-link>
+      &emsp;
       <router-link to="/similar_method_search">Similar Method Search</router-link>
       &emsp;
       <router-link to="/about">About this App</router-link>

@@ -7,7 +7,8 @@ const routes = [
     {path: "/search/:search_term", name: "Search Results", component: ()=>import('../views/SearchResults.vue')},
     {path: "/monograph_list", name: "Monograph List", component: ()=>import('../views/MonographList.vue')},
     {path: "/find_inchikeys/:inchikey", name: "Inchikey Search", component: ()=>import('../views/InchikeyRedirect.vue')},
-    {path: "/similar_method_search", name: "Similar Method Search", component: ()=>import('../views/SimilarMethodSearch.vue')}
+    {path: "/similar_method_search", name: "Similar Methods Search", component: ()=>import('../views/SimilarMethodSearch.vue')},
+    {path: "/methods_list", name: "Methods List", component: ()=>import('../views/MethodList.vue')}
   ]
 
 const router = createRouter({
