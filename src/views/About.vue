@@ -8,6 +8,9 @@
       <li>Monographs that detail the results of an in-depth analysis.  These often contain multiple spectra of varying types.</li>
       <li>Analytical methods which document testing procedures for one or more compounds.</li>
     </ul>
+    <br />
+    <br />
+    <p>This app was last updated on 2022-11-22.</p>
     <label class="toggle-switch">
       <input type="checkbox" class="toggle-switch-input" checked>
       <span class="toggle-slider"></span>

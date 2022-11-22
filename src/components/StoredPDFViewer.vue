@@ -32,17 +32,17 @@
 </template>
 
 <script>
-  import axios from 'axios';
+  import axios from 'axios'
 
   import '@/assets/style.css'
-  import '@/assets/search_results.css';
-  import { BACKEND_LOCATION } from '@/assets/store';
+  import '@/assets/search_results.css'
+  import { BACKEND_LOCATION } from '@/assets/store'
 
-  import CompoundTile from '@/components/CompoundTile.vue';
+  import CompoundTile from '@/components/CompoundTile.vue'
 
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css';
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css';
-  import { AgGridVue } from "ag-grid-vue3";
+  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
+  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import { AgGridVue } from "ag-grid-vue3"
 
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'

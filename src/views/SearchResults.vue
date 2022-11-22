@@ -31,6 +31,7 @@
         <a :class="determineTabBarClass('monograph')" @click="updateTab('monograph')">Monographs ({{record_type_counts.monograph}})</a>
         <a :class="determineTabBarClass('method')" @click="updateTab('method')">Methods ({{record_type_counts.method}})</a>
       </div>
+      <!--:tooltipShowDelay="tooltipShowDelay"-->
       <ag-grid-vue
         class="ag-theme-balham"
         style="height:600px; width:100%"
@@ -54,11 +55,11 @@
 </template>
 
 <script>
-  import axios from 'axios';
+  import axios from 'axios'
 
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css';
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css';
-  import { AgGridVue } from "ag-grid-vue3";
+  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
+  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
@@ -67,7 +68,7 @@
   import '@/assets/search_results.css'
   import SpectrumViewer from '@/components/SpectrumViewer.vue'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
-  import { BACKEND_LOCATION } from '@/assets/store';
+  import { BACKEND_LOCATION } from '@/assets/store'
 
   export default {
     data(){
@@ -77,6 +78,7 @@
         results: [],
         id_info: {},
         still_searching: true,
+        tooltipShowDelay: 500,
         BACKEND_LOCATION,
         include_single_point_spectra: true,
         result_table_view_mode: "all",
@@ -101,15 +103,8 @@
               }
             }
           },
-          {field: 'comment', headerName: 'Information', flex: 1,
-            cellRenderer: params => {
-              if (params.data.comment) {
-                return '<span title="' + params.data.comment + '">' + params.data.comment + '</span>'
-              } else {
-                return "None"
-              }
-            }
-          }
+          {field: 'comment', headerName: 'Information', flex: 1, tooltipField: 'comment'},
+          {field: 'link', headerName: 'Link', hide: true}
         ]
       };
     },
@@ -126,11 +121,11 @@
           if (this.$route.query.methods === "true"){filters_to_use.push("Method")}
           if (this.$route.query.monographs === "true"){filters_to_use.push("Monograph")}
           if (this.$route.query.spectra === "true"){filters_to_use.push("Spectrum")}
-          const rec_instance = this.gridApi.getFilterInstance('record_type');
-          rec_instance.setModel({values: filters_to_use});
+          const rec_instance = this.gridApi.getFilterInstance('record_type')
+          rec_instance.setModel({values: filters_to_use})
         }
-        this.gridApi.onFilterChanged();   //regenerates the table with the filter settings
-        this.gridApi.sizeColumnsToFit();
+        this.gridApi.onFilterChanged()   //regenerates the table with the filter settings
+        this.gridApi.sizeColumnsToFit()
       },
       onRowSelected(event) {
         if (event.event){
@@ -143,16 +138,7 @@
         }
       },
       downloadResultsAsCSV() {
-        let csv = "Spectrum Type,Source,Link,Record Type\n";
-        this.results.forEach((row) =>{
-          csv += [row.spectrum_type, row.source, row.link, row.record_type].join(",")
-          csv += "\n"
-        })
-        const anchor = document.createElement('a');
-        anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-        anchor.target = '_blank';
-        anchor.download = 'nameYourFileHere.csv';
-        anchor.click();
+        this.gridApi.exportDataAsCsv({columnKeys: ["spectrum_type", "source", "link", "record_type", "comment"]});
       },
       isExternalFilterPresent() {
         return true
@@ -173,7 +159,7 @@
           }
         }
 
-        return (!singlePointSpectrum) & correctResultType;
+        return (!singlePointSpectrum) & correctResultType
       },
       updateCheckboxFilters() {
         this.gridApi.onFilterChanged()
@@ -193,7 +179,7 @@
       }
     },
     async created() {
-      const path = `${this.BACKEND_LOCATION}/search/${this.$route.params.search_term}`;
+      const path = `${this.BACKEND_LOCATION}/search/${this.$route.params.search_term}`
       const response = await axios.get(path)
       this.results = response.data.results
       this.id_info = response.data.id_info

@@ -3,6 +3,7 @@
     <ag-grid-vue
       class="ag-theme-balham"
       style="height:600px; width:100%"
+      :defaultColDef="default_column_def"
       :columnDefs="column_defs"
       :rowData="results"
       rowSelection="single"
@@ -12,48 +13,37 @@
 </template>
 
 <script>
-  import axios from 'axios';
+  import axios from 'axios'
 
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css';
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css';
-  import { AgGridVue } from "ag-grid-vue3";
+  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
+  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { BACKEND_LOCATION } from '@/assets/store';
+  import { BACKEND_LOCATION } from '@/assets/store'
 
   export default {
     data() {
       return {
         BACKEND_LOCATION,
         results: [],
+        default_column_def: {resizable: true, filter: 'agTextColumnFilter', floatingFilter: true},
         column_defs: [
-          {field: "method_number", headerName: "Method #", filter: 'agTextColumnFilter', floatingFilter: true},
-          {field: "method_name", headerName: "Name", filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
-            if (params.data.method_name) {
-              return '<span title="' + params.data.method_name + '">' + params.data.method_name + '</span>'
-            } else {
-              return ""
-            }
-          }},
-          {field: "year_published", headerName: "Year", width: 90, filter: 'agTextColumnFilter', floatingFilter: true},
-          {field: "spectrum_type", headerName: "Methodology", width: 110, filter: 'agTextColumnFilter', floatingFilter: true},
-          {field: "source", headerName: "Source", width: 100, filter: 'agTextColumnFilter', floatingFilter: true},
-          {field: "analyte", headerName: "Analyte", filter: 'agTextColumnFilter', floatingFilter: true},
-          {field: "matrix", headerName: "Matrix", filter: 'agTextColumnFilter', floatingFilter: true},
-          {field: "comment", headerName: "Synopsis", filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
-            if (params.data.comment) {
-              return '<span title="' + params.data.comment + '">' + params.data.comment + '</span>'
-            } else {
-              return ""
-            }
-          }}
+          {field: "method_number", headerName: "Method #"},
+          {field: "method_name", headerName: "Name", tooltipField: 'method_name'},
+          {field: "year_published", headerName: "Year", width: 90,},
+          {field: "spectrum_type", headerName: "Methodology", width: 115},
+          {field: "source", headerName: "Source", width: 100},
+          {field: "analyte", headerName: "Analyte", tooltipField: 'analyte'},
+          {field: "matrix", headerName: "Matrix"},
+          {field: "comment", headerName: "Synopsis", flex: 1, tooltipField: 'comment'}
         ]
       }
     },
     async created() {
-      const path = `${this.BACKEND_LOCATION}/methods_list`;
+      const path = `${this.BACKEND_LOCATION}/methods_list`
       const response = await axios.get(path)
       this.results = response.data.results
     },

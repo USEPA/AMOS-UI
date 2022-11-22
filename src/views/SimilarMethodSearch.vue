@@ -8,8 +8,8 @@
         <button @click="methodSearch()">Method Search</button>
       </div>
       <p>The table below lists methods for compounds that are similar to {{ current_DTXSID }}.</p>
-      <p>Bolded rows refer to methods which contain the chemical being searched.</p> 
-      <p>Select a row in the table to view the method on the right half of the screen.</p> 
+      <p>Select a row in the table to view the method on the right half of the screen.  Bolded rows refer to methods which contain the chemical being searched.</p>
+      <p>Columns can be hidden by clicking on the menu icon seen when hovering over a column name -- this brings up a menu where column visibility can be toggled.</p> 
       <div id="grid-theme-wrapper" class="modded-theme">
         <ag-grid-vue
           class="ag-theme-balham"
@@ -29,18 +29,18 @@
 </template>
 
 <script>
-  import axios from 'axios';
+  import axios from 'axios'
 
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css';
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css';
-  import { AgGridVue } from "ag-grid-vue3";
+  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
+  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import '@/assets/style.css'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
-  import { BACKEND_LOCATION } from '@/assets/store';
+  import { BACKEND_LOCATION } from '@/assets/store'
   
   export default{
     data() {
@@ -59,11 +59,12 @@
             return `<span title='${title_text}'>${this.ids_to_method_names[params.value]}</span>`
           }},
           {field: "source", headerName: "Source", width: 90, suppressSizeToFit: true, sortable: true, aggFunc: 'first'},
+          {field: "spectrum_type", headerName: "Methodology", width: 120, suppressSizeToFit: true, sortable: true, aggFunc: 'first'},
           {field: "year_published", headerName: "Year", width: 70, suppressSizeToFit: true, sortable: true, aggFunc: 'first'},
           {field: "similarity", headerName: "Similarity", width: 95, suppressSizeToFit: true, sortable: true, aggFunc: 'max', cellRenderer:'agGroupCellRenderer', cellRendererParams: {
             innerRenderer: params => {return params.value.toFixed(2)}
           }},
-          {field: "dtxsid", headerName: "Similar DTXSID", width: 125, suppressSizeToFit: true},
+          {field: "dtxsid", headerName: "Similar DTXSID", width: 125, suppressSizeToFit: true, sortable: true},
           {field: "compound_name", headerName: "Compound Name"}
         ],
         rowClassRules: {
@@ -77,9 +78,9 @@
         },
         autoGroupColumnDef: {headerName: 'Method Name (# compounds)', width: 210, sortable: true, comparator: (valueA, valueB, nodeA, nodeB, isDescending) => {
           // Need to be able to sort the groups by method name, not internal id, so map them and then compare.
-          const nameA = this.ids_to_method_names[valueA];
-          const nameB = this.ids_to_method_names[valueB];
-          return nameA == nameB ? 0 : nameA > nameB ? 1 : -1;
+          const nameA = this.ids_to_method_names[valueA]
+          const nameB = this.ids_to_method_names[valueB]
+          return nameA == nameB ? 0 : nameA > nameB ? 1 : -1
         }}
       }
     },
@@ -94,7 +95,7 @@
       async methodSearch() {
         this.any_method_selected = false
         this.method_search_DTXSID = this.method_search_DTXSID.trim()
-        const path = `${this.BACKEND_LOCATION}/get_similar_methods/${this.method_search_DTXSID}`;
+        const path = `${this.BACKEND_LOCATION}/get_similar_methods/${this.method_search_DTXSID}`
         const response = await axios.get(path)
         this.current_DTXSID = this.method_search_DTXSID
         this.results = response.data.results
@@ -105,8 +106,8 @@
       },
       onRowSelected(event){
         if (event.event){
-          var new_method_id = "";
-          var source = "";
+          var new_method_id = ""
+          var source = ""
           // There are two possibilities: either a group header row has been slected, or not.  In the former case, the
           // event.data field will not exist, but it does exist in the latter case, so it's useful for distinguishing
           // the two.

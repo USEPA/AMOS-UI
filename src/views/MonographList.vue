@@ -24,18 +24,18 @@
 </template>
 
 <script>
-  import axios from 'axios';
+  import axios from 'axios'
   
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css';
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css';
-  import { AgGridVue } from "ag-grid-vue3";
+  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
+  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import '@/assets/style.css'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
-  import { BACKEND_LOCATION } from '@/assets/store';
+  import { BACKEND_LOCATION } from '@/assets/store'
 
   export default {
     data(){
@@ -54,8 +54,7 @@
     },
 
     async created() {
-      //const path = `http://v2626umcth819.rtord.epa.gov:9415/monograph_list`;
-      const path = `${this.BACKEND_LOCATION}/monograph_list`;
+      const path = `${this.BACKEND_LOCATION}/monograph_list`
       const response = await axios.get(path)
       this.names = response.data.names
       this.monograph_info = response.data.monograph_info
