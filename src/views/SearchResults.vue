@@ -7,16 +7,16 @@
         <br/>
         <div class="chemical-box">
           <div class="chemical-image-highlight">
-              <img class="chemical-image" :src="`https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/${id_info.dtxsid}`"/>
+              <img class="chemical-image" :src="`https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/${compound_info.dtxsid}`"/>
           </div>
           <div class="chemical-info">
             <ul style="list-style-type: none;">
-              <li><strong>(Preferred) Name:</strong> {{ id_info.preferred_name }} </li>
-              <li><strong>DTXSID:</strong> <a :href="`https://comptox.epa.gov/dashboard/chemical/details/${id_info.dtxsid}`">{{ id_info.dtxsid }}</a> </li>
-              <li><strong>CASRN:</strong> {{ id_info.casrn }} </li>
-              <li><strong>InChIKey:</strong> {{ id_info.inchikey }} </li>
-              <li><strong>Molecular Formula:</strong> {{ id_info.molecular_formula }} </li>
-              <li><strong>Mass:</strong> {{ id_info.molecular_weight }} </li>
+              <li><strong>(Preferred) Name:</strong> {{ compound_info.preferred_name }} </li>
+              <li><strong>DTXSID:</strong> <a :href="`https://comptox.epa.gov/dashboard/chemical/details/${compound_info.dtxsid}`">{{ compound_info.dtxsid }}</a> </li>
+              <li><strong>CASRN:</strong> {{ compound_info.casrn }} </li>
+              <li><strong>InChIKey:</strong> {{ compound_info.inchikey }} </li>
+              <li><strong>Molecular Formula:</strong> {{ compound_info.molecular_formula }} </li>
+              <li><strong>Mass:</strong> {{ compound_info.molecular_weight }} </li>
               <li>&nbsp;</li>
               <li><button v-if="!still_searching" @click="downloadResultsAsCSV">Download Results</button></li>
             </ul>
@@ -48,7 +48,7 @@
     <div class="information-viewer">
       <p class="info-paragraph" v-if="view_type == 'none'">Click on a row in the table to the left to display either a spectrum (if available) or a PDF file in this space.</p>
       <SpectrumViewer v-else-if="view_type == 'Spectrum'" :selectedRowData="selected_row_data"/>
-      <StoredPDFViewer v-else-if="view_type == 'PDF'" style="width: 50vw;" :selectedRowData="selected_row_data"/>
+      <StoredPDFViewer v-else-if="view_type == 'PDF'" style="width: 50vw;" :selectedRowData="selected_row_data" :recordType="selected_row_data.record_type"/>
       <p class="info-paragraph" v-else>This database does not contain anything for this record.  Click the hyperlink in the "Record Type" column to be directed to the source.</p>
     </div>
   </div>
@@ -76,7 +76,7 @@
         view_type: "none",
         selected_row_data: {},
         results: [],
-        id_info: {},
+        compound_info: {},
         still_searching: true,
         tooltipShowDelay: 500,
         BACKEND_LOCATION,
@@ -84,7 +84,7 @@
         result_table_view_mode: "all",
         record_type_counts: {method: 0, monograph: 0, spectrum: 0},
         columnDefs: [
-          {field: 'spectrum_type', headerName: 'Spectrum Type', sortable: true, sort: 'asc', filter: 'agSetColumnFilter', width: 150, suppressSizeToFit: true},
+          {field: 'spectrum_types', headerName: 'Spectrum Type', sortable: true, sort: 'asc', filter: 'agSetColumnFilter', width: 150, suppressSizeToFit: true},
           {field: 'source', headerName: 'Source', sortable: true, width: 110, suppressSizeToFit: true, cellRenderer: params => {
             if (params.data.source == "SWG") {
               return "<a href='" + params.data.link + "' target='_blank' title='Scientific Working Group' class='has-hover-text'>" + params.data.source + "</a>";
@@ -103,7 +103,7 @@
               }
             }
           },
-          {field: 'comment', headerName: 'Information', flex: 1, tooltipField: 'comment'},
+          {field: 'description', headerName: 'Information', flex: 1, tooltipField: 'comment'},
           {field: 'link', headerName: 'Link', hide: true}
         ]
       };
@@ -116,6 +116,8 @@
         //const st_instance = this.gridApi.getFilterInstance('spectrum_type');
         //st_instance.setModel({values: ['GC-MS', 'LC-MS+', 'LC-MS-', 'LC-MS-Unknown']});
 
+        // TODO: there's gotta be a better way to handle the logic below, not sure it's even needed
+        // with the tabs anymore...
         var filters_to_use = []
         if (typeof(this.$route.query.monographs) === "string" && typeof(this.$route.query.monographs) === "string" && typeof(this.$route.query.spectra) === "string"){
           if (this.$route.query.methods === "true"){filters_to_use.push("Method")}
@@ -130,6 +132,7 @@
       onRowSelected(event) {
         if (event.event){
           this.view_type = event.data.data_type
+          //console.log(event.data)
           if (event.data.data_type == "Spectrum"){
             this.selected_row_data = event.data
           } else if (event.data.data_type == "PDF"){
@@ -181,15 +184,11 @@
     async created() {
       const path = `${this.BACKEND_LOCATION}/search/${this.$route.params.search_term}`
       const response = await axios.get(path)
-      this.results = response.data.results
-      this.id_info = response.data.id_info
+      this.results = response.data.records
+      this.compound_info = response.data.compound_info
       this.still_searching = false
 
-      console.log(response.data.record_type_counts)
       this.record_type_counts = response.data.record_type_counts
-      //for(record_type in ["Method", "Monograph", "Spectrum"]) {
-      //  if (this.record_type_counts)
-      //}
 
       if (this.$route.query.initial_results_tab) {
         const initial_tab = this.$route.query.initial_results_tab

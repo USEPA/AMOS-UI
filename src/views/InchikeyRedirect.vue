@@ -3,7 +3,7 @@
     <p v-if="exact_match">An exact match for the InChIKey "<router-link :to="`/search/${this.$route.params.inchikey}`">{{$route.params.inchikey}}</router-link>" was found.  However, several other InChIKeys with the same first block were discovered, if you were looking for one of those.</p>
     <p v-else>An exact match for the InChIKey "{{$route.params.inchikey}}" was not found.  However, several other InChIKeys with the same first block were discovered, if you were looking for one of those.</p>
     <ul>
-      <li v-for="ui in unique_inchikeys"><router-link :to="`/search/${ui}`">{{ui}}</router-link></li>
+      <li v-for="ui in unique_inchikeys"><router-link :to="`/search/${ui.inchikey}`">{{ui.inchikey}}</router-link> ({{ui.preferred_name}})</li>
   </ul>
   </div>
   <div v-else>
@@ -26,7 +26,8 @@
       }
     },
     async created() {
-      //const response = await axios.get(`http://v2626umcth819.rtord.epa.gov:9415/find_inchikeys/${this.$route.params.inchikey}`)
+      /* TODO: Fix the logic two handle two cases better: (a) one InChIKey found that matches the
+      first block, but doesn't match the full key, and (b) zero inchikeys found. */
       const response = await axios.get(`${this.BACKEND_LOCATION}/find_inchikeys/${this.$route.params.inchikey}`)
       this.search_complete = true
       if (response.data.unique_inchikeys.length == 1 & response.data.inchikey_present){

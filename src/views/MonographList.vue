@@ -19,7 +19,7 @@
         @row-selected="onRowSelected"
       ></ag-grid-vue>
     </div>
-    <StoredPDFViewer style="width: 48vw;" v-if="any_monograph_selected" :selectedRowData="selected_row_data"/>
+    <StoredPDFViewer style="width: 48vw;" v-if="any_monograph_selected" :selectedRowData="selected_row_data" recordType="monograph"/>
   </div>
 </template>
 
@@ -46,8 +46,8 @@
         any_monograph_selected: false,  // used to avoid having a box with an error pop up if nothing's been selected yet,
         BACKEND_LOCATION,
         column_defs: [
-          {field: 'name', headerName: 'Monograph Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, sort: "asc", flex: 1},
-          {field: 'info_source', headerName: 'Source', sortable: true, width: 250},
+          {field: 'monograph_name', headerName: 'Monograph Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, sort: "asc", flex: 1},
+          {field: 'sub_source', headerName: 'Source', sortable: true, width: 250},
           {field: 'year_published', headerName: 'Year', sortable: true, width: 70}
         ]
       }
@@ -57,7 +57,7 @@
       const path = `${this.BACKEND_LOCATION}/monograph_list`
       const response = await axios.get(path)
       this.names = response.data.names
-      this.monograph_info = response.data.monograph_info
+      this.monograph_info = response.data.results
     },
 
     methods: {
@@ -69,7 +69,7 @@
           console.log(event)
           this.selected_row_data = event.data
           this.any_monograph_selected = true
-          this.target_pdf_url = `${this.BACKEND_LOCATION}/get_pdf/${event.data.record_source}/${event.data.filename}.pdf`
+          this.target_pdf_url = `${this.BACKEND_LOCATION}/get_pdf/monograph/${event.data.internal_id}`
         }
       }
     },

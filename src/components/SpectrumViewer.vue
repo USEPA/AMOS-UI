@@ -49,8 +49,7 @@
         console.log(this.selectedRowData)
       },
       async getSpectrumData() {
-        //const path = `http://v2626umcth819.rtord.epa.gov:9415/get_spectrum/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`;
-        const path = `${this.BACKEND_LOCATION}/get_spectrum/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`;
+        const path = `${this.BACKEND_LOCATION}/get_spectrum/${this.selectedRowData.internal_id}`
         const response = await axios.get(path)
         this.spectrum = response.data.spectrum
         this.spectral_entropy = response.data.spectral_entropy

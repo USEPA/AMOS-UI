@@ -3,7 +3,7 @@
     <div class="results-header">
       <h2 v-if="pdf_name">{{pdf_name}}</h2>
       <ul v-if="metadata_rows" style="list-style-type: none;">
-        <li v-for="r in metadata_rows"><strong>{{r[0]}}:</strong> {{r[1]}}</li>
+        <li v-for="r in Object.entries(metadata_rows)"><strong>{{r[0]}}:</strong> {{r[1]}}</li>
       </ul>
     </div>
     <div class="tab-bar">
@@ -85,9 +85,10 @@
         ]
       }
     },
-    props: ['selectedRowData'],
+    props: ['selectedRowData', 'recordType'],
     watch: {
       selectedRowData(){
+        console.log(this.selected_row_data)
         this.metadata_rows = {}
         this.pdf_name = ""
         this.loadPDF()
@@ -101,14 +102,14 @@
 
     methods: {
       async loadPDF(){
-        this.target_pdf_url = encodeURI(`${this.BACKEND_LOCATION}/get_pdf/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
-        const response = await axios.get(`${this.BACKEND_LOCATION}/get_pdf_metadata/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
+        this.target_pdf_url = encodeURI(`${this.BACKEND_LOCATION}/get_pdf/${this.recordType}/${this.selectedRowData.internal_id}`)
+        const response = await axios.get(`${this.BACKEND_LOCATION}/get_pdf_metadata/${this.recordType}/${this.selectedRowData.internal_id}`)
         this.pdf_name = response.data.pdf_name
         this.metadata_rows = response.data.metadata_rows
       },
       async findDTXSIDs(){
-        const response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.selectedRowData.source}/${this.selectedRowData.internal_id}`)
-        this.compound_list = response.data.chemical_ids
+        const response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.selectedRowData.internal_id}`)
+        this.compound_list = response.data.compound_list
       },
       updateTab(tabName) {
         this.viewer_mode = tabName

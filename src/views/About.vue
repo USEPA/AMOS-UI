@@ -5,16 +5,17 @@
     <p>The database contains a mixture of data that can be divided into three categories.</p>
     <ul>
       <li>Mass spectra of various types (including GC, LC, Raman, and IR spectra, among others).</li>
-      <li>Monographs that detail the results of an in-depth analysis.  These often contain multiple spectra of varying types.</li>
-      <li>Analytical methods which document testing procedures for one or more compounds.</li>
+      <li>Monographs that detail the results of an in-depth analysis.  These often contain multiple spectra of varying types, but only a few compounds at most.</li>
+      <li>Analytical methods which document full testing procedures for one or more (potentially a couple hundred) compounds.</li>
     </ul>
     <br />
     <br />
-    <p>This app was last updated on 2022-11-22.</p>
-    <label class="toggle-switch">
+    <p>This app was last updated on 2022-12-07.</p>
+    <!-- In theory, the below is a functional toggle switch that might be useful, but we'll see if it's what we'll use down the line.
+      <label class="toggle-switch">
       <input type="checkbox" class="toggle-switch-input" checked>
       <span class="toggle-slider"></span>
-    </label> 
+    </label> -->
   </div>
 </template>
 

@@ -16,6 +16,8 @@
       &emsp;
       <router-link to="/about">About this App</router-link>
       &emsp;
+      <!--<crossnav />
+      &emsp;-->
       <button @click="store.showHeaderAndFooter = !store.showHeaderAndFooter">Toggle Header/Footer</button>
     </div>
   </div>
@@ -23,6 +25,7 @@
 
 <script>
   import {store} from "@/assets/store.js"
+  import crossnav from "./crossnav.vue"
 
   export default {
     methods: {
@@ -39,11 +42,12 @@
       }
     },
     data() {
-      return {
-        store
-      }
-    }
-  }
+        return {
+            store
+        };
+    },
+    components: { crossnav }
+}
 </script>
 
 <style>

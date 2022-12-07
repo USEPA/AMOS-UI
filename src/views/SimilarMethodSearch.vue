@@ -9,6 +9,7 @@
       </div>
       <p>The table below lists methods for compounds that are similar to {{ current_DTXSID }}.</p>
       <p>Select a row in the table to view the method on the right half of the screen.  Bolded rows refer to methods which contain the chemical being searched.</p>
+      <p>Hover over a method name to see the full text of it.  The number in parentheses at the end is the number of similar compounds found in the method (not necessarily the number of compounds present in the method).</p>
       <p>Columns can be hidden by clicking on the menu icon seen when hovering over a column name -- this brings up a menu where column visibility can be toggled.</p> 
       <div id="grid-theme-wrapper" class="modded-theme">
         <ag-grid-vue
@@ -24,7 +25,7 @@
         ></ag-grid-vue>
       </div>
     </div>
-    <StoredPDFViewer style="width: 48vw;" v-if="any_method_selected" :selectedRowData="selected_row_data"/>
+    <StoredPDFViewer style="width: 48vw;" v-if="any_method_selected" :selectedRowData="selected_row_data" recordType="method"/>
   </div>
 </template>
 
@@ -93,6 +94,7 @@
     },
     methods: {
       async methodSearch() {
+        this.results = []
         this.any_method_selected = false
         this.method_search_DTXSID = this.method_search_DTXSID.trim()
         const path = `${this.BACKEND_LOCATION}/get_similar_methods/${this.method_search_DTXSID}`

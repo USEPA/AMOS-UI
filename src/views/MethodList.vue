@@ -34,7 +34,7 @@
           {field: "method_number", headerName: "Method #"},
           {field: "method_name", headerName: "Name", tooltipField: 'method_name'},
           {field: "year_published", headerName: "Year", width: 90,},
-          {field: "spectrum_type", headerName: "Methodology", width: 115},
+          {field: "methodology", headerName: "Methodology", width: 115},
           {field: "source", headerName: "Source", width: 100},
           {field: "analyte", headerName: "Analyte", tooltipField: 'analyte'},
           {field: "matrix", headerName: "Matrix"},
@@ -43,14 +43,14 @@
       }
     },
     async created() {
-      const path = `${this.BACKEND_LOCATION}/methods_list`
+      const path = `${this.BACKEND_LOCATION}/method_list`
       const response = await axios.get(path)
       this.results = response.data.results
     },
     methods: {
       onDoubleClick(event) {
         console.log(event)
-        window.open(`${this.BACKEND_LOCATION}/get_pdf/${event.data.source}/${event.data.internal_id}`)
+        window.open(`${this.BACKEND_LOCATION}/get_pdf/method/${event.data.internal_id}`)
       }
     },
     components: {
