@@ -1,5 +1,6 @@
 <template>
   <div>
+    <p>Below is a list of all methods in the database.  Double-click on a row to open the method's PDF file in a new tab.</p>
     <ag-grid-vue
       class="ag-theme-balham"
       style="height:600px; width:100%"
@@ -32,13 +33,12 @@
         default_column_def: {resizable: true, filter: 'agTextColumnFilter', floatingFilter: true},
         column_defs: [
           {field: "method_number", headerName: "Method #"},
-          {field: "method_name", headerName: "Name", tooltipField: 'method_name'},
-          {field: "year_published", headerName: "Year", width: 90,},
-          {field: "methodology", headerName: "Methodology", width: 115},
-          {field: "source", headerName: "Source", width: 100},
-          {field: "analyte", headerName: "Analyte", tooltipField: 'analyte'},
-          {field: "matrix", headerName: "Matrix"},
-          {field: "comment", headerName: "Synopsis", flex: 1, tooltipField: 'comment'}
+          {field: "method_name", headerName: "Name", tooltipField: 'method_name', sortable: true, flex: 1},
+          {field: "year_published", headerName: "Year", width: 90, sortable: true},
+          {field: "methodology", headerName: "Methodology", width: 115, sortable: true},
+          {field: "source", headerName: "Source", width: 100, sortable: true},
+          {field: "analyte", headerName: "Analyte", tooltipField: 'analyte', sortable: true, flex: 1},
+          {field: "matrix", headerName: "Matrix", sortable: true, flex: 1}
         ]
       }
     },

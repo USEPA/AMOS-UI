@@ -8,7 +8,8 @@ const routes = [
     {path: "/monograph_list", name: "Monograph List", component: ()=>import('../views/MonographList.vue')},
     {path: "/find_inchikeys/:inchikey", name: "Inchikey Search", component: ()=>import('../views/InchikeyRedirect.vue')},
     {path: "/similar_method_search", name: "Similar Methods Search", component: ()=>import('../views/SimilarMethodSearch.vue')},
-    {path: "/methods_list", name: "Methods List", component: ()=>import('../views/MethodList.vue')}
+    {path: "/methods_list", name: "Methods List", component: ()=>import('../views/MethodList.vue')},
+    {path: "/batch_search", name: "Batch Search", component: ()=>import('../views/BatchSearch.vue')}
   ]
 
 const router = createRouter({

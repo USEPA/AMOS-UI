@@ -12,8 +12,8 @@
 </template>
 
 <script>
-  import axios from 'axios';
-  import { BACKEND_LOCATION } from '@/assets/store';
+  import axios from 'axios'
+  import { BACKEND_LOCATION } from '@/assets/store'
 
   export default {
     data() {

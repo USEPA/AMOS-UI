@@ -141,7 +141,7 @@
         }
       },
       downloadResultsAsCSV() {
-        this.gridApi.exportDataAsCsv({columnKeys: ["spectrum_type", "source", "link", "record_type", "comment"]});
+        this.gridApi.exportDataAsCsv({columnKeys: ["spectrum_types", "source", "link", "record_type", "description"]});
       },
       isExternalFilterPresent() {
         return true
@@ -230,6 +230,10 @@
 
 .has-hover-text {
   text-decoration: underline dashed;
+}
+
+h1 {
+  font-size: 2em;
 }
 
 </style>

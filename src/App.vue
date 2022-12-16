@@ -26,13 +26,10 @@
   }
 </script>
 
-<style scoped>
-.container {
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.container::after {
-  clear: both;
+<style>
+#app {
+  margin: 0 auto;
+  padding: 1rem;
+  font-weight: normal;
 }
 </style>

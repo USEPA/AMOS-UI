@@ -2,7 +2,7 @@
   <div class="home">
     <h1>Home Page</h1>
     <div class="about-this-app">
-      <p>The search will return records of all three types -- spectra, monographs, and methods -- by default, however certain ones can be hidden by default using the checkboxes below the search bar.</p>
+      <p>The search will return records of all three types -- spectra, monographs, and methods.  The initial tab shown can be selected with the radio buttons below.</p>
       <div>
         <input @keyup.enter="go_big_bar()" id="big-search-bar" name="big-search-bar" placeholder="Search name, InChIKey, DTXSID, or CASRN..." size="60" v-model="bigBarSearchTerm">
         <button @click="go_big_bar()">Search</button>
@@ -17,6 +17,8 @@
         <label><input type="radio" id="spectrum-tab" v-model="initial_results_tab" value="spectrum">Spectra</label>
       </div>
     </div>
+    <br />
+    For more information about this app, see the <router-link to="/about">about</router-link> page.
   </div>
 </template>
 

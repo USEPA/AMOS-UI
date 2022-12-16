@@ -1,23 +1,27 @@
 <template>
   <div class="nav-bar">
     <div class="nav-bar-left">
-      <label for="search-term">Search</label> &nbsp;
       <input @keyup.enter="go()" type="text" v-model="searchTerm" name="search-term">
-      <button @click="go()">Search</button>
+      <button @click="go()">Compound Search</button>
     </div>
     <div class="nav-bar-right">
       <router-link to="/">Home</router-link>
       &emsp;
-      <router-link to="/monograph_list">Monograph List</router-link>
+      <b-nav-item-dropdown text="Lists" class="nav-dropdown" style="background: #0e6993;">
+        <b-dropdown-item to="/monograph_list">Monographs</b-dropdown-item>
+        <b-dropdown-item to="/methods_list">Methods</b-dropdown-item>
+      </b-nav-item-dropdown>
       &emsp;
-      <router-link to="/methods_list">Methods List</router-link>
-      &emsp;
-      <router-link to="/similar_method_search">Similar Method Search</router-link>
+      <router-link to="/similar_method_search">Similar Method Search</router-link> &emsp;
+      <b-nav-item-dropdown text="Related Applications" class="nav-dropdown">
+        <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:9414/" class="normal-text">Chemical Transformations Database</b-dropdown-item>
+        <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:81/substances">Analytical QC</b-dropdown-item>
+        <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:5173/">Spectral and Methods Database</b-dropdown-item>
+        <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:9004/molmass_web.py">Molecular Mass Calculator</b-dropdown-item>
+      </b-nav-item-dropdown>
       &emsp;
       <router-link to="/about">About this App</router-link>
       &emsp;
-      <!--<crossnav />
-      &emsp;-->
       <button @click="store.showHeaderAndFooter = !store.showHeaderAndFooter">Toggle Header/Footer</button>
     </div>
   </div>
@@ -25,7 +29,6 @@
 
 <script>
   import {store} from "@/assets/store.js"
-  import crossnav from "./crossnav.vue"
 
   export default {
     methods: {
@@ -42,11 +45,10 @@
       }
     },
     data() {
-        return {
-            store
-        };
-    },
-    components: { crossnav }
+      return {
+        store
+      };
+    }
 }
 </script>
 
@@ -57,10 +59,29 @@
     justify-content: space-between;
     background: #0e6993;
     color: white;
+    font-family: Roboto;
+    line-height: 1;
+    text-align: center;
+  }
+
+  .nav-bar-right {
+    display: flex;
+    align-items: center;
   }
 
   .nav-bar-right a{
     color: white;
     text-decoration: none;
+  }
+
+  .nav-dropdown {
+    background: #0e6993;
+    display: flex;
+    float: left;
+    color: white;
+  }
+
+  .nav-dropdown a{
+    color: black;
   }
 </style>

@@ -3,26 +3,29 @@
     <div class="monograph-box">
       <p></p>
       <div>
-        <label for="search-dtxsid">DTXSID</label> &nbsp;
-        <input @keyup.enter="methodSearch()" type="text" v-model="method_search_DTXSID" name="search-dtxsid">
+        <label for="search-dtxsid">Compound Identifier</label> &nbsp;
+        <input @keyup.enter="methodSearch()" type="text" v-model="searched_compound" name="search-dtxsid">
         <button @click="methodSearch()">Method Search</button>
       </div>
-      <p>The table below lists methods for compounds that are similar to {{ current_DTXSID }}.</p>
-      <p>Select a row in the table to view the method on the right half of the screen.  Bolded rows refer to methods which contain the chemical being searched.</p>
-      <p>Hover over a method name to see the full text of it.  The number in parentheses at the end is the number of similar compounds found in the method (not necessarily the number of compounds present in the method).</p>
-      <p>Columns can be hidden by clicking on the menu icon seen when hovering over a column name -- this brings up a menu where column visibility can be toggled.</p> 
-      <div id="grid-theme-wrapper" class="modded-theme">
-        <ag-grid-vue
-          class="ag-theme-balham"
-          style="height:600px; width:100%"
-          :columnDefs="column_defs"
-          :rowData="results"
-          :autoGroupColumnDef="autoGroupColumnDef"
-          suppressAggFuncInHeader="true"
-          rowSelection="single"
-          @row-selected="onRowSelected"
-          :rowClassRules="rowClassRules"
-        ></ag-grid-vue>
+      <p v-if="no_search_complete">This page allows for searching for methods that contain either a given chemical or other chemicals similar to it.  A name, InChIKey, CASRN, or DTXSID can be searched on.</p>
+      <div v-else>
+        <p>The table below lists methods for compounds that are similar to {{ current_compound }}.</p>
+        <p>Select a row in the table to view the method on the right half of the screen.  Bolded rows refer to methods which contain the chemical being searched.</p>
+        <p>Hover over a method name to see the full text of it.  The number in parentheses at the end is the number of similar compounds found in the method (not necessarily the number of compounds present in the method).</p>
+        <p>Columns can be hidden by clicking on the menu icon seen when hovering over a column name -- this brings up a menu where column visibility can be toggled.</p> 
+        <div id="grid-theme-wrapper" class="modded-theme">
+          <ag-grid-vue
+            class="ag-theme-balham"
+            style="height:600px; width:100%"
+            :columnDefs="column_defs"
+            :rowData="results"
+            :autoGroupColumnDef="autoGroupColumnDef"
+            suppressAggFuncInHeader="true"
+            rowSelection="single"
+            @row-selected="onRowSelected"
+            :rowClassRules="rowClassRules"
+          ></ag-grid-vue>
+      </div>
       </div>
     </div>
     <StoredPDFViewer style="width: 48vw;" v-if="any_method_selected" :selectedRowData="selected_row_data" recordType="method"/>
@@ -49,9 +52,10 @@
         BACKEND_LOCATION,
         results: [],
         any_method_selected: false,
+        no_search_complete: true,
         selected_row_data: {},
-        method_search_DTXSID: "",
-        current_DTXSID: "",
+        searched_compound: "",
+        current_compound: "",
         ids_to_method_names: "",
         current_method_shown_id: "",
         column_defs: [
@@ -96,12 +100,14 @@
       async methodSearch() {
         this.results = []
         this.any_method_selected = false
-        this.method_search_DTXSID = this.method_search_DTXSID.trim()
-        const path = `${this.BACKEND_LOCATION}/get_similar_methods/${this.method_search_DTXSID}`
+        this.no_search_complete = true
+        this.searched_compound = this.searched_compound.trim()
+        const path = `${this.BACKEND_LOCATION}/get_similar_methods/${this.searched_compound}`
         const response = await axios.get(path)
-        this.current_DTXSID = this.method_search_DTXSID
+        this.current_compound = this.searched_compound
         this.results = response.data.results
         this.ids_to_method_names = response.data.ids_to_method_names
+        this.no_search_complete = false
       },
       onGridReady(params) {
         1
