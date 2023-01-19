@@ -8,5 +8,11 @@ export default defineConfig({
     alias: [
       {find: "@", replacement: "/src/"}
     ]
+  },
+  // disables an error message that appears randomly and for no known reason
+  server: {
+    hmr: {
+      overlay: false
+    }
   }
 })

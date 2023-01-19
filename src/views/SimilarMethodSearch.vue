@@ -1,3 +1,11 @@
+<!--
+  This page shows results for a method similarity search.  An individual compound is searched for (by name, DTXSID,
+  CASRN, or InChIKey) and the search returns a list of all methods which contain at least one compound that is
+  sufficiently similar to the searched compound.
+
+  This page takes no URL route or query parameters.
+-->
+
 <template>
   <div class="wrap">
     <div class="monograph-box">

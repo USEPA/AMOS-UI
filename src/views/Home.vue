@@ -1,3 +1,10 @@
+<!--
+  This is the home page for the app.  Running a general search of the database can be done from here, but most other
+  functionality should stay on other pages.
+
+  There are no URL route or query parameters associated with this page.
+-->
+
 <template>
   <div class="home">
     <h1>Home Page</h1>

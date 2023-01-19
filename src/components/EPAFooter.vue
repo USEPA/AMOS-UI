@@ -1,3 +1,9 @@
+<!--
+  This component is an EPA-standard footer element that should be available to all pages in this app.
+
+  This component does not take any props.
+-->
+
 <template>
   <footer class="main-footer clearfix" role="contentinfo" :style="style">
     <div class="main-footer__inner">

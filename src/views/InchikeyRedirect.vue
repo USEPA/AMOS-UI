@@ -1,3 +1,12 @@
+<!--
+  This page is a temporary redirect for general InChIKey searches.  Specifically, there are instances where someone may
+  be searching using an InChIKey, but the second block is different for some reason (non-standard key, isomers, etc.).
+  When redirected to this page when running a general search by InChIKey, this will list all InChIKeys in the database
+  that match the first block of the searched-for InChIKey.
+
+  This page takes one URL route parameter, the InChIKey being searched for.  No query parameters are used.
+-->
+
 <template>
   <div v-if="search_complete">
     <p v-if="exact_match">An exact match for the InChIKey "<router-link :to="`/search/${this.$route.params.inchikey}`">{{$route.params.inchikey}}</router-link>" was found.  However, several other InChIKeys with the same first block were discovered, if you were looking for one of those.</p>

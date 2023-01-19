@@ -1,3 +1,10 @@
+<!--
+  This page displays a list of all monographs in the database, as well as being able to display the monographs and
+  associated compounds themselves.
+
+  This page takes no URL route or query parameters.
+-->
+
 <template>
   <div class="wrap">
     <div class="monograph-box">
@@ -66,7 +73,6 @@
       },
       onRowSelected(event){
         if (event.event){
-          console.log(event)
           this.selected_row_data = event.data
           this.any_monograph_selected = true
           this.target_pdf_url = `${this.BACKEND_LOCATION}/get_pdf/monograph/${event.data.internal_id}`

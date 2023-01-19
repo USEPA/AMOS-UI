@@ -1,3 +1,10 @@
+<!--
+  This component is used to organize links that go to various pages on the app.  It also contains a search bar for the
+  general record search.
+
+  This component takes no props.
+-->
+
 <template>
   <div class="nav-bar">
     <div class="nav-bar-left">
@@ -12,12 +19,16 @@
         <b-dropdown-item to="/methods_list">Methods</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
-      <router-link to="/similar_method_search">Similar Method Search</router-link> &emsp;
+      <router-link to="/similar_method_search">Similar Method Search</router-link>
+      &emsp;
+      <router-link to="/batch_search">Batch Search</router-link>
+      &emsp;
       <b-nav-item-dropdown text="Related Applications" class="nav-dropdown">
         <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:9414/" class="normal-text">Chemical Transformations Database</b-dropdown-item>
         <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:81/substances">Analytical QC</b-dropdown-item>
         <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:5173/">Spectral and Methods Database</b-dropdown-item>
         <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:9004/molmass_web.py">Molecular Mass Calculator</b-dropdown-item>
+        <b-dropdown-item href="https://aop-dev.rtpnc.epa.gov/nta-ui/nta.html">CFM-ID Spectral Search</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
       <router-link to="/about">About this App</router-link>
@@ -34,7 +45,6 @@
     methods: {
       go() {
         this.searchTerm = this.searchTerm.trim()
-        console.log(this.searchTerm)
         const inchikeyRegex = /^([A-Z]{14})-[A-Z]{8}[SN][A-Z]-[A-Z]$/
         var matchResult = this.searchTerm.match(inchikeyRegex)
         if (matchResult) {
@@ -74,6 +84,11 @@
     text-decoration: none;
   }
 
+  .nav-bar-right a:hover{
+    color: white;
+    text-decoration: underline;
+  }
+
   .nav-dropdown {
     background: #0e6993;
     display: flex;
@@ -83,5 +98,10 @@
 
   .nav-dropdown a{
     color: black;
+  }
+
+  .nav-dropdown a:hover{
+    color: black;
+    text-decoration: none
   }
 </style>

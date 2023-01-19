@@ -1,6 +1,14 @@
+<!--
+  This page is used for batch searching compounds by DTXSID -- and only by DTXSID -- and returning information on the
+  records in a CSV file.
+
+  There are no URL route or query parameters associated with this page.
+-->
+
 <template>
   <p>This page allows for batch searching of compounds by DTXSID.  DTXSIDs must be separated in the text field below by newlines.  If you have a list of compounds not identified by DTXSIDs, you can go <a href="https://comptox.epa.gov/dashboard/batch-search">here</a> to retrieve them.</p>
   <p>The results returned from this search are essentially the same ones that are returned on the compound search page.  A CSV will automatically attempt to download once the results have been retrieved from the database.</p>
+  <p>Note: if two or more searched DTXSIDs are present in the same record (e.g., a method that covers multiple similar compounds), that record will appear once for every searched DTXSID that appears in it.</p>
   <div class="batch-search-controls">
     <textarea type="text" class="batch-search-input" rows="10" columns="25" v-model="search_box"></textarea>
     <button @click="batch_search()" class="batch-search-button">Search</button>
@@ -32,8 +40,7 @@
         this.status_boxes.show_no_results_error = false
         if(this.search_box != ""){
           const search_terms = this.search_box.split("\n")
-          const response = await axios.post(`${this.BACKEND_LOCATION}/batch_search`, {dtxsids: search_terms})
-          console.log(response.data.csv_string)
+          const response = await axios.post(`${this.BACKEND_LOCATION}/batch_search`, {dtxsids: search_terms, base_url: window.location.origin})
           if (response.data.csv_string != "") {
             const anchor = document.createElement('a')
             anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response.data.csv_string);

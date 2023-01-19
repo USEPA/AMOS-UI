@@ -1,3 +1,9 @@
+<!--
+  This component is an EPA-standard header element that should be available to all pages in this app.
+
+  This component does not take any props.
+-->
+
 <template>
   <div>
     <header class="masthead clearfix" role="banner">

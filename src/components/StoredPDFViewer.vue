@@ -1,7 +1,18 @@
+<!--
+  This comoponent is for displaying the PDF for a method or monograph (or, possibly in the future, a spectrum) along
+  with two possible views for the compound(s) that the document references.
+
+  This component takes two props:
+  - selectedRowData, which should be a JSON object with an internal_id element
+  - recordType, a string that should have a value of either "method" or "monograph", which is sent to the Flask backend
+    for determining which table contains the PDF
+-->
+
 <template>
   <div>
     <div class="results-header">
       <h2 v-if="pdf_name">{{pdf_name}}</h2>
+      <p v-if="has_associated_spectra">This method has spectra associated with it.  Click <router-link :to="`/method_with_spectra/method/${selectedRowData.internal_id}`">here</router-link> to view.</p>
       <ul v-if="metadata_rows" style="list-style-type: none;">
         <li v-for="r in Object.entries(metadata_rows)"><strong>{{r[0]}}:</strong> {{r[1]}}</li>
       </ul>
@@ -11,6 +22,7 @@
       <a :class="viewer_mode == 'CompoundGrid' ? 'active' : ''" @click="updateTab('CompoundGrid')">Compounds (grid)</a>
       <a :class="viewer_mode == 'CompoundTable' ? 'active' : ''" @click="updateTab('CompoundTable')">Compounds (table)</a>
     </div>
+
     <iframe v-if="viewer_mode == 'PDF'" class="pdf-viewer-box" :src="`${target_pdf_url}`" type="application/pdf"></iframe>
 
     <div class="compound-grid" v-else-if="viewer_mode == 'CompoundGrid'">
@@ -43,7 +55,6 @@
   import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
   import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
-
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
@@ -59,6 +70,7 @@
         metadata_rows: {},
         viewer_mode: "PDF",
         compound_list: [],
+        has_associated_spectra: false,
         BACKEND_LOCATION,
         column_defs: [
           {field:'image', headerName:'Structure', autoHeight: true, width: 100, cellRenderer: (params) => {
@@ -88,7 +100,6 @@
     props: ['selectedRowData', 'recordType'],
     watch: {
       selectedRowData(){
-        console.log(this.selected_row_data)
         this.metadata_rows = {}
         this.pdf_name = ""
         this.loadPDF()
@@ -106,6 +117,7 @@
         const response = await axios.get(`${this.BACKEND_LOCATION}/get_pdf_metadata/${this.recordType}/${this.selectedRowData.internal_id}`)
         this.pdf_name = response.data.pdf_name
         this.metadata_rows = response.data.metadata_rows
+        this.has_associated_spectra = response.data.has_associated_spectra
       },
       async findDTXSIDs(){
         const response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.selectedRowData.internal_id}`)

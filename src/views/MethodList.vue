@@ -1,3 +1,11 @@
+<!--
+  This page serves as a list of all methods contained in the database.  Currently, unlike the monographs, the table
+  describing the methods fills the entire window, so the method cannot be displayed in the same window.  Double-clicking
+  a row in the table will open the method's PDF in a new window.
+
+  There are no URL route or query parameters associated with this page.
+-->
+
 <template>
   <div>
     <p>Below is a list of all methods in the database.  Double-click on a row to open the method's PDF file in a new tab.</p>
@@ -49,7 +57,6 @@
     },
     methods: {
       onDoubleClick(event) {
-        console.log(event)
         window.open(`${this.BACKEND_LOCATION}/get_pdf/method/${event.data.internal_id}`)
       }
     },

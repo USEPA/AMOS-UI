@@ -1,3 +1,12 @@
+<!--
+  This component is for displaying basic information on a single compound -- specifically, an image of the structure,
+  the DTXSID, and the EPA-preferred name.
+
+  This component takes two props:
+  - dtxsid, the full DTXSID of the compound
+  - preferred_name, the EPA-preferred name of the compound
+-->
+
 <template>
   <div class="compound-tile">
     <p style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"><router-link :to="`/search/${preferred_name}`"> {{preferred_name}} </router-link> </p>

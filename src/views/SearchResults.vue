@@ -1,3 +1,17 @@
+<!--
+  This page displays the records that correspond to a single searched compound in a table, and will display information
+  about the searched compound and any record in the results that is selected.
+
+  This page can take one URL route parameter and four query parameters.  The route parameter is:
+  - search_term: the term searched for; can be either a compound name, an InChIKey, a CASRN, or a DTXSID
+  The query parameters are:
+  - methods, monographs, spectra: three parameters that toggle whether records of that type appear; if none are present,
+    all records are displayed, otherwise it depends on which of those three appear with a value of 'true' in the query
+    parameters
+  - initial_row_selected: the internal ID of a record; if this parameter exists, the page will try to preselect this
+    record's row once the table is loaded
+-->
+
 <template>
   <div class="full-results-page">
     <div class="search-results">
@@ -47,7 +61,7 @@
     </div>
     <div class="information-viewer">
       <p class="info-paragraph" v-if="view_type == 'none'">Click on a row in the table to the left to display either a spectrum (if available) or a PDF file in this space.</p>
-      <SpectrumViewer v-else-if="view_type == 'Spectrum'" :selectedRowData="selected_row_data"/>
+      <SpectrumViewer v-else-if="view_type == 'Spectrum'" :selectedRowData="selected_row_data" displayAdditionalInfo/>
       <StoredPDFViewer v-else-if="view_type == 'PDF'" style="width: 50vw;" :selectedRowData="selected_row_data" :recordType="selected_row_data.record_type"/>
       <p class="info-paragraph" v-else>This database does not contain anything for this record.  Click the hyperlink in the "Record Type" column to be directed to the source.</p>
     </div>
@@ -126,13 +140,22 @@
           const rec_instance = this.gridApi.getFilterInstance('record_type')
           rec_instance.setModel({values: filters_to_use})
         }
+        if (typeof(this.$route.query.initial_row_selected) === "string") {
+          this.gridApi.forEachNode(node => {
+            if (node.data.internal_id === this.$route.query.initial_row_selected) {
+              node.setSelected(true)
+              // need to run this manually, even though the documentation says setSelected should trigger the row selected function
+              this.onRowSelected({event: true, data: node.data})
+            }
+          })
+        }
         this.gridApi.onFilterChanged()   //regenerates the table with the filter settings
         this.gridApi.sizeColumnsToFit()
       },
       onRowSelected(event) {
         if (event.event){
           this.view_type = event.data.data_type
-          //console.log(event.data)
+          console.log(event.data.internal_id)
           if (event.data.data_type == "Spectrum"){
             this.selected_row_data = event.data
           } else if (event.data.data_type == "PDF"){
@@ -141,7 +164,18 @@
         }
       },
       downloadResultsAsCSV() {
-        this.gridApi.exportDataAsCsv({columnKeys: ["spectrum_types", "source", "link", "record_type", "description"]});
+        console.log(this.$route)
+        this.gridApi.exportDataAsCsv({
+          columnKeys: ["spectrum_types", "source", "link", "record_type", "description"],
+          fileName: this.$route.params.search_term + "_results.csv",
+          processCellCallback: cell => {
+            if ((cell.column.colId === "link") & (cell.value === null)){
+              return `${window.location.origin}/search/${this.$route.params.search_term}?initial_row_selected=${cell.node.data.internal_id}`
+            } else {
+              return cell.value
+            }
+          }
+        });
       },
       isExternalFilterPresent() {
         return true
