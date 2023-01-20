@@ -100,7 +100,11 @@
         columnDefs: [
           {field: 'spectrum_types', headerName: 'Spectrum Type', sortable: true, sort: 'asc', filter: 'agSetColumnFilter', width: 150, suppressSizeToFit: true},
           {field: 'source', headerName: 'Source', sortable: true, width: 110, suppressSizeToFit: true, cellRenderer: params => {
-            if (params.data.source == "SWG") {
+            // TODO: As it is now, none of the SWG or ECM methods should be missing a link, so this "shortcut" treating
+            // the missing case is okay for now, but there's probably more rigorous way to handle this
+            if (params.data.link === null) {
+              return params.data.source
+            } else if (params.data.source == "SWG") {
               return "<a href='" + params.data.link + "' target='_blank' title='Scientific Working Group' class='has-hover-text'>" + params.data.source + "</a>";
             } else if (params.data.source == "ECM") {
               return "<a href='" + params.data.link + "' target='_blank' title='Environmental Chemistry Methods' class='has-hover-text'>" + params.data.source + "</a>";

@@ -1,6 +1,6 @@
 This is a Vue 3 client written to be used as the user side of the spectrum search app.  The Flask backend used alongside it can be found [here](https://ccte-bitbucket.epa.gov/users/gjanesch/repos/spectrum-search-app-server/browse).
 
-The primary packages used are Vue itself, Axios, and AG Grid.
+The primary packages used are Vue itself, Axios, and AG Grid for core functionality, plus Bootstrap for some of the visual elements.
 
 
 ### Running the client
