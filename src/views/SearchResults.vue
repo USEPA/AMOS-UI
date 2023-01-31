@@ -17,47 +17,54 @@
     <div class="search-results">
       <div class="results-header">
         <h1 v-if="still_searching" class="text-that-can-overflow">Searching for "{{$route.params.search_term}}"...</h1>
-        <h1 v-else class="text-that-can-overflow">{{ results.length }} Results for "{{$route.params.search_term}}"</h1>
-        <br/>
-        <div class="chemical-box">
-          <div class="chemical-image-highlight">
-              <img class="chemical-image" :src="`https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/${compound_info.dtxsid}`"/>
+        <h1 v-else-if="!still_searching & no_compound_match">No compound match found.</h1>
+        <div v-else>
+          <h1 class="text-that-can-overflow">{{ results.length }} Results for "{{$route.params.search_term}}"</h1>
+          <br/>
+          <div class="chemical-box">
+            <div class="chemical-image-highlight">
+                <img class="chemical-image" :src="`https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/${compound_info.dtxsid}`"/>
+            </div>
+            <div class="chemical-info">
+              <ul style="list-style-type: none;">
+                <li><strong>(Preferred) Name:</strong> {{ compound_info.preferred_name }} </li>
+                <li><strong>DTXSID:</strong> <a :href="`https://comptox.epa.gov/dashboard/chemical/details/${compound_info.dtxsid}`">{{ compound_info.dtxsid }}</a> </li>
+                <li><strong>CASRN:</strong> {{ compound_info.casrn }} </li>
+                <li><strong>InChIKey:</strong> {{ compound_info.inchikey }} </li>
+                <li><strong>Molecular Formula:</strong> {{ compound_info.molecular_formula }} </li>
+                <li><strong>Mass:</strong> {{ compound_info.molecular_weight }} </li>
+                <li>&nbsp;</li>
+                <li><button v-if="!still_searching" @click="downloadResultsAsCSV">Download Results</button></li>
+              </ul>
+            </div>
           </div>
-          <div class="chemical-info">
-            <ul style="list-style-type: none;">
-              <li><strong>(Preferred) Name:</strong> {{ compound_info.preferred_name }} </li>
-              <li><strong>DTXSID:</strong> <a :href="`https://comptox.epa.gov/dashboard/chemical/details/${compound_info.dtxsid}`">{{ compound_info.dtxsid }}</a> </li>
-              <li><strong>CASRN:</strong> {{ compound_info.casrn }} </li>
-              <li><strong>InChIKey:</strong> {{ compound_info.inchikey }} </li>
-              <li><strong>Molecular Formula:</strong> {{ compound_info.molecular_formula }} </li>
-              <li><strong>Mass:</strong> {{ compound_info.molecular_weight }} </li>
-              <li>&nbsp;</li>
-              <li><button v-if="!still_searching" @click="downloadResultsAsCSV">Download Results</button></li>
-            </ul>
-          </div>
+          <input type="checkbox" id="single-point-spectra" v-model="include_single_point_spectra" @change="updateCheckboxFilters">
+          <label for="single-point-spectra">Include Single Point Spectra</label>
         </div>
-        <input type="checkbox" id="single-point-spectra" v-model="include_single_point_spectra" @change="updateCheckboxFilters">
-        <label for="single-point-spectra">Include Single Point Spectra</label>
       </div>
-      <div class="tab-bar">
-        <a :class="result_table_view_mode == 'all' ? 'active' : ''" @click="updateTab('all')">All Results ({{results.length}})</a>
-        <a :class="determineTabBarClass('spectrum')" @click="updateTab('spectrum')">Spectra ({{record_type_counts.spectrum}})</a>
-        <a :class="determineTabBarClass('monograph')" @click="updateTab('monograph')">Monographs ({{record_type_counts.monograph}})</a>
-        <a :class="determineTabBarClass('method')" @click="updateTab('method')">Methods ({{record_type_counts.method}})</a>
+      <p v-if="no_compound_match">There is no compound in this database that matches the search term "{{$route.params.search_term}}" -- if something should be here, please check the search term for typos.</p>
+      <p v-else-if="results.length==0">The search term "{{$route.params.search_term}}" matches a compound in the database; however, no data records were found.</p>
+      <div v-else>
+        <div class="tab-bar">
+          <a :class="result_table_view_mode == 'all' ? 'active' : ''" @click="updateTab('all')">All Results ({{results.length}})</a>
+          <a :class="determineTabBarClass('spectrum')" @click="updateTab('spectrum')">Spectra ({{record_type_counts.spectrum}})</a>
+          <a :class="determineTabBarClass('monograph')" @click="updateTab('monograph')">Monographs ({{record_type_counts.monograph}})</a>
+          <a :class="determineTabBarClass('method')" @click="updateTab('method')">Methods ({{record_type_counts.method}})</a>
+        </div>
+        <!--:tooltipShowDelay="tooltipShowDelay"-->
+        <ag-grid-vue
+          class="ag-theme-balham"
+          style="height:600px; width:100%"
+          v-if="results.length > 0"
+          :columnDefs="columnDefs"
+          :rowData="results"
+          rowSelection="single"
+          @first-data-rendered="onGridReady"
+          @row-selected="onRowSelected"
+          :isExternalFilterPresent="isExternalFilterPresent"
+          :doesExternalFilterPass="doesExternalFilterPass"
+        ></ag-grid-vue>
       </div>
-      <!--:tooltipShowDelay="tooltipShowDelay"-->
-      <ag-grid-vue
-        class="ag-theme-balham"
-        style="height:600px; width:100%"
-        v-if="results.length > 0"
-        :columnDefs="columnDefs"
-        :rowData="results"
-        rowSelection="single"
-        @first-data-rendered="onGridReady"
-        @row-selected="onRowSelected"
-        :isExternalFilterPresent="isExternalFilterPresent"
-        :doesExternalFilterPass="doesExternalFilterPass"
-      ></ag-grid-vue>
     </div>
     <div class="information-viewer">
       <p class="info-paragraph" v-if="view_type == 'none'">Click on a row in the table to the left to display either a spectrum (if available) or a PDF file in this space.</p>
@@ -92,6 +99,7 @@
         results: [],
         compound_info: {},
         still_searching: true,
+        no_compound_match: false,
         tooltipShowDelay: 500,
         BACKEND_LOCATION,
         include_single_point_spectra: true,
@@ -121,7 +129,13 @@
               }
             }
           },
-          {field: 'description', headerName: 'Information', flex: 1, tooltipField: 'comment'},
+          {field: 'description', headerName: 'Information', flex: 1, tooltipField: 'comment', cellRenderer: params =>{
+            if (params.data.description === null) {
+              return "No description available."
+            } else {
+              return params.data.description
+            }
+          }},
           {field: 'link', headerName: 'Link', hide: true}
         ]
       };
@@ -222,16 +236,20 @@
     async created() {
       const path = `${this.BACKEND_LOCATION}/search/${this.$route.params.search_term}`
       const response = await axios.get(path)
-      this.results = response.data.records
-      this.compound_info = response.data.compound_info
       this.still_searching = false
-
-      this.record_type_counts = response.data.record_type_counts
-
-      if (this.$route.query.initial_results_tab) {
-        const initial_tab = this.$route.query.initial_results_tab
-        if (["spectrum", "monograph", "method"].includes(initial_tab.toLowerCase())) {
-          this.result_table_view_mode = initial_tab
+      if (response.data.no_compound_match === true) {
+        this.no_compound_match = true
+        console.log(`No compound match for "${this.$route.params.search_term}"`)
+      } else {
+        this.results = response.data.records
+        this.compound_info = response.data.compound_info
+        this.record_type_counts = response.data.record_type_counts
+  
+        if (this.$route.query.initial_results_tab) {
+          const initial_tab = this.$route.query.initial_results_tab
+          if (["spectrum", "monograph", "method"].includes(initial_tab.toLowerCase())) {
+            this.result_table_view_mode = initial_tab
+          }
         }
       }
     },

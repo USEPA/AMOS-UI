@@ -24,11 +24,11 @@
       <router-link to="/batch_search">Batch Search</router-link>
       &emsp;
       <b-nav-item-dropdown text="Related Applications" class="nav-dropdown">
-        <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:9414/" class="normal-text">Chemical Transformations Database</b-dropdown-item>
-        <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:81/substances">Analytical QC</b-dropdown-item>
-        <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:5173/">Spectral and Methods Database</b-dropdown-item>
-        <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:9004/molmass_web.py">Molecular Mass Calculator</b-dropdown-item>
-        <b-dropdown-item href="https://aop-dev.rtpnc.epa.gov/nta-ui/nta.html">CFM-ID Spectral Search</b-dropdown-item>
+        <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:9414/" target="_blank" class="normal-text">Chemical Transformations Database</b-dropdown-item>
+        <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:81/substances" target="_blank">Analytical QC</b-dropdown-item>
+        <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:5173/" target="_blank">Spectral and Methods Database</b-dropdown-item>
+        <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:9004/molmass_web.py" target="_blank">Molecular Mass Calculator</b-dropdown-item>
+        <b-dropdown-item href="https://aop-dev.rtpnc.epa.gov/nta-ui/nta.html" target="_blank">CFM-ID Spectral Search</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
       <router-link to="/about">About this App</router-link>

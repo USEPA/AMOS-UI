@@ -67,8 +67,8 @@
         show_table_modal: false,
         BACKEND_LOCATION,
         column_defs: [
-          {field:'m/z', headerName:'m/z', flex: 1},
-          {field:'intensity', headerName:'Peak Intensity', flex: 1}
+          {field:'m/z', headerName:'m/z', flex: 1, sortable: true},
+          {field:'intensity', headerName:'Peak Intensity', flex: 1, sortable: true}
         ]
       }
     },
