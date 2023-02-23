@@ -26,7 +26,7 @@
         @row-selected="onRowSelected"
       ></ag-grid-vue>
     </div>
-    <StoredPDFViewer style="width: 48vw;" v-if="any_monograph_selected" :selectedRowData="selected_row_data" recordType="monograph"/>
+    <StoredPDFViewer style="width: 48vw;" v-if="any_monograph_selected" :internalID="selected_row_data.internal_id" recordType="monograph"/>
   </div>
 </template>
 
@@ -47,9 +47,8 @@
   export default {
     data(){
       return {
-        names: [],
         selected_row_data: {},
-        monograph_info: [],
+        monograph_info: null,
         any_monograph_selected: false,  // used to avoid having a box with an error pop up if nothing's been selected yet,
         BACKEND_LOCATION,
         column_defs: [
@@ -63,7 +62,6 @@
     async created() {
       const path = `${this.BACKEND_LOCATION}/monograph_list`
       const response = await axios.get(path)
-      this.names = response.data.names
       this.monograph_info = response.data.results
     },
 

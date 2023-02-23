@@ -14,10 +14,10 @@
     <p v-if="search_type == 'invalid'">The search type {{ this.$route.params.by_type }} is invalid; it should be either "method" or "spectrum".</p>
     <div v-else class="full-results-page">
       <div class="half-page-column">
-        <StoredPDFViewer style="width: 50vw;" :selectedRowData="pdf_viewer_data" recordType="method"/>
+        <StoredPDFViewer style="width: 50vw;" :internalID="pdf_viewer_data.internal_id" recordType="method"/>
       </div>
       <div class="half-page-column">
-        <p></p>
+        <p>This is a list of spectra associated with this method, organized by compound identifier.  Double-click on a row to show the spectrum in a modal window.</p>
         <ag-grid-vue
             class="ag-theme-balham"
             style="height:600px; width:100%"
@@ -31,7 +31,7 @@
     </div>
     <div>
       <b-modal scrollable size="lg" v-model="show_modal">
-        <SpectrumViewer :selectedRowData="selected_row_data"/>
+        <SpectrumViewer :internalID="spectrum_internal_id"/>
       </b-modal>
     </div>
   </div>
@@ -58,6 +58,7 @@
         pdf_viewer_data: {},
         show_modal: false,
         BACKEND_LOCATION,
+        spectrum_internal_id: "",
         column_defs: [
           {field: 'dtxsid', headerName: 'DTXSID', sortable: true},
           {field: 'preferred_name', headerName: 'Compound Name', sortable: true, flex: 1},
@@ -79,7 +80,7 @@
         1
       },
       onDoubleClick(event) {
-        this.selected_row_data = {internal_id: event.data.internal_id}
+        this.spectrum_internal_id = event.data.internal_id
         this.show_modal = true
       }
     },

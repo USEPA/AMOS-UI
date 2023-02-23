@@ -3,28 +3,27 @@
   about it.
 
   This component takes two props:
-  - selectedRowData, a JSON object that contains an internal_id field corresponding to a record in the database
+  - internalID, a string corresponding to a unique ID in the database for a spectrum (with data in the database)
   - displayAdditionalInfo, a boolean value that partially controls whether text indicating that the spectrum is
     assocated with a method is displayed
 -->
 
 <template>
   <div class="spectrum-display-container">
-    <div class="results-header">
-      <p>Below is a plot of the spectrum as intensities versus mass-to-charge ratios (m/z).  Click and drag over a section of the horizontal axis to zoom; double click to zoom back out.  Intensities are scaled so that the highest peak has a value of 100.</p>
-    </div>
+    <p>Below is a plot of the spectrum as intensities versus mass-to-charge ratios (m/z).  Click and drag over a section of the horizontal axis to zoom; double click to zoom back out.  Intensities are scaled so that the highest peak has a value of 100.</p>
     <div class="graph-container">
       <div id="graph" ref="graph">graph_placeholder</div>
     </div>
+    <br />
     <div class="info-container">
-      <p>Information</p>
+      <p style="font-weight: bold;">Information</p>
       <ul style="list-style-type: none;">
         <li><strong>Number of Points:</strong> {{ spectrum.length }}</li>
         <li><strong>Spectral Entropy:</strong> {{ spectral_entropy ? spectral_entropy.toFixed(4) : "Undefined" }}</li>
         <li><strong>Normalized Entropy:</strong> {{ normalized_entropy ? normalized_entropy.toFixed(4) : "Undefined" }}</li>
         <li><strong>Rating:</strong> {{ spectrum.length == 1 ? "N/A" : (spectral_entropy <= 3.0 & normalized_entropy <= 0.8 ? "Clean" : "Noisy") }}</li>
         <li><strong>SPLASH:</strong> <a :href="`https://www.google.com/search?q=${splash}`">{{ splash }}</a></li>
-        <li v-if="has_associated_method && displayAdditionalInfo">There's an associated method for this spectrum; click <router-link :to="`/method_with_spectra/spectrum/${selectedRowData.internal_id}`">here</router-link> to view.</li>
+        <li v-if="has_associated_method && displayAdditionalInfo">There's an associated method for this spectrum; click <router-link :to="`/method_with_spectra/spectrum/${internalID}`">here</router-link> to view.</li>
       </ul>
       <button @click="show_table_modal = true">Show Points</button>
     </div>
@@ -72,9 +71,9 @@
         ]
       }
     },
-    props: {selectedRowData: Object, displayAdditionalInfo: Boolean},
+    props: {internalID: String, displayAdditionalInfo: Boolean},
     watch: {
-      selectedRowData(){
+      internalID(){
         this.getSpectrumData()
       }
     },
@@ -82,11 +81,8 @@
       this.getSpectrumData()
     },
     methods: {
-      dummyLog() {
-        console.log(this.selectedRowData)
-      },
       async getSpectrumData() {
-        const path = `${this.BACKEND_LOCATION}/get_spectrum/${this.selectedRowData.internal_id}`
+        const path = `${this.BACKEND_LOCATION}/get_spectrum/${this.internalID}`
         const response = await axios.get(path)
         this.spectrum = response.data.spectrum
         this.spectral_entropy = response.data.spectral_entropy

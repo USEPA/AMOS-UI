@@ -36,7 +36,7 @@
       </div>
       </div>
     </div>
-    <StoredPDFViewer style="width: 48vw;" v-if="any_method_selected" :selectedRowData="selected_row_data" recordType="method"/>
+    <StoredPDFViewer style="width: 48vw;" v-if="any_method_selected" :internalID="selected_row_data.internal_id" recordType="method"/>
   </div>
 </template>
 

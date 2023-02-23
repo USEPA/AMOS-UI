@@ -8,13 +8,13 @@
 
 <template>
   <div>
-    <p>Below is a list of all methods in the database.  Double-click on a row to open the method's PDF file in a new tab.</p>
+    <p>Below is a list of all {{method_info.length}} methods currently in the database.  Double-click on a row to display the method and its compounds in another tab.</p>
     <ag-grid-vue
       class="ag-theme-balham"
       style="height:600px; width:100%"
       :defaultColDef="default_column_def"
       :columnDefs="column_defs"
-      :rowData="results"
+      :rowData="method_info"
       rowSelection="single"
       @row-double-clicked="onDoubleClick"
     ></ag-grid-vue>
@@ -37,7 +37,7 @@
     data() {
       return {
         BACKEND_LOCATION,
-        results: [],
+        method_info: null,    //starting this as null instead of an empty array means the loading overlay will trigger
         default_column_def: {resizable: true, filter: 'agTextColumnFilter', floatingFilter: true},
         column_defs: [
           {field: "method_number", headerName: "Method #"},
@@ -53,11 +53,11 @@
     async created() {
       const path = `${this.BACKEND_LOCATION}/method_list`
       const response = await axios.get(path)
-      this.results = response.data.results
+      this.method_info = response.data.results
     },
     methods: {
       onDoubleClick(event) {
-        window.open(`${this.BACKEND_LOCATION}/get_pdf/method/${event.data.internal_id}`)
+        window.open(`/view_method/${event.data.internal_id}`)
       }
     },
     components: {

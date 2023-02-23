@@ -29,6 +29,10 @@
         <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:5173/" target="_blank">Spectral and Methods Database</b-dropdown-item>
         <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:9004/molmass_web.py" target="_blank">Molecular Mass Calculator</b-dropdown-item>
         <b-dropdown-item href="https://aop-dev.rtpnc.epa.gov/nta-ui/nta.html" target="_blank">CFM-ID Spectral Search</b-dropdown-item>
+        <b-dropdown-item href="https://comptox.epa.gov/dashboard/" target="_blank">CompTox Chemicals Dashboard</b-dropdown-item>
+        <b-dropdown-item href="https://comptox.epa.gov/genra/" target="_blank">Generalized Read-Across (GenRA)</b-dropdown-item>
+        <b-dropdown-item href="https://comptox.epa.gov/dashboard/chemical/pubmed-abstract-sifter/" target="_blank">Literature Abstract Sifter</b-dropdown-item>
+        <b-dropdown-item href="https://www.epa.gov/chemical-research/cheminformatics" target="_blank">Cheminformatics PoC Modules</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
       <router-link to="/about">About this App</router-link>

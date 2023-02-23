@@ -42,34 +42,35 @@
           <label for="single-point-spectra">Include Single Point Spectra</label>
         </div>
       </div>
-      <p v-if="no_compound_match">There is no compound in this database that matches the search term "{{$route.params.search_term}}" -- if something should be here, please check the search term for typos.</p>
-      <p v-else-if="results.length==0">The search term "{{$route.params.search_term}}" matches a compound in the database; however, no data records were found.</p>
-      <div v-else>
-        <div class="tab-bar">
-          <a :class="result_table_view_mode == 'all' ? 'active' : ''" @click="updateTab('all')">All Results ({{results.length}})</a>
-          <a :class="determineTabBarClass('spectrum')" @click="updateTab('spectrum')">Spectra ({{record_type_counts.spectrum}})</a>
-          <a :class="determineTabBarClass('monograph')" @click="updateTab('monograph')">Monographs ({{record_type_counts.monograph}})</a>
-          <a :class="determineTabBarClass('method')" @click="updateTab('method')">Methods ({{record_type_counts.method}})</a>
+      <div v-if="!still_searching">
+        <p v-if="no_compound_match">There is no compound in this database that matches the search term "{{$route.params.search_term}}" -- if something should be here, please check the search term for typos.</p>
+        <p v-else-if="results.length==0">The search term "{{$route.params.search_term}}" matches a compound in the database; however, no data records were found.</p>
+        <div v-else>
+          <div class="tab-bar">
+            <a :class="result_table_view_mode == 'all' ? 'active' : ''" @click="updateTab('all')">All Results ({{results.length}})</a>
+            <a :class="determineTabBarClass('spectrum')" @click="updateTab('spectrum')">Spectra ({{record_type_counts.spectrum}})</a>
+            <a :class="determineTabBarClass('monograph')" @click="updateTab('monograph')">Monographs ({{record_type_counts.monograph}})</a>
+            <a :class="determineTabBarClass('method')" @click="updateTab('method')">Methods ({{record_type_counts.method}})</a>
+          </div>
+          <ag-grid-vue
+            class="ag-theme-balham"
+            style="height:600px; width:100%"
+            v-if="results.length > 0"
+            :columnDefs="columnDefs"
+            :rowData="results"
+            rowSelection="single"
+            @first-data-rendered="onGridReady"
+            @row-selected="onRowSelected"
+            :isExternalFilterPresent="isExternalFilterPresent"
+            :doesExternalFilterPass="doesExternalFilterPass"
+          ></ag-grid-vue>
         </div>
-        <!--:tooltipShowDelay="tooltipShowDelay"-->
-        <ag-grid-vue
-          class="ag-theme-balham"
-          style="height:600px; width:100%"
-          v-if="results.length > 0"
-          :columnDefs="columnDefs"
-          :rowData="results"
-          rowSelection="single"
-          @first-data-rendered="onGridReady"
-          @row-selected="onRowSelected"
-          :isExternalFilterPresent="isExternalFilterPresent"
-          :doesExternalFilterPass="doesExternalFilterPass"
-        ></ag-grid-vue>
       </div>
     </div>
     <div class="information-viewer">
       <p class="info-paragraph" v-if="view_type == 'none'">Click on a row in the table to the left to display either a spectrum (if available) or a PDF file in this space.</p>
-      <SpectrumViewer v-else-if="view_type == 'Spectrum'" :selectedRowData="selected_row_data" displayAdditionalInfo/>
-      <StoredPDFViewer v-else-if="view_type == 'PDF'" style="width: 50vw;" :selectedRowData="selected_row_data" :recordType="selected_row_data.record_type"/>
+      <SpectrumViewer v-else-if="view_type == 'Spectrum'" :internalID="selected_row_data.internal_id" displayAdditionalInfo/>
+      <StoredPDFViewer v-else-if="view_type == 'PDF'" style="width: 50vw;" :internalID="selected_row_data.internal_id" :recordType="selected_row_data.record_type" displayAdditionalInfo/>
       <p class="info-paragraph" v-else>This database does not contain anything for this record.  Click the hyperlink in the "Record Type" column to be directed to the source.</p>
     </div>
   </div>

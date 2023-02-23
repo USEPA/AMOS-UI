@@ -23,7 +23,7 @@
     </ul>
     <br />
     <br />
-    <p>This app was last updated on 2023-01-20.</p>
+    <p>This app was last updated on 2023-02-23.</p>
     <!-- In theory, the below is a functional toggle switch that might be useful, but we'll see if it's what we'll use down the line.
       <label class="toggle-switch">
       <input type="checkbox" class="toggle-switch-input" checked>
