@@ -9,12 +9,12 @@
   <div class="wrap">
     <div class="monograph-box">
       <p>
-        This is a list of monographs available in the database. All monographs currently originate
-        from four sources: the <a href="https://www.swgdrug.org/monographs.htm">Scientific Working 
-        Group</a> (SWG), the <a href="https://www.npsdiscovery.org/reports/monographs/">Center for 
-        Forensic Science Research & Education</a> (CFRSE), <a href="https://www.nmslabs.com/">NMS 
-        Labs</a>, and the <a href="https://www.kgi.edu/academics/schools/school-of-pharmacy-and-health-sciences/">
-        KGI School of Pharmacy and Health Sciences</a>.
+        This is a list of {{monograph_info.length}} monographs available in the database. All monographs currently
+        originate from four sources: the <a href="https://www.swgdrug.org/monographs.htm">Scientific Working 
+        Group</a> (SWG), the <a href="https://www.npsdiscovery.org/reports/monographs/">Center for Forensic
+        Science Research & Education</a> (CFRSE), <a href="https://www.nmslabs.com/">NMS Labs</a>, and the 
+        <a href="https://www.kgi.edu/academics/schools/school-of-pharmacy-and-health-sciences/"> KGI School of
+        Pharmacy and Health Sciences</a>.
       </p>
       <ag-grid-vue
         class="ag-theme-balham"

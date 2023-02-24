@@ -30,7 +30,7 @@
                 <li><strong>(Preferred) Name:</strong> {{ compound_info.preferred_name }} </li>
                 <li><strong>DTXSID:</strong> <a :href="`https://comptox.epa.gov/dashboard/chemical/details/${compound_info.dtxsid}`">{{ compound_info.dtxsid }}</a> </li>
                 <li><strong>CASRN:</strong> {{ compound_info.casrn }} </li>
-                <li><strong>InChIKey:</strong> {{ compound_info.inchikey }} </li>
+                <li><strong>InChIKey:</strong> {{ compound_info.jchem_inchikey }} </li>
                 <li><strong>Molecular Formula:</strong> {{ compound_info.molecular_formula }} </li>
                 <li><strong>Mass:</strong> {{ compound_info.molecular_weight }} </li>
                 <li>&nbsp;</li>
