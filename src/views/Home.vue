@@ -12,7 +12,7 @@
       <p>The search will return records of all three types -- spectra, monographs, and methods.  The initial tab shown can be selected with the radio buttons below.</p>
       <div>
         <input @keyup.enter="go_big_bar()" id="big-search-bar" name="big-search-bar" placeholder="Search name, InChIKey, DTXSID, or CASRN..." size="60" v-model="bigBarSearchTerm">
-        <button @click="go_big_bar()">Search</button>
+        <button @click="go_big_bar()">Compound Search</button>
       </div>
       <div>
         <label><input type="radio" id="all-tab" v-model="initial_results_tab" value="all">All</label>

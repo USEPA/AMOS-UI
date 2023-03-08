@@ -6,6 +6,20 @@
   white-space: nowrap;
 }
 
+.fake-link {
+  color: #0000EE;
+  text-decoration: underline;
+}
+
+.two-column-page {
+  display: flex;
+  justify-content: space-between;
+}
+
+.half-page-column {
+  width: 48vw;
+}
+
 
 /***** STYLES FOR TAB BARS *****/
 

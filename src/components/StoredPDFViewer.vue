@@ -75,8 +75,8 @@
         column_defs: [
           {field:'image', headerName:'Structure', autoHeight: true, width: 100, cellRenderer: (params) => {
             var image = document.createElement('img');
-            image.src = 'https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/'+params.data.dtxsid;
-            image.style = "width:70px;height:70px;";
+            image.src = 'https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/' + params.data.dtxsid;
+            image.style = "width:70px;height:70px;padding-top:2px;padding-bottom:2px;";
             return image;
           }},
           {field: 'dtxsid', headerName: 'DTXSID', width: 120, cellRenderer: params => {
@@ -134,7 +134,7 @@
 <style>
   .pdf-viewer-box{
     height: 90vh;
-    width: 50vw;
+    width: 48vw;
     overflow: scroll;
   }
 

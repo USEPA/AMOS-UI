@@ -7,7 +7,7 @@
 -->
 
 <template>
-  <div class="split-page">
+  <div class="two-column-page">
     <div class="half-page-column">
       <div class="results-header">
         <h2 v-if="pdf_name">{{pdf_name}}</h2>
@@ -58,6 +58,7 @@
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
+
   export default {
     data(){
       return {
@@ -73,7 +74,7 @@
           {field:'image', headerName:'Structure', autoHeight: true, width: 100, cellRenderer: (params) => {
             var image = document.createElement('img');
             image.src = 'https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/'+params.data.dtxsid;
-            image.style = "width:70px;height:70px;";
+            image.style = "width:70px;height:70px;padding-top:2px;padding-bottom:2px;";
             return image;
           }},
           {field: 'dtxsid', headerName: 'DTXSID', width: 120, cellRenderer: params => {
@@ -122,18 +123,14 @@
 </script>
 
 <style>
-  .split-page {
+  .ag-row .ag-cell {
     display: flex;
-    justify-content: space-between;
-  }
-
-  .half-page-column {
-    width: 48vw;
+    align-items: center;
   }
 
   .pdf-viewer-box{
     height: 90vh;
-    width: 48vw;
+    width: 46vw;
     overflow: scroll;
   }
 

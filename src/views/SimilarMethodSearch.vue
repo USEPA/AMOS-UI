@@ -7,17 +7,20 @@
 -->
 
 <template>
-  <div class="wrap">
-    <div class="monograph-box">
+  <div class="two-column-page">
+    <div class="half-page-column">
       <p></p>
       <div>
         <label for="search-dtxsid">Compound Identifier</label> &nbsp;
         <input @keyup.enter="methodSearch()" type="text" v-model="searched_compound" name="search-dtxsid">
         <button @click="methodSearch()">Method Search</button>
       </div>
-      <p v-if="no_search_complete">This page allows for searching for methods that contain either a given chemical or other chemicals similar to it.  A name, InChIKey, CASRN, or DTXSID can be searched on.</p>
+      <br />
+      <p v-if="!searching & !search_complete">This page allows for searching for methods that contain either a given chemical or other chemicals similar to it.  A name, InChIKey, CASRN, or DTXSID can be searched on.</p>
+      <p v-else-if="searching">Searching...</p>
+      <p v-else-if="!found_compound">No compound match was found for "{{ current_compound }}".</p>
       <div v-else>
-        <p>The table below lists methods for compounds that are similar to {{ current_compound }}.</p>
+        <p>The table below lists methods for compounds that are similar to "{{ current_compound }}".</p>
         <p>Select a row in the table to view the method on the right half of the screen.  Bolded rows refer to methods which contain the chemical being searched.</p>
         <p>Hover over a method name to see the full text of it.  The number in parentheses at the end is the number of similar compounds found in the method (not necessarily the number of compounds present in the method).</p>
         <p>Columns can be hidden by clicking on the menu icon seen when hovering over a column name -- this brings up a menu where column visibility can be toggled.</p> 
@@ -58,9 +61,11 @@
     data() {
       return {
         BACKEND_LOCATION,
-        results: [],
+        results: null,
         any_method_selected: false,
-        no_search_complete: true,
+        searching: false,
+        search_complete: false,
+        found_compound: false,
         selected_row_data: {},
         searched_compound: "",
         current_compound: "",
@@ -72,7 +77,7 @@
             return `<span title='${title_text}'>${this.ids_to_method_names[params.value]}</span>`
           }},
           {field: "source", headerName: "Source", width: 90, suppressSizeToFit: true, sortable: true, aggFunc: 'first'},
-          {field: "spectrum_type", headerName: "Methodology", width: 120, suppressSizeToFit: true, sortable: true, aggFunc: 'first'},
+          {field: "methodology", headerName: "Methodology", width: 120, suppressSizeToFit: true, sortable: true, aggFunc: 'first'},
           {field: "year_published", headerName: "Year", width: 70, suppressSizeToFit: true, sortable: true, aggFunc: 'first'},
           {field: "similarity", headerName: "Similarity", width: 95, suppressSizeToFit: true, sortable: true, aggFunc: 'max', cellRenderer:'agGroupCellRenderer', cellRendererParams: {
             innerRenderer: params => {return params.value.toFixed(2)}
@@ -106,16 +111,21 @@
     },
     methods: {
       async methodSearch() {
-        this.results = []
+        this.results = null
+        this.searching = true
         this.any_method_selected = false
-        this.no_search_complete = true
+        this.search_complete = false
         this.searched_compound = this.searched_compound.trim()
+
         const path = `${this.BACKEND_LOCATION}/get_similar_methods/${this.searched_compound}`
         const response = await axios.get(path)
+
+        this.found_compound = response.data.found_searched_compound
         this.current_compound = this.searched_compound
         this.results = response.data.results
         this.ids_to_method_names = response.data.ids_to_method_names
-        this.no_search_complete = false
+        this.searching = false
+        this.search_complete = true
       },
       onGridReady(params) {
         1
@@ -146,16 +156,6 @@
 </script>
 
 <style>
-.wrap{
-  display: flex;
-}
-
-.monograph-box{
-  /*height: 90vh;*/
-  width: 48vw;
-  /*overflow: scroll;*/
-}
-
 .method-has-chemical-match {
   font-weight: 700;
 }

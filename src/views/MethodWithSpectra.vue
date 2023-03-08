@@ -12,9 +12,9 @@
 <template>
   <div>
     <p v-if="search_type == 'invalid'">The search type {{ this.$route.params.by_type }} is invalid; it should be either "method" or "spectrum".</p>
-    <div v-else class="full-results-page">
+    <div v-else class="two-column-page">
       <div class="half-page-column">
-        <StoredPDFViewer style="width: 50vw;" :internalID="pdf_viewer_data.internal_id" recordType="method"/>
+        <StoredPDFViewer style="width: 48vw;" :internalID="pdf_viewer_data.internal_id" recordType="method"/>
       </div>
       <div class="half-page-column">
         <p>This is a list of spectra associated with this method, organized by compound identifier.  Double-click on a row to show the spectrum in a modal window.</p>
@@ -39,6 +39,7 @@
 
 <script>
   import axios from 'axios'
+  import '@/assets/style.css'
   import { BACKEND_LOCATION } from '@/assets/store'
 
   import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
@@ -92,9 +93,5 @@
   .full-results-page {
     display: flex;
     justify-content: space-between;
-  }
-
-  .half-page-column {
-    width: 46vw;
   }
 </style>

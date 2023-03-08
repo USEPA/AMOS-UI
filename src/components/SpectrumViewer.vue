@@ -21,7 +21,7 @@
         <li><strong>Number of Points:</strong> {{ spectrum.length }}</li>
         <li><strong>Spectral Entropy:</strong> {{ spectral_entropy ? spectral_entropy.toFixed(4) : "Undefined" }}</li>
         <li><strong>Normalized Entropy:</strong> {{ normalized_entropy ? normalized_entropy.toFixed(4) : "Undefined" }}</li>
-        <li><strong>Rating:</strong> {{ spectrum.length == 1 ? "N/A" : (spectral_entropy <= 3.0 & normalized_entropy <= 0.8 ? "Clean" : "Noisy") }}</li>
+        <li><div style="display: flex;"><strong>Rating:</strong> &nbsp; <div :class="{'clean-spectrum': spectrum_is_clean, 'noisy-spectrum': !spectrum_is_clean}">{{ spectrum.length == 1 ? "N/A" : (spectrum_is_clean ? "Clean" : "Noisy") }}</div></div></li>
         <li><strong>SPLASH:</strong> <a :href="`https://www.google.com/search?q=${splash}`">{{ splash }}</a></li>
         <li v-if="has_associated_method && displayAdditionalInfo">There's an associated method for this spectrum; click <router-link :to="`/method_with_spectra/spectrum/${internalID}`">here</router-link> to view.</li>
       </ul>
@@ -64,6 +64,7 @@
         splash: "",
         has_associated_method: false,
         show_table_modal: false,
+        spectrum_is_clean: false,
         BACKEND_LOCATION,
         column_defs: [
           {field:'m/z', headerName:'m/z', flex: 1, sortable: true},
@@ -87,6 +88,7 @@
         this.spectrum = response.data.spectrum
         this.spectral_entropy = response.data.spectral_entropy
         this.normalized_entropy = response.data.normalized_entropy
+        this.spectrum_is_clean = this.spectral_entropy <= 3.0 & this.normalized_entropy <= 0.8
         this.splash = response.data.splash
         this.has_associated_method = response.data.has_associated_method
         if (this.spectrum.length == 1){
@@ -161,6 +163,14 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.clean-spectrum {
+  color: #008888
+}
+
+.noisy-spectrum {
+  color: #880000
 }
 
 .dygraph-label {

@@ -6,8 +6,8 @@
 -->
 
 <template>
-  <div class="wrap">
-    <div class="monograph-box">
+  <div class="two-column-page">
+    <div class="half-page-column">
       <p>
         This is a list of {{monograph_info.length}} monographs available in the database. All monographs currently
         originate from four sources: the <a href="https://www.swgdrug.org/monographs.htm">Scientific Working 
@@ -16,6 +16,7 @@
         <a href="https://www.kgi.edu/academics/schools/school-of-pharmacy-and-health-sciences/"> KGI School of
         Pharmacy and Health Sciences</a>.
       </p>
+      <p>Select a row to view a monograph.</p>
       <ag-grid-vue
         class="ag-theme-balham"
         style="height:800px; width:100%"
@@ -86,15 +87,5 @@
 </script>
 
 <style>
-
-.wrap{
-  display: flex;
-}
-
-.monograph-box{
-  /*height: 90vh;*/
-  width: 48vw;
-  /*overflow: scroll;*/
-}
 
 </style>

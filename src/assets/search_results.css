@@ -1,11 +1,10 @@
 /* STUFF FOR CHEMICAL IMAGE DISPLAY */
 
 .chemical-box {
-    display: flex;
-    justify-content: center;
-    overflow: hidden;
-    /*border: 10px solid red;*/
-  }
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
   
 .chemical-image-highlight {
   display: flex;
@@ -22,7 +21,6 @@
 
 .chemical-info {
   display: flex;
-  /*border: 5px solid yellow;*/
   align-items: center;
   font-size: 18px;
   line-height: 1.1;

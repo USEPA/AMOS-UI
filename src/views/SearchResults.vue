@@ -2,7 +2,7 @@
   This page displays the records that correspond to a single searched compound in a table, and will display information
   about the searched compound and any record in the results that is selected.
 
-  This page can take one URL route parameter and four query parameters.  The route parameter is:
+  This page can take one URL route parameter and four optional query parameters.  The route parameter is:
   - search_term: the term searched for; can be either a compound name, an InChIKey, a CASRN, or a DTXSID
   The query parameters are:
   - methods, monographs, spectra: three parameters that toggle whether records of that type appear; if none are present,
@@ -13,8 +13,8 @@
 -->
 
 <template>
-  <div class="full-results-page">
-    <div class="search-results">
+  <div class="two-column-page">
+    <div class="half-page-column">
       <div class="results-header">
         <h1 v-if="still_searching" class="text-that-can-overflow">Searching for "{{$route.params.search_term}}"...</h1>
         <h1 v-else-if="!still_searching & no_compound_match">No compound match found.</h1>
@@ -39,7 +39,7 @@
             </div>
           </div>
           <input type="checkbox" id="single-point-spectra" v-model="include_single_point_spectra" @change="updateCheckboxFilters">
-          <label for="single-point-spectra">Include Single Point Spectra</label>
+          <label for="single-point-spectra">Display Single Point Spectra</label>
         </div>
       </div>
       <div v-if="!still_searching">
@@ -67,7 +67,7 @@
         </div>
       </div>
     </div>
-    <div class="information-viewer">
+    <div class="half-page-column">
       <p class="info-paragraph" v-if="view_type == 'none'">Click on a row in the table to the left to display either a spectrum (if available) or a PDF file in this space.</p>
       <SpectrumViewer v-else-if="view_type == 'Spectrum'" :internalID="selected_row_data.internal_id" displayAdditionalInfo/>
       <StoredPDFViewer v-else-if="view_type == 'PDF'" style="width: 50vw;" :internalID="selected_row_data.internal_id" :recordType="selected_row_data.record_type" displayAdditionalInfo/>
@@ -107,10 +107,9 @@
         result_table_view_mode: "all",
         record_type_counts: {method: 0, monograph: 0, spectrum: 0},
         columnDefs: [
-          {field: 'spectrum_types', headerName: 'Spectrum Type', sortable: true, sort: 'asc', filter: 'agSetColumnFilter', width: 150, suppressSizeToFit: true},
+          {field: 'spectrum_types', headerName: 'Methodology', sortable: true, sort: 'asc', filter: 'agSetColumnFilter', width: 150, suppressSizeToFit: true},
           {field: 'source', headerName: 'Source', sortable: true, width: 110, suppressSizeToFit: true, cellRenderer: params => {
-            // TODO: As it is now, none of the SWG or ECM methods should be missing a link, so this "shortcut" treating
-            // the missing case is okay for now, but there's probably more rigorous way to handle this
+            // TODO: Will want a mapping for shorthands, rather than static cases like this.
             if (params.data.link === null) {
               return params.data.source
             } else if (params.data.source == "SWG") {
@@ -172,9 +171,11 @@
         this.gridApi.sizeColumnsToFit()
       },
       onRowSelected(event) {
+        // Row selection creates two events -- one for the selection, one for the deselection.  Only
+        // the former has an "event" field inside it, so rely on that to filter the deselection
+        // event out.
         if (event.event){
           this.view_type = event.data.data_type
-          console.log(event.data.internal_id)
           if (event.data.data_type == "Spectrum"){
             this.selected_row_data = event.data
           } else if (event.data.data_type == "PDF"){
@@ -183,11 +184,11 @@
         }
       },
       downloadResultsAsCSV() {
-        console.log(this.$route)
         this.gridApi.exportDataAsCsv({
-          columnKeys: ["spectrum_types", "source", "link", "record_type", "description"],
+          columnKeys: ["methodology", "source", "link", "record_type", "description"],
           fileName: this.$route.params.search_term + "_results.csv",
           processCellCallback: cell => {
+            // If a link is missing for a record, have it link back to the search page, with the record preselected
             if ((cell.column.colId === "link") & (cell.value === null)){
               return `${window.location.origin}/search/${this.$route.params.search_term}?initial_row_selected=${cell.node.data.internal_id}`
             } else {
@@ -200,9 +201,12 @@
         return true
       },
       doesExternalFilterPass(node) {
+        // Controls the filtering of records in the table -- so far, this amounts to handling the
+        // toggling of single point spectra and switching between record types.
         let singlePointSpectrum = false
-        if (node.data.comment) {
-          if (!this.include_single_point_spectra & (node.data.comment.includes("# PEAKS=1;") | node.data.comment.endsWith("# PEAKS=1"))) {
+        if (node.data.description) {
+          if (!this.include_single_point_spectra & (node.data.description.includes("# PEAKS=1;") | node.data.description.endsWith("# PEAKS=1"))) {
+            console.log(node.data.description)
             singlePointSpectrum = true
           }
         }
@@ -263,26 +267,9 @@
 </script>
 
 <style>
-.full-results-page {
-  display: flex;
-}
-
-.search-results {
-  width: 48vw;
-}
-
-.information-viewer {
-  width: 48vw;
-}
-
 .info-paragraph {
   text-align: center;
   font-size: 20px;
-}
-
-.fake-link {
-  color: #0000EE;
-  text-decoration: underline;
 }
 
 .has-hover-text {
