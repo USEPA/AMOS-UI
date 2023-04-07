@@ -31,14 +31,17 @@
       </div>
     </div>
 
-    <ag-grid-vue
-      v-else-if="viewer_mode == 'CompoundTable'"
-      class="ag-theme-balham"
-      style="height:500px; width:100%"
-      :columnDefs="column_defs"
-      :rowData="compound_list"
-      rowSelection="single"
-    ></ag-grid-vue>
+    <div v-else-if="viewer_mode == 'CompoundTable'">
+      <button @click="downloadCompoundInfo">Download Compound Info</button>
+      <ag-grid-vue
+        class="ag-theme-balham"
+        style="height:500px; width:100%"
+        :columnDefs="column_defs"
+        :rowData="compound_list"
+        rowSelection="single"
+        @grid-ready="onGridReady"
+      ></ag-grid-vue>
+    </div>
     <p v-else>Illegal value for 'viewer_mode' selected.  Current value is {{viewer_mode}}.</p>
   </div>
 </template>
@@ -125,6 +128,16 @@
       },
       updateTab(tabName) {
         this.viewer_mode = tabName
+      },
+      downloadCompoundInfo() {
+        this.gridApi.exportDataAsCsv({
+          columnKeys: ["dtxsid", "casrn", "preferred_name"],
+          fileName: this.internalID + "_compound_list.csv"
+        });
+      },
+      onGridReady(params) {
+        this.gridApi = params.api;
+        this.gridColumnApi = params.columnApi;
       }
     },
     components: { AgGridVue, CompoundTile }

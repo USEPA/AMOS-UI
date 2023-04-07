@@ -22,23 +22,23 @@
       <li>Batch searching compounds by DTXSID, and returning basic information for all records.</li>
     </ul>
     <br />
+    <p>Below is a chart detailing the breakdown of the methods currently in the database.  Click on a circle to zoom in and see more detail; click outside it to move to a higher level.</p>
+    <MethodsBubbleChart />
     <br />
-    <p>This app was last updated on 2023-03-08.</p>
-    <!-- In theory, the below is a functional toggle switch that might be useful, but we'll see if it's what we'll use down the line.
-      <label class="toggle-switch">
-      <input type="checkbox" class="toggle-switch-input" checked>
-      <span class="toggle-slider"></span>
-    </label> -->
+    <p>This app was last updated on 2023-04-07.</p>
   </div>
 </template>
 
 <script>
+  import MethodsBubbleChart from '@/components/MethodsBubbleChart.vue'
+
   export default {
     data() {
       return {
         x: true
       }
-    }
+    },
+    components: {MethodsBubbleChart}
   }
 </script>
 

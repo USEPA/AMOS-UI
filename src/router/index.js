@@ -11,7 +11,8 @@ const routes = [
     {path: "/methods_list", name: "Methods List", component: ()=>import('../views/MethodList.vue')},
     {path: "/batch_search", name: "Batch Search", component: ()=>import('../views/BatchSearch.vue')},
     {path: "/method_with_spectra/:by_type/:internal_id", name: "Method With Associated Spectra", component: ()=>import('../views/MethodWithSpectra.vue')},
-    {path: "/view_method/:internal_id", name: "Method Viewer", component: ()=>import('../views/MethodViewer.vue')}
+    {path: "/view_method/:internal_id", name: "Method Viewer", component: ()=>import('../views/MethodViewer.vue')},
+    {path: "/spectrum_comparison", name: "Spectrum Comparison", component: ()=>import('../views/SpectrumComparison.vue')}
   ]
 
 const router = createRouter({

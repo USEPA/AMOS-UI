@@ -1,14 +1,16 @@
 /***** GENERAL-USE STYLES *****/
 
-.text-that-can-overflow {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .fake-link {
   color: #0000EE;
   text-decoration: underline;
+}
+
+.half-page-column {
+  width: 48vw;
+}
+
+.has-hover-text {
+  text-decoration: underline dashed;
 }
 
 .two-column-page {
@@ -16,9 +18,12 @@
   justify-content: space-between;
 }
 
-.half-page-column {
-  width: 48vw;
+.text-that-can-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
 
 
 /***** STYLES FOR TAB BARS *****/

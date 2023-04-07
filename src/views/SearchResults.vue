@@ -90,7 +90,7 @@
   import '@/assets/search_results.css'
   import SpectrumViewer from '@/components/SpectrumViewer.vue'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
-  import { BACKEND_LOCATION } from '@/assets/store'
+  import { BACKEND_LOCATION, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
 
   export default {
     data(){
@@ -103,19 +103,18 @@
         no_compound_match: false,
         tooltipShowDelay: 500,
         BACKEND_LOCATION,
+        SOURCE_ABBREVIATION_MAPPING,
         include_single_point_spectra: true,
         result_table_view_mode: "all",
         record_type_counts: {method: 0, monograph: 0, spectrum: 0},
         columnDefs: [
           {field: 'spectrum_types', headerName: 'Methodology', sortable: true, sort: 'asc', filter: 'agSetColumnFilter', width: 150, suppressSizeToFit: true},
           {field: 'source', headerName: 'Source', sortable: true, width: 110, suppressSizeToFit: true, cellRenderer: params => {
-            // TODO: Will want a mapping for shorthands, rather than static cases like this.
             if (params.data.link === null) {
               return params.data.source
-            } else if (params.data.source == "SWG") {
-              return "<a href='" + params.data.link + "' target='_blank' title='Scientific Working Group' class='has-hover-text'>" + params.data.source + "</a>";
-            } else if (params.data.source == "ECM") {
-              return "<a href='" + params.data.link + "' target='_blank' title='Environmental Chemistry Methods' class='has-hover-text'>" + params.data.source + "</a>";
+            } else if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source]) {
+              const full_name = this.SOURCE_ABBREVIATION_MAPPING[params.data.source]
+              return "<a href='" + params.data.link + "' target='_blank' title='" + full_name +"' class='has-hover-text'>" + params.data.source + "</a>";
             } else {
               return "<a href='" + params.data.link + "' target='_blank'>" + params.data.source + "</a>";
             }
@@ -144,20 +143,6 @@
       onGridReady(params) {
         this.gridApi = params.api
 
-        // Code to set filters on table generation -- keeping just in case it's useful later
-        //const st_instance = this.gridApi.getFilterInstance('spectrum_type');
-        //st_instance.setModel({values: ['GC-MS', 'LC-MS+', 'LC-MS-', 'LC-MS-Unknown']});
-
-        // TODO: there's gotta be a better way to handle the logic below, not sure it's even needed
-        // with the tabs anymore...
-        var filters_to_use = []
-        if (typeof(this.$route.query.monographs) === "string" && typeof(this.$route.query.monographs) === "string" && typeof(this.$route.query.spectra) === "string"){
-          if (this.$route.query.methods === "true"){filters_to_use.push("Method")}
-          if (this.$route.query.monographs === "true"){filters_to_use.push("Monograph")}
-          if (this.$route.query.spectra === "true"){filters_to_use.push("Spectrum")}
-          const rec_instance = this.gridApi.getFilterInstance('record_type')
-          rec_instance.setModel({values: filters_to_use})
-        }
         if (typeof(this.$route.query.initial_row_selected) === "string") {
           this.gridApi.forEachNode(node => {
             if (node.data.internal_id === this.$route.query.initial_row_selected) {

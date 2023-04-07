@@ -25,7 +25,10 @@
         <li><strong>SPLASH:</strong> <a :href="`https://www.google.com/search?q=${splash}`">{{ splash }}</a></li>
         <li v-if="has_associated_method && displayAdditionalInfo">There's an associated method for this spectrum; click <router-link :to="`/method_with_spectra/spectrum/${internalID}`">here</router-link> to view.</li>
       </ul>
-      <button @click="show_table_modal = true">Show Points</button>
+      <div>
+        <button @click="show_table_modal = true">Show Points</button>
+        <button v-if="spectrum_metadata" @click="show_metadata_modal = true">Spectrum Info</button>
+      </div>
     </div>
     <b-modal v-model="show_table_modal">
       <ag-grid-vue
@@ -35,6 +38,19 @@
         :rowData="spectrumAsRows(spectrum)"
         rowSelection="single"
       ></ag-grid-vue>
+      <button @click="copySpectrum()">Copy to Clipboard</button>
+    </b-modal>
+    <b-modal v-model="show_metadata_modal" ref="metadata_modal">
+      <h5 v-if="spectrum_metadata.Chromatography">Chromatography Info:</h5>
+      <ul v-if="spectrum_metadata.Chromatography" style="list-style-type: none;" ref="metadata_modal">
+        <li v-for="c in Object.entries(spectrum_metadata.Chromatography)"><strong>{{c[0]}}:</strong> {{c[1]}}</li>
+      </ul>
+      <br />
+      <h5 v-if="spectrum_metadata.Spectrometry">Spectrometry Info:</h5>
+      <ul v-if="spectrum_metadata.Spectrometry" style="list-style-type: none;">
+        <li v-for="s in Object.entries(spectrum_metadata.Spectrometry)"><strong>{{s[0]}}:</strong> {{s[1]}}</li>
+      </ul>
+      <button @click="copyMetadata()">Copy to Clipboard</button>
     </b-modal>
   </div>
 </template>
@@ -64,7 +80,9 @@
         splash: "",
         has_associated_method: false,
         show_table_modal: false,
+        show_metadata_modal: false,
         spectrum_is_clean: false,
+        spectrum_metadata: {},
         BACKEND_LOCATION,
         column_defs: [
           {field:'m/z', headerName:'m/z', flex: 1, sortable: true},
@@ -91,6 +109,7 @@
         this.spectrum_is_clean = this.spectral_entropy <= 3.0 & this.normalized_entropy <= 0.8
         this.splash = response.data.splash
         this.has_associated_method = response.data.has_associated_method
+        this.spectrum_metadata = response.data.spectrum_metadata
         if (this.spectrum.length == 1){
           const padded_spectrum = [[this.spectrum[0][0] - 1, 0], this.spectrum[0], [this.spectrum[0][0] + 1, 0]]
           const g = new Dygraph(document.getElementById("graph"), padded_spectrum, {
@@ -138,6 +157,16 @@
       },
       spectrumAsRows(spectrum) {
         return spectrum.map(function(x){return {"m/z":x[0], "intensity":x[1]}})
+      },
+      copyMetadata() {
+        const chromatography = Object.entries(this.spectrum_metadata.Chromatography).map(x => `${x[0]}: ${x[1]}`).join("\n")
+        const spectrometry = Object.entries(this.spectrum_metadata.Spectrometry).map(x => `${x[0]}: ${x[1]}`).join("\n")
+        const data_string = `Chromatography:\n${chromatography}\n\nSpectrometry:\n${spectrometry}`
+        navigator.clipboard.writeText(data_string)
+      },
+      copySpectrum() {
+        const spectrum_string = "m/z Intensity\n" + this.spectrum.map(x => `${x[0]} ${x[1]}`).join("\n");
+        navigator.clipboard.writeText(spectrum_string)
       }
     },
     components: {AgGridVue}
