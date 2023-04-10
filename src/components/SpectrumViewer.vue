@@ -162,11 +162,37 @@
         const chromatography = Object.entries(this.spectrum_metadata.Chromatography).map(x => `${x[0]}: ${x[1]}`).join("\n")
         const spectrometry = Object.entries(this.spectrum_metadata.Spectrometry).map(x => `${x[0]}: ${x[1]}`).join("\n")
         const data_string = `Chromatography:\n${chromatography}\n\nSpectrometry:\n${spectrometry}`
-        navigator.clipboard.writeText(data_string)
+        // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
+        // can't get that to work in this app, though, since it apparently requires a secured connection and the
+        // deployed version of this app doesn't have that.  So I'm sticking to this technically-depricated solution that
+        // I pulled out of CompTox's code, since it apparently works there.
+        const textarea = document.createElement('textarea')
+        textarea.value = data_string
+        document.body.appendChild(textarea)
+        textarea.select()
+        try {
+          document.execCommand('copy')
+        } catch (err) {
+          console.log('Cannot copy: ' + err)
+        }
+        document.body.removeChild(textarea)
       },
       copySpectrum() {
         const spectrum_string = "m/z Intensity\n" + this.spectrum.map(x => `${x[0]} ${x[1]}`).join("\n");
-        navigator.clipboard.writeText(spectrum_string)
+        // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
+        // can't get that to work in this app, though, since it apparently requires a secured connection and the
+        // deployed version of this app doesn't have that.  So I'm sticking to this technically-depricated solution that
+        // I pulled out of CompTox's code, since it apparently works there.
+        const textarea = document.createElement('textarea')
+        textarea.value = spectrum_string
+        document.body.appendChild(textarea)
+        textarea.select()
+        try {
+          document.execCommand('copy')
+        } catch (err) {
+          console.log('Cannot copy: ' + err)
+        }
+        document.body.removeChild(textarea)
       }
     },
     components: {AgGridVue}
