@@ -25,7 +25,7 @@
     <p>Below is a chart detailing the breakdown of the methods currently in the database.  Click on a circle to zoom in and see more detail; click outside it to move to a higher level.</p>
     <MethodsBubbleChart />
     <br />
-    <p>This app was last updated on 2023-04-07.</p>
+    <p>This app was last updated on 2023-05-01.</p>
   </div>
 </template>
 
@@ -43,47 +43,5 @@
 </script>
 
 <style>
-  .toggle-switch {
-    position: fixed;
-    width: 34px;
-    height: 19px;
-  }
 
-  .toggle-switch-input { 
-    opacity: 0;
-    width: 0;
-    height: 0;
-  }
-
-  .toggle-slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 1rem;
-    background-color: lightgray;
-    transition: .3s;
-  }
-
-  .toggle-slider::before {
-    position: absolute;
-    content: "";
-    height: 15px;
-    width: 15px;
-    left: 2px;
-    bottom: 2px;
-    border-radius: 50%;
-    background-color: white;
-    transition: .3s;
-  }
-
-  .toggle-switch-input:checked + .toggle-slider::before {
-    transform: translateX(15px);
-  }
-
-  .toggle-switch-input:checked + .toggle-slider {
-    background-color: cornflowerblue;
-  }
 </style>

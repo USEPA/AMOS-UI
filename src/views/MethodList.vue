@@ -13,6 +13,8 @@
     <div>
       <label for="full-table-filter">Full Table Filter</label> &nbsp;
       <input type="text" v-model="full_table_filter" name="full-table-filter" @keyup="quickFilter(full_table_filter)">
+      &nbsp;
+      <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." />
     </div>
     <div class="button-array">
       <button @click="saveFiltersAsURL">Save filters to URL</button>
@@ -44,6 +46,7 @@
 
   import '@/assets/style.css'
   import { BACKEND_LOCATION, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
+  import HelpIcon from '@/components/HelpIcon.vue'
 
   export default {
     data() {
@@ -69,6 +72,7 @@
             }
           }},
           {field: "analyte", headerName: "Analyte", tooltipField: 'analyte', sortable: true, flex: 1},
+          {field: "chemical_class", headerName: "Chemical Class", sortable: true, flex: 1},
           {field: "matrix", headerName: "Matrix", sortable: true, flex: 1.2},
           {field: "count", headerName: "# Compounds", width: 120, floatingFilter: false, sortable: true}
         ]
@@ -140,7 +144,7 @@
       }
     },
     components: {
-      AgGridVue
+      AgGridVue, HelpIcon
     }
   }
 </script>

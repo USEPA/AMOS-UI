@@ -21,8 +21,8 @@
     <div class="half-page-column">
       <div style="margin-bottom:3cm;"></div>
       <div class="tab-bar">
-        <a :class="viewer_mode == 'CompoundGrid' ? 'active' : ''" @click="updateTab('CompoundGrid')">Compounds (grid)</a>
-        <a :class="viewer_mode == 'CompoundTable' ? 'active' : ''" @click="updateTab('CompoundTable')">Compounds (table)</a>
+        <a :class="viewer_mode == 'CompoundGrid' ? 'active' : ''" @click="updateTab('CompoundGrid')">Compounds ({{ compound_list.length }}) (grid)</a>
+        <a :class="viewer_mode == 'CompoundTable' ? 'active' : ''" @click="updateTab('CompoundTable')">Compounds ({{ compound_list.length }}) (table)</a>
       </div>
       <div class="compound-grid" v-if="viewer_mode == 'CompoundGrid'">
         <div v-for="cl in compound_list">

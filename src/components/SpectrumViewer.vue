@@ -30,6 +30,8 @@
         <button v-if="spectrum_metadata" @click="show_metadata_modal = true">Spectrum Info</button>
       </div>
     </div>
+
+    <!-- Modal window that displays the spectrum in an AG Grid table.-->
     <b-modal v-model="show_table_modal">
       <ag-grid-vue
         class="ag-theme-balham"
@@ -40,6 +42,8 @@
       ></ag-grid-vue>
       <button @click="copySpectrum()">Copy to Clipboard</button>
     </b-modal>
+
+    <!-- Modal window that displays the metadata associated with the spectrum, using the spectrum_metadata field from the database. -->
     <b-modal v-model="show_metadata_modal" ref="metadata_modal">
       <h5 v-if="spectrum_metadata.Chromatography">Chromatography Info:</h5>
       <ul v-if="spectrum_metadata.Chromatography" style="list-style-type: none;" ref="metadata_modal">

@@ -119,7 +119,8 @@
                   ylabel: "Relative Intensity",
                   width: 600,
                   height: 400,
-                  xRangePad: 10
+                  xRangePad: 10,
+                  series: {'Spectrum 1 Intensity':{color: "orange"}, 'Spectrum 2 Intensity':{"color":"green"}}
               })
           }
           this.entropy_similarity = this.calculateEntropySimilarity(spectrum1, spectrum2)
@@ -144,11 +145,17 @@
         }
       },
       calculateSpectralEntropy(a_spectrum) {
+        // Calculates spectral entropy.
+        // NOTE: This is currently not the same way that the spectral entropies stored in the database are calculated,
+        // since that a method of consolidating some peaks that isn't implemented here.
         const total_intensity = a_spectrum.map(x => x[1]).reduce((a,b) => a+b, 0)
         const scaled_intensities = a_spectrum.map(x => x[1]/total_intensity)
         return scaled_intensities.map(x => -1*x*Math.log(x)).reduce((a,b) => a+b, 0)
       },
       calculateEntropySimilarity(spectrum_a, spectrum_b) {
+        // Intended to calculate the entropy similarity, the formula for which I got from a paper sent to me by Tony.
+        // There seem to be some differences in implementation compared to the paper, though, as I can get negative
+        // values under certain circumstances.
         var combined_spectrum = []
         var idx_a = 0, idx_b = 0
         while ((idx_a < spectrum_a.length) | (idx_b < spectrum_b.length)) {

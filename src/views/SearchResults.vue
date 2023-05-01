@@ -23,7 +23,8 @@
           <br/>
           <div class="chemical-box">
             <div class="chemical-image-highlight">
-                <img class="chemical-image" :src="`https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/${compound_info.dtxsid}`"/>
+              <img v-if="has_image" class="chemical-image" :src="`https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/${compound_info.dtxsid}`"/>  
+              <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this compound.</div>
             </div>
             <div class="chemical-info">
               <ul style="list-style-type: none;">
@@ -38,8 +39,10 @@
               </ul>
             </div>
           </div>
-          <input type="checkbox" id="single-point-spectra" v-model="include_single_point_spectra" @change="updateCheckboxFilters">
-          <label for="single-point-spectra">Display Single Point Spectra</label>
+          <div v-if="results.length > 0">
+            <input type="checkbox" id="single-point-spectra" v-model="include_single_point_spectra" @change="updateCheckboxFilters">
+            <label for="single-point-spectra">Display Single Point Spectra</label>
+          </div>
         </div>
       </div>
       <div v-if="!still_searching">
@@ -101,6 +104,7 @@
         compound_info: {},
         still_searching: true,
         no_compound_match: false,
+        has_image: true,
         tooltipShowDelay: 500,
         BACKEND_LOCATION,
         SOURCE_ABBREVIATION_MAPPING,
@@ -143,6 +147,7 @@
       onGridReady(params) {
         this.gridApi = params.api
 
+        // Sometimes we might want to pre-select a row when the results load; this logic takes care of it
         if (typeof(this.$route.query.initial_row_selected) === "string") {
           this.gridApi.forEachNode(node => {
             if (node.data.internal_id === this.$route.query.initial_row_selected) {
@@ -229,12 +234,18 @@
       this.still_searching = false
       if (response.data.no_compound_match === true) {
         this.no_compound_match = true
-        console.log(`No compound match for "${this.$route.params.search_term}"`)
       } else {
         this.results = response.data.records
         this.compound_info = response.data.compound_info
         this.record_type_counts = response.data.record_type_counts
-  
+
+        // To avoid showing the broken image icon (for cleanliness purposes), determine beforehand if an image exists.
+        const response2 = await axios.get(`https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/${this.compound_info.dtxsid}`)
+        if (response2.data === "") {
+          this.has_image = false
+        }
+        
+        // switch the initial tab shown, if the query parameter is present
         if (this.$route.query.initial_results_tab) {
           const initial_tab = this.$route.query.initial_results_tab
           if (["spectrum", "monograph", "method"].includes(initial_tab.toLowerCase())) {

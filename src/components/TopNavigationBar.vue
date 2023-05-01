@@ -38,6 +38,7 @@
       &emsp;
       <b-nav-item-dropdown text="Other Pages" class="nav-dropdown">
         <b-dropdown-item to="/spectrum_comparison">Spectrum Comparison</b-dropdown-item>
+        <b-dropdown-item to="/spectrum_search">Spectrum Search</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
       <button @click="store.showHeaderAndFooter = !store.showHeaderAndFooter">Toggle Header/Footer</button>
