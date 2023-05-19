@@ -34,20 +34,10 @@
     methods: {
       go_big_bar() {
         const search_term = this.bigBarSearchTerm.trim()
-        const inchikeyRegex = /^([A-Z]{14})-[A-Z]{8}[SN][A-Z]-[A-Z]$/
-        var matchResult = search_term.match(inchikeyRegex)
-        if (matchResult) {
-          this.$router.push({
-            path: `/find_inchikeys/${search_term}`,
-            query: {initial_results_tab: this.initial_results_tab}
-          })
-          
-        } else {
           this.$router.push({
             path: `/search/${search_term}`,
             query: {initial_results_tab: this.initial_results_tab}
           })
-        }
       }
     },
     data() {

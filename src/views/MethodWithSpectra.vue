@@ -17,7 +17,7 @@
         <StoredPDFViewer style="width: 48vw;" :internalID="pdf_viewer_data.internal_id" recordType="method"/>
       </div>
       <div class="half-page-column">
-        <p>This is a list of spectra associated with this method, organized by compound identifier.  Double-click on a row to show the spectrum in a modal window.</p>
+        <p>This is a list of the {{ results.length }} spectra associated with this method, organized by compound identifier.  Double-click on a row to show the spectrum in a modal window.</p>
         <ag-grid-vue
             class="ag-theme-balham"
             style="height:600px; width:100%"

@@ -23,22 +23,26 @@
       &emsp;
       <router-link to="/batch_search">Batch Search</router-link>
       &emsp;
+      <b-nav-item-dropdown text="Other Pages" class="nav-dropdown">
+        <b-dropdown-item to="/spectrum_comparison">Spectrum Comparison</b-dropdown-item>
+        <b-dropdown-item to="/spectrum_search">Spectrum Search</b-dropdown-item>
+      </b-nav-item-dropdown>
+      &emsp;
+      <b-nav-item-dropdown text="About" class="nav-dropdown">
+        <b-dropdown-item to="/about">About this App</b-dropdown-item>
+        <b-dropdown-item to="/contact">Contact Info</b-dropdown-item>
+        <b-dropdown-item to="/data_sources">Data Sources</b-dropdown-item>
+      </b-nav-item-dropdown>
+      &emsp;
       <b-nav-item-dropdown text="Related Applications" class="nav-dropdown">
         <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:9414/" target="_blank" class="normal-text">Chemical Transformations Database</b-dropdown-item>
         <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:81/substances" target="_blank">Analytical QC</b-dropdown-item>
         <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:9004/molmass_web.py" target="_blank">Molecular Mass Calculator</b-dropdown-item>
         <b-dropdown-item href="https://aop-dev.rtpnc.epa.gov/nta-ui/nta.html" target="_blank">CFM-ID Spectral Search</b-dropdown-item>
-        <b-dropdown-item href="https://comptox.epa.gov/dashboard/" target="_blank">CompTox Chemicals Dashboard</b-dropdown-item>
+        <b-dropdown-item href="https://comptox.epa.gov/dashboard/" target="_blank">CompTox Chemicals Dashboard (public)</b-dropdown-item>
         <b-dropdown-item href="https://comptox.epa.gov/genra/" target="_blank">Generalized Read-Across (GenRA)</b-dropdown-item>
         <b-dropdown-item href="https://comptox.epa.gov/dashboard/chemical/pubmed-abstract-sifter/" target="_blank">Literature Abstract Sifter</b-dropdown-item>
         <b-dropdown-item href="https://www.epa.gov/chemical-research/cheminformatics" target="_blank">Cheminformatics PoC Modules</b-dropdown-item>
-      </b-nav-item-dropdown>
-      &emsp;
-      <router-link to="/about">About this App</router-link>
-      &emsp;
-      <b-nav-item-dropdown text="Other Pages" class="nav-dropdown">
-        <b-dropdown-item to="/spectrum_comparison">Spectrum Comparison</b-dropdown-item>
-        <b-dropdown-item to="/spectrum_search">Spectrum Search</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
       <button @click="store.showHeaderAndFooter = !store.showHeaderAndFooter">Toggle Header/Footer</button>
@@ -53,13 +57,7 @@
     methods: {
       go() {
         this.searchTerm = this.searchTerm.trim()
-        const inchikeyRegex = /^([A-Z]{14})-[A-Z]{8}[SN][A-Z]-[A-Z]$/
-        var matchResult = this.searchTerm.match(inchikeyRegex)
-        if (matchResult) {
-          this.$router.push(`/find_inchikeys/${this.searchTerm}`)
-        } else {
-          this.$router.push(`/search/${this.searchTerm}`)
-        }
+        this.$router.push(`/search/${this.searchTerm}`)
       }
     },
     data() {

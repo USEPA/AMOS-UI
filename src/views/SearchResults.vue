@@ -23,15 +23,15 @@
           <br/>
           <div class="chemical-box">
             <div class="chemical-image-highlight">
-              <img v-if="has_image" class="chemical-image" :src="`https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/${compound_info.dtxsid}`"/>  
+              <img v-if="has_image" class="chemical-image" :src="`${IMAGE_BY_DTXSID_API}${compound_info.dtxsid}`"/>  
               <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this compound.</div>
             </div>
             <div class="chemical-info">
               <ul style="list-style-type: none;">
                 <li><strong>(Preferred) Name:</strong> {{ compound_info.preferred_name }} </li>
-                <li><strong>DTXSID:</strong> <a :href="`https://comptox.epa.gov/dashboard/chemical/details/${compound_info.dtxsid}`">{{ compound_info.dtxsid }}</a> </li>
+                <li><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${compound_info.dtxsid}`">{{ compound_info.dtxsid }}</a> </li>
                 <li><strong>CASRN:</strong> {{ compound_info.casrn }} </li>
-                <li><strong>InChIKey:</strong> {{ compound_info.jchem_inchikey }} </li>
+                <li><strong>InChIKey:</strong> {{ compound_info.indigo_inchikey ? compound_info.indigo_inchikey : compound_info.jchem_inchikey}} </li>
                 <li><strong>Molecular Formula:</strong> {{ compound_info.molecular_formula }} </li>
                 <li><strong>Mass:</strong> {{ compound_info.molecular_weight }} </li>
                 <li>&nbsp;</li>
@@ -76,6 +76,12 @@
       <StoredPDFViewer v-else-if="view_type == 'PDF'" style="width: 50vw;" :internalID="selected_row_data.internal_id" :recordType="selected_row_data.record_type" displayAdditionalInfo/>
       <p class="info-paragraph" v-else>This database does not contain anything for this record.  Click the hyperlink in the "Record Type" column to be directed to the source.</p>
     </div>
+    <b-modal size="xl" v-model="disambiguation.inchikey">
+      <InchikeyDisambiguation :searchedKey="$route.params.search_term" :substances="possible_substances" @inchikeySelected="disambiguate" />
+    </b-modal>
+    <b-modal size="xl" v-model="disambiguation.synonym">
+      <SynonymDisambiguation :synonym="$route.params.search_term" :substances="possible_substances" @synonymSelected="disambiguate" />
+    </b-modal>
   </div>
 </template>
 
@@ -91,14 +97,19 @@
 
   import '@/assets/style.css'
   import '@/assets/search_results.css'
+  import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
   import SpectrumViewer from '@/components/SpectrumViewer.vue'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
-  import { BACKEND_LOCATION, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
+  import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
+  import { BACKEND_LOCATION, COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
 
   export default {
     data(){
       return {
         view_type: "none",
+        ambiguity_type: "",
+        disambiguation: {inchikey: false, synonym: false},
+        possible_substances: [],
         selected_row_data: {},
         results: [],
         compound_info: {},
@@ -107,23 +118,34 @@
         has_image: true,
         tooltipShowDelay: 500,
         BACKEND_LOCATION,
+        COMPTOX_PAGE_URL,
+        IMAGE_BY_DTXSID_API,
         SOURCE_ABBREVIATION_MAPPING,
         include_single_point_spectra: true,
         result_table_view_mode: "all",
         record_type_counts: {method: 0, monograph: 0, spectrum: 0},
         columnDefs: [
-          {field: 'spectrum_types', headerName: 'Methodology', sortable: true, sort: 'asc', filter: 'agSetColumnFilter', width: 150, suppressSizeToFit: true},
-          {field: 'source', headerName: 'Source', sortable: true, width: 110, suppressSizeToFit: true, cellRenderer: params => {
-            if (params.data.link === null) {
-              return params.data.source
-            } else if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source]) {
-              const full_name = this.SOURCE_ABBREVIATION_MAPPING[params.data.source]
-              return "<a href='" + params.data.link + "' target='_blank' title='" + full_name +"' class='has-hover-text'>" + params.data.source + "</a>";
-            } else {
-              return "<a href='" + params.data.link + "' target='_blank'>" + params.data.source + "</a>";
+          {field: 'spectrum_types', headerName: 'Methodology', sortable: true, sort: 'asc', filter: 'agTextColumnFilter', floatingFilter: true, width: 150, suppressSizeToFit: true},
+          {field: 'source', headerName: 'Source', sortable: true, width: 110, suppressSizeToFit: true, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
+              if (params.data.link === null) {
+                return params.data.source
+              } else if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source] && this.SOURCE_ABBREVIATION_MAPPING[params.data.source].full_name) {
+                // adding has-hover-text here is needed since URL formatting apparently overrides supplying has-hover-text via cellClass
+                return "<a href='" + params.data.link + "' target='_blank' class='has-hover-text'>" + params.data.source + "</a>";
+              } else {
+                return "<a href='" + params.data.link + "' target='_blank'>" + params.data.source + "</a>";
+              }
+            }, cellClass: params => {
+              if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source] && this.SOURCE_ABBREVIATION_MAPPING[params.data.source].full_name) {
+                return "has-hover-text"
+              }
+            }, tooltipValueGetter: params => {
+              if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source]) {
+                return this.SOURCE_ABBREVIATION_MAPPING[params.data.source].full_name
+              }
             }
-          }},
-          {field: 'record_type', headerName: 'Record Type', filter: 'agSetColumnFilter', width: 110, suppressSizeToFit: true,
+          },
+          {field: 'record_type', headerName: 'Record Type', width: 110, suppressSizeToFit: true,
             cellRenderer: params => {
               if (params.data.data_type !== null) {
                 return "<span class='fake-link'>" + params.data.record_type + "</span>"
@@ -132,7 +154,7 @@
               }
             }
           },
-          {field: 'description', headerName: 'Information', flex: 1, tooltipField: 'comment', cellRenderer: params =>{
+          {field: 'description', headerName: 'Information', flex: 1, tooltipField: 'comment', filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params =>{
             if (params.data.description === null) {
               return "No description available."
             } else {
@@ -226,38 +248,38 @@
         } else {
           return ""
         }
+      },
+      disambiguate(dtxsid) {
+        this.$router.push(`/search/${dtxsid}`)
       }
     },
     async created() {
-      const path = `${this.BACKEND_LOCATION}/search/${this.$route.params.search_term}`
-      const response = await axios.get(path)
-      this.still_searching = false
-      if (response.data.no_compound_match === true) {
+      const response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${this.$route.params.search_term}`)
+      if (response.data.substances === null) {
         this.no_compound_match = true
+        this.still_searching = false
+      } else if (response.data.ambiguity) {
+        this.ambiguity_type = response.data.ambiguity
+        this.possible_substances = response.data.substances
+        if (response.data.ambiguity == "inchikey") {
+          this.disambiguation.inchikey = true
+        } else if (response.data.ambiguity == "synonym") {
+          this.disambiguation.synonym = true
+        }
       } else {
-        this.results = response.data.records
-        this.compound_info = response.data.compound_info
-        this.record_type_counts = response.data.record_type_counts
-
-        // To avoid showing the broken image icon (for cleanliness purposes), determine beforehand if an image exists.
-        const response2 = await axios.get(`https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/${this.compound_info.dtxsid}`)
-        if (response2.data === "") {
-          this.has_image = false
-        }
-        
-        // switch the initial tab shown, if the query parameter is present
-        if (this.$route.query.initial_results_tab) {
-          const initial_tab = this.$route.query.initial_results_tab
-          if (["spectrum", "monograph", "method"].includes(initial_tab.toLowerCase())) {
-            this.result_table_view_mode = initial_tab
-          }
-        }
+        const search_results = await axios.get(`${this.BACKEND_LOCATION}/search/${response.data.substances.dtxsid}`)
+        this.results = search_results.data.records
+        this.compound_info = response.data.substances
+        this.record_type_counts = search_results.data.record_type_counts
+        this.still_searching = false
       }
     },
     components: {
       AgGridVue,
+      InchikeyDisambiguation,
       SpectrumViewer,
-      StoredPDFViewer
+      StoredPDFViewer,
+      SynonymDisambiguation
     }
   }
 </script>

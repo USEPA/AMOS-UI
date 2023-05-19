@@ -51,7 +51,7 @@
 
   import '@/assets/style.css'
   import '@/assets/search_results.css'
-  import { BACKEND_LOCATION } from '@/assets/store'
+  import { BACKEND_LOCATION, COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API } from '@/assets/store'
 
   import CompoundTile from '@/components/CompoundTile.vue'
 
@@ -75,15 +75,17 @@
         compound_list: [],
         has_associated_spectra: false,
         BACKEND_LOCATION,
+        COMPTOX_PAGE_URL,
+        IMAGE_BY_DTXSID_API,
         column_defs: [
           {field:'image', headerName:'Structure', autoHeight: true, width: 100, cellRenderer: (params) => {
             var image = document.createElement('img');
-            image.src = 'https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/' + params.data.dtxsid;
+            image.src = this.IMAGE_BY_DTXSID_API + params.data.dtxsid;
             image.style = "width:70px;height:70px;padding-top:2px;padding-bottom:2px;";
             return image;
           }},
           {field: 'dtxsid', headerName: 'DTXSID', width: 120, cellRenderer: params => {
-            return "<a href='https://comptox.epa.gov/dashboard/chemical/details/" + params.data.dtxsid + "' target='_blank'>" + params.data.dtxsid + "</a>"
+            return "<a href='" + this.COMPTOX_PAGE_URL + params.data.dtxsid + "' target='_blank'>" + params.data.dtxsid + "</a>"
           }},
           {field: 'links', headerName: 'Links', cellRenderer: params => {
             const link = document.createElement("a");

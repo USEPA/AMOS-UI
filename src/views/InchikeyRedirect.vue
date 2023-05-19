@@ -5,6 +5,9 @@
   that match the first block of the searched-for InChIKey.
 
   This page takes one URL route parameter, the InChIKey being searched for.  No query parameters are used.
+
+  NOTE: This page is currently dummied out, and is being kept for now in case something with its replacement method
+  goes bad.
 -->
 
 <template>

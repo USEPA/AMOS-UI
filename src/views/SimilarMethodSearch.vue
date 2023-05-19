@@ -12,8 +12,8 @@
       <p></p>
       <div>
         <label for="search-dtxsid">Compound Identifier</label> &nbsp;
-        <input @keyup.enter="methodSearch()" type="text" v-model="searched_compound" name="search-dtxsid">
-        <button @click="methodSearch()">Method Search</button>
+        <input @keyup.enter="methodSearch(searched_compound)" type="text" v-model="searched_compound" name="search-dtxsid">
+        <button @click="methodSearch(searched_compound)">Method Search</button>
       </div>
       <br />
       <p v-if="!searching & !search_complete">This page allows for searching for methods that contain either a given chemical or other chemicals similar to it.  A name, InChIKey, CASRN, or DTXSID can be searched on.</p>
@@ -41,6 +41,12 @@
     </div>
     <StoredPDFViewer style="width: 48vw;" v-if="any_method_selected" :internalID="selected_row_data.internal_id" recordType="method"/>
   </div>
+  <b-modal size="xl" v-model="disambiguation.inchikey">
+    <InchikeyDisambiguation :searchedKey="$route.params.search_term" :substances="possible_substances" @inchikeySelected="disambiguate"/>
+  </b-modal>
+  <b-modal size="xl" v-model="disambiguation.synonym">
+    <SynonymDisambiguation :synonym="$route.params.search_term" :substances="possible_substances" @synonymSelected="disambiguate" />
+  </b-modal>
 </template>
 
 <script>
@@ -54,7 +60,9 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import '@/assets/style.css'
+  import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
+  import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
   import { BACKEND_LOCATION } from '@/assets/store'
   
   export default{
@@ -66,6 +74,8 @@
         searching: false,
         search_complete: false,
         found_compound: false,
+        disambiguation: {inchikey: false, synonym: false},
+        possible_substances: [],
         selected_row_data: {},
         searched_compound: "",
         current_compound: "",
@@ -107,30 +117,46 @@
     },
     components: {
       AgGridVue,
-      StoredPDFViewer
+      InchikeyDisambiguation,
+      StoredPDFViewer,
+      SynonymDisambiguation
     },
     methods: {
-      async methodSearch() {
+      async methodSearch(searched_compound) {
+        // variable setup
         this.results = null
         this.searching = true
         this.any_method_selected = false
         this.search_complete = false
-        this.searched_compound = this.searched_compound.trim()
+        //this.searched_compound = this.searched_compound.trim()
 
-        const path = `${this.BACKEND_LOCATION}/get_similar_methods/${this.searched_compound}`
-        const response = await axios.get(path)
+        const response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${searched_compound.trim()}`)
 
-        this.found_compound = response.data.found_searched_compound
-        this.current_compound = this.searched_compound
-        this.results = response.data.results
-        this.ids_to_method_names = response.data.ids_to_method_names
-        this.searching = false
-        this.search_complete = true
+        if (response.data.substances === null) {
+          this.found_compound = false
+          this.searching = false
+        } else if (response.data.ambiguity) {
+          this.possible_substances = response.data.substances
+          if (response.data.ambiguity == "inchikey") {
+            this.disambiguation.inchikey = true
+          } else if (response.data.ambiguity == "synonym") {
+            this.disambiguation.synonym = true
+          }
+        } else {
+          console.log(response.data.substances.dtxsid)
+          const methods_response = await axios.get(`${this.BACKEND_LOCATION}/get_similar_methods/${response.data.substances.dtxsid}`)
+          this.current_compound = searched_compound.trim()  // should be whatever the user chooses
+          this.found_compound = true
+          this.results = methods_response.data.results
+          this.ids_to_method_names = methods_response.data.ids_to_method_names
+          this.searching = false
+          this.search_complete = true
+        }
       },
       onGridReady(params) {
         1
       },
-      onRowSelected(event){
+      onRowSelected(event) {
         if (event.event){
           var new_method_id = ""
           var source = ""
@@ -151,6 +177,12 @@
           }
         }
       },
+      disambiguate(dtxsid) {
+        console.log(dtxsid)
+        this.disambiguation.inchikey = false
+        this.disambiguation.synonym = false
+        this.methodSearch(dtxsid)
+      }
     }
   }
 </script>

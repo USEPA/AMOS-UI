@@ -8,7 +8,7 @@
 
 <template>
   <div>
-    <p>Below is a list of methods currently in the database.  Double-click on a row to display the method and its compounds in another tab.</p>
+    <p>Below is a list of methods currently in the database.  Double-click on a row to display the method and its compounds in another tab.  Cells in the table with a dashed underline have hovertext, usually for expanding out abbreviations in the cell content (it will take a second or two for the hovertext to appear).</p>
     <p>{{method_info.length}} methods in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed.</p>
     <div>
       <label for="full-table-filter">Full Table Filter</label> &nbsp;
@@ -17,8 +17,9 @@
       <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." />
     </div>
     <div class="button-array">
-      <button @click="saveFiltersAsURL">Save filters to URL</button>
+      <button @click="saveFiltersAsURL">Copy filters to clipboard</button>
       <button @click="downloadCompoundsInMethods" :disabled="filtered_record_count==0">Download Compounds</button>
+      <button @click="resetFilters">Reset Filters</button>
     </div>
     <ag-grid-vue
       class="ag-theme-balham"
@@ -45,14 +46,16 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import '@/assets/style.css'
-  import { BACKEND_LOCATION, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
+  import { BACKEND_LOCATION, ANALYTE_MAPPING, METHODOLOGY_MAPPING, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
   import HelpIcon from '@/components/HelpIcon.vue'
 
   export default {
     data() {
       return {
+        ANALYTE_MAPPING,
         BACKEND_LOCATION,
         SOURCE_ABBREVIATION_MAPPING,
+        METHODOLOGY_MAPPING,
         method_info: null,    //starting this as null instead of an empty array means the loading overlay will trigger
         default_column_def: {resizable: true, filter: 'agTextColumnFilter', floatingFilter: true, filterParams: {maxNumConditions: 1}},
         full_table_filter: "",
@@ -61,17 +64,58 @@
           {field: "method_number", headerName: "Method #"},
           {field: "method_name", headerName: "Name", tooltipField: 'method_name', sortable: true, flex: 1, cellClass: 'fake-link'},
           {field: "year_published", headerName: "Year", width: 90, sortable: true, filter: 'agNumberColumnFilter'},
-          {field: "methodology", headerName: "Methodology", width: 115, sortable: true},
-          {field: "source", headerName: "Source", width: 100, sortable: true, tooltipValueGetter: params => {
-            return this.SOURCE_ABBREVIATION_MAPPING[params.data.source]
-                }, cellClass: params => {
-            if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source]) {
-              return "has-hover-text"
-            } else {
-              return null
+          {field: "methodology", headerName: "Methodology", width: 115, sortable: true, tooltipValueGetter: params => {
+              if (this.METHODOLOGY_MAPPING[params.data.methodology]) {
+                return this.METHODOLOGY_MAPPING[params.data.methodology].full_name
+              }
+            }, cellClass: params => {
+              if (this.METHODOLOGY_MAPPING[params.data.methodology] && this.METHODOLOGY_MAPPING[params.data.methodology].full_name) {
+                return "has-hover-text"
+              }
             }
-          }},
-          {field: "analyte", headerName: "Analyte", tooltipField: 'analyte', sortable: true, flex: 1},
+          },
+          {field: "source", headerName: "Source", width: 100, sortable: true, tooltipValueGetter: params => {
+              if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source]) {
+                return this.SOURCE_ABBREVIATION_MAPPING[params.data.source].full_name
+              }
+            }, cellRenderer: params => {
+              const src = params.data.source
+              if (this.SOURCE_ABBREVIATION_MAPPING[src]) {
+                const link = this.SOURCE_ABBREVIATION_MAPPING[src].link
+                if (this.SOURCE_ABBREVIATION_MAPPING[src].full_name) {
+                  return `<a href='${link}' target='_blank' class='has-hover-text'>${src}</a>`
+                } else {
+                  return `<a href='${link}' target='_blank'>${src}</a>`
+                }
+              } else {
+                return params.data.source
+              }
+            }
+          },
+          {field: "analyte", headerName: "Analyte", sortable: true, flex: 1, tooltipValueGetter: params => {
+              if (params.data.analyte) {
+                var tooltipValue = params.data.analyte
+                if (tooltipValue) {
+                  for (const k of Object.keys(this.ANALYTE_MAPPING)) {
+                    if (tooltipValue.includes(k)) {
+                      tooltipValue = tooltipValue.replaceAll(k, this.ANALYTE_MAPPING[k])
+                    }
+                  }
+                  if (tooltipValue != params.data.analyte) {
+                    return tooltipValue
+                  }
+                }
+              }
+            }, cellClass: params => {
+              if (params.data.analyte) {
+                for (const k of Object.keys(this.ANALYTE_MAPPING)) {
+                  if (params.data.analyte.includes(k)) {
+                    return "has-hover-text"
+                  }
+                }
+              }
+            }
+          },
           {field: "chemical_class", headerName: "Chemical Class", sortable: true, flex: 1},
           {field: "matrix", headerName: "Matrix", sortable: true, flex: 1.2},
           {field: "count", headerName: "# Compounds", width: 120, floatingFilter: false, sortable: true}
@@ -134,13 +178,15 @@
         const internal_id_list = Array(this.filtered_record_count).fill().map((_,idx) => this.gridApi.getDisplayedRowAtIndex(idx).data.internal_id)
         const response = await axios.post(`${this.BACKEND_LOCATION}/compounds_for_ids/`, {internal_id_list: internal_id_list})
 
-        console.log(internal_id_list)
-
         const anchor = document.createElement('a')
         anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response.data.csv_string);
         anchor.target = '_blank';
         anchor.download = 'method_list_compounds.csv';
         anchor.click();
+      },
+      resetFilters() {
+        this.gridApi.setFilterModel(null);
+        this.quickFilter("")
       }
     },
     components: {
