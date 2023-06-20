@@ -31,10 +31,10 @@
 .tab-bar {
   margin-bottom: 0px;
   display: flex;
-  justify-content: space-around;
+  justify-content: left;
 }
 
-.tab-bar a{
+.tab-bar a {
   padding: 12px 24px;
   border: 1px solid #0e6993;
 }
@@ -43,7 +43,7 @@
   background: rgb(14, 105, 147, 0.25);
 }
 
-.tab-bar a.disabled{
+.tab-bar a.disabled {
   border: 1px solid #87b4c9;
   color: #87b4c9;
   pointer-events: none;

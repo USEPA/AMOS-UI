@@ -31,7 +31,13 @@
       rowSelection="single"
       @row-double-clicked="onDoubleClick"
       @filter-changed="onFilterChanged"
+      :tooltipShowDelay="400"
     ></ag-grid-vue>
+    <br />
+    <p>Some usage notes:</p>
+    <ul>
+      <li>There is an "Author(s)" field in the table that is hidden by default; searches from the full-table search field will still include it, however.</li>
+    </ul>
   </div>
 </template>
 
@@ -118,7 +124,8 @@
           },
           {field: "chemical_class", headerName: "Chemical Class", sortable: true, flex: 1},
           {field: "matrix", headerName: "Matrix", sortable: true, flex: 1.2},
-          {field: "count", headerName: "# Compounds", width: 120, floatingFilter: false, sortable: true}
+          {field: "count", headerName: "# Compounds", width: 120, floatingFilter: false, sortable: true},
+          {field: "author", headerName: "Author(s)", hide: true}
         ]
       }
     },
@@ -187,7 +194,7 @@
       resetFilters() {
         this.gridApi.setFilterModel(null);
         this.quickFilter("")
-      }
+      },
     },
     components: {
       AgGridVue, HelpIcon

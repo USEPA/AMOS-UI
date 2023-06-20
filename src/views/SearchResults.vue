@@ -66,6 +66,7 @@
             @row-selected="onRowSelected"
             :isExternalFilterPresent="isExternalFilterPresent"
             :doesExternalFilterPass="doesExternalFilterPass"
+            :postSortRows="postSortRows"
           ></ag-grid-vue>
         </div>
       </div>
@@ -77,10 +78,10 @@
       <p class="info-paragraph" v-else>This database does not contain anything for this record.  Click the hyperlink in the "Record Type" column to be directed to the source.</p>
     </div>
     <b-modal size="xl" v-model="disambiguation.inchikey">
-      <InchikeyDisambiguation :searchedKey="$route.params.search_term" :substances="possible_substances" @inchikeySelected="disambiguate" />
+      <InchikeyDisambiguation :searchedKey="$route.params.search_term" :substances="possible_substances" :record_counts="record_counts_by_dtxsid" @inchikeySelected="disambiguate" />
     </b-modal>
     <b-modal size="xl" v-model="disambiguation.synonym">
-      <SynonymDisambiguation :synonym="$route.params.search_term" :substances="possible_substances" @synonymSelected="disambiguate" />
+      <SynonymDisambiguation :synonym="$route.params.search_term" :substances="possible_substances" :record_counts="record_counts_by_dtxsid" @synonymSelected="disambiguate" />
     </b-modal>
   </div>
 </template>
@@ -113,6 +114,7 @@
         selected_row_data: {},
         results: [],
         compound_info: {},
+        record_counts_by_dtxsid: {},
         still_searching: true,
         no_compound_match: false,
         has_image: true,
@@ -154,7 +156,7 @@
               }
             }
           },
-          {field: 'description', headerName: 'Information', flex: 1, tooltipField: 'comment', filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params =>{
+          {field: 'description', headerName: 'Information', sortable: true, flex: 1, tooltipField: 'comment', filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params =>{
             if (params.data.description === null) {
               return "No description available."
             } else {
@@ -174,7 +176,7 @@
           this.gridApi.forEachNode(node => {
             if (node.data.internal_id === this.$route.query.initial_row_selected) {
               node.setSelected(true)
-              // need to run this manually, even though the documentation says setSelected should trigger the row selected function
+              // need to run this manually, even though the documentation says setSelected should trigger onRowSelected
               this.onRowSelected({event: true, data: node.data})
             }
           })
@@ -218,7 +220,6 @@
         let singlePointSpectrum = false
         if (node.data.description) {
           if (!this.include_single_point_spectra & (node.data.description.includes("# PEAKS=1;") | node.data.description.endsWith("# PEAKS=1"))) {
-            console.log(node.data.description)
             singlePointSpectrum = true
           }
         }
@@ -251,6 +252,21 @@
       },
       disambiguate(dtxsid) {
         this.$router.push(`/search/${dtxsid}`)
+      },
+      postSortRows(params) {
+        // Any node with a missing (null-valued) description will get booted to the end of the sorted list.
+        let rowNodes = params.nodes
+        let i = 0
+        let n_elements = rowNodes.length
+        while (i < n_elements) {
+          const description = rowNodes[i].data.description
+          if (description === null) {
+            rowNodes.splice(rowNodes.length, 0, rowNodes.splice(i,1)[0])
+            n_elements--
+          } else {
+            i++
+          }
+        }
       }
     },
     async created() {
@@ -261,6 +277,9 @@
       } else if (response.data.ambiguity) {
         this.ambiguity_type = response.data.ambiguity
         this.possible_substances = response.data.substances
+        const dtxsids = this.possible_substances.map(ps => ps.dtxsid)
+        this.record_counts_by_dtxsid = await axios.post(`${this.BACKEND_LOCATION}/record_counts_by_dtxsid/`, {dtxsids: dtxsids})
+        this.record_counts_by_dtxsid = this.record_counts_by_dtxsid.data
         if (response.data.ambiguity == "inchikey") {
           this.disambiguation.inchikey = true
         } else if (response.data.ambiguity == "synonym") {

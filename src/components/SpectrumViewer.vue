@@ -22,7 +22,7 @@
         <li><strong>Spectral Entropy:</strong> {{ spectral_entropy ? spectral_entropy.toFixed(4) : "Undefined" }}</li>
         <li><strong>Normalized Entropy:</strong> {{ normalized_entropy ? normalized_entropy.toFixed(4) : "Undefined" }}</li>
         <li><div style="display: flex;"><strong>Rating:</strong> &nbsp; <div :class="{'clean-spectrum': spectrum_is_clean, 'noisy-spectrum': !spectrum_is_clean}">{{ spectrum.length == 1 ? "N/A" : (spectrum_is_clean ? "Clean" : "Noisy") }}</div></div></li>
-        <li><strong>SPLASH:</strong> <a :href="`https://www.google.com/search?q=${splash}`">{{ splash }}</a></li>
+        <li><strong>SPLASH:</strong> <a :href="`https://www.google.com/search?q=${splash}`" target="_blank">{{ splash }}</a></li>
         <li v-if="has_associated_method && displayAdditionalInfo">There's an associated method for this spectrum; click <router-link :to="`/method_with_spectra/spectrum/${internalID}`">here</router-link> to view.</li>
       </ul>
       <div>

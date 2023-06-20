@@ -95,7 +95,6 @@
           console.log("Unknown value for error_type.")
         }
         const response = await axios.post(`${this.BACKEND_LOCATION}/spectrum_search/`, {upper_mass_limit: upper_mass_limit, lower_mass_limit: lower_mass_limit, methodology: this.methodology})
-        //console.log(response.data.results)
         this.user_spectrum_array = this.user_spectrum_string.split("\n").map(x => x.split(" ").map(y => Number(y)))
         
         this.results = response.data.results.map(x => {x.similarity = Number(this.calculateEntropySimilarity(this.user_spectrum_array, x.spectrum).toFixed(4)); return x})

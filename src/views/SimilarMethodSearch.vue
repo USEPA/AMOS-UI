@@ -28,7 +28,7 @@
           <ag-grid-vue
             class="ag-theme-balham"
             style="height:600px; width:100%"
-            :columnDefs="column_defs"
+            :columnDefs="result_column_defs"
             :rowData="results"
             :autoGroupColumnDef="autoGroupColumnDef"
             suppressAggFuncInHeader="true"
@@ -36,10 +36,19 @@
             @row-selected="onRowSelected"
             :rowClassRules="rowClassRules"
           ></ag-grid-vue>
-      </div>
+        </div>
       </div>
     </div>
     <StoredPDFViewer style="width: 48vw;" v-if="any_method_selected" :internalID="selected_row_data.internal_id" recordType="method"/>
+    <div class="half-page-column" v-if="search_complete & found_compound & !any_method_selected">
+      <p>Below is a table of the substances where at least one similar method was found.</p>
+      <ag-grid-vue
+        class="ag-theme-balham"
+        style="height:600px; width:100%"
+        :columnDefs="count_column_defs"
+        :rowData="dtxsid_counts"
+      ></ag-grid-vue>
+    </div>
   </div>
   <b-modal size="xl" v-model="disambiguation.inchikey">
     <InchikeyDisambiguation :searchedKey="$route.params.search_term" :substances="possible_substances" @inchikeySelected="disambiguate"/>
@@ -76,12 +85,13 @@
         found_compound: false,
         disambiguation: {inchikey: false, synonym: false},
         possible_substances: [],
+        dtxsid_counts: [],
         selected_row_data: {},
         searched_compound: "",
         current_compound: "",
         ids_to_method_names: "",
         current_method_shown_id: "",
-        column_defs: [
+        result_column_defs: [
           {field: "internal_id", rowGroup: true, hide: true, sortable: true, cellRenderer: params => {
             const title_text = this.ids_to_method_names[params.value] + " (" + params.node.allChildrenCount + ")";
             return `<span title='${title_text}'>${this.ids_to_method_names[params.value]}</span>`
@@ -89,11 +99,19 @@
           {field: "source", headerName: "Source", width: 90, suppressSizeToFit: true, sortable: true, aggFunc: 'first'},
           {field: "methodology", headerName: "Methodology", width: 120, suppressSizeToFit: true, sortable: true, aggFunc: 'first'},
           {field: "year_published", headerName: "Year", width: 70, suppressSizeToFit: true, sortable: true, aggFunc: 'first'},
-          {field: "similarity", headerName: "Similarity", width: 95, suppressSizeToFit: true, sortable: true, aggFunc: 'max', cellRenderer:'agGroupCellRenderer', cellRendererParams: {
+          {field: "similarity", headerName: "Similarity", width: 95, suppressSizeToFit: true, sortable: true, sort: 'desc', aggFunc: 'max', cellRenderer:'agGroupCellRenderer', cellRendererParams: {
             innerRenderer: params => {return params.value.toFixed(2)}
           }},
           {field: "dtxsid", headerName: "Similar DTXSID", width: 125, suppressSizeToFit: true, sortable: true},
           {field: "compound_name", headerName: "Compound Name"}
+        ],
+        count_column_defs: [
+          {field: "dtxsid", headerName: "DTXSID", sortable: true, width: 125},
+          {field: "preferred_name", headerName: "Name", sortable: true, flex: 1},
+          {field: "similarity", headerName: "Similarity", sortable: true, sort: 'desc', width: 95, cellRenderer: 
+            params => {return params.data.similarity.toFixed(2)}
+          },
+          {field: "num_methods", headerName: "# Methods", sortable: true, width: 95}
         ],
         rowClassRules: {
           "method-has-chemical-match": function(params) {
@@ -128,7 +146,6 @@
         this.searching = true
         this.any_method_selected = false
         this.search_complete = false
-        //this.searched_compound = this.searched_compound.trim()
 
         const response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${searched_compound.trim()}`)
 
@@ -143,8 +160,8 @@
             this.disambiguation.synonym = true
           }
         } else {
-          console.log(response.data.substances.dtxsid)
           const methods_response = await axios.get(`${this.BACKEND_LOCATION}/get_similar_methods/${response.data.substances.dtxsid}`)
+          this.dtxsid_counts = methods_response.data.dtxsid_counts
           this.current_compound = searched_compound.trim()  // should be whatever the user chooses
           this.found_compound = true
           this.results = methods_response.data.results
@@ -178,7 +195,6 @@
         }
       },
       disambiguate(dtxsid) {
-        console.log(dtxsid)
         this.disambiguation.inchikey = false
         this.disambiguation.synonym = false
         this.methodSearch(dtxsid)

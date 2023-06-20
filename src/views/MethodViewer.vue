@@ -34,7 +34,7 @@
         <button @click="downloadCompoundInfo">Download Compound Info</button>
         <ag-grid-vue
           class="ag-theme-balham"
-          style="height:500px; width:100%"
+          style="height:550px; width:100%"
           :columnDefs="column_defs"
           :rowData="compound_list"
           rowSelection="single"
@@ -85,7 +85,7 @@
           {field: 'dtxsid', headerName: 'DTXSID', width: 120, cellRenderer: params => {
             return "<a href='" + this.COMPTOX_PAGE_URL + params.data.dtxsid + "' target='_blank'>" + params.data.dtxsid + "</a>"
           }},
-          {field: 'links', headerName: 'Links', cellRenderer: params => {
+          {field: 'links', headerName: 'Links', width: 90, cellRenderer: params => {
             const link = document.createElement("a");
             link.href = this.$router.resolve(`/search/${params.data.dtxsid}`).href;
             link.innerText = "Search";
@@ -95,8 +95,8 @@
             });
             return link;
           }},
-          {field: 'casrn', headerName: 'CASRN', width: 90},
-          {field: 'preferred_name', headerName:'Compound Name', flex: 1}
+          {field: 'casrn', headerName: 'CASRN', width: 90, filter: 'agTextColumnFilter', floatingFilter: true},
+          {field: 'preferred_name', headerName:'Compound Name', flex: 1, filter: 'agTextColumnFilter', floatingFilter: true}
         ]
       }
     },
