@@ -11,13 +11,13 @@
     <p>The database contains a mixture of data that can be divided into three categories.</p>
     <ul>
       <li><b>Mass spectra</b> of various types (including GC, LC, Raman, and IR spectra, among others).</li>
-      <li><b>Monographs</b> that detail the results of an in-depth analysis.  These often contain multiple spectra of varying types, but only a few compounds at most.</li>
+      <li><b>Fact sheets</b> which act as summaries about one or a few compounds.  These range from brief, relatively non-technical overviews of a compound to monographs that detail multiple experimental spectra.</li>
       <li>Analytical <b>methods</b> which document full testing procedures for one or more (potentially a couple hundred) compounds.</li>
     </ul>
     <p>The primary functions of this app are as follows:</p>
     <ul>
       <li>Performing general searches on all three categories of records for specfic compounds, and displaying information about those records -- this is what the "Search" field at the top left is used for.  Searching can be done by DTXSID, CAS registry number, InChIKey, or compound names.</li>
-      <li>Viewing lists of monographs and methods in the database, along with displaying their PDFs and the compounds associated with them.</li>
+      <li>Viewing lists of fact sheets and methods in the database, along with displaying their PDFs and the compounds associated with them.</li>
       <li>Searching for all methods that cover a compound similar to one being searched.  This uses EPA calculations for the similarity between two compounds and returns all methods containing at least one compound of sufficient similarity (similarity level is currently hardcoded on the Flask backend).  Searching can be done by DTXSID, CAS registry number, InChIKey, or compound names.</li>
       <li>Batch searching compounds by DTXSID, and returning basic information for all records.</li>
     </ul>
@@ -25,7 +25,7 @@
     <p>Below is a chart detailing the breakdown of the methods currently in the database.  Click on a circle to zoom in and see more detail; click outside it to move to a higher level.</p>
     <MethodsBubbleChart />
     <br />
-    <p>This app was last updated on 2023-06-26.</p>
+    <p>This app was last updated on 2023-07-03.</p>
   </div>
 </template>
 

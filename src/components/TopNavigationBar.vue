@@ -15,7 +15,7 @@
       <router-link to="/">Home</router-link>
       &emsp;
       <b-nav-item-dropdown text="Lists" class="nav-dropdown" style="background: #0e6993;">
-        <b-dropdown-item to="/monograph_list">Monographs</b-dropdown-item>
+        <b-dropdown-item to="/fact_sheet_list">Fact Sheets</b-dropdown-item>
         <b-dropdown-item to="/methods_list">Methods</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
@@ -78,6 +78,7 @@
     font-family: Roboto;
     line-height: 1;
     text-align: center;
+    margin-bottom: 10px;
   }
 
   .nav-bar-right {

@@ -6,15 +6,15 @@
 -->
 
 <template>
-  This page is meant to give descriptions of the various data sources combined in this application.  It is just a placeholder for now.
+  This page is meant to give descriptions of the various data sources combined in this application.
   <br /><br />
   <DataSourceDetails 
     sourceName="Agilent"
     category="Vendor methods collection"
     url="https://www.agilent.com"
     sourceID="Agilent"
-    substances="735"
-    methods="58"
+    substances="2019"
+    methods="176"
   />
   <DataSourceDetails 
     sourceName="Analytical QC"
@@ -25,12 +25,20 @@
     spectra="9305"
   />
   <DataSourceDetails 
+    sourceName="Cayman Spectral Library"
+    category="Open-access spectrum collection"
+    url="https://www.caymanchem.com/forensics/publications/csl"
+    sourceID="Cayman"
+    substances="1757"
+    spectra="1818"
+  />
+  <DataSourceDetails 
     sourceName="Center for Forensic Science Research & Education"
     category="Open monographs collection"
     url="https://www.cfsre.org/nps-discovery/monographs"
     sourceID="CFSRE"
     substances="148"
-    monographs="138"
+    factSheets="138"
   />
   <DataSourceDetails 
     sourceName="Centers for Disease Control and Prevention"
@@ -39,6 +47,14 @@
     sourceID="CDC"
     substances="364"
     methods="25"
+  />
+  <DataSourceDetails 
+    sourceName="Human Metabolome Database"
+    category="Open-access spectrum collection"
+    url="https://hmdb.ca/"
+    sourceID="HMDB"
+    substances="3162"
+    spectra="15481"
   />
   <DataSourceDetails 
     sourceName="Jozef Stefan Institute"
@@ -54,57 +70,65 @@
     category="Open-access spectral database"
     url="https://massbank.eu/MassBank/"
     sourceID="MassBank EU"
-    substances="12256"
-    spectra="81884"
+    substances="12313"
+    spectra="82343"
   />
   <DataSourceDetails 
     sourceName="MassBank of North America"
     category="Open-access spectral database"
     url="https://mona.fiehnlab.ucdavis.edu"
     sourceID="MoNA"
-    substances="8491"
-    spectra="54744"
+    substances="8521"
+    spectra="55882"
   />
   <DataSourceDetails 
     sourceName="National Environmental Methods Index"
     category="Government methods collection"
     url="https://www.nemi.gov/home"
     sourceID="NEMI"
-    substances="698"
-    methods="56"
+    substances="1700"
+    methods="151"
   />
   <DataSourceDetails 
     sourceName="National Institute of Standards and Technology"
     category="Government methods collection"
     url="https://www.nist.gov/"
     sourceID="NIST"
-    substances="573"
-    methods="42"
+    substances="746"
+    methods="49"
+  />
+  <DataSourceDetails 
+    sourceName="National Pesticide Information Center"
+    category="Open fact sheet collection"
+    url="http://www.npic.orst.edu/"
+    sourceID="NPIC"
+    substances="54"
+    factSheets="54"
   />
   <DataSourceDetails 
     sourceName="Scientific Working Group for the Analysis of Seized Drugs"
     category="Open spectrum and monographs collection"
     url="https://www.swgdrug.org/"
     sourceID="SWG"
-    substances="3413"
-    spectra="3276"
-    monographs="515"
+    substances="3443"
+    spectra="3312"
+    factSheets="515"
   />
   <DataSourceDetails
     sourceName="SCIEX"
     category="Vendor methods collection"
     url="https://sciex.com/"
     sourceID="SCIEX"
-    substances="274"
-    methods="15"
+    substances="638"
+    methods="32"
   />
   <DataSourceDetails 
     sourceName="SpectraBase"
     category="Spectrum database (spectra are not open, metadata is)"
     url="https://spectrabase.com/"
     sourceID="SpectraBase"
-    substances="149675"
-    spectra="590767"
+    substances="149764"
+    spectra="590943"
   />
   <DataSourceDetails 
     sourceName="U.S. Department of Agriculture"
@@ -119,8 +143,8 @@
     category="Government methods collection"
     url="https://www.epa.gov/"
     sourceID="USEPA"
-    substances="847"
-    methods="60"
+    substances="980"
+    methods="69"
   />
   <DataSourceDetails 
     sourceName="U.S. Geological Survey"

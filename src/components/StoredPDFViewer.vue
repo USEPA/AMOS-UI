@@ -1,16 +1,16 @@
 <!--
-  This comoponent is for displaying the PDF for a method or monograph (or, possibly in the future, a spectrum) along
+  This comoponent is for displaying the PDF for a method or fact sheet (or, possibly in the future, a spectrum) along
   with two possible views for the compound(s) that the document references.
 
   This component takes two props:
   - internalID, a string that matches the internal ID of a PDF document in the database
-  - recordType, a string that should have a value of either "method" or "monograph", which is sent to the Flask backend
+  - recordType, a string that should have a value of either "method" or "fact sheet", which is sent to the Flask backend
     for determining which table contains the PDF
 -->
 
 <template>
   <div>
-    <div class="results-header">
+    <div class="results-header" style="overflow: auto;">
       <h2 v-if="pdf_name">{{pdf_name}}</h2>
       <p v-if="has_associated_spectra && displayAdditionalInfo">This method has spectra associated with it.  Click <router-link :to="`/method_with_spectra/method/${internalID}`">here</router-link> to view.</p>
       <ul v-if="metadata_rows" style="list-style-type: none;">

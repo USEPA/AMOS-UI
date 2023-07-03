@@ -1,5 +1,5 @@
 <!--
-  This page displays a list of all monographs in the database, as well as being able to display the monographs and
+  This page displays a list of all fact sheets in the database, as well as being able to display the fact sheets and
   associated compounds themselves.
 
   This page takes no URL route or query parameters.
@@ -9,25 +9,26 @@
   <div class="two-column-page">
     <div class="half-page-column">
       <p>
-        This is a list of {{monograph_info.length}} monographs available in the database. All monographs currently
-        originate from four sources: the <a href="https://www.swgdrug.org/monographs.htm">Scientific Working 
-        Group</a> (SWG), the <a href="https://www.npsdiscovery.org/reports/monographs/">Center for Forensic
-        Science Research & Education</a> (CFRSE), <a href="https://www.nmslabs.com/">NMS Labs</a>, and the 
+        This is a list of {{fact_sheet_info.length}} fact sheets available in the database. All facts currently 
+        originate from five sources: the <a href="http://npic.orst.edu/">National Pesticide Information Center</a>
+        (NPIC), the <a href="https://www.swgdrug.org/monographs.htm">Scientific Working Group</a> (SWG), the
+        <a href="https://www.npsdiscovery.org/reports/monographs/">Center for Forensic Science Research & Education</a> 
+        (CFRSE), <a href="https://www.nmslabs.com/">NMS Labs</a>, and the 
         <a href="https://www.kgi.edu/academics/schools/school-of-pharmacy-and-health-sciences/"> KGI School of
         Pharmacy and Health Sciences</a>.
       </p>
-      <p>Select a row to view a monograph.</p>
+      <p>Select a row in the table below to view a fact sheet.</p>
       <ag-grid-vue
         class="ag-theme-balham"
         style="height:800px; width:100%"
         :columnDefs="column_defs"
-        :rowData="monograph_info"
+        :rowData="fact_sheet_info"
         rowSelection="single"
         @first-data-rendered="onGridReady"
         @row-selected="onRowSelected"
       ></ag-grid-vue>
     </div>
-    <StoredPDFViewer style="width: 48vw;" v-if="any_monograph_selected" :internalID="selected_row_data.internal_id" recordType="monograph"/>
+    <StoredPDFViewer style="width: 48vw;" v-if="any_fact_sheet_selected" :internalID="selected_row_data.internal_id" recordType="fact sheet"/>
   </div>
 </template>
 
@@ -49,11 +50,11 @@
     data(){
       return {
         selected_row_data: {},
-        monograph_info: null,
-        any_monograph_selected: false,  // used to avoid having a box with an error pop up if nothing's been selected yet,
+        fact_sheet_info: null,
+        any_fact_sheet_selected: false,  // used to avoid having a box with an error pop up if nothing's been selected yet,
         BACKEND_LOCATION,
         column_defs: [
-          {field: 'monograph_name', headerName: 'Monograph Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, sort: "asc", flex: 1},
+          {field: 'fact_sheet_name', headerName: 'Fact Sheet Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, sort: "asc", flex: 1},
           {field: 'sub_source', headerName: 'Source', sortable: true, width: 250},
           {field: 'year_published', headerName: 'Year', sortable: true, width: 70}
         ]
@@ -61,9 +62,9 @@
     },
 
     async created() {
-      const path = `${this.BACKEND_LOCATION}/monograph_list`
+      const path = `${this.BACKEND_LOCATION}/fact_sheet_list`
       const response = await axios.get(path)
-      this.monograph_info = response.data.results
+      this.fact_sheet_info = response.data.results
     },
 
     methods: {
@@ -73,8 +74,8 @@
       onRowSelected(event){
         if (event.event){
           this.selected_row_data = event.data
-          this.any_monograph_selected = true
-          this.target_pdf_url = `${this.BACKEND_LOCATION}/get_pdf/monograph/${event.data.internal_id}`
+          this.any_fact_sheet_selected = true
+          this.target_pdf_url = `${this.BACKEND_LOCATION}/get_pdf/fact sheet/${event.data.internal_id}`
         }
       }
     },

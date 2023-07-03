@@ -5,9 +5,7 @@
   This page can take one URL route parameter and four optional query parameters.  The route parameter is:
   - search_term: the term searched for; can be either a compound name, an InChIKey, a CASRN, or a DTXSID
   The query parameters are:
-  - methods, monographs, spectra: three parameters that toggle whether records of that type appear; if none are present,
-    all records are displayed, otherwise it depends on which of those three appear with a value of 'true' in the query
-    parameters
+  - initial_results_tab: preselects which record type tab is selected.  If not supplied, all results will be shown
   - initial_row_selected: the internal ID of a record; if this parameter exists, the page will try to preselect this
     record's row once the table is loaded
 -->
@@ -33,7 +31,7 @@
                 <li><strong>CASRN:</strong> {{ compound_info.casrn }} </li>
                 <li><strong>InChIKey:</strong> {{ compound_info.indigo_inchikey ? compound_info.indigo_inchikey : compound_info.jchem_inchikey}} </li>
                 <li><strong>Molecular Formula:</strong> {{ compound_info.molecular_formula }} </li>
-                <li><strong>Mass:</strong> {{ compound_info.molecular_weight }} </li>
+                <li><strong>Mass:</strong> {{ compound_info.monoisotopic_mass }} </li>
                 <li>&nbsp;</li>
                 <li><button v-if="!still_searching" @click="downloadResultsAsCSV">Download Results</button></li>
               </ul>
@@ -51,9 +49,9 @@
         <div v-else>
           <div class="tab-bar">
             <a :class="result_table_view_mode == 'all' ? 'active' : ''" @click="updateTab('all')">All Results ({{results.length}})</a>
-            <a :class="determineTabBarClass('spectrum')" @click="updateTab('spectrum')">Spectra ({{record_type_counts.spectrum}})</a>
-            <a :class="determineTabBarClass('monograph')" @click="updateTab('monograph')">Monographs ({{record_type_counts.monograph}})</a>
             <a :class="determineTabBarClass('method')" @click="updateTab('method')">Methods ({{record_type_counts.method}})</a>
+            <a :class="determineTabBarClass('spectrum')" @click="updateTab('spectrum')">Spectra ({{record_type_counts.spectrum}})</a>
+            <a :class="determineTabBarClass('fact sheet')" @click="updateTab('fact sheet')">Fact Sheets ({{record_type_counts["fact sheet"]}})</a>
           </div>
           <ag-grid-vue
             class="ag-theme-balham"
@@ -74,7 +72,7 @@
     <div class="half-page-column">
       <p class="info-paragraph" v-if="view_type == 'none'">Click on a row in the table to the left to display either a spectrum (if available) or a PDF file in this space.</p>
       <SpectrumViewer v-else-if="view_type == 'Spectrum'" :internalID="selected_row_data.internal_id" displayAdditionalInfo/>
-      <StoredPDFViewer v-else-if="view_type == 'PDF'" style="width: 50vw;" :internalID="selected_row_data.internal_id" :recordType="selected_row_data.record_type" displayAdditionalInfo/>
+      <StoredPDFViewer v-else-if="view_type == 'PDF'" :internalID="selected_row_data.internal_id" :recordType="selected_row_data.record_type" displayAdditionalInfo/>
       <p class="info-paragraph" v-else>This database does not contain anything for this record.  Click the hyperlink in the "Record Type" column to be directed to the source.</p>
     </div>
     <b-modal size="xl" v-model="disambiguation.inchikey">
@@ -125,9 +123,9 @@
         SOURCE_ABBREVIATION_MAPPING,
         include_single_point_spectra: true,
         result_table_view_mode: "all",
-        record_type_counts: {method: 0, monograph: 0, spectrum: 0},
+        record_type_counts: {method: 0, "fact sheet": 0, spectrum: 0},
         columnDefs: [
-          {field: 'spectrum_types', headerName: 'Methodology', sortable: true, sort: 'asc', filter: 'agTextColumnFilter', floatingFilter: true, width: 150, suppressSizeToFit: true},
+          {field: 'methodologies', headerName: 'Methodology', sortable: true, sort: 'asc', filter: 'agTextColumnFilter', floatingFilter: true, width: 150, suppressSizeToFit: true},
           {field: 'source', headerName: 'Source', sortable: true, width: 110, suppressSizeToFit: true, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
               if (params.data.link === null) {
                 return params.data.source

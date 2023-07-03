@@ -16,7 +16,10 @@
             <p>First Spectrum</p>
             <textarea type="text" class="batch-search-input" rows="20" columns="35" v-model="spectrum_box_1"></textarea>
           </div>
-          <div class="search-inputs" style="padding-left: 100px">
+          <div v-if="dtxcid_mode" class="search-inputs" style="padding-left: 100px">
+            <p>DTXCID mode -- {{ dtxcids }}</p>
+          </div>
+          <div v-else class="search-inputs" style="padding-left: 100px">
             <p>Second Spectrum</p>
             <textarea type="text" class="batch-search-input" rows="20" columns="35" v-model="spectrum_box_2"></textarea>
           </div>
@@ -46,7 +49,19 @@
         spectrum_box_2: "2 100\n4 100\n6 100",
         spectrum: [],
         entropy_similarity: 0,
-        show_similarity: false
+        show_similarity: false,
+        dtxcid_mode: false,
+        dtxcids: []
+      }
+    },
+    async created() {
+      if (this.$route.query.dtxcids) {
+        this.dtxcid_mode = true
+        this.dtxcids = this.$route.query.dtxcids.split(",")
+        if (this.$route.query.spectrum) {
+          var temp_spectrum = this.$route.query.spectrum
+          this.spectrum_box_1 = temp_spectrum.replaceAll(":", " ").replaceAll(";", "\n")
+        }
       }
     },
     methods: {

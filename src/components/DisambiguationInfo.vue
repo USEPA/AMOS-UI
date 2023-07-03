@@ -21,13 +21,13 @@
           <li><strong>CASRN:</strong> {{ substance_info.casrn }} </li>
           <li><strong>InChIKey:</strong> {{ substance_info.indigo_inchikey ? substance_info.indigo_inchikey : substance_info.jchem_inchikey}} </li>
           <li><strong>Molecular Formula:</strong> {{ substance_info.molecular_formula }} </li>
-          <li><strong>Mass:</strong> {{ substance_info.molecular_weight }} </li>
+          <li><strong>Mass:</strong> {{ substance_info.monoisotopic_mass }} </li>
           <li><br /></li>
           <li v-if="record_info">Records available:
             <span v-if="record_info.Spectrum">{{ record_info.Spectrum }} spectra</span>
-            <span v-if="record_info.Spectrum && (record_info.Monograph || record_info.Method)">, </span>
-            <span v-if="record_info.Monograph">{{ record_info.Monograph }} monographs</span>
-            <span v-if="record_info.Monograph && record_info.Method">, </span>
+            <span v-if="record_info.Spectrum && (record_info['Fact Sheet'] || record_info.Method)">, </span>
+            <span v-if="record_info['Fact Sheet']">{{ record_info['Fact Sheet'] }} fact sheets</span>
+            <span v-if="record_info['Fact Sheet'] && record_info.Method">, </span>
             <span v-if="record_info.Method">{{ record_info.Method }} methods</span>
           </li>
           <li v-else>No records for this substance are available.</li>

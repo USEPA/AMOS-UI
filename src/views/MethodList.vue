@@ -1,5 +1,5 @@
 <!--
-  This page serves as a list of all methods contained in the database.  Currently, unlike the monographs, the table
+  This page serves as a list of all methods contained in the database.  Currently, unlike the fact sheets, the table
   describing the methods fills the entire window, so the method cannot be displayed in the same window.  Double-clicking
   a row in the table will open the method's PDF in a new window.
 

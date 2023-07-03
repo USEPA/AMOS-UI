@@ -9,7 +9,7 @@
   <div class="home">
     <h1>Home Page</h1>
     <div class="about-this-app">
-      <p>The search will return records of all three types -- spectra, monographs, and methods.  The initial tab shown can be selected with the radio buttons below.</p>
+      <p>The search will return records of all three types -- spectra, fact sheets, and methods.  The initial tab shown can be selected with the radio buttons below.</p>
       <div>
         <input @keyup.enter="go_big_bar()" id="big-search-bar" name="big-search-bar" placeholder="Search name, InChIKey, DTXSID, or CASRN..." size="60" v-model="bigBarSearchTerm">
         <button @click="go_big_bar()">Compound Search</button>
@@ -19,7 +19,7 @@
         &emsp;
         <label><input type="radio" id="methods-tab" v-model="initial_results_tab" value="method">Methods</label>
         &emsp;
-        <label><input type="radio" id="mongraph-tab" v-model="initial_results_tab" value="monograph">Monographs</label>
+        <label><input type="radio" id="mongraph-tab" v-model="initial_results_tab" value="fact sheet">Fact Sheets</label>
         &emsp;
         <label><input type="radio" id="spectrum-tab" v-model="initial_results_tab" value="spectrum">Spectra</label>
       </div>
