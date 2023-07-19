@@ -74,7 +74,8 @@
         columnDefs: [
           {field: 'dtxsid', headerName: 'DTXSID', width: 140},
           {field: 'dtxcid', headerName: 'DTXCID', width: 140},
-          {field: 'similarity', headerName: "Similarity", width: 100, sort: "desc"},
+          {field: 'similarity', headerName: "Similarity", width: 100, sort: "desc", cellRenderer: 
+            params => {return params.data.similarity.toFixed(4)}},
           {field: 'description', headerName: 'Description', flex: 1},
           {field: 'internal_id', headerName: 'Internal ID', hide: true}
         ]
@@ -94,52 +95,16 @@
         } else {
           console.log("Unknown value for error_type.")
         }
-        const response = await axios.post(`${this.BACKEND_LOCATION}/spectrum_search/`, {upper_mass_limit: upper_mass_limit, lower_mass_limit: lower_mass_limit, methodology: this.methodology})
         this.user_spectrum_array = this.user_spectrum_string.split("\n").map(x => x.split(" ").map(y => Number(y)))
-        
-        this.results = response.data.results.map(x => {x.similarity = Number(this.calculateEntropySimilarity(this.user_spectrum_array, x.spectrum).toFixed(4)); return x})
+        const response = await axios.post(
+          `${this.BACKEND_LOCATION}/spectrum_similarity_search/`,
+          {upper_mass_limit: upper_mass_limit, lower_mass_limit: lower_mass_limit, methodology: this.methodology, spectrum: this.user_spectrum_array}
+        )
+        console.log(response.data.results)
+        this.results = response.data.results
       },
       onGridReady(params) {
         this.gridApi = params.api
-      },
-      calculateSpectralEntropy(a_spectrum) {
-        // Calculates spectral entropy.
-        // NOTE: This is currently not the same way that the spectral entropies stored in the database are calculated,
-        // since that a method of consolidating some peaks that isn't implemented here.
-        const total_intensity = a_spectrum.map(x => x[1]).reduce((a,b) => a+b, 0)
-        const scaled_intensities = a_spectrum.map(x => x[1]/total_intensity)
-        return scaled_intensities.map(x => -1*x*Math.log(x)).reduce((a,b) => a+b, 0)
-      },
-      calculateEntropySimilarity(spectrum_a, spectrum_b) {
-        // Intended to calculate the entropy similarity, the formula for which I got from a paper sent to me by Tony.
-        // There seem to be some differences in implementation compared to the paper, though, as I can get negative
-        // values under certain circumstances.
-        var combined_spectrum = []
-        var idx_a = 0, idx_b = 0
-        while ((idx_a < spectrum_a.length) | (idx_b < spectrum_b.length)) {
-          if (idx_a == spectrum_a.length) {
-            combined_spectrum.push(spectrum_b[idx_b])
-            idx_b += 1
-          } else if (idx_b == spectrum_b.length) {
-            combined_spectrum.push(spectrum_a[idx_a])
-            idx_a += 1
-          } else if (spectrum_a[idx_a][0] == spectrum_b[idx_b][0]) {
-            combined_spectrum.push([spectrum_a[idx_a][0], spectrum_a[idx_a][1] + spectrum_b[idx_b][1]])
-            idx_a += 1
-            idx_b += 1
-          } else if (spectrum_a[idx_a][0] < spectrum_b[idx_b][0]) {
-            combined_spectrum.push(spectrum_a[idx_a])
-            idx_a += 1
-          } else {
-            combined_spectrum.push(spectrum_b[idx_b])
-            idx_b += 1
-          }
-        }
-
-        const sAB = this.calculateSpectralEntropy(combined_spectrum)
-        const sA = this.calculateSpectralEntropy(spectrum_a)
-        const sB = this.calculateSpectralEntropy(spectrum_b)
-        return 1 - (2 * sAB - sA - sB)/Math.log(4)
       },
       display_both_spectra(stored_spectrum, dtxsid) {
         var spectrum = this.user_spectrum_array.map(x => [x[0],x[1],null]).concat(stored_spectrum.map(x => [x[0],null,x[1]]))

@@ -25,7 +25,7 @@
     <p>Below is a chart detailing the breakdown of the methods currently in the database.  Click on a circle to zoom in and see more detail; click outside it to move to a higher level.</p>
     <MethodsBubbleChart />
     <br />
-    <p>This app was last updated on 2023-07-03.</p>
+    <p>This app was last updated on 2023-07-19.</p>
   </div>
 </template>
 

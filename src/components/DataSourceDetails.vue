@@ -27,11 +27,11 @@
     <strong>Number of substances in data: </strong> {{ substances }}
     <br />
     <strong>Records in AMOS: </strong>
-    <span v-if="spectra">{{ spectra }} spectra</span>
+    <span v-if="spectra">{{ spectra }} {{spectra == 1 ? "spectrum" : "spectra"}}</span>
     <span v-if="spectra && (factSheets || methods)">, </span>
-    <span v-if="factSheets">{{ factSheets }} fact sheets</span>
+    <span v-if="factSheets">{{ factSheets }} fact sheet{{factSheets == 1 ? "" : "s"}}</span>
     <span v-if="factSheets && methods">, </span>
-    <span v-if="methods">{{ methods }} methods</span>
+    <span v-if="methods">{{ methods }} method{{methods == 1 ? "" : "s"}}</span>
   </details>
 </template>
 

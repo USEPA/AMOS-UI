@@ -33,14 +33,18 @@
       <div class="info-container" style="padding-left: 100px">
         <div id="graph" ref="graph"></div>
         <br />
-        <p v-if="show_similarity"><strong>Entropy Similarity:</strong> {{ entropy_similarity.toFixed(4) }}</p>
+        <p v-if="entropy_display == 'entropy'"><strong>Spectral Entropy:</strong> {{ spectral_entropy.toFixed(4) }}</p>
+        <p v-else-if="entropy_display == 'similarity'"><strong>Entropy Similarity:</strong> {{ entropy_similarity.toFixed(4) }}</p>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+  import axios from 'axios'
   import Dygraph from 'dygraphs';
+
+  import { BACKEND_LOCATION } from '@/assets/store';
 
   export default {
     data() {
@@ -48,10 +52,12 @@
         spectrum_box_1: "1 100\n3 100\n5 100",
         spectrum_box_2: "2 100\n4 100\n6 100",
         spectrum: [],
+        spectral_entropy: 0,
         entropy_similarity: 0,
-        show_similarity: false,
+        entropy_display: null,
         dtxcid_mode: false,
-        dtxcids: []
+        dtxcids: [],
+        BACKEND_LOCATION
       }
     },
     async created() {
@@ -65,10 +71,11 @@
       }
     },
     methods: {
-      display_spectrum(box_contents) {
+      async display_spectrum(box_contents) {
           this.show_similarity = false
           this.spectrum = box_contents.split("\n").map(x => x.split(" ").map(y => Number(y)))
-          this.calculateSpectralEntropy(this.spectrum)
+          this.spectral_entropy = await this.calculateSpectralEntropy(this.spectrum)
+          this.entropy_display = "entropy"
           if (this.spectrum.length == 1){
               const padded_spectrum = [[this.spectrum[0][0] - 1, 0], this.spectrum[0], [this.spectrum[0][0] + 1, 0]]
               const g = new Dygraph(document.getElementById("graph"), padded_spectrum, {
@@ -96,7 +103,7 @@
               })
           }
       },
-      display_both_spectra() {
+      async display_both_spectra() {
           const spectrum1 = this.spectrum_box_1.split("\n").map(x => x.split(" ").map(y => Number(y)))
           const spectrum2 = this.spectrum_box_2.split("\n").map(x => x.split(" ").map(y => Number(y)))
           this.spectrum = spectrum1.map(x => [x[0],x[1],null]).concat(spectrum2.map(x => [x[0],null,x[1]]))
@@ -138,8 +145,8 @@
                   series: {'Spectrum 1 Intensity':{color: "orange"}, 'Spectrum 2 Intensity':{"color":"green"}}
               })
           }
-          this.entropy_similarity = this.calculateEntropySimilarity(spectrum1, spectrum2)
-          this.show_similarity = true
+          this.entropy_similarity = await this.calculateEntropySimilarity(spectrum1, spectrum2)
+          this.entropy_display = "similarity"
       },
       barChartPlotter(e) {
         const ctx = e.drawingContext
@@ -159,44 +166,16 @@
           barWidth, yBottom - p.canvasy)
         }
       },
-      calculateSpectralEntropy(a_spectrum) {
+      async calculateSpectralEntropy(spectrum) {
         // Calculates spectral entropy.
         // NOTE: This is currently not the same way that the spectral entropies stored in the database are calculated,
         // since that a method of consolidating some peaks that isn't implemented here.
-        const total_intensity = a_spectrum.map(x => x[1]).reduce((a,b) => a+b, 0)
-        const scaled_intensities = a_spectrum.map(x => x[1]/total_intensity)
-        return scaled_intensities.map(x => -1*x*Math.log(x)).reduce((a,b) => a+b, 0)
+        const response = await axios.post(`${this.BACKEND_LOCATION}/spectral_entropy/`, {spectrum: spectrum})
+        return response.data.entropy
       },
-      calculateEntropySimilarity(spectrum_a, spectrum_b) {
-        // Intended to calculate the entropy similarity, the formula for which I got from a paper sent to me by Tony.
-        // There seem to be some differences in implementation compared to the paper, though, as I can get negative
-        // values under certain circumstances.
-        var combined_spectrum = []
-        var idx_a = 0, idx_b = 0
-        while ((idx_a < spectrum_a.length) | (idx_b < spectrum_b.length)) {
-          if (idx_a == spectrum_a.length) {
-            combined_spectrum.push(spectrum_b[idx_b])
-            idx_b += 1
-          } else if (idx_b == spectrum_b.length) {
-            combined_spectrum.push(spectrum_a[idx_a])
-            idx_a += 1
-          } else if (spectrum_a[idx_a][0] == spectrum_b[idx_b][0]) {
-            combined_spectrum.push([spectrum_a[idx_a][0], spectrum_a[idx_a][1] + spectrum_b[idx_b][1]])
-            idx_a += 1
-            idx_b += 1
-          } else if (spectrum_a[idx_a][0] < spectrum_b[idx_b][0]) {
-            combined_spectrum.push(spectrum_a[idx_a])
-            idx_a += 1
-          } else {
-            combined_spectrum.push(spectrum_b[idx_b])
-            idx_b += 1
-          }
-        }
-
-        const sAB = this.calculateSpectralEntropy(combined_spectrum)
-        const sA = this.calculateSpectralEntropy(spectrum_a)
-        const sB = this.calculateSpectralEntropy(spectrum_b)
-        return 1 - (2 * sAB - sA - sB)/Math.log(4)
+      async calculateEntropySimilarity(spectrum_1, spectrum_2) {
+        const response = await axios.post(`${this.BACKEND_LOCATION}/entropy_similarity/`, {spectrum_1: spectrum_1, spectrum_2: spectrum_2})
+        return response.data.similarity
       }
     }
   }

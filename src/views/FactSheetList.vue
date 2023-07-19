@@ -9,15 +9,15 @@
   <div class="two-column-page">
     <div class="half-page-column">
       <p>
-        This is a list of {{fact_sheet_info.length}} fact sheets available in the database. All facts currently 
-        originate from five sources: the <a href="http://npic.orst.edu/">National Pesticide Information Center</a>
-        (NPIC), the <a href="https://www.swgdrug.org/monographs.htm">Scientific Working Group</a> (SWG), the
+        This is a list of fact sheets available in the database. All facts currently originate from five sources: the
+        <a href="http://npic.orst.edu/">National Pesticide Information Center</a> (NPIC), the
+        <a href="https://www.swgdrug.org/monographs.htm">Scientific Working Group</a> (SWG), the
         <a href="https://www.npsdiscovery.org/reports/monographs/">Center for Forensic Science Research & Education</a> 
         (CFRSE), <a href="https://www.nmslabs.com/">NMS Labs</a>, and the 
         <a href="https://www.kgi.edu/academics/schools/school-of-pharmacy-and-health-sciences/"> KGI School of
-        Pharmacy and Health Sciences</a>.
+        Pharmacy and Health Sciences</a>.  Select a row in the table below to view a fact sheet.
       </p>
-      <p>Select a row in the table below to view a fact sheet.</p>
+      <p>{{fact_sheet_info.length}} fact sheets in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed.</p>
       <ag-grid-vue
         class="ag-theme-balham"
         style="height:800px; width:100%"
@@ -26,6 +26,7 @@
         rowSelection="single"
         @first-data-rendered="onGridReady"
         @row-selected="onRowSelected"
+        @filter-changed="onFilterChanged"
       ></ag-grid-vue>
     </div>
     <StoredPDFViewer style="width: 48vw;" v-if="any_fact_sheet_selected" :internalID="selected_row_data.internal_id" recordType="fact sheet"/>
@@ -53,9 +54,10 @@
         fact_sheet_info: null,
         any_fact_sheet_selected: false,  // used to avoid having a box with an error pop up if nothing's been selected yet,
         BACKEND_LOCATION,
+        filtered_record_count: 0,
         column_defs: [
           {field: 'fact_sheet_name', headerName: 'Fact Sheet Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, sort: "asc", flex: 1},
-          {field: 'sub_source', headerName: 'Source', sortable: true, width: 250},
+          {field: 'sub_source', headerName: 'Source', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, width: 250},
           {field: 'year_published', headerName: 'Year', sortable: true, width: 70}
         ]
       }
@@ -69,7 +71,8 @@
 
     methods: {
       onGridReady(params) {
-        1
+        this.gridApi = params.api;
+        this.gridApi.onFilterChanged();
       },
       onRowSelected(event){
         if (event.event){
@@ -77,6 +80,9 @@
           this.any_fact_sheet_selected = true
           this.target_pdf_url = `${this.BACKEND_LOCATION}/get_pdf/fact sheet/${event.data.internal_id}`
         }
+      },
+      onFilterChanged(params) {
+        this.filtered_record_count = this.gridApi.getDisplayedRowCount()
       }
     },
 

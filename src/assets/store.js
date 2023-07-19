@@ -28,9 +28,10 @@ export const ANALYTE_MAPPING = {
 }*/
 
 export const SOURCE_ABBREVIATION_MAPPING = {
+    'Agilent': {'link': 'https://www.agilent.com/'},
     'AJAC': {'link': 'https://www.scirp.org/journal/ajac/', 'full_name': 'American Journal of Analytical Chemistry'},
     'ASTM': {'link': 'https://www.astm.org/', 'full_name': 'American Society for Testing and Materials'},
-    'Agilent': {'link': 'https://www.agilent.com/'},
+    'ATSDR': {'link': 'https://www.atsdr.cdc.gov', 'full_name': 'Agency for Toxic Substances and Disease Registry'},
     'CDC': {'link': 'https://www.cdc.gov/', 'full_name': 'U.S. Centers for Disease Control and Prevention'},
     'DTSC': {'link': 'https://dtsc.ca.gov/', 'full_name': 'California Department of Toxic Substance Control'},
     'EPA': {'link': 'https://www.epa.gov/', 'full_name': 'U.S. Environmental Protection Agency'},
@@ -43,6 +44,7 @@ export const SOURCE_ABBREVIATION_MAPPING = {
     'ISO': {'link': 'https://www.iso.org/home.html', 'full_name': 'International Organization for Standardization'},
     'MDPI': {'link': 'https://www.mdpi.com/', 'full_name': 'Multidisciplinary Digital Publishing Institute'},
     'NEMI': {'link': 'https://www.nemi.gov/home/', 'full_name': 'National Environmental Methods Index'},
+    'NIOSH': {'link': 'https://www.cdc.gov.niosh/index.htm', 'full_name': 'National Institute for Occupational Safety and Health'},
     'NIST': {'link': 'https://www.nist.gov/', 'full_name': 'National Institute of Standards and Technology'},
     'SCIEX': {'link': 'https://sciex.com/'},
     'SGS': {'link': 'https://www.sgs.com/en'},

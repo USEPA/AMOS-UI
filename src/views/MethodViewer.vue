@@ -9,8 +9,11 @@
 <template>
   <div class="two-column-page">
     <div class="half-page-column">
-      <div class="results-header">
-        <h2 v-if="pdf_name">{{pdf_name}}</h2>
+      <div class="results-header" style="overflow: auto;">
+        <h2 v-if="pdf_name">
+          <a v-if="pdf_source_url" :href="pdf_source_url">{{pdf_name}}</a>
+          <span v-else>{{pdf_name}}</span>
+        </h2>
         <p v-if="has_associated_spectra">This method has spectra associated with it.  Click <router-link :to="`/method_with_spectra/method/${$route.params.internal_id}`">here</router-link> to view.</p>
         <ul v-if="metadata_rows" style="list-style-type: none;">
           <li v-for="r in Object.entries(metadata_rows)"><strong>{{r[0]}}:</strong> {{r[1]}}</li>
@@ -75,12 +78,20 @@
         BACKEND_LOCATION,
         COMPTOX_PAGE_URL,
         IMAGE_BY_DTXSID_API,
+        pdf_source_url: null,
         column_defs: [
           {field:'image', headerName:'Structure', autoHeight: true, width: 100, cellRenderer: (params) => {
-            var image = document.createElement('img');
-            image.src = this.IMAGE_BY_DTXSID_API + params.data.dtxsid;
-            image.style = "width:70px;height:70px;padding-top:2px;padding-bottom:2px;";
-            return image;
+            if (params.data.image_link) {
+              var image = document.createElement('img');
+              image.src = this.IMAGE_BY_DTXSID_API + params.data.dtxsid;
+              image.style = "width:70px;height:70px;padding-top:2px;padding-bottom:2px;";
+              return image;
+            } else {
+              var p = document.createElement('div')
+              p.style = "width:70px;height:70px;padding-top:2px;padding-bottom:2px;text-align: center; line-height: 70px;";
+              p.innerText = "No image."
+              return p
+            }
           }},
           {field: 'dtxsid', headerName: 'DTXSID', width: 120, cellRenderer: params => {
             return "<a href='" + this.COMPTOX_PAGE_URL + params.data.dtxsid + "' target='_blank'>" + params.data.dtxsid + "</a>"
@@ -102,6 +113,10 @@
     },
 
     async created() {
+      const response = await axios.get(`${this.BACKEND_LOCATION}/get_info_by_id/${this.$route.params.internal_id}`)
+      if (response.data.result) {
+        this.pdf_source_url = response.data.result.link
+      }
       this.loadPDF()
       this.findDTXSIDs()
     },
@@ -117,6 +132,12 @@
       async findDTXSIDs(){
         const response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.$route.params.internal_id}`)
         this.compound_list = response.data.compound_list
+        for (let i=0; i<this.compound_list.length; i++) {
+          const image_url = this.IMAGE_BY_DTXSID_API + this.compound_list[i].dtxsid
+          if (await this.doesImageExist(image_url)) {
+            this.compound_list[i]["image_link"] = image_url
+          }
+        }
       },
       updateTab(tabName) {
         this.viewer_mode = tabName
@@ -130,6 +151,10 @@
       onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
+      },
+      async doesImageExist(api_url) {
+        const response = await axios.get(api_url)
+        return response.data.length > 0
       }
     },
 
