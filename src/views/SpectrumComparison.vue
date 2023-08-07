@@ -8,7 +8,7 @@
 <template>
   <div>
     <p><strong>NOTE: This page is effectively just a demo at the moment, as the full functionality has yet to be coded or established.</strong></p>
-    <p>This page allows you to load a spectrum and visualize it.  To use it, copy the data you want to see into the text box.  It should be in the form of space-delimited values for m/z and intensity, with one peak per line.</p>
+    <p>This page allows you to load and visualize spectra.  To use it, copy the data you want to see into the text box.  It should be in the form of space-delimited values for m/z and intensity, with one peak per line.</p>
     <div class="display-stuff">
       <div class="search-inputs">
         <div class="display-stuff">
@@ -16,8 +16,16 @@
             <p>First Spectrum</p>
             <textarea type="text" class="batch-search-input" rows="20" columns="35" v-model="spectrum_box_1"></textarea>
           </div>
-          <div v-if="dtxcid_mode" class="search-inputs" style="padding-left: 100px">
-            <p>DTXCID mode -- {{ dtxcids }}</p>
+          <div v-if="dtxsid_mode" class="search-inputs" style="padding-left: 100px">
+            <p>DTXSID mode -- {{ dtxsids }}</p>
+            <ag-grid-vue
+              class="ag-theme-balham"
+              style="height:600px; width:600px"
+              :columnDefs="column_defs"
+              :rowData="database_spectra"
+              rowSelection="single"
+              @row-selected="onRowSelected"
+            ></ag-grid-vue>
           </div>
           <div v-else class="search-inputs" style="padding-left: 100px">
             <p>Second Spectrum</p>
@@ -44,6 +52,13 @@
   import axios from 'axios'
   import Dygraph from 'dygraphs';
 
+  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
+  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import { AgGridVue } from "ag-grid-vue3"
+  import 'ag-grid-enterprise'
+  import { LicenseManager } from 'ag-grid-enterprise'
+  LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
+
   import { BACKEND_LOCATION } from '@/assets/store';
 
   export default {
@@ -55,18 +70,28 @@
         spectral_entropy: 0,
         entropy_similarity: 0,
         entropy_display: null,
-        dtxcid_mode: false,
-        dtxcids: [],
-        BACKEND_LOCATION
+        dtxsid_mode: false,
+        dtxsids: [],
+        database_spectra: [],
+        substance_mapping: {},
+        BACKEND_LOCATION,
+        column_defs: [
+          {field: "dtxsid", headerName: "DTXSID", width: 140},
+          {field: "name", headerName: "Name", width: 140, cellRenderer: params => {return this.substance_mapping[params.data.dtxsid]}},
+          {field: "description", headerName: "Description", flex: 1}
+        ]
       }
     },
     async created() {
-      if (this.$route.query.dtxcids) {
-        this.dtxcid_mode = true
-        this.dtxcids = this.$route.query.dtxcids.split(",")
+      if (this.$route.query.dtxsids) {
+        this.dtxsid_mode = true
+        this.dtxsids = this.$route.query.dtxsids.split(",")
+        const response = await axios.post(`${this.BACKEND_LOCATION}/spectra_for_substances/`, {dtxsids: this.dtxsids})
+        console.log(response)
+        this.database_spectra = response.data.spectra
+        this.substance_mapping = response.data.substance_mapping
         if (this.$route.query.spectrum) {
-          var temp_spectrum = this.$route.query.spectrum
-          this.spectrum_box_1 = temp_spectrum.replaceAll(":", " ").replaceAll(";", "\n")
+          this.spectrum_box_1 = this.$route.query.spectrum.replaceAll(":", " ").replaceAll(";", "\n")
         }
       }
     },
@@ -142,7 +167,7 @@
                   width: 600,
                   height: 400,
                   xRangePad: 10,
-                  series: {'Spectrum 1 Intensity':{color: "orange"}, 'Spectrum 2 Intensity':{"color":"green"}}
+                  series: {'Spectrum 1 Intensity': {color: "orange"}, 'Spectrum 2 Intensity': {"color":"green"}}
               })
           }
           this.entropy_similarity = await this.calculateEntropySimilarity(spectrum1, spectrum2)
@@ -177,7 +202,8 @@
         const response = await axios.post(`${this.BACKEND_LOCATION}/entropy_similarity/`, {spectrum_1: spectrum_1, spectrum_2: spectrum_2})
         return response.data.similarity
       }
-    }
+    },
+    components: { AgGridVue }
   }
 </script>
 

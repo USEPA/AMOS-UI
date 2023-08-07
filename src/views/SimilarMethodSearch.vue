@@ -12,7 +12,7 @@
       <p></p>
       <div>
         <label for="search-dtxsid">Compound Identifier</label> &nbsp;
-        <input @keyup.enter="methodSearch(searched_compound)" type="text" v-model="searched_compound" name="search-dtxsid">
+        <input @keyup.enter="methodSearch(searched_compound)" type="text" size="30" v-model="searched_compound" name="search-dtxsid">
         <button @click="methodSearch(searched_compound)">Method Search</button>
       </div>
       <br />

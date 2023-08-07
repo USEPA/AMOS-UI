@@ -28,26 +28,32 @@
       <button @click="spectrum_search">Search</button>
     </div>
     <div class="half-page-column">
-      Second column test.
-      <ag-grid-vue
-        class="ag-theme-balham"
-        style="height:400px; width:100%"
-        v-if="results.length > 0"
-        :columnDefs="columnDefs"
-        :rowData="results"
-        rowSelection="single"
-        @row-selected="onRowSelected"
-        @first-data-rendered="onGridReady"
-      ></ag-grid-vue>
+      <div v-if="results.length > 0">
+        Search found {{ results.length }} spectra covering {{ unique_substances }} substances.
+        <ag-grid-vue
+          class="ag-theme-balham"
+          style="height:400px; width:100%"
+          v-if="results.length > 0"
+          :columnDefs="columnDefs"
+          :rowData="results"
+          rowSelection="single"
+          @row-selected="onRowSelected"
+          @first-data-rendered="onGridReady"
+          suppressAggFuncInHeader="true"
+          :autoGroupColumnDef="autoGroupColumnDef"
+        ></ag-grid-vue>
+      </div>
       <p v-else>No results available.</p>
       <div id="graph" ref="graph"></div>
     </div>
   </div>
+  <b-alert variant="warning" dismissible v-model="error_messages.invalidFormat">There are issues with the contents of the user spectrum -- please check to ensure it is correct.</b-alert>
 </template>
 
 <script>
   import axios from 'axios'
   import Dygraph from 'dygraphs';
+  import { validateSpectrumInput } from '@/assets/common_functions'
   import { BACKEND_LOCATION } from '@/assets/store'
 
   import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
@@ -62,27 +68,41 @@
   export default{
     data() {
       return {
-        mass_target: 491,
-        mass_error: 0.2,
+        mass_target: 194,
+        mass_error: 0.1,
         error_type: "error_da",
         methodology: "LC/MS",
         results: [],
-        user_spectrum_string: "",
-        user_spectrum_array: "",
+        unique_substances: 0,
+        user_spectrum_string: "53.84601 0.040218\n59.7077 0.039517\n69.04531 0.269281\n71.112045 0.036707\n83.06077 0.233345\n110.071434 2.046293\n111.055466 0.068346\n123.04299 0.058855\n124.86625 0.049269\n132.70123 0.047547\n138.06598 34.97314\n151.09726 0.06952\n156.07649 0.046879\n180.06517 0.067487\n181.07085 0.058521\n195.08736 100",
+        user_spectrum_array: [],
         show_plot: false,
         BACKEND_LOCATION,
+        error_messages: {invalidFormat: false},
+        substance_mapping: {},
         columnDefs: [
-          {field: 'dtxsid', headerName: 'DTXSID', width: 140},
-          {field: 'dtxcid', headerName: 'DTXCID', width: 140},
-          {field: 'similarity', headerName: "Similarity", width: 100, sort: "desc", cellRenderer: 
-            params => {return params.data.similarity.toFixed(4)}},
+          //{field: 'dtxsid', headerName: 'DTXSID', width: 140},
+          //{field: 'preferred_name', headerName: 'Name', width: 140},
+          {field: 'dtxsid', hide: true, headerName: "Substance", width: 300, rowGroup: true, cellRenderer: params => {
+            console.log(params)
+            return `${params.value} (${this.substance_mapping[params.value]})`
+          }},
+          {field: 'similarity', headerName: "Similarity", width: 100, sort: "desc", aggFunc: 'max', cellRenderer:'agGroupCellRenderer', cellRendererParams: {
+            innerRenderer: params => {console.log(params); return params.value.toFixed(4)}
+          }},
           {field: 'description', headerName: 'Description', flex: 1},
           {field: 'internal_id', headerName: 'Internal ID', hide: true}
-        ]
+        ],
+        autoGroupColumnDef: {headerName: 'DTXSID (Name)', width: 300, sortable: true}
       }
     },
     methods: {
       async spectrum_search() {
+        this.user_spectrum_string = this.user_spectrum_string.trim()
+        if (validateSpectrumInput(this.user_spectrum_string) === false) {
+          this.error_messages.invalidFormat = true
+          return;
+        }
         var lower_mass_limit = 0
         var upper_mass_limit = 0
         if (this.error_type == "error_da"){
@@ -100,8 +120,9 @@
           `${this.BACKEND_LOCATION}/spectrum_similarity_search/`,
           {upper_mass_limit: upper_mass_limit, lower_mass_limit: lower_mass_limit, methodology: this.methodology, spectrum: this.user_spectrum_array}
         )
-        console.log(response.data.results)
         this.results = response.data.results
+        this.unique_substances = response.data.unique_substances
+        this.substance_mapping = response.data.substance_mapping
       },
       onGridReady(params) {
         this.gridApi = params.api

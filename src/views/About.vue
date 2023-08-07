@@ -21,11 +21,19 @@
       <li>Searching for all methods that cover a compound similar to one being searched.  This uses EPA calculations for the similarity between two compounds and returns all methods containing at least one compound of sufficient similarity (similarity level is currently hardcoded on the Flask backend).  Searching can be done by DTXSID, CAS registry number, InChIKey, or compound names.</li>
       <li>Batch searching compounds by DTXSID, and returning basic information for all records.</li>
     </ul>
+    <p>The contents of the database are as follows:</p>
+    <ul>
+      <li>Spectra: 164,461 in database and 600,248 externally linked</li>
+      <li>Fact Shets: 707 in database</li>
+      <li>Methods: 3294 in database</li>
+      <li>Unique sources: 133</li>
+      <li>Substances appearing in at least one record: 161,660</li>
+    </ul>
     <br />
     <p>Below is a chart detailing the breakdown of the methods currently in the database.  Click on a circle to zoom in and see more detail; click outside it to move to a higher level.</p>
     <MethodsBubbleChart />
     <br />
-    <p>This app was last updated on 2023-07-19.</p>
+    <p>This app was last updated on 2023-08-07.</p>
   </div>
 </template>
 

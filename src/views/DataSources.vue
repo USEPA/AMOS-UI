@@ -21,8 +21,8 @@
     category="Vendor methods collection"
     url="https://www.agilent.com"
     sourceID="Agilent"
-    substances="2439"
-    methods="239"
+    substances="2555"
+    methods="244"
   />
   <DataSourceDetails
     sourceName="Analytical QC"
@@ -126,9 +126,9 @@
     category="Open spectrum and monographs collection"
     url="https://www.swgdrug.org/"
     sourceID="SWG"
-    substances="3443"
+    substances="3450"
     factSheets="515"
-    spectra="3312"
+    spectra="3319"
   />
   <DataSourceDetails
     sourceName="SCIEX"
@@ -167,8 +167,8 @@
     category="Government methods collection"
     url="https://www.usgs.gov/"
     sourceID="USGS"
-    substances="456"
-    methods="10"
+    substances="457"
+    methods="11"
   />
   <br />
 </template>
