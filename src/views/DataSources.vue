@@ -61,8 +61,8 @@
     category="Open-access spectrum collection"
     url="https://hmdb.ca/"
     sourceID="HMDB"
-    substances="3162"
-    spectra="15481"
+    substances="4819"
+    spectra="53315"
   />
   <DataSourceDetails
     sourceName="Jozef Stefan Institute"
@@ -86,8 +86,8 @@
     category="Open-access spectral database"
     url="https://mona.fiehnlab.ucdavis.edu"
     sourceID="MoNA"
-    substances="8521"
-    spectra="55882"
+    substances="7156"
+    spectra="48564"
   />
   <DataSourceDetails
     sourceName="National Environmental Methods Index"

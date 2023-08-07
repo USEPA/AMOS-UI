@@ -23,11 +23,11 @@
     </ul>
     <p>The contents of the database are as follows:</p>
     <ul>
-      <li>Spectra: 164,461 in database and 600,248 externally linked</li>
+      <li>Spectra: 194,977 in database and 600,248 externally linked</li>
       <li>Fact Shets: 707 in database</li>
       <li>Methods: 3294 in database</li>
       <li>Unique sources: 133</li>
-      <li>Substances appearing in at least one record: 161,660</li>
+      <li>Substances appearing in at least one record: 161,748</li>
     </ul>
     <br />
     <p>Below is a chart detailing the breakdown of the methods currently in the database.  Click on a circle to zoom in and see more detail; click outside it to move to a higher level.</p>
