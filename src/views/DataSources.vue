@@ -102,16 +102,16 @@
     category="Government methods collection"
     url="https://www.cdc.gov.niosh/index.htm"
     sourceID="NIOSH"
-    substances="212"
-    methods="70"
+    substances="295"
+    methods="71"
   />
   <DataSourceDetails
     sourceName="National Institute of Standards and Technology"
     category="Government methods collection"
     url="https://www.nist.gov/"
     sourceID="NIST"
-    substances="746"
-    methods="49"
+    substances="752"
+    methods="50"
   />
   <DataSourceDetails
     sourceName="National Pesticide Information Center"

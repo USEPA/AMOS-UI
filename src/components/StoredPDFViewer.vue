@@ -48,6 +48,7 @@
 
 <script>
   import axios from 'axios'
+  import { objectArrayToCSV } from '@/assets/common_functions'
 
   import '@/assets/style.css'
   import '@/assets/search_results.css'
@@ -146,6 +147,13 @@
         this.viewer_mode = tabName
       },
       downloadCompoundInfo() {
+        /*const csv_string = objectArrayToCSV(this.compound_list)
+        const anchor = document.createElement('a')
+        anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv_string);
+        anchor.target = '_blank';
+        anchor.download = 'compound_list.csv';
+        anchor.click();*/
+        
         this.gridApi.exportDataAsCsv({
           columnKeys: ["dtxsid", "casrn", "preferred_name"],
           fileName: this.internalID + "_compound_list.csv"

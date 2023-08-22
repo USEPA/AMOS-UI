@@ -124,6 +124,7 @@
           },
           {field: "chemical_class", headerName: "Chemical Class", sortable: true, flex: 1},
           {field: "matrix", headerName: "Matrix", sortable: true, flex: 1.2},
+          {field: "limitation", headerName: "Limitation", width: 100},
           {field: "count", headerName: "# Compounds", width: 120, floatingFilter: false, sortable: true},
           {field: "author", headerName: "Author(s)", hide: true}
         ]

@@ -11,7 +11,7 @@
     <div class="half-page-column">
       <div class="results-header" style="overflow: auto;">
         <h2 v-if="pdf_name">
-          <a v-if="pdf_source_url" :href="pdf_source_url">{{pdf_name}}</a>
+          <a v-if="pdf_source_url" :href="pdf_source_url" target="_blank">{{pdf_name}}</a>
           <span v-else>{{pdf_name}}</span>
         </h2>
         <p v-if="has_associated_spectra">This method has spectra associated with it.  Click <router-link :to="`/method_with_spectra/method/${$route.params.internal_id}`">here</router-link> to view.</p>
