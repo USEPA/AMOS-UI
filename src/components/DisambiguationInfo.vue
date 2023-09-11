@@ -41,7 +41,6 @@
   import axios from 'axios'
 
   import '@/assets/style.css'
-  import '@/assets/search_results.css'
   import { IMAGE_BY_DTXSID_API } from '@/assets/store'
 
   export default {

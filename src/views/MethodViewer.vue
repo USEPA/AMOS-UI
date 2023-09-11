@@ -53,7 +53,6 @@
   import axios from 'axios'
 
   import '@/assets/style.css'
-  import '@/assets/search_results.css'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API } from '@/assets/store'
   
   import CompoundTile from '@/components/CompoundTile.vue'

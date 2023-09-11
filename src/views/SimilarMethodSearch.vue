@@ -20,12 +20,14 @@
       <p v-else-if="searching">Searching...</p>
       <p v-else-if="!found_compound">No compound match was found for "{{ current_compound }}".</p>
       <div v-else>
-        <p>The table below lists methods for compounds that are similar to "{{ current_compound }}".</p>
-        <p>Select a row in the table to view the method on the right half of the screen.  Bolded rows refer to methods which contain the chemical being searched.</p>
-        <p>Hover over a method name to see the full text of it.  The number in parentheses at the end is the number of similar compounds found in the method (not necessarily the number of compounds present in the method).</p>
-        <p>Columns can be hidden by clicking on the menu icon seen when hovering over a column name -- this brings up a menu where column visibility can be toggled.</p> 
+        <p>The table below lists methods for compounds that are similar to "{{ current_compound }}".  {{ dtxsid_counts.length }} distinct substances of sufficient similarity were found in  {{ Object.keys(ids_to_method_names).length }} methods.</p>
+        <p>There are two tables below -- one lists all the methods containing a compound similar to {{ current_compound }}, while the other lists all similar substances found.  Clicking on a row will bring up the method or a comparison between the searched and selected substances, respectively.  Hover over a method or substance name to see the full name.  Columns can be hidden by clicking on the menu icon seen when hovering over a column name.</p>
+        <div class="tab-bar">
+          <a :class="tab_viewer_mode == 'Methods' ? 'active': ''" @click="updateTab('Methods')">Methods</a>
+          <a :class="tab_viewer_mode == 'Substances' ? 'active': ''" @click="updateTab('Substances')">Substances</a>
+        </div>
         <div id="grid-theme-wrapper" class="modded-theme">
-          <ag-grid-vue
+          <ag-grid-vue v-if="tab_viewer_mode == 'Methods'"
             class="ag-theme-balham"
             style="height:600px; width:100%"
             :columnDefs="result_column_defs"
@@ -33,21 +35,59 @@
             :autoGroupColumnDef="autoGroupColumnDef"
             suppressAggFuncInHeader="true"
             rowSelection="single"
-            @row-selected="onRowSelected"
-            :rowClassRules="rowClassRules"
+            @row-selected="methodsRowSelected"
+            :rowClassRules="methodsRowClassRules"
           ></ag-grid-vue>
+          <ag-grid-vue v-if="tab_viewer_mode == 'Substances'"
+            class="ag-theme-balham"
+            style="height:600px; width:100%"
+            :columnDefs="count_column_defs"
+            :rowData="dtxsid_counts"
+            rowSelection="single"
+            @row-selected="substancesRowSelected"
+            :getRowClass="getRowClass"
+            ></ag-grid-vue>
+            <!--:rowClassRules="substancesRowClassRules"-->
         </div>
       </div>
     </div>
-    <StoredPDFViewer style="width: 48vw;" v-if="any_method_selected" :internalID="selected_row_data.internal_id" recordType="method"/>
-    <div class="half-page-column" v-if="search_complete & found_compound & !any_method_selected">
-      <p>Below is a table of the substances where at least one similar method was found.</p>
-      <ag-grid-vue
-        class="ag-theme-balham"
-        style="height:600px; width:100%"
-        :columnDefs="count_column_defs"
-        :rowData="dtxsid_counts"
-      ></ag-grid-vue>
+    <StoredPDFViewer style="width: 48vw;" v-if="right_side_viewer_mode == 'Methods'" :internalID="selected_row_data.internal_id" recordType="method" :highlightedCompounds="similar_substances"/>
+    <div class="half-page-column" v-else-if="right_side_viewer_mode == 'Substances'">
+      <h4>Searched Substance:</h4>
+      <div class="chemical-box">
+        <div class="chemical-image-highlight">
+          <img v-if="1" class="chemical-image" :src="`${IMAGE_BY_DTXSID_API}${substance_info.searched_substance.dtxsid}`"/>  
+          <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this compound.</div>
+        </div>
+        <div class="chemical-info">
+          <ul style="list-style-type: none;">
+            <li><strong>(Preferred) Name:</strong> {{ substance_info.searched_substance.preferred_name }} </li>
+            <li><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substance_info.searched_substance.dtxsid}`">{{ substance_info.searched_substance.dtxsid }}</a> </li>
+            <li><strong>CASRN:</strong> {{ substance_info.searched_substance.casrn }} </li>
+            <li><strong>InChIKey:</strong> {{ substance_info.searched_substance.indigo_inchikey ? substance_info.searched_substance.indigo_inchikey : substance_info.searched_substance.jchem_inchikey}} </li>
+            <li><strong>Molecular Formula:</strong> {{ substance_info.searched_substance.molecular_formula }} </li>
+            <li><strong>Mass:</strong> {{ substance_info.searched_substance.monoisotopic_mass }} </li>
+          </ul>
+        </div>
+      </div>
+      <br />
+      <h4>Selected Substance From Table:</h4>
+      <div class="chemical-box">
+        <div class="chemical-image-highlight">
+          <img v-if="1" class="chemical-image" :src="`${IMAGE_BY_DTXSID_API}${substance_info.similar_substance.dtxsid}`"/>  
+          <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this compound.</div>
+        </div>
+        <div class="chemical-info">
+          <ul style="list-style-type: none;">
+            <li><strong>(Preferred) Name:</strong> {{ substance_info.similar_substance.preferred_name }} </li>
+            <li><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substance_info.similar_substance.dtxsid}`">{{ substance_info.similar_substance.dtxsid }}</a> </li>
+            <li><strong>CASRN:</strong> {{ substance_info.similar_substance.casrn }} </li>
+            <li><strong>InChIKey:</strong> {{ substance_info.similar_substance.indigo_inchikey ? substance_info.similar_substance.indigo_inchikey : substance_info.similar_substance.jchem_inchikey}} </li>
+            <li><strong>Molecular Formula:</strong> {{ substance_info.similar_substance.molecular_formula }} </li>
+            <li><strong>Mass:</strong> {{ substance_info.similar_substance.monoisotopic_mass }} </li>
+          </ul>
+        </div>
+      </div>
     </div>
   </div>
   <b-modal size="xl" v-model="disambiguation.inchikey">
@@ -72,14 +112,16 @@
   import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
   import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
-  import { BACKEND_LOCATION } from '@/assets/store'
+  import { BACKEND_LOCATION, COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API } from '@/assets/store'
   
   export default{
     data() {
       return {
         BACKEND_LOCATION,
+        COMPTOX_PAGE_URL,
+        IMAGE_BY_DTXSID_API,
         results: null,
-        any_method_selected: false,
+        any_row_selected: false,
         searching: false,
         search_complete: false,
         found_compound: false,
@@ -91,6 +133,10 @@
         current_compound: "",
         ids_to_method_names: "",
         current_method_shown_id: "",
+        tab_viewer_mode: "Methods",
+        right_side_viewer_mode: "N/A",
+        substance_info: {searched_substance: {}, similar_substance: {}},
+        similar_substances: [],
         result_column_defs: [
           {field: "internal_id", rowGroup: true, hide: true, sortable: true, cellRenderer: params => {
             const title_text = this.ids_to_method_names[params.value] + " (" + params.node.allChildrenCount + ")";
@@ -107,14 +153,14 @@
         ],
         count_column_defs: [
           {field: "dtxsid", headerName: "DTXSID", sortable: true, width: 125},
-          {field: "preferred_name", headerName: "Name", sortable: true, flex: 1},
-          {field: "similarity", headerName: "Similarity", sortable: true, sort: 'desc', width: 95, cellRenderer: 
+          {field: "preferred_name", headerName: "Name", sortable: true, flex: 1, tooltipField: "preferred_name"},
+          {field: "similarity", headerName: "Similarity", sortable: true, sort: 'desc', width: 110, cellRenderer: 
             params => {return params.data.similarity.toFixed(2)}
           },
-          {field: "num_methods", headerName: "# Methods", sortable: true, width: 95}
+          {field: "num_methods", headerName: "# Methods", sortable: true, width: 110},
         ],
-        rowClassRules: {
-          "method-has-chemical-match": function(params) {
+        methodsRowClassRules: {
+          "emphasized-row": function(params) {
             if (params.data === undefined) {
               return params.node.allLeafChildren[0].data.has_searched_compound
             } else {
@@ -122,6 +168,13 @@
             }
           }
         },
+        /*substancesRowClassRules: {
+          "emphasized-row": function(params) {
+            console.log(params)
+            return params.data.dtxsid == this.current_compound
+            return false
+          }
+        },*/
         autoGroupColumnDef: {headerName: 'Method Name (# compounds)', width: 210, sortable: true, comparator: (valueA, valueB, nodeA, nodeB, isDescending) => {
           // Need to be able to sort the groups by method name, not internal id, so map them and then compare.
           const nameA = this.ids_to_method_names[valueA]
@@ -144,7 +197,7 @@
         // variable setup
         this.results = null
         this.searching = true
-        this.any_method_selected = false
+        this.right_side_viewer_mode = "N/A"
         this.search_complete = false
 
         const response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${searched_compound.trim()}`)
@@ -160,8 +213,10 @@
             this.disambiguation.synonym = true
           }
         } else {
+          this.substance_info.searched_substance = response.data.substances
           const methods_response = await axios.get(`${this.BACKEND_LOCATION}/get_similar_methods/${response.data.substances.dtxsid}`)
           this.dtxsid_counts = methods_response.data.dtxsid_counts
+          this.similar_substances = this.dtxsid_counts.map(x => x.dtxsid)
           this.current_compound = searched_compound.trim()  // should be whatever the user chooses
           this.found_compound = true
           this.results = methods_response.data.results
@@ -173,7 +228,7 @@
       onGridReady(params) {
         1
       },
-      onRowSelected(event) {
+      methodsRowSelected(event) {
         if (event.event){
           var new_method_id = ""
           var source = ""
@@ -190,21 +245,36 @@
           if (new_method_id != this.current_method_shown_id) {
             this.current_method_shown_id = new_method_id
             this.selected_row_data = {internal_id: new_method_id, source}
-            this.any_method_selected = true
+            this.right_side_viewer_mode = "Methods"
           }
+        }
+      },
+      async substancesRowSelected(event) {
+        if (event.event) {
+          const response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${event.data.dtxsid}`)
+          this.substance_info.similar_substance = response.data.substances
+          this.right_side_viewer_mode = "Substances"
         }
       },
       disambiguate(dtxsid) {
         this.disambiguation.inchikey = false
         this.disambiguation.synonym = false
         this.methodSearch(dtxsid)
+      },
+      updateTab(tab_name) {
+        this.tab_viewer_mode = tab_name
+      },
+      getRowClass(params) {
+        if (params.node.data.dtxsid == this.substance_info.searched_substance.dtxsid) {
+          return "emphasized-row"
+        }
       }
     }
   }
 </script>
 
 <style>
-.method-has-chemical-match {
+.emphasized-row {
   font-weight: 700;
 }
 </style>

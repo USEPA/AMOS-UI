@@ -70,14 +70,15 @@
           {field: "method_number", headerName: "Method #"},
           {field: "method_name", headerName: "Name", tooltipField: 'method_name', sortable: true, flex: 1, cellClass: 'fake-link'},
           {field: "year_published", headerName: "Year", width: 90, sortable: true, filter: 'agNumberColumnFilter'},
-          {field: "methodology", headerName: "Methodology", width: 115, sortable: true, tooltipValueGetter: params => {
-              if (this.METHODOLOGY_MAPPING[params.data.methodology]) {
-                return this.METHODOLOGY_MAPPING[params.data.methodology].full_name
-              }
-            }, cellClass: params => {
-              if (this.METHODOLOGY_MAPPING[params.data.methodology] && this.METHODOLOGY_MAPPING[params.data.methodology].full_name) {
-                return "has-hover-text"
-              }
+          {field: "methodology", headerName: "Methodology", width: 115, sortable: true, cellRenderer: params => {
+              const methodology_html = params.data.methodologies.map(m => {
+                if (this.METHODOLOGY_MAPPING[m]) {
+                  return `<span class='has-hover-text' title='${this.METHODOLOGY_MAPPING[m].full_name}'>${m}</span>`
+                } else {
+                  return m
+                }
+              })
+              return methodology_html.join("; ")
             }
           },
           {field: "source", headerName: "Source", width: 100, sortable: true, tooltipValueGetter: params => {
@@ -125,6 +126,7 @@
           {field: "chemical_class", headerName: "Chemical Class", sortable: true, flex: 1},
           {field: "matrix", headerName: "Matrix", sortable: true, flex: 1.2},
           {field: "limitation", headerName: "Limitation", width: 100},
+          {field: "document_type", headerName: "DocType", width: 100},
           {field: "count", headerName: "# Compounds", width: 120, floatingFilter: false, sortable: true},
           {field: "author", headerName: "Author(s)", hide: true}
         ]

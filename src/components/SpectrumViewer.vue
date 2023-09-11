@@ -45,13 +45,13 @@
 
     <!-- Modal window that displays the metadata associated with the spectrum, using the spectrum_metadata field from the database. -->
     <b-modal v-model="show_metadata_modal" ref="metadata_modal">
-      <h5 v-if="spectrum_metadata.Chromatography">Chromatography Info:</h5>
-      <ul v-if="spectrum_metadata.Chromatography" style="list-style-type: none;" ref="metadata_modal">
+      <h5 v-if="spectrum_metadata && spectrum_metadata.Chromatography">Chromatography Info:</h5>
+      <ul v-if="spectrum_metadata && spectrum_metadata.Chromatography" style="list-style-type: none;" ref="metadata_modal">
         <li v-for="c in Object.entries(spectrum_metadata.Chromatography)"><strong>{{c[0]}}:</strong> {{c[1]}}</li>
       </ul>
       <br />
-      <h5 v-if="spectrum_metadata.Spectrometry">Spectrometry Info:</h5>
-      <ul v-if="spectrum_metadata.Spectrometry" style="list-style-type: none;">
+      <h5 v-if="spectrum_metadata && spectrum_metadata.Spectrometry">Spectrometry Info:</h5>
+      <ul v-if="spectrum_metadata && spectrum_metadata.Spectrometry" style="list-style-type: none;">
         <li v-for="s in Object.entries(spectrum_metadata.Spectrometry)"><strong>{{s[0]}}:</strong> {{s[1]}}</li>
       </ul>
       <button @click="copyMetadata()">Copy to Clipboard</button>
@@ -63,7 +63,7 @@
   import axios from 'axios';
   import Dygraph from 'dygraphs';
   
-  import '@/assets/search_results.css'
+  import '@/assets/style.css'
   import { BACKEND_LOCATION } from '@/assets/store';
 
   import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
@@ -113,6 +113,7 @@
         this.spectrum_is_clean = this.spectral_entropy <= 3.0 & this.normalized_entropy <= 0.8
         this.splash = response.data.splash
         this.has_associated_method = response.data.has_associated_method
+        
         this.spectrum_metadata = response.data.spectrum_metadata
         if (this.spectrum.length == 1){
           const padded_spectrum = [[this.spectrum[0][0] - 1, 0], this.spectrum[0], [this.spectrum[0][0] + 1, 0]]

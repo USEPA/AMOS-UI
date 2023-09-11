@@ -13,7 +13,8 @@
     category="Government methods collection"
     url="https://www.atsdr.cdc.gov"
     sourceID="ATSDR"
-    substances="856"
+    substances="1033"
+    factSheets="181"
     methods="40"
   />
   <DataSourceDetails
@@ -21,8 +22,8 @@
     category="Vendor methods collection"
     url="https://www.agilent.com"
     sourceID="Agilent"
-    substances="2555"
-    methods="244"
+    substances="3136"
+    methods="293"
   />
   <DataSourceDetails
     sourceName="Analytical QC"
@@ -37,16 +38,16 @@
     category="Open-access spectrum collection"
     url="https://www.caymanchem.com/forensics/publications/csl"
     sourceID="Cayman"
-    substances="1757"
-    spectra="1818"
+    substances="2118"
+    spectra="2198"
   />
   <DataSourceDetails
     sourceName="Center for Forensic Science Research & Education"
     category="Open monographs collection"
     url="https://www.cfsre.org/nps-discovery/monographs"
     sourceID="CFSRE"
-    substances="148"
-    factSheets="138"
+    substances="84"
+    factSheets="74"
   />
   <DataSourceDetails
     sourceName="Centers for Disease Control and Prevention"
@@ -55,6 +56,30 @@
     sourceID="CDC"
     substances="364"
     methods="25"
+  />
+  <DataSourceDetails
+    sourceName="Drug Enforcement Administration"
+    category="Government methods collection"
+    url="https://www.dea.gov"
+    sourceID="DEA"
+    substances="18"
+    methods="33"
+  />
+  <DataSourceDetails
+    sourceName="European Union Reference Laboratories"
+    category="Open-access methods collection"
+    url="https://www.eurl-pesticides.eu"
+    sourceID="EURL"
+    substances="739"
+    methods="65"
+  />
+  <DataSourceDetails
+    sourceName="Global Natural Products Social Molecular Networking"
+    category="Open-access spectrum libraries"
+    url="https://gnps.ucsd.edu"
+    sourceID="GNPS"
+    substances="1919"
+    spectra="7779"
   />
   <DataSourceDetails
     sourceName="Human Metabolome Database"
@@ -78,8 +103,8 @@
     category="Open-access spectral database"
     url="https://massbank.eu/MassBank/"
     sourceID="MassBank EU"
-    substances="12313"
-    spectra="82343"
+    substances="12670"
+    spectra="85859"
   />
   <DataSourceDetails
     sourceName="MassBank of North America"
@@ -102,16 +127,17 @@
     category="Government methods collection"
     url="https://www.cdc.gov.niosh/index.htm"
     sourceID="NIOSH"
-    substances="295"
-    methods="71"
+    substances="636"
+    methods="372"
   />
   <DataSourceDetails
     sourceName="National Institute of Standards and Technology"
     category="Government methods collection"
     url="https://www.nist.gov/"
-    sourceID="NIST"
-    substances="752"
-    methods="50"
+    sourceID="NIST, NIST PFAS"
+    substances="870"
+    methods="51"
+    spectra="68"
   />
   <DataSourceDetails
     sourceName="National Pesticide Information Center"
@@ -122,12 +148,20 @@
     factSheets="54"
   />
   <DataSourceDetails
+    sourceName="New Jersey Department of Health"
+    category="Government fact sheet collection"
+    url="https://www.nj.gov/health"
+    sourceID="NJDOH"
+    substances="1626"
+    factSheets="1626"
+  />
+  <DataSourceDetails
     sourceName="Scientific Working Group for the Analysis of Seized Drugs"
     category="Open spectrum and monographs collection"
     url="https://www.swgdrug.org/"
     sourceID="SWG"
-    substances="3450"
-    factSheets="515"
+    substances="3397"
+    factSheets="471"
     spectra="3319"
   />
   <DataSourceDetails
@@ -137,6 +171,14 @@
     sourceID="SCIEX"
     substances="639"
     methods="33"
+  />
+  <DataSourceDetails
+    sourceName="Shimadzu"
+    category="Vendor methods collection"
+    url="https://www.shimadzu.com"
+    sourceID="Shimadzu"
+    substances="1644"
+    methods="304"
   />
   <DataSourceDetails
     sourceName="SpectraBase"
@@ -158,9 +200,11 @@
     sourceName="U.S. Environmental Protection Agency"
     category="Government methods collection"
     url="https://www.epa.gov/"
-    sourceID="USEPA"
-    substances="983"
-    methods="72"
+    sourceID="EPA, EPA MS Labs, EPA-ECM, EPA-OW, USEPA"
+    substances="2620"
+    factSheets="377"
+    methods="1775"
+    spectra="470"
   />
   <DataSourceDetails
     sourceName="U.S. Geological Survey"
@@ -169,6 +213,22 @@
     sourceID="USGS"
     substances="457"
     methods="11"
+  />
+  <DataSourceDetails
+    sourceName="U.S. National Response Team"
+    category="Open fact sheet collection"
+    url="https://www.nrt.org"
+    sourceID="NRT"
+    substances="31"
+    factSheets="20"
+  />
+  <DataSourceDetails
+    sourceName="U.S. Occupational Safety & Health Administration"
+    category="Government methods collection"
+    url="https://www.osha.gov"
+    sourceID="OSHA"
+    substances="479"
+    methods="329"
   />
   <br />
 </template>

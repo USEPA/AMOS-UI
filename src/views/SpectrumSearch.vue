@@ -42,11 +42,42 @@
           suppressAggFuncInHeader="true"
           :autoGroupColumnDef="autoGroupColumnDef"
         ></ag-grid-vue>
+        <div style="display: block;">
+          <div id="graph" ref="graph" style="display: flex;"></div>
+          <div v-if="any_row_selected">
+            <button @click="show_modal.table = true">Show Points</button>
+            <button v-if="spectrum_metadata" @click="show_modal.metadata = true">Spectrum Info</button>
+          </div>
+        </div>
       </div>
       <p v-else>No results available.</p>
-      <div id="graph" ref="graph"></div>
     </div>
   </div>
+  <!-- Modal window that displays the spectrum in an AG Grid table.-->
+  <b-modal v-model="show_modal.table">
+    <ag-grid-vue
+      class="ag-theme-balham"
+      style="height:600px; width:100%"
+      :columnDefs="column_defs"
+      :rowData="spectrumAsRows(selected_spectrum)"
+      rowSelection="single"
+    ></ag-grid-vue>
+    <button @click="copySpectrum()">Copy to Clipboard</button>
+  </b-modal>
+
+  <!-- Modal window that displays the metadata associated with the spectrum, using the spectrum_metadata field from the database. -->
+  <b-modal v-model="show_modal.metadata" ref="metadata_modal">
+    <h5 v-if="spectrum_metadata && spectrum_metadata.Chromatography">Chromatography Info:</h5>
+    <ul v-if="spectrum_metadata && spectrum_metadata.Chromatography" style="list-style-type: none;" ref="metadata_modal">
+      <li v-for="c in Object.entries(spectrum_metadata.Chromatography)"><strong>{{c[0]}}:</strong> {{c[1]}}</li>
+    </ul>
+    <br />
+    <h5 v-if="spectrum_metadata && spectrum_metadata.Spectrometry">Spectrometry Info:</h5>
+    <ul v-if="spectrum_metadata && spectrum_metadata.Spectrometry" style="list-style-type: none;">
+      <li v-for="s in Object.entries(spectrum_metadata.Spectrometry)"><strong>{{s[0]}}:</strong> {{s[1]}}</li>
+    </ul>
+    <button @click="copyMetadata()">Copy to Clipboard</button>
+  </b-modal>
   <b-alert variant="warning" dismissible v-model="error_messages.invalidFormat">There are issues with the contents of the user spectrum -- please check to ensure it is correct.</b-alert>
 </template>
 
@@ -80,20 +111,25 @@
         BACKEND_LOCATION,
         error_messages: {invalidFormat: false},
         substance_mapping: {},
+        show_modal: {metadata: false, table: false},
+        any_row_selected: false,
+        spectrum_metadata: {},
+        selected_spectrum: [],
         columnDefs: [
-          //{field: 'dtxsid', headerName: 'DTXSID', width: 140},
-          //{field: 'preferred_name', headerName: 'Name', width: 140},
           {field: 'dtxsid', hide: true, headerName: "Substance", width: 300, rowGroup: true, cellRenderer: params => {
-            console.log(params)
             return `${params.value} (${this.substance_mapping[params.value]})`
           }},
           {field: 'similarity', headerName: "Similarity", width: 100, sort: "desc", aggFunc: 'max', cellRenderer:'agGroupCellRenderer', cellRendererParams: {
-            innerRenderer: params => {console.log(params); return params.value.toFixed(4)}
+            innerRenderer: params => {return params.value.toFixed(4)}
           }},
           {field: 'description', headerName: 'Description', flex: 1},
           {field: 'internal_id', headerName: 'Internal ID', hide: true}
         ],
-        autoGroupColumnDef: {headerName: 'DTXSID (Name)', width: 300, sortable: true}
+        autoGroupColumnDef: {headerName: 'DTXSID (Name)', width: 300, sortable: true},
+        column_defs: [
+          {field:'m/z', headerName:'m/z', flex: 1, sortable: true},
+          {field:'intensity', headerName:'Peak Intensity', flex: 1, sortable: true}
+        ]
       }
     },
     methods: {
@@ -190,10 +226,15 @@
         if(event.event) {
           this.show_plot = true
           this.display_both_spectra(event.data.spectrum, event.data.dtxsid)
-          //console.log(event)
+          this.selected_spectrum = event.data.spectrum
+          this.spectrum_metadata = event.data.spectrum_metadata
+          this.any_row_selected = true
         } else {
           this.show_plot = false
         }
+      },
+      spectrumAsRows(selected_spectrum) {
+        return selected_spectrum.map(function(x){return {"m/z":x[0], "intensity":x[1]}})
       }
     },
     components: {AgGridVue}

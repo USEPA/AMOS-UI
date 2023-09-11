@@ -13,26 +13,13 @@ export const ANALYTE_MAPPING = {
     PFAS: "Per- and polyfluoroalkyl substances"
 }
 
-/*export const SOURCE_ABBREVIATION_MAPPING = {
-    CDC: "U.S. Center for Disease Control",
-    CFSRE: "Center for Forensic Science Research & Education",
-    DTSC: "California Department of Toxic Substances Control",
-    EPA: "U.S. Environmental Protection Agency",
-    "EPA-ECM": "U.S. Environmental Protection Agency Environmental Chemistry Methods",
-    FDA: "U.S. Food & Drug Administration",
-    MDPI: "Multidisciplinary Digital Publishing Institute",
-    SWG: "Scientific Working Group for the Analysis of Seized Drugs",
-    USDA: "U.S. Department of Agriculture",
-    USEPA: "U.S. Environmental Protection Agency",
-    USGS: "U.S. Geological Survey",
-}*/
-
 export const SOURCE_ABBREVIATION_MAPPING = {
     'Agilent': {'link': 'https://www.agilent.com/'},
     'AJAC': {'link': 'https://www.scirp.org/journal/ajac/', 'full_name': 'American Journal of Analytical Chemistry'},
     'ASTM': {'link': 'https://www.astm.org/', 'full_name': 'American Society for Testing and Materials'},
     'ATSDR': {'link': 'https://www.atsdr.cdc.gov', 'full_name': 'Agency for Toxic Substances and Disease Registry'},
     'CDC': {'link': 'https://www.cdc.gov/', 'full_name': 'U.S. Centers for Disease Control and Prevention'},
+    'CFSRE': {'link': 'https://www.cfsre.org', 'full_name': 'Center for Forensic Science Research & Education'},
     'DTSC': {'link': 'https://dtsc.ca.gov/', 'full_name': 'California Department of Toxic Substance Control'},
     'EPA': {'link': 'https://www.epa.gov/', 'full_name': 'U.S. Environmental Protection Agency'},
     'EPA-ECM': {'link': 'https://www.epa.gov/pesticide-analytical-methods/environmental-chemistry-methods-ecm', 'full_name': 'U.S. Environmental Protection Agency Environmental Chemistry Methods'},
@@ -46,9 +33,14 @@ export const SOURCE_ABBREVIATION_MAPPING = {
     'NEMI': {'link': 'https://www.nemi.gov/home/', 'full_name': 'National Environmental Methods Index'},
     'NIOSH': {'link': 'https://www.cdc.gov.niosh/index.htm', 'full_name': 'National Institute for Occupational Safety and Health'},
     'NIST': {'link': 'https://www.nist.gov/', 'full_name': 'National Institute of Standards and Technology'},
+    'NJDOH': {'link': 'http://www.nj.gov/health', 'full_name': 'New Jersey Department of Health'},
+    'NMS Labs': {'link': 'https://www.nmslabs.com/', 'full_name': 'National Mediacal Services Labs'},
+    'NPIC': {'link': 'https://www.npic.orst.edu', 'full_name': 'National Pesticide Information Center'},
+    'NRT': {'link': 'https://www.nrt.org/', 'full_name': 'U.S. National Response Team'},
     'SCIEX': {'link': 'https://sciex.com/'},
     'SGS': {'link': 'https://www.sgs.com/en'},
     'Springer Nature': {'link': 'https://www.springernature.com/gp'},
+    'SWG': {'link': 'https://www.swgdrug.org', 'full_name': 'Scientific Working Group for the Analysis of Seized Drugs'},
     'Thermo Fisher': {'link': 'https://www.thermofisher.com/us/en/home.html'},
     'USDA': {'link': 'https://www.usda.gov/', 'full_name': 'U.S. Department of Agriculture'},
     'USEPA': {'link': 'https://www.epa.gov/', 'full_name': 'U.S. Environmental Protection Agency'},

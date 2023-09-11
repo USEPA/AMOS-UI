@@ -22,7 +22,7 @@
     <br />
     <strong>URL:</strong> <a :href="url">{{ url }}</a>
     <br />
-    <strong>Data Source ID:</strong> {{ sourceID }}
+    <strong>Data Source ID(s):</strong> {{ sourceID }}
     <br />
     <strong>Number of substances in data: </strong> {{ substances }}
     <br />

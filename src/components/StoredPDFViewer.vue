@@ -27,7 +27,8 @@
 
     <div class="compound-grid" v-else-if="viewer_mode == 'CompoundGrid'">
       <div v-for="cl in compound_list">
-        <CompoundTile :dtxsid="`${cl.dtxsid}`" :preferred_name="`${cl.preferred_name}`" />
+        <CompoundTile v-if="highlightedCompounds.includes(cl.dtxsid)" :dtxsid="`${cl.dtxsid}`" :preferred_name="`${cl.preferred_name}`" highlight/>
+        <CompoundTile v-else :dtxsid="`${cl.dtxsid}`" :preferred_name="`${cl.preferred_name}`"/>
       </div>
     </div>
 
@@ -40,6 +41,7 @@
         :rowData="compound_list"
         rowSelection="single"
         @grid-ready="onGridReady"
+        :rowClassRules="rowClassRules"
       ></ag-grid-vue>
     </div>
     <p v-else>Illegal value for 'viewer_mode' selected.  Current value is {{viewer_mode}}.</p>
@@ -51,7 +53,6 @@
   import { objectArrayToCSV } from '@/assets/common_functions'
 
   import '@/assets/style.css'
-  import '@/assets/search_results.css'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API } from '@/assets/store'
 
   import CompoundTile from '@/components/CompoundTile.vue'
@@ -107,10 +108,13 @@
           }},
           {field: 'casrn', headerName: 'CASRN', width: 90, filter: 'agTextColumnFilter', floatingFilter: true},
           {field: 'preferred_name', headerName:'Compound Name', flex: 1, filter: 'agTextColumnFilter', floatingFilter: true}
-        ]
+        ],
+        rowClassRules: {
+          'substance-highlight': (params) => {console.log(this.highlightedCompounds.includes(params.data.dtxsid)); return this.highlightedCompounds.includes(params.data.dtxsid)}
+        }
       }
     },
-    props: {internalID: String, recordType: String, displayAdditionalInfo: Boolean},
+    props: {internalID: String, recordType: String, displayAdditionalInfo: Boolean, highlightedCompounds: {type: Array, default: []}},
     watch: {
       internalID(){
         this.metadata_rows = {}
@@ -141,7 +145,6 @@
             this.compound_list[i]["image_link"] = image_url
           }
         }
-        console.log(this.compound_list)
       },
       updateTab(tabName) {
         this.viewer_mode = tabName
