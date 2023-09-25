@@ -18,6 +18,7 @@
     </div>
     <div class="button-array">
       <button @click="saveFiltersAsURL">Copy filters to clipboard</button>
+      <button @click="downloadCurrentTable">Download Table</button>
       <button @click="downloadCompoundsInMethods" :disabled="filtered_record_count==0">Download Compounds</button>
       <button @click="resetFilters">Reset Filters</button>
     </div>
@@ -67,9 +68,9 @@
         full_table_filter: "",
         filtered_record_count: 0,
         column_defs: [
-          {field: "method_number", headerName: "Method #"},
-          {field: "method_name", headerName: "Name", tooltipField: 'method_name', sortable: true, flex: 1, cellClass: 'fake-link'},
-          {field: "year_published", headerName: "Year", width: 90, sortable: true, filter: 'agNumberColumnFilter'},
+          {field: "method_number", headerName: "Method #", width: 100},
+          {field: "method_name", headerName: "Name", tooltipField: 'method_name', sortable: true, flex: 2.5, cellClass: 'fake-link'},
+          {field: "year_published", headerName: "Year", width: 85, sortable: true, filter: 'agNumberColumnFilter'},
           {field: "methodology", headerName: "Methodology", width: 115, sortable: true, cellRenderer: params => {
               const methodology_html = params.data.methodologies.map(m => {
                 if (this.METHODOLOGY_MAPPING[m]) {
@@ -81,7 +82,7 @@
               return methodology_html.join("; ")
             }
           },
-          {field: "source", headerName: "Source", width: 100, sortable: true, tooltipValueGetter: params => {
+          {field: "source", headerName: "Source", width: 95, sortable: true, tooltipValueGetter: params => {
               if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source]) {
                 return this.SOURCE_ABBREVIATION_MAPPING[params.data.source].full_name
               }
@@ -108,9 +109,7 @@
                       tooltipValue = tooltipValue.replaceAll(k, this.ANALYTE_MAPPING[k])
                     }
                   }
-                  if (tooltipValue != params.data.analyte) {
-                    return tooltipValue
-                  }
+                  return tooltipValue
                 }
               }
             }, cellClass: params => {
@@ -123,11 +122,11 @@
               }
             }
           },
-          {field: "chemical_class", headerName: "Chemical Class", sortable: true, flex: 1},
-          {field: "matrix", headerName: "Matrix", sortable: true, flex: 1.2},
-          {field: "limitation", headerName: "Limitation", width: 100},
-          {field: "document_type", headerName: "DocType", width: 100},
-          {field: "count", headerName: "# Compounds", width: 120, floatingFilter: false, sortable: true},
+          {field: "chemical_class", headerName: "Chemical Class", sortable: true, flex: 1, tooltipField: "chemical_class"},
+          {field: "matrix", headerName: "Matrix", sortable: true, flex: 1, tooltipField: "matrix"},
+          {field: "limitation", headerName: "Limitation", width: 100, tooltipField: "limitation"},
+          {field: "document_type", headerName: "Type", width: 80},
+          {field: "count", headerName: "#", width: 60, floatingFilter: false, sortable: true, headerTooltip: "Number of compounds in method."},
           {field: "author", headerName: "Author(s)", hide: true}
         ]
       }
@@ -194,6 +193,11 @@
         anchor.download = 'method_list_compounds.csv';
         anchor.click();
       },
+      downloadCurrentTable() {
+        this.gridApi.exportDataAsCsv({
+          fileName: "method_list.csv"
+        });
+      },
       resetFilters() {
         this.gridApi.setFilterModel(null);
         this.quickFilter("")
@@ -206,10 +210,5 @@
 </script>
 
 <style>
-.button-array {
-  margin: 10px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
+
 </style>

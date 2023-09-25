@@ -22,7 +22,7 @@
           <div class="chemical-box">
             <div class="chemical-image-highlight">
               <img v-if="has_image" class="chemical-image" :src="`${IMAGE_BY_DTXSID_API}${compound_info.dtxsid}`"/>  
-              <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this compound.</div>
+              <div v-else style="text-align: center; display: flex; align-items: center;">No structural representation was found for this compound.</div>
             </div>
             <div class="chemical-info">
               <ul style="list-style-type: none;">
@@ -95,6 +95,7 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import '@/assets/style.css'
+  import { doesImageExist } from '@/assets/common_functions'
   import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
   import SpectrumViewer from '@/components/SpectrumViewer.vue'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
@@ -167,6 +168,7 @@
     methods: {
       onGridReady(params) {
         this.gridApi = params.api
+        this.gridColumnApi = params.columnApi
 
         // Sometimes we might want to pre-select a row when the results load; this logic takes care of it
         if (typeof(this.$route.query.initial_row_selected) === "string") {
@@ -236,6 +238,11 @@
       },
       updateTab(tabName) {
         this.result_table_view_mode = tabName
+        if (tabName === "fact sheet"){
+          this.gridColumnApi.setColumnVisible('methodologies', false)
+        } else {
+          this.gridColumnApi.setColumnVisible('methodologies', true)
+        }
         this.gridApi.onFilterChanged()
       },
       determineTabBarClass(tab_label) {
@@ -267,11 +274,15 @@
       }
     },
     async created() {
+      // Start by trying to get the DTXSID for the search term.
       const response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${this.$route.params.search_term}`)
+      // There are three possibilities: no search term found, search term found, search term is ambiguous (matches multiple compounds by synonym/InChIKey).
       if (response.data.substances === null) {
+        // No substance found.
         this.no_compound_match = true
         this.still_searching = false
       } else if (response.data.ambiguity) {
+        // Search term is ambiguous.
         this.ambiguity_type = response.data.ambiguity
         this.possible_substances = response.data.substances
         const dtxsids = this.possible_substances.map(ps => ps.dtxsid)
@@ -283,10 +294,12 @@
           this.disambiguation.synonym = true
         }
       } else {
+        // Search term matches one susbtance.
         const search_results = await axios.get(`${this.BACKEND_LOCATION}/search/${response.data.substances.dtxsid}`)
         this.results = search_results.data.records
         this.compound_info = response.data.substances
         this.record_type_counts = search_results.data.record_type_counts
+        this.has_image = await doesImageExist(this.compound_info.dtxsid)
         this.still_searching = false
       }
     },

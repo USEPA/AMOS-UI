@@ -16,9 +16,10 @@
         <button @click="methodSearch(searched_compound)">Method Search</button>
       </div>
       <br />
-      <p v-if="!searching & !search_complete">This page allows for searching for methods that contain either a given chemical or other chemicals similar to it.  A name, InChIKey, CASRN, or DTXSID can be searched on.</p>
-      <p v-else-if="searching">Searching...</p>
-      <p v-else-if="!found_compound">No compound match was found for "{{ current_compound }}".</p>
+      <p v-if="searching">Searching...</p>
+      <p v-else-if="!search_complete">This page allows for searching for methods that contain either a given chemical or other chemicals similar to it.  A name, InChIKey, CASRN, or DTXSID can be searched on.</p>
+      <p v-else-if="!found_compound">"{{ current_compound }}" was not recognized as a known substance.</p>
+      <p v-else-if="dtxsid_counts.length == 0">The substance "{{ current_compound }}" was recognized, however no methods containing it or similar substances for it were found.</p>
       <div v-else>
         <p>The table below lists methods for compounds that are similar to "{{ current_compound }}".  {{ dtxsid_counts.length }} distinct substances of sufficient similarity were found in  {{ Object.keys(ids_to_method_names).length }} methods.</p>
         <p>There are two tables below -- one lists all the methods containing a compound similar to {{ current_compound }}, while the other lists all similar substances found.  Clicking on a row will bring up the method or a comparison between the searched and selected substances, respectively.  Hover over a method or substance name to see the full name.  Columns can be hidden by clicking on the menu icon seen when hovering over a column name.</p>
@@ -47,45 +48,48 @@
             @row-selected="substancesRowSelected"
             :getRowClass="getRowClass"
             ></ag-grid-vue>
-            <!--:rowClassRules="substancesRowClassRules"-->
         </div>
       </div>
     </div>
     <StoredPDFViewer style="width: 48vw;" v-if="right_side_viewer_mode == 'Methods'" :internalID="selected_row_data.internal_id" recordType="method" :highlightedCompounds="similar_substances"/>
     <div class="half-page-column" v-else-if="right_side_viewer_mode == 'Substances'">
       <h4>Searched Substance:</h4>
-      <div class="chemical-box">
-        <div class="chemical-image-highlight">
-          <img v-if="1" class="chemical-image" :src="`${IMAGE_BY_DTXSID_API}${substance_info.searched_substance.dtxsid}`"/>  
-          <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this compound.</div>
-        </div>
-        <div class="chemical-info">
-          <ul style="list-style-type: none;">
-            <li><strong>(Preferred) Name:</strong> {{ substance_info.searched_substance.preferred_name }} </li>
-            <li><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substance_info.searched_substance.dtxsid}`">{{ substance_info.searched_substance.dtxsid }}</a> </li>
-            <li><strong>CASRN:</strong> {{ substance_info.searched_substance.casrn }} </li>
-            <li><strong>InChIKey:</strong> {{ substance_info.searched_substance.indigo_inchikey ? substance_info.searched_substance.indigo_inchikey : substance_info.searched_substance.jchem_inchikey}} </li>
-            <li><strong>Molecular Formula:</strong> {{ substance_info.searched_substance.molecular_formula }} </li>
-            <li><strong>Mass:</strong> {{ substance_info.searched_substance.monoisotopic_mass }} </li>
-          </ul>
+      <div style="display: flex; justify-content: center;">
+        <div class="chemical-box" style="justify-content: left; width: 90%">
+          <div class="chemical-image-highlight">
+            <img v-if="1" class="chemical-image" :src="`${IMAGE_BY_DTXSID_API}${substance_info.searched_substance.dtxsid}`"/>  
+            <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this compound.</div>
+          </div>
+          <div class="chemical-info">
+            <ul style="list-style-type: none;">
+              <li><strong>(Preferred) Name:</strong> {{ substance_info.searched_substance.preferred_name }} </li>
+              <li><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substance_info.searched_substance.dtxsid}`">{{ substance_info.searched_substance.dtxsid }}</a> </li>
+              <li><strong>CASRN:</strong> {{ substance_info.searched_substance.casrn }} </li>
+              <li><strong>InChIKey:</strong> {{ substance_info.searched_substance.indigo_inchikey ? substance_info.searched_substance.indigo_inchikey : substance_info.searched_substance.jchem_inchikey}} </li>
+              <li><strong>Molecular Formula:</strong> {{ substance_info.searched_substance.molecular_formula }} </li>
+              <li><strong>Mass:</strong> {{ substance_info.searched_substance.monoisotopic_mass }} </li>
+            </ul>
+          </div>
         </div>
       </div>
       <br />
       <h4>Selected Substance From Table:</h4>
-      <div class="chemical-box">
-        <div class="chemical-image-highlight">
-          <img v-if="1" class="chemical-image" :src="`${IMAGE_BY_DTXSID_API}${substance_info.similar_substance.dtxsid}`"/>  
-          <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this compound.</div>
-        </div>
-        <div class="chemical-info">
-          <ul style="list-style-type: none;">
-            <li><strong>(Preferred) Name:</strong> {{ substance_info.similar_substance.preferred_name }} </li>
-            <li><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substance_info.similar_substance.dtxsid}`">{{ substance_info.similar_substance.dtxsid }}</a> </li>
-            <li><strong>CASRN:</strong> {{ substance_info.similar_substance.casrn }} </li>
-            <li><strong>InChIKey:</strong> {{ substance_info.similar_substance.indigo_inchikey ? substance_info.similar_substance.indigo_inchikey : substance_info.similar_substance.jchem_inchikey}} </li>
-            <li><strong>Molecular Formula:</strong> {{ substance_info.similar_substance.molecular_formula }} </li>
-            <li><strong>Mass:</strong> {{ substance_info.similar_substance.monoisotopic_mass }} </li>
-          </ul>
+      <div style="display: flex; justify-content: center;">
+        <div class="chemical-box" style="justify-content: left; width: 90%">
+          <div class="chemical-image-highlight">
+            <img v-if="1" class="chemical-image" :src="`${IMAGE_BY_DTXSID_API}${substance_info.similar_substance.dtxsid}`"/>  
+            <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this compound.</div>
+          </div>
+          <div class="chemical-info">
+            <ul style="list-style-type: none;">
+              <li><strong>(Preferred) Name:</strong> {{ substance_info.similar_substance.preferred_name }} </li>
+              <li><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substance_info.similar_substance.dtxsid}`">{{ substance_info.similar_substance.dtxsid }}</a> </li>
+              <li><strong>CASRN:</strong> {{ substance_info.similar_substance.casrn }} </li>
+              <li><strong>InChIKey:</strong> {{ substance_info.similar_substance.indigo_inchikey ? substance_info.similar_substance.indigo_inchikey : substance_info.similar_substance.jchem_inchikey}} </li>
+              <li><strong>Molecular Formula:</strong> {{ substance_info.similar_substance.molecular_formula }} </li>
+              <li><strong>Mass:</strong> {{ substance_info.similar_substance.monoisotopic_mass }} </li>
+            </ul>
+          </div>
         </div>
       </div>
     </div>
@@ -168,13 +172,6 @@
             }
           }
         },
-        /*substancesRowClassRules: {
-          "emphasized-row": function(params) {
-            console.log(params)
-            return params.data.dtxsid == this.current_compound
-            return false
-          }
-        },*/
         autoGroupColumnDef: {headerName: 'Method Name (# compounds)', width: 210, sortable: true, comparator: (valueA, valueB, nodeA, nodeB, isDescending) => {
           // Need to be able to sort the groups by method name, not internal id, so map them and then compare.
           const nameA = this.ids_to_method_names[valueA]
@@ -201,10 +198,10 @@
         this.search_complete = false
 
         const response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${searched_compound.trim()}`)
-
         if (response.data.substances === null) {
           this.found_compound = false
           this.searching = false
+          console.log("done, none")
         } else if (response.data.ambiguity) {
           this.possible_substances = response.data.substances
           if (response.data.ambiguity == "inchikey") {
@@ -215,6 +212,7 @@
         } else {
           this.substance_info.searched_substance = response.data.substances
           const methods_response = await axios.get(`${this.BACKEND_LOCATION}/get_similar_methods/${response.data.substances.dtxsid}`)
+          console.log(methods_response)
           this.dtxsid_counts = methods_response.data.dtxsid_counts
           this.similar_substances = this.dtxsid_counts.map(x => x.dtxsid)
           this.current_compound = searched_compound.trim()  // should be whatever the user chooses
@@ -223,6 +221,7 @@
           this.ids_to_method_names = methods_response.data.ids_to_method_names
           this.searching = false
           this.search_complete = true
+          console.log("done, some")
         }
       },
       onGridReady(params) {

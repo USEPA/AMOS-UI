@@ -50,7 +50,7 @@
 
 <script>
   import axios from 'axios'
-  import { objectArrayToCSV } from '@/assets/common_functions'
+  import { doesImageExist, objectArrayToCSV } from '@/assets/common_functions'
 
   import '@/assets/style.css'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API } from '@/assets/store'
@@ -80,7 +80,7 @@
         COMPTOX_PAGE_URL,
         IMAGE_BY_DTXSID_API,
         column_defs: [
-          {field:'image', headerName:'Structure', autoHeight: true, width: 100, cellRenderer: (params) => {
+          {field:'image', headerName:'Structure', autoHeight: true, width: 100, wrapText: true, cellRenderer: (params) => {
             if (params.data.image_link) {
               var image = document.createElement('img');
               image.src = this.IMAGE_BY_DTXSID_API + params.data.dtxsid;
@@ -89,7 +89,7 @@
             } else {
               var p = document.createElement('div')
               p.style = "width:70px;height:70px;padding-top:2px;padding-bottom:2px;text-align: center; line-height: 70px;";
-              p.innerText = "No image."
+              p.innerText = "No structure."
               return p
             }
           }},
@@ -140,9 +140,8 @@
         const response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.internalID}`)
         this.compound_list = response.data.compound_list
         for (let i=0; i<this.compound_list.length; i++) {
-          const image_url = this.IMAGE_BY_DTXSID_API + this.compound_list[i].dtxsid
-          if (await this.doesImageExist(image_url)) {
-            this.compound_list[i]["image_link"] = image_url
+          if (await doesImageExist(this.compound_list[i].dtxsid)) {
+            this.compound_list[i]["image_link"] = this.IMAGE_BY_DTXSID_API + this.compound_list[i].dtxsid
           }
         }
       },
@@ -165,10 +164,6 @@
       onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
-      },
-      async doesImageExist(api_url) {
-        const response = await axios.get(api_url)
-        return response.data.length > 0
       }
     },
     components: { AgGridVue, CompoundTile }

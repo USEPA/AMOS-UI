@@ -1,5 +1,12 @@
 /***** GENERAL-USE STYLES *****/
 
+.button-array {
+  margin: 10px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 .fake-link {
   color: #0000EE;
   text-decoration: underline;

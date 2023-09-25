@@ -6,7 +6,8 @@
   - sourceName: the proper (i.e., unabbrieviated and official) name of the source.
   - category: a short description of the type of source that this is.  Currently not standardized.
   - url: the home page for the source.
-  - sourceID: names used for the source in the database.  Typically this means the abbreviations or other shorthand used (such as "USEPA" instead of "U.S. Environmental Protection Agency").
+  - sourceID: names used for the source in the database.  Typically this means the abbreviations or other shorthand used
+    (such as "USEPA" instead of "U.S. Environmental Protection Agency").
   - substances: the number of unique substances that appear between all records in AMOS from this source.
   - spectra: the number of spectrum records in AMOS from this source.
   - factSheets: the number of fact sheets in AMOS from this source.

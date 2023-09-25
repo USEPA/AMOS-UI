@@ -9,7 +9,7 @@
         <label><input type="radio" id="error_da" v-model="error_type" value="error_da">Da</label>
         &nbsp;
         <label><input type="radio" id="error_ppm" v-model="error_type" value="error_ppm">ppm</label>
-        <p>WARNING: Wide mass intervals can severly slow down the app due to retrieving large spectra; there are currently no limits on what mass values can be collected, so be careful.</p>
+        <p>NOTE: Please use the neutral mass of the substance when searching.</p>
       </div>
       <br />
       <div>

@@ -12,9 +12,22 @@
         This is a list of fact sheets available in the database.
       </p>
       <p>{{fact_sheet_info.length}} fact sheets in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed.</p>
+      <div>
+        <label for="full-table-filter">Full Table Filter</label> &nbsp;
+        <input type="text" v-model="full_table_filter" name="full-table-filter" @keyup="quickFilter(full_table_filter)">
+        &nbsp;
+        <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." />
+      </div>
+      <div class="button-array">
+        <button @click="saveFiltersAsURL">Copy filters to clipboard</button>
+        <button @click="downloadCurrentTable">Download Table</button>
+        <button @click="downloadCompoundsInDocs" :disabled="filtered_record_count==0">Download Compounds</button>
+        <button @click="resetFilters">Reset Filters</button>
+      </div>
       <ag-grid-vue
         class="ag-theme-balham"
         style="height:800px; width:100%"
+        :defaultColDef="default_column_def"
         :columnDefs="column_defs"
         :rowData="fact_sheet_info"
         rowSelection="single"
@@ -40,6 +53,7 @@
   import '@/assets/style.css'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
   import { BACKEND_LOCATION, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
+  import HelpIcon from '@/components/HelpIcon.vue'
 
   export default {
     data(){
@@ -50,6 +64,8 @@
         any_fact_sheet_selected: false,  // used to avoid having a box with an error pop up if nothing's been selected yet,
         BACKEND_LOCATION,
         filtered_record_count: 0,
+        full_table_filter: "",
+        default_column_def: {resizable: true},
         column_defs: [
           {field: 'internal_id', headerName: 'Doc ID', sortable: true, width: 80},
           {field: 'fact_sheet_name', headerName: 'Fact Sheet Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, sort: "asc", flex: 1},
@@ -81,6 +97,15 @@
     methods: {
       onGridReady(params) {
         this.gridApi = params.api;
+        for (const k of Object.keys(this.$route.query)) {
+          if (k === "full_table") {
+            this.full_table_filter = this.$route.query[k]
+            this.gridApi.setQuickFilter(this.full_table_filter)
+          } else {
+            const filter_params = this.$route.query[k].split("_")
+            this.gridApi.getFilterInstance(k).setModel({type: filter_params[0], filter: filter_params[1]})
+          }
+        }
         this.gridApi.onFilterChanged();
       },
       onRowSelected(event){
@@ -90,13 +115,59 @@
           this.target_pdf_url = `${this.BACKEND_LOCATION}/get_pdf/fact sheet/${event.data.internal_id}`
         }
       },
+      saveFiltersAsURL() {
+        const current_filters = this.gridApi.getFilterModel();
+        var url = window.location.origin + this.$route.path + "?"
+        if (this.full_table_filter) {
+          url = url + `full_table=${this.full_table_filter}&`
+        }
+        url = url + Object.keys(current_filters).map(x => `${x}=${current_filters[x].type}_${current_filters[x].filter}`).join("&")
+
+        // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
+        // can't get that to work in this app, though, since it apparently requires a secured connection and the
+        // deployed version of this app doesn't have that.  So I'm sticking to this technically-depricated solution that
+        // I pulled out of CompTox's code, since it apparently works there.
+        const textarea = document.createElement('textarea')
+        textarea.value = url
+        document.body.appendChild(textarea)
+        textarea.select()
+        try {
+          document.execCommand('copy')
+        } catch (err) {
+          console.log('Cannot copy: ' + err)
+        }
+        document.body.removeChild(textarea)
+      },
       onFilterChanged(params) {
         this.filtered_record_count = this.gridApi.getDisplayedRowCount()
+      },
+      quickFilter(input) {
+        this.gridApi.setQuickFilter(input)
+      },
+      async downloadCompoundsInDocs() {
+        const internal_id_list = Array(this.filtered_record_count).fill().map((_,idx) => this.gridApi.getDisplayedRowAtIndex(idx).data.internal_id)
+        const response = await axios.post(`${this.BACKEND_LOCATION}/compounds_for_ids/`, {internal_id_list: internal_id_list})
+
+        const anchor = document.createElement('a')
+        anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response.data.csv_string);
+        anchor.target = '_blank';
+        anchor.download = 'method_list_compounds.csv';
+        anchor.click();
+      },
+      resetFilters() {
+        this.gridApi.setFilterModel(null);
+        this.quickFilter("")
+      },
+      downloadCurrentTable() {
+        this.gridApi.exportDataAsCsv({
+          fileName: "fact_sheet_list.csv"
+        });
       }
     },
 
     components: {
       AgGridVue,
+      HelpIcon,
       StoredPDFViewer
     }
   }

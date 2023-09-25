@@ -12,14 +12,14 @@
     <p style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"><router-link :to="`/search/${preferred_name}`"> {{preferred_name}} </router-link> </p>
     <div style="display: block; margin-left: auto; margin-right: auto; width:150px; height:150px;">
       <img v-if="has_image" style="width:150px; height:150px;" :src="`${IMAGE_BY_DTXSID_API}${dtxsid}`"/>  
-      <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this compound.</div>
+      <div v-else style="text-align: center; display: flex; align-items: center;">No structural representation was found for this compound.</div>
     </div>
     <a :href="`${COMPTOX_PAGE_URL}${dtxsid}`" target="_blank"> {{dtxsid}} ↗</a>
   </div>
 </template>
 
 <script>
-  import axios from 'axios'
+  import { doesImageExist } from '@/assets/common_functions'
   import { COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API } from '@/assets/store'
 
   import '@/assets/style.css'
@@ -29,10 +29,7 @@
       return {COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API, has_image: true}
     },
     async created() {
-      const response2 = await axios.get(`${this.IMAGE_BY_DTXSID_API}${this.dtxsid}`)
-      if (response2.data === "") {
-        this.has_image = false
-      }
+      this.has_image = await doesImageExist(this.dtxsid)
     },
     props: {dtxsid: String, preferred_name: String, highlight: Boolean}
   }

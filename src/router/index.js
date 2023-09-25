@@ -13,6 +13,7 @@ const routes = [
     {path: "/batch_search", name: "Batch Search", component: ()=>import('../views/BatchSearch.vue')},
     {path: "/method_with_spectra/:by_type/:internal_id", name: "Method With Associated Spectra", component: ()=>import('../views/MethodWithSpectra.vue')},
     {path: "/view_method/:internal_id", name: "Method Viewer", component: ()=>import('../views/MethodViewer.vue')},
+    {path: "/view_fact_sheet/:internal_id", name: "Fact Sheet Viewer", component: ()=>import('../views/FactSheetViewer.vue')},
     {path: "/spectrum_comparison", name: "Spectrum Comparison", component: ()=>import('../views/SpectrumComparison.vue')},
     {path: "/spectrum_search", name: "Spectrum Search", component: ()=>import('../views/SpectrumSearch.vue')},
   ]
