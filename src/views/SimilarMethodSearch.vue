@@ -57,7 +57,7 @@
       <div style="display: flex; justify-content: center;">
         <div class="chemical-box" style="justify-content: left; width: 90%">
           <div class="chemical-image-highlight">
-            <img v-if="1" class="chemical-image" :src="`${IMAGE_BY_DTXSID_API}${substance_info.searched_substance.dtxsid}`"/>  
+            <img v-if="substance_info.searched_substance.image_link" class="chemical-image" :src="substance_info.searched_substance.image_link"/>  
             <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this compound.</div>
           </div>
           <div class="chemical-info">
@@ -77,7 +77,7 @@
       <div style="display: flex; justify-content: center;">
         <div class="chemical-box" style="justify-content: left; width: 90%">
           <div class="chemical-image-highlight">
-            <img v-if="1" class="chemical-image" :src="`${IMAGE_BY_DTXSID_API}${substance_info.similar_substance.dtxsid}`"/>  
+            <img v-if="substance_info.similar_substance.image_link" class="chemical-image" :src="substance_info.similar_substance.image_link"/>  
             <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this compound.</div>
           </div>
           <div class="chemical-info">
@@ -116,14 +116,13 @@
   import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
   import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
-  import { BACKEND_LOCATION, COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API } from '@/assets/store'
+  import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
   
   export default{
     data() {
       return {
         BACKEND_LOCATION,
         COMPTOX_PAGE_URL,
-        IMAGE_BY_DTXSID_API,
         results: null,
         any_row_selected: false,
         searching: false,
@@ -211,8 +210,8 @@
           }
         } else {
           this.substance_info.searched_substance = response.data.substances
+          this.substance_info.searched_substance.image_link = await getSubstanceImageLink(response.data.substances.dtxsid)
           const methods_response = await axios.get(`${this.BACKEND_LOCATION}/get_similar_methods/${response.data.substances.dtxsid}`)
-          console.log(methods_response)
           this.dtxsid_counts = methods_response.data.dtxsid_counts
           this.similar_substances = this.dtxsid_counts.map(x => x.dtxsid)
           this.current_compound = searched_compound.trim()  // should be whatever the user chooses
@@ -221,7 +220,6 @@
           this.ids_to_method_names = methods_response.data.ids_to_method_names
           this.searching = false
           this.search_complete = true
-          console.log("done, some")
         }
       },
       onGridReady(params) {
@@ -252,6 +250,7 @@
         if (event.event) {
           const response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${event.data.dtxsid}`)
           this.substance_info.similar_substance = response.data.substances
+          this.substance_info.similar_substance.image_link = await getSubstanceImageLink(response.data.substances.dtxsid)
           this.right_side_viewer_mode = "Substances"
         }
       },

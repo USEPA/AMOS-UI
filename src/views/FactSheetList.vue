@@ -9,7 +9,7 @@
   <div class="two-column-page">
     <div class="half-page-column">
       <p>
-        This is a list of fact sheets available in the database.
+        This is a list of fact sheets available in the database.  Select a row in the table to view the fact sheet on the right side of the page.
       </p>
       <p>{{fact_sheet_info.length}} fact sheets in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed.</p>
       <div>
@@ -50,9 +50,10 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
+  import { timestampForFile } from '@/assets/common_functions'
+  import { BACKEND_LOCATION, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
   import '@/assets/style.css'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
-  import { BACKEND_LOCATION, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
   import HelpIcon from '@/components/HelpIcon.vue'
 
   export default {
@@ -146,21 +147,22 @@
       },
       async downloadCompoundsInDocs() {
         const internal_id_list = Array(this.filtered_record_count).fill().map((_,idx) => this.gridApi.getDisplayedRowAtIndex(idx).data.internal_id)
-        const response = await axios.post(`${this.BACKEND_LOCATION}/compounds_for_ids/`, {internal_id_list: internal_id_list})
-
-        const anchor = document.createElement('a')
-        anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response.data.csv_string);
-        anchor.target = '_blank';
-        anchor.download = 'method_list_compounds.csv';
-        anchor.click();
+        
+        await axios.post(`${this.BACKEND_LOCATION}/compounds_for_ids/`, {internal_id_list: internal_id_list}, {responseType: "blob"}).then(res => {
+          let blob = new Blob([res.data], {type: res.headers['content-type']})
+          let link = document.createElement('a')
+          link.href = window.URL.createObjectURL(blob)
+          link.download = `fact_sheet_list_compounds_${timestampForFile()}.xlsx`
+          link.click()
+        })
       },
       resetFilters() {
         this.gridApi.setFilterModel(null);
         this.quickFilter("")
       },
       downloadCurrentTable() {
-        this.gridApi.exportDataAsCsv({
-          fileName: "fact_sheet_list.csv"
+        this.gridApi.exportDataAsExcel({
+          fileName: `fact_sheet_list_${timestampForFile()}.xlsx`
         });
       }
     },

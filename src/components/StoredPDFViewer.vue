@@ -50,10 +50,10 @@
 
 <script>
   import axios from 'axios'
-  import { doesImageExist, objectArrayToCSV } from '@/assets/common_functions'
+  import { getSubstanceImageLink } from '@/assets/common_functions'
 
   import '@/assets/style.css'
-  import { BACKEND_LOCATION, COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API } from '@/assets/store'
+  import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
 
   import CompoundTile from '@/components/CompoundTile.vue'
 
@@ -78,12 +78,11 @@
         has_associated_spectra: false,
         BACKEND_LOCATION,
         COMPTOX_PAGE_URL,
-        IMAGE_BY_DTXSID_API,
         column_defs: [
           {field:'image', headerName:'Structure', autoHeight: true, width: 100, wrapText: true, cellRenderer: (params) => {
             if (params.data.image_link) {
               var image = document.createElement('img');
-              image.src = this.IMAGE_BY_DTXSID_API + params.data.dtxsid;
+              image.src = params.data.image_link
               image.style = "width:70px;height:70px;padding-top:2px;padding-bottom:2px;";
               return image;
             } else {
@@ -140,25 +139,16 @@
         const response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.internalID}`)
         this.compound_list = response.data.compound_list
         for (let i=0; i<this.compound_list.length; i++) {
-          if (await doesImageExist(this.compound_list[i].dtxsid)) {
-            this.compound_list[i]["image_link"] = this.IMAGE_BY_DTXSID_API + this.compound_list[i].dtxsid
-          }
+          this.compound_list[i]["image_link"] = await getSubstanceImageLink(this.compound_list[i].dtxsid)
         }
       },
       updateTab(tabName) {
         this.viewer_mode = tabName
       },
       downloadCompoundInfo() {
-        /*const csv_string = objectArrayToCSV(this.compound_list)
-        const anchor = document.createElement('a')
-        anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv_string);
-        anchor.target = '_blank';
-        anchor.download = 'compound_list.csv';
-        anchor.click();*/
-        
-        this.gridApi.exportDataAsCsv({
+        this.gridApi.exportDataAsExcel({
           columnKeys: ["dtxsid", "casrn", "preferred_name"],
-          fileName: this.internalID + "_compound_list.csv"
+          fileName: `${this.internalID}_compound_list.xlsx`
         });
       },
       onGridReady(params) {

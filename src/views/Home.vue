@@ -23,6 +23,10 @@
         &emsp;
         <label><input type="radio" id="spectrum-tab" v-model="initial_results_tab" value="spectrum">Spectra</label>
       </div>
+      <div>
+        <input type="checkbox" id="susbtring-search" v-model="substring_search">
+        <label for="susbtring-search">Search by substring (name only)</label>
+      </div>
     </div>
     <br />
     For more information about this app, see the <router-link to="/about">about</router-link> page.
@@ -34,15 +38,21 @@
     methods: {
       go_big_bar() {
         const search_term = this.bigBarSearchTerm.trim()
+        if (this.substring_search) {
+          this.$router.push({path: `/substring_search/${search_term}`})
+        }
+        else {
           this.$router.push({
             path: `/search/${search_term}`,
             query: {initial_results_tab: this.initial_results_tab}
           })
+        }
       }
     },
     data() {
       return {
-        initial_results_tab: "all"
+        initial_results_tab: "all",
+        substring_search: false
       }
     }
   }

@@ -23,17 +23,17 @@
     </ul>
     <p>The contents of the database are as follows:</p>
     <ul>
-      <li>Spectra: 206,652 in database and 600,248 externally linked</li>
-      <li>Fact Sheets: 2924 in database</li>
-      <li>Methods: 3931 in database</li>
-      <li>Unique sources: 141</li>
-      <li>Substances appearing in at least one record: 162,994</li>
+      <li>Spectra: 210,140 in database and 600,248 externally linked</li>
+      <li>Fact Sheets: 3699 in database</li>
+      <li>Methods: 4166 in database</li>
+      <li>Unique sources: 149</li>
+      <li>Substances appearing in at least one record: 164,037</li>
     </ul>
     <br />
     <p>Below is a chart detailing the breakdown of the methods currently in the database.  Click on a circle to zoom in and see more detail; click outside it to move to a higher level.</p>
     <MethodsBubbleChart />
     <br />
-    <p>This app was last updated on 2023-09-11.</p>
+    <p>This app was last updated on 2023-10-31.</p>
   </div>
 </template>
 

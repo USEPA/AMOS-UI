@@ -21,7 +21,7 @@
           <br/>
           <div class="chemical-box">
             <div class="chemical-image-highlight">
-              <img v-if="has_image" class="chemical-image" :src="`${IMAGE_BY_DTXSID_API}${compound_info.dtxsid}`"/>  
+              <img v-if="image_link" class="chemical-image" :src="image_link"/>  
               <div v-else style="text-align: center; display: flex; align-items: center;">No structural representation was found for this compound.</div>
             </div>
             <div class="chemical-info">
@@ -33,7 +33,7 @@
                 <li><strong>Molecular Formula:</strong> {{ compound_info.molecular_formula }} </li>
                 <li><strong>Mass:</strong> {{ compound_info.monoisotopic_mass }} </li>
                 <li>&nbsp;</li>
-                <li><button v-if="!still_searching" @click="downloadResultsAsCSV">Download Results</button></li>
+                <li><button v-if="!still_searching" @click="downloadResultsAsExcel">Download Results</button></li>
               </ul>
             </div>
           </div>
@@ -95,12 +95,12 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import '@/assets/style.css'
-  import { doesImageExist } from '@/assets/common_functions'
+  import { getSubstanceImageLink } from '@/assets/common_functions'
   import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
   import SpectrumViewer from '@/components/SpectrumViewer.vue'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
   import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
-  import { BACKEND_LOCATION, COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
+  import { BACKEND_LOCATION, COMPTOX_PAGE_URL, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
 
   export default {
     data(){
@@ -116,10 +116,10 @@
         still_searching: true,
         no_compound_match: false,
         has_image: true,
+        image_link: "",
         tooltipShowDelay: 500,
         BACKEND_LOCATION,
         COMPTOX_PAGE_URL,
-        IMAGE_BY_DTXSID_API,
         SOURCE_ABBREVIATION_MAPPING,
         include_single_point_spectra: true,
         result_table_view_mode: "all",
@@ -154,6 +154,7 @@
               }
             }
           },
+          {field: 'count', headerName: '#', width: 35, sortable: true, headerTooltip: "Number of compounds in record."},
           {field: 'description', headerName: 'Information', sortable: true, flex: 1, tooltipField: 'comment', filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params =>{
             if (params.data.description === null) {
               return "No description available."
@@ -180,6 +181,11 @@
             }
           })
         }
+
+        if (typeof(this.$route.query.initial_results_tab) === "string") {
+          this.updateTab(this.$route.query.initial_results_tab) 
+        }
+
         this.gridApi.onFilterChanged()   //regenerates the table with the filter settings
         this.gridApi.sizeColumnsToFit()
       },
@@ -196,10 +202,10 @@
           }
         }
       },
-      downloadResultsAsCSV() {
-        this.gridApi.exportDataAsCsv({
+      downloadResultsAsExcel() {
+        this.gridApi.exportDataAsExcel({
           columnKeys: ["methodology", "source", "link", "record_type", "description"],
-          fileName: this.$route.params.search_term + "_results.csv",
+          fileName: this.$route.params.search_term + "_results.xlsx",
           processCellCallback: cell => {
             // If a link is missing for a record, have it link back to the search page, with the record preselected
             if ((cell.column.colId === "link") & (cell.value === null)){
@@ -299,7 +305,7 @@
         this.results = search_results.data.records
         this.compound_info = response.data.substances
         this.record_type_counts = search_results.data.record_type_counts
-        this.has_image = await doesImageExist(this.compound_info.dtxsid)
+        this.image_link = await getSubstanceImageLink(this.compound_info.dtxsid)
         this.still_searching = false
       }
     },

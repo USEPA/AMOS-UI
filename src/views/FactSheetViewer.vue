@@ -52,8 +52,8 @@
     import axios from 'axios'
   
     import '@/assets/style.css'
-    import { doesImageExist } from '@/assets/common_functions'
-    import { BACKEND_LOCATION, COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API } from '@/assets/store'
+    import { getSubstanceImageLink } from '@/assets/common_functions'
+    import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
     
     import CompoundTile from '@/components/CompoundTile.vue'
     
@@ -76,18 +76,17 @@
           has_associated_spectra: false,
           BACKEND_LOCATION,
           COMPTOX_PAGE_URL,
-          IMAGE_BY_DTXSID_API,
           pdf_source_url: null,
           column_defs: [
             {field:'image', headerName:'Structure', autoHeight: true, width: 100, cellRenderer: (params) => {
               if (params.data.image_link) {
                 var image = document.createElement('img');
-                image.src = this.IMAGE_BY_DTXSID_API + params.data.dtxsid;
+                image.src = params.data.image_link
                 image.style = "width:70px;height:70px;padding-top:2px;padding-bottom:2px;";
                 return image;
               } else {
                 var p = document.createElement('div')
-                p.style = "width:70px;height:70px;padding-top:2px;padding-bottom:2px;text-align: center; line-height: 70px;";
+                p.style = "width:70px;height:70px;padding-top:2px;padding-bottom:2px; text-align: center; line-height: 70px;";
                 p.innerText = "No structure."
                 return p
               }
@@ -132,18 +131,16 @@
           const response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.$route.params.internal_id}`)
           this.compound_list = response.data.compound_list
           for (let i=0; i<this.compound_list.length; i++) {
-            if (await doesImageExist(this.compound_list[i].dtxsid)) {
-              this.compound_list[i]["image_link"] = this.IMAGE_BY_DTXSID_API + this.compound_list[i].dtxsid
-            }
+            this.compound_list[i]["image_link"] = await getSubstanceImageLink(this.compound_list[i].dtxsid)
           }
         },
         updateTab(tabName) {
           this.viewer_mode = tabName
         },
         downloadCompoundInfo() {
-          this.gridApi.exportDataAsCsv({
+          this.gridApi.exportDataAsExcel({
             columnKeys: ["dtxsid", "casrn", "preferred_name"],
-            fileName: this.internalID + "_compound_list.csv"
+            fileName: `${this.$route.params.internal_id}_compound_list.xlsx`
           });
         },
         onGridReady(params) {

@@ -11,7 +11,7 @@
   <div @click="dummy" class="disambiguation-box">
     <div class="disambiguation-content">
       <div class="chemical-image-highlight">
-        <img v-if="has_image" class="chemical-image" :src="`${IMAGE_BY_DTXSID_API}${substance_info.dtxsid}`"/>  
+        <img v-if="image_link" class="chemical-image" :src="image_link"/>  
         <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this compound.</div>
       </div>
       <div class="chemical-info">
@@ -40,26 +40,22 @@
 <script>
   import axios from 'axios'
 
+  import { getSubstanceImageLink } from '@/assets/common_functions'
   import '@/assets/style.css'
-  import { IMAGE_BY_DTXSID_API } from '@/assets/store'
 
   export default {
     props: {substance_info: Object, record_info: Object},
     data() {
       return {
-        IMAGE_BY_DTXSID_API,
-        has_image: true
+        image_link: ""
       }
     },
     async created() {
-      const response2 = await axios.get(`${this.IMAGE_BY_DTXSID_API}${this.substance_info.dtxsid}`)
-      if (response2.data === "") {
-        this.has_image = false
-      }
+      this.image_link = await getSubstanceImageLink(this.substance_info.dtxsid)
     },
     methods: {
       dummy() {
-        console.log(this.record_info)
+        1
       }
     }
   }

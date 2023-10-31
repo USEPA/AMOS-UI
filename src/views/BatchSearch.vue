@@ -1,35 +1,53 @@
 <!--
   This page is used for batch searching compounds by DTXSID -- and only by DTXSID -- and returning information on the
-  records in a CSV file.
+  records in an Excel workbook.
 
   There are no URL route or query parameters associated with this page.
 -->
 
 <template>
-  <p>This page allows for batch searching of compounds by DTXSID.  DTXSIDs must be separated in the text field below by newlines.  If you have a list of compounds not identified by DTXSIDs, you can go <a href="https://comptox.epa.gov/dashboard/batch-search">here</a> to retrieve them.</p>
-  <p>The results returned from this search are essentially the same ones that are returned on the compound search page.  A CSV will automatically attempt to download once the results have been retrieved from the database.</p>
+  <p>
+    This page allows for batch searching of information on substances by DTXSID.  DTXSIDs must be 
+    separated in the text field below by newlines.  If you have a list of identifiers other than 
+    DTXSIDs, you can go <a href="https://comptox.epa.gov/dashboard/batch-search">here</a> to 
+    translate them to DTXSIDs.  An Excel workbook will automatically attempt to download once the 
+    results have been retrieved from the database; the file contains information on the records, 
+    including links to their original sources, but does not contain the actual records themselves.
+  </p>
+  <p>If you have a list of compounds with identifiers other than DTXSIDs, you can go <a href="https://comptox.epa.gov/dashboard/batch-search">here</a> to translate them to DTXSIDs.</p>
   <p>Note: if two or more searched DTXSIDs are present in the same record (e.g., a method that covers multiple similar compounds), that record will appear once for every searched DTXSID that appears in it.</p>
-  <div class="batch-search-controls">
-    <textarea type="text" class="batch-search-input" rows="10" columns="25" v-model="search_box"></textarea>
-    <button @click="batch_search()" class="batch-search-button">Search</button>
+  <div style="display: flex; margin-top: 40px">
+    <div class="batch-search-controls">
+      <h5>DTXSID List</h5>
+      <textarea type="text" class="batch-search-input" rows="10" columns="25" v-model="search_box"></textarea>
+      <button @click="batch_search()" class="batch-search-button">Search</button>
+    </div>
+    <div class="batch-search-options" style="display: block">
+      <h5>Search Options</h5>
+      <div style="display: flex">
+        <input type="checkbox" id="include-spectrabase" v-model="include_spectrabase" checked>
+        <label for="include-spectrabase"><span class="has-hover-text" title="SpectraBase contains a lot of non-MS spectra, and their data requires an account, so it may not be desirable to include these results.">Include SpectraBase</span></label>
+      </div>
+    </div>
   </div>
   <b-alert variant="warning" dismissible v-model="status_boxes.show_empty_box_error">No compounds were entered in the text box.</b-alert>
-  <b-alert variant="warning" dismissible v-model="status_boxes.show_no_results_error">No results were found for the compound(s) searched.</b-alert>
 </template>
 
 <script>
   import axios from 'axios'
+
+  import { timestampForFile } from '@/assets/common_functions'
   import { BACKEND_LOCATION } from '@/assets/store'
+  import '@/assets/style.css'
 
   export default {
     data() {
       return {
         batch_search_params: {},
+        include_spectrabase: true,
         search_box: "",
-        csv_string: "",
         status_boxes: {
-          show_empty_box_error: false,
-          show_no_results_error: false
+          show_empty_box_error: false
         },
         BACKEND_LOCATION
       }
@@ -37,19 +55,15 @@
     methods: {
       async batch_search() {
         this.status_boxes.show_empty_box_error = false
-        this.status_boxes.show_no_results_error = false
         if(this.search_box != ""){
           const search_terms = this.search_box.split("\n")
-          const response = await axios.post(`${this.BACKEND_LOCATION}/batch_search`, {dtxsids: search_terms, base_url: window.location.origin})
-          if (response.data.csv_string != "") {
-            const anchor = document.createElement('a')
-            anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response.data.csv_string);
-            anchor.target = '_blank';
-            anchor.download = 'batch_search.csv';
-            anchor.click();
-          } else {
-            this.status_boxes.show_no_results_error = true
-          }
+          await axios.post(`${this.BACKEND_LOCATION}/batch_search`, {dtxsids: search_terms, base_url: window.location.origin, include_spectrabase: this.include_spectrabase}, {responseType: "blob"}).then(res => {
+            let blob = new Blob([res.data], {type: res.headers['content-type']})
+            let link = document.createElement('a')
+            link.href = window.URL.createObjectURL(blob)
+            link.download = `batch_search_${timestampForFile()}.xlsx`
+            link.click()
+          })
           
         } else {
           this.status_boxes.show_empty_box_error = true
@@ -61,7 +75,7 @@
 
 <style>
   .batch-search-input {
-    height: 150px;
+    height: 200px;
   }
 
   .batch-search-button {
@@ -71,10 +85,13 @@
   }
 
   .batch-search-controls {
-    height: 200px;
+    height: 280px;
     width: 200px;
     display: flex;
     flex-direction: column;
     align-items: center;
+  }
+  .batch-search-options {
+    margin-left: 100px
   }
 </style>

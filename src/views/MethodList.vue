@@ -52,8 +52,9 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import '@/assets/style.css'
+  import { timestampForFile } from '@/assets/common_functions'
   import { BACKEND_LOCATION, ANALYTE_MAPPING, METHODOLOGY_MAPPING, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
+  import '@/assets/style.css'
   import HelpIcon from '@/components/HelpIcon.vue'
 
   export default {
@@ -185,17 +186,18 @@
       },
       async downloadCompoundsInMethods() {
         const internal_id_list = Array(this.filtered_record_count).fill().map((_,idx) => this.gridApi.getDisplayedRowAtIndex(idx).data.internal_id)
-        const response = await axios.post(`${this.BACKEND_LOCATION}/compounds_for_ids/`, {internal_id_list: internal_id_list})
-
-        const anchor = document.createElement('a')
-        anchor.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(response.data.csv_string);
-        anchor.target = '_blank';
-        anchor.download = 'method_list_compounds.csv';
-        anchor.click();
+        
+        await axios.post(`${this.BACKEND_LOCATION}/compounds_for_ids/`, {internal_id_list: internal_id_list}, {responseType: "blob"}).then(res => {
+          let blob = new Blob([res.data], {type: res.headers['content-type']})
+          let link = document.createElement('a')
+          link.href = window.URL.createObjectURL(blob)
+          link.download = `method_list_compounds_${timestampForFile()}.xlsx`
+          link.click()
+        })
       },
       downloadCurrentTable() {
-        this.gridApi.exportDataAsCsv({
-          fileName: "method_list.csv"
+        this.gridApi.exportDataAsExcel({
+          fileName: `method_list_${timestampForFile()}.xlsx`
         });
       },
       resetFilters() {

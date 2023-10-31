@@ -16,6 +16,7 @@ const routes = [
     {path: "/view_fact_sheet/:internal_id", name: "Fact Sheet Viewer", component: ()=>import('../views/FactSheetViewer.vue')},
     {path: "/spectrum_comparison", name: "Spectrum Comparison", component: ()=>import('../views/SpectrumComparison.vue')},
     {path: "/spectrum_search", name: "Spectrum Search", component: ()=>import('../views/SpectrumSearch.vue')},
+    {path: "/substring_search/:substring", name: "Substring Search", component: ()=>import('../views/SubstringSearch.vue')}
   ]
 
 const router = createRouter({

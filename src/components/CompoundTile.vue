@@ -11,7 +11,7 @@
   <div :class="highlight ? 'compound-tile substance-highlight' : 'compound-tile'">
     <p style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"><router-link :to="`/search/${preferred_name}`"> {{preferred_name}} </router-link> </p>
     <div style="display: block; margin-left: auto; margin-right: auto; width:150px; height:150px;">
-      <img v-if="has_image" style="width:150px; height:150px;" :src="`${IMAGE_BY_DTXSID_API}${dtxsid}`"/>  
+      <img v-if="image_link" style="width:150px; height:150px;" :src="image_link"/>  
       <div v-else style="text-align: center; display: flex; align-items: center;">No structural representation was found for this compound.</div>
     </div>
     <a :href="`${COMPTOX_PAGE_URL}${dtxsid}`" target="_blank"> {{dtxsid}} ↗</a>
@@ -19,17 +19,17 @@
 </template>
 
 <script>
-  import { doesImageExist } from '@/assets/common_functions'
-  import { COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API } from '@/assets/store'
+  import { getSubstanceImageLink } from '@/assets/common_functions'
+  import { COMPTOX_PAGE_URL } from '@/assets/store'
 
   import '@/assets/style.css'
 
   export default {
     data() {
-      return {COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API, has_image: true}
+      return {COMPTOX_PAGE_URL, image_link: ""}
     },
     async created() {
-      this.has_image = await doesImageExist(this.dtxsid)
+      this.image_link = await getSubstanceImageLink(this.dtxsid)
     },
     props: {dtxsid: String, preferred_name: String, highlight: Boolean}
   }
