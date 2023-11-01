@@ -11,8 +11,8 @@
     <p>The database contains a mixture of data that can be divided into three categories.</p>
     <ul>
       <li><b>Mass spectra</b> of various types (including GC, LC, Raman, and IR spectra, among others).</li>
-      <li><b>Fact sheets</b> which act as summaries about one or a few compounds.  These range from brief, relatively non-technical overviews of a compound to monographs that detail multiple experimental spectra.</li>
       <li>Analytical <b>methods</b> which document full testing procedures for one or more (potentially a couple hundred) compounds.</li>
+      <li><b>Fact sheets</b> which are supplemental documents of various kinds that cover one or a few compounds.  These range from brief, relatively non-technical overviews of a compound to monographs that detail multiple experimental spectra.</li>
     </ul>
     <p>The primary functions of this app are as follows:</p>
     <ul>
@@ -33,7 +33,7 @@
     <p>Below is a chart detailing the breakdown of the methods currently in the database.  Click on a circle to zoom in and see more detail; click outside it to move to a higher level.</p>
     <MethodsBubbleChart />
     <br />
-    <p>This app was last updated on 2023-10-31.</p>
+    <p>This app was last updated on 2023-11-01.</p>
   </div>
 </template>
 

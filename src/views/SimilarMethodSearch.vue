@@ -116,6 +116,7 @@
   import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
   import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
+  import { getSubstanceImageLink } from '@/assets/common_functions'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
   
   export default{

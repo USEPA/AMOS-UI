@@ -109,7 +109,7 @@
           {field: 'preferred_name', headerName:'Compound Name', flex: 1, filter: 'agTextColumnFilter', floatingFilter: true}
         ],
         rowClassRules: {
-          'substance-highlight': (params) => {console.log(this.highlightedCompounds.includes(params.data.dtxsid)); return this.highlightedCompounds.includes(params.data.dtxsid)}
+          'substance-highlight': (params) => {return this.highlightedCompounds.includes(params.data.dtxsid)}
         }
       }
     },

@@ -29,6 +29,8 @@ export async function getSubstanceImage(dtxsid) {
 }
 
 export async function getSubstanceImageLink(dtxsid) {
+    // Checks the CCTE API for a substance image; if it doesn't find one, check the Flask backend.  Return the API or
+    // Flask link if an image was found on either of those, or null if no link was found.
     const first_response = await axios.get(IMAGE_BY_DTXSID_API + dtxsid)
     if (first_response.data.length > 0) {
         return IMAGE_BY_DTXSID_API + dtxsid
