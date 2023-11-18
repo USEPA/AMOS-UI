@@ -1,5 +1,5 @@
 <!--
-  This page is a viewer for a method PDF and its accompanying compound list.  Functionally, it is
+  This page is a viewer for a method PDF and its accompanying substance list.  Functionally, it is
   essentially the StoredPDFViewer component, split out across a full webpage.
 
   This page takes no query parameters and one URL route parameter, internal_id, which is the
@@ -24,22 +24,26 @@
     <div class="half-page-column">
       <div style="margin-bottom:3cm;"></div>
       <div class="tab-bar">
-        <a :class="viewer_mode == 'CompoundGrid' ? 'active' : ''" @click="updateTab('CompoundGrid')">Compounds ({{ compound_list.length }}) (grid)</a>
-        <a :class="viewer_mode == 'CompoundTable' ? 'active' : ''" @click="updateTab('CompoundTable')">Compounds ({{ compound_list.length }}) (table)</a>
+        <a :class="viewer_mode == 'SubstanceGrid' ? 'active' : ''" @click="updateTab('SubstanceGrid')">Substances ({{ substance_list.length }}) (grid)</a>
+        <a :class="viewer_mode == 'SubstanceTable' ? 'active' : ''" @click="updateTab('SubstanceTable')">Substances ({{ substance_list.length }}) (table)</a>
       </div>
-      <div class="compound-grid" v-if="viewer_mode == 'CompoundGrid'">
-        <div v-for="cl in compound_list">
-          <CompoundTile :dtxsid="`${cl.dtxsid}`" :preferred_name="`${cl.preferred_name}`" />
+
+      <div v-if="viewer_mode == 'SubstanceGrid'">
+        <button @click="downloadSubstanceGridInfo">Download Substance Info</button>
+        <div class="substance-grid">
+          <div v-for="cl in substance_list">
+            <SubstanceTile :dtxsid="`${cl.dtxsid}`" :preferred_name="`${cl.preferred_name}`" />
+          </div>
         </div>
       </div>
 
-      <div v-else-if="viewer_mode == 'CompoundTable'">
-        <button @click="downloadCompoundInfo">Download Compound Info</button>
+      <div v-else-if="viewer_mode == 'SubstanceTable'">
+        <button @click="downloadSubstanceTableInfo">Download Substance Info</button>
         <ag-grid-vue
           class="ag-theme-balham"
           style="height:550px; width:100%"
           :columnDefs="column_defs"
-          :rowData="compound_list"
+          :rowData="substance_list"
           rowSelection="single"
           @grid-ready="onGridReady"
         ></ag-grid-vue>
@@ -56,7 +60,7 @@
   import { getSubstanceImageLink } from '@/assets/common_functions'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
   
-  import CompoundTile from '@/components/CompoundTile.vue'
+  import SubstanceTile from '@/components/SubstanceTile.vue'
   
   import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
   import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
@@ -72,8 +76,8 @@
         pdf_name: "",
         pdf_metadata: "",
         metadata_rows: {},
-        viewer_mode: "CompoundGrid",
-        compound_list: [],
+        viewer_mode: "SubstanceGrid",
+        substance_list: [],
         has_associated_spectra: false,
         BACKEND_LOCATION,
         COMPTOX_PAGE_URL,
@@ -106,7 +110,7 @@
             return link;
           }},
           {field: 'casrn', headerName: 'CASRN', width: 90, filter: 'agTextColumnFilter', floatingFilter: true},
-          {field: 'preferred_name', headerName:'Compound Name', flex: 1, filter: 'agTextColumnFilter', floatingFilter: true}
+          {field: 'preferred_name', headerName:'Substance Name', flex: 1, filter: 'agTextColumnFilter', floatingFilter: true}
         ]
       }
     },
@@ -130,18 +134,27 @@
       },
       async findDTXSIDs(){
         const response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.$route.params.internal_id}`)
-        this.compound_list = response.data.compound_list
-        for (let i=0; i<this.compound_list.length; i++) {
-          this.compound_list[i]["image_link"] = await getSubstanceImageLink(this.compound_list[i].dtxsid)
+        this.substance_list = response.data.substance_list
+        for (let i=0; i<this.substance_list.length; i++) {
+          this.substance_list[i]["image_link"] = await getSubstanceImageLink(this.substance_list[i].dtxsid)
         }
       },
       updateTab(tabName) {
         this.viewer_mode = tabName
       },
-      downloadCompoundInfo() {
+      async downloadSubstanceGridInfo() {
+        await axios.get(`${this.BACKEND_LOCATION}/get_substance_file_for_record/${this.$route.params.internal_id}`, {responseType: "blob"}).then(res => {
+          let blob = new Blob([res.data], {type: res.headers['content-type']})
+          let link = document.createElement('a')
+          link.href = window.URL.createObjectURL(blob)
+          link.download = `${this.$route.params.internal_id}_substance_list.xlsx`
+          link.click()
+        })
+      },
+      downloadSubstanceTableInfo() {
         this.gridApi.exportDataAsExcel({
           columnKeys: ["dtxsid", "casrn", "preferred_name"],
-          fileName: `${this.$route.params.internal_id}_compound_list.xlsx`
+          fileName: `${this.$route.params.internal_id}_substance_list.xlsx`
         });
       },
       onGridReady(params) {
@@ -150,7 +163,7 @@
       }
     },
 
-    components: { AgGridVue, CompoundTile }
+    components: { AgGridVue, SubstanceTile }
   }
 </script>
 
@@ -166,7 +179,7 @@
     overflow: scroll;
   }
 
-  .compound-grid {
+  .substance-grid {
     display: flex;
     flex-wrap: wrap;
     justify-content: left;

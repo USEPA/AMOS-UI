@@ -1,11 +1,11 @@
 <!--
-  This page displays the records that correspond to a single searched compound in a table, and will display information
-  about the searched compound and any record in the results that is selected.
+  This page displays the records that correspond to a single searched substance in a table, and will display information
+  about the searched substance and any record in the all_results that is selected.
 
   This page can take one URL route parameter and four optional query parameters.  The route parameter is:
-  - search_term: the term searched for; can be either a compound name, an InChIKey, a CASRN, or a DTXSID
+  - search_term: the term searched for; can be either a name, an InChIKey, a CASRN, or a DTXSID
   The query parameters are:
-  - initial_results_tab: preselects which record type tab is selected.  If not supplied, all results will be shown
+  - initial_results_tab: preselects which record type tab is selected.  If not supplied, all all_results will be shown
   - initial_row_selected: the internal ID of a record; if this parameter exists, the page will try to preselect this
     record's row once the table is loaded
 -->
@@ -13,42 +13,50 @@
 <template>
   <div class="two-column-page">
     <div class="half-page-column">
-      <div class="results-header">
+      <div class="all_results-header">
         <h1 v-if="still_searching" class="text-that-can-overflow">Searching for "{{$route.params.search_term}}"...</h1>
-        <h1 v-else-if="!still_searching & no_compound_match">No compound match found.</h1>
+        <h1 v-else-if="!still_searching & no_substance_match">No substance match found.</h1>
         <div v-else>
-          <h1 class="text-that-can-overflow">{{ results.length }} Results for "{{$route.params.search_term}}"</h1>
+          <h1 class="text-that-can-overflow">{{ all_results.length }} Results for "{{$route.params.search_term}}"</h1>
           <br/>
           <div class="chemical-box">
             <div class="chemical-image-highlight">
               <img v-if="image_link" class="chemical-image" :src="image_link"/>  
-              <div v-else style="text-align: center; display: flex; align-items: center;">No structural representation was found for this compound.</div>
+              <div v-else style="text-align: center; display: flex; align-items: center;">No structural representation was found for this substance.</div>
             </div>
             <div class="chemical-info">
               <ul style="list-style-type: none;">
-                <li><strong>(Preferred) Name:</strong> {{ compound_info.preferred_name }} </li>
-                <li><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${compound_info.dtxsid}`">{{ compound_info.dtxsid }}</a> </li>
-                <li><strong>CASRN:</strong> {{ compound_info.casrn }} </li>
-                <li><strong>InChIKey:</strong> {{ compound_info.indigo_inchikey ? compound_info.indigo_inchikey : compound_info.jchem_inchikey}} </li>
-                <li><strong>Molecular Formula:</strong> {{ compound_info.molecular_formula }} </li>
-                <li><strong>Mass:</strong> {{ compound_info.monoisotopic_mass }} </li>
+                <li><strong>(Preferred) Name:</strong> {{ substance_info.preferred_name }} </li>
+                <li><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substance_info.dtxsid}`">{{ substance_info.dtxsid }}</a> </li>
+                <li><strong>CASRN:</strong> {{ substance_info.casrn }} </li>
+                <li><strong>InChIKey:</strong> {{ substance_info.indigo_inchikey ? substance_info.indigo_inchikey : substance_info.jchem_inchikey}} </li>
+                <li><strong>Molecular Formula:</strong> {{ substance_info.molecular_formula }} </li>
+                <li><strong>Mass:</strong> {{ substance_info.monoisotopic_mass }} </li>
                 <li>&nbsp;</li>
                 <li><button v-if="!still_searching" @click="downloadResultsAsExcel">Download Results</button></li>
               </ul>
             </div>
           </div>
-          <div v-if="results.length > 0">
-            <input type="checkbox" id="single-point-spectra" v-model="include_single_point_spectra" @change="updateCheckboxFilters">
-            <label for="single-point-spectra">Display Single Point Spectra</label>
-          </div>
+        </div>
+      </div>
+      <div v-if="all_results.length > 0">
+        <div>
+          <input type="checkbox" id="single-point-spectra" v-model="include_single_point_spectra" @change="updateCheckboxFilters">
+          <label for="single-point-spectra">Display Single Point Spectra</label>
+        </div>
+        <div>
+          <input type="checkbox" id="ms-ready" v-model="include_ms_ready" @change="ms_ready_toggle">
+          <label for="ms-ready">Include MS-Ready methods</label>
+          &nbsp;
+          <help-icon style="vertical-align:middle;" tooltipText="MS-Ready refers to a standardization of substances by collapsing isomers, salts, isotopes, etc., into a single form, identifiable by having the same first block of their InChIKey.  Selecting this will include methods from substances with the same MS-Ready form." />
         </div>
       </div>
       <div v-if="!still_searching">
-        <p v-if="no_compound_match">There is no compound in this database that matches the search term "{{$route.params.search_term}}" -- if something should be here, please check the search term for typos.</p>
-        <p v-else-if="results.length==0">The search term "{{$route.params.search_term}}" matches a compound in the database; however, no data records were found.</p>
+        <p v-if="no_substance_match">There is no substance in this database that matches the search term "{{$route.params.search_term}}" -- if something should be here, please check the search term for typos.</p>
+        <p v-else-if="all_results.length==0">The search term "{{$route.params.search_term}}" matches a substance in the database; however, no data records were found.</p>
         <div v-else>
           <div class="tab-bar">
-            <a :class="result_table_view_mode == 'all' ? 'active' : ''" @click="updateTab('all')">All Results ({{results.length}})</a>
+            <a :class="result_table_view_mode == 'all' ? 'active' : ''" @click="updateTab('all')">All Results ({{all_results.length}})</a>
             <a :class="determineTabBarClass('method')" @click="updateTab('method')">Methods ({{record_type_counts.method}})</a>
             <a :class="determineTabBarClass('spectrum')" @click="updateTab('spectrum')">Spectra ({{record_type_counts.spectrum}})</a>
             <a :class="determineTabBarClass('fact sheet')" @click="updateTab('fact sheet')">Fact Sheets ({{record_type_counts["fact sheet"]}})</a>
@@ -56,9 +64,9 @@
           <ag-grid-vue
             class="ag-theme-balham"
             style="height:600px; width:100%"
-            v-if="results.length > 0"
+            v-if="all_results.length > 0"
             :columnDefs="columnDefs"
-            :rowData="results"
+            :rowData="all_results"
             rowSelection="single"
             @first-data-rendered="onGridReady"
             @row-selected="onRowSelected"
@@ -94,13 +102,14 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import '@/assets/style.css'
   import { getSubstanceImageLink } from '@/assets/common_functions'
+  import { BACKEND_LOCATION, COMPTOX_PAGE_URL, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
+  import '@/assets/style.css'
+  import HelpIcon from '@/components/HelpIcon.vue'
   import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
   import SpectrumViewer from '@/components/SpectrumViewer.vue'
   import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
   import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
-  import { BACKEND_LOCATION, COMPTOX_PAGE_URL, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
 
   export default {
     data(){
@@ -110,11 +119,12 @@
         disambiguation: {inchikey: false, synonym: false},
         possible_substances: [],
         selected_row_data: {},
-        results: [],
-        compound_info: {},
+        all_results: [],
+        results: {substance: [], ms_ready: []},
+        substance_info: {},
         record_counts_by_dtxsid: {},
         still_searching: true,
-        no_compound_match: false,
+        no_substance_match: false,
         has_image: true,
         image_link: "",
         tooltipShowDelay: 500,
@@ -124,6 +134,8 @@
         include_single_point_spectra: true,
         result_table_view_mode: "all",
         record_type_counts: {method: 0, "fact sheet": 0, spectrum: 0},
+        include_ms_ready: false,
+        ms_ready_search_run: false,
         columnDefs: [
           {field: 'methodologies', headerName: 'Methodology', sortable: true, sort: 'asc', filter: 'agTextColumnFilter', floatingFilter: true, width: 150, suppressSizeToFit: true},
           {field: 'source', headerName: 'Source', sortable: true, width: 110, suppressSizeToFit: true, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
@@ -154,7 +166,8 @@
               }
             }
           },
-          {field: 'count', headerName: '#', width: 35, sortable: true, headerTooltip: "Number of compounds in record."},
+          {field: 'method_number', headerName: 'Method #', width: 110, hide: true},
+          {field: 'count', headerName: '#', width: 35, sortable: true, headerTooltip: "Number of substances in record."},
           {field: 'description', headerName: 'Information', sortable: true, flex: 1, tooltipField: 'comment', filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params =>{
             if (params.data.description === null) {
               return "No description available."
@@ -171,7 +184,7 @@
         this.gridApi = params.api
         this.gridColumnApi = params.columnApi
 
-        // Sometimes we might want to pre-select a row when the results load; this logic takes care of it
+        // Sometimes we might want to pre-select a row when the all_results load; this logic takes care of it
         if (typeof(this.$route.query.initial_row_selected) === "string") {
           this.gridApi.forEachNode(node => {
             if (node.data.internal_id === this.$route.query.initial_row_selected) {
@@ -246,8 +259,20 @@
         this.result_table_view_mode = tabName
         if (tabName === "fact sheet"){
           this.gridColumnApi.setColumnVisible('methodologies', false)
+          this.gridColumnApi.setColumnVisible('method_number', false)
+          this.gridColumnApi.setColumnVisible('record_type', true)
+        } else if (tabName === "spectrum") {
+          this.gridColumnApi.setColumnVisible('methodologies', true)
+          this.gridColumnApi.setColumnVisible('method_number', false)
+          this.gridColumnApi.setColumnVisible('record_type', true)
+        } else if (tabName === "method") {
+          this.gridColumnApi.setColumnVisible('methodologies', true)
+          this.gridColumnApi.setColumnVisible('method_number', true)
+          this.gridColumnApi.setColumnVisible('record_type', false)
         } else {
           this.gridColumnApi.setColumnVisible('methodologies', true)
+          this.gridColumnApi.setColumnVisible('method_number', false)
+          this.gridColumnApi.setColumnVisible('record_type', true)
         }
         this.gridApi.onFilterChanged()
       },
@@ -277,15 +302,31 @@
             i++
           }
         }
+      },
+      async ms_ready_toggle() {
+        if (this.include_ms_ready) {
+          if (this.ms_ready_search_run == false) {
+            const response = await axios.get(`${this.BACKEND_LOCATION}/get_ms_ready_methods/${this.substance_info.jchem_inchikey}`)
+            const main_ids = this.results.substance.map(x => x.internal_id)
+            this.results.ms_ready = response.data.results.filter(x => {console.log(!main_ids.includes(x.internal_id)); return !main_ids.includes(x.internal_id)})
+            this.ms_ready_search_run = true
+          }
+          this.all_results = this.results.substance.concat(this.results.ms_ready)
+          this.record_type_counts.method = this.record_type_counts.method + this.results.ms_ready.length
+        }
+        else {
+          this.all_results = this.results.substance
+          this.record_type_counts.method = this.record_type_counts.method - this.results.ms_ready.length
+        }
       }
     },
     async created() {
       // Start by trying to get the DTXSID for the search term.
       const response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${this.$route.params.search_term}`)
-      // There are three possibilities: no search term found, search term found, search term is ambiguous (matches multiple compounds by synonym/InChIKey).
+      // There are three possibilities: no search term found, search term found, search term is ambiguous (matches multiple substances by synonym/InChIKey).
       if (response.data.substances === null) {
         // No substance found.
-        this.no_compound_match = true
+        this.no_substance_match = true
         this.still_searching = false
       } else if (response.data.ambiguity) {
         // Search term is ambiguous.
@@ -302,15 +343,17 @@
       } else {
         // Search term matches one susbtance.
         const search_results = await axios.get(`${this.BACKEND_LOCATION}/search/${response.data.substances.dtxsid}`)
-        this.results = search_results.data.records
-        this.compound_info = response.data.substances
+        this.all_results = search_results.data.records
+        this.results.substance = search_results.data.records
+        this.substance_info = response.data.substances
         this.record_type_counts = search_results.data.record_type_counts
-        this.image_link = await getSubstanceImageLink(this.compound_info.dtxsid)
+        this.image_link = await getSubstanceImageLink(this.substance_info.dtxsid)
         this.still_searching = false
       }
     },
     components: {
       AgGridVue,
+      HelpIcon,
       InchikeyDisambiguation,
       SpectrumViewer,
       StoredPDFViewer,

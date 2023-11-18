@@ -1,6 +1,6 @@
 <!--
-  This page displays a list of all fact sheets in the database, as well as being able to display the fact sheets and
-  associated compounds themselves.
+  This page displays a list of all fact sheets in the database, as well as being able to display the fact sheets
+  themselves with their associated substances.
 
   This page takes no URL route or query parameters.
 -->
@@ -21,7 +21,7 @@
       <div class="button-array">
         <button @click="saveFiltersAsURL">Copy filters to clipboard</button>
         <button @click="downloadCurrentTable">Download Table</button>
-        <button @click="downloadCompoundsInDocs" :disabled="filtered_record_count==0">Download Compounds</button>
+        <button @click="downloadSubstancesInDocs" :disabled="filtered_record_count==0">Download Substances</button>
         <button @click="resetFilters">Reset Filters</button>
       </div>
       <ag-grid-vue
@@ -81,7 +81,20 @@
             }
           },
           {field: 'document_type', headerName: 'Type', sortable: true, width: 90},
-          {field: 'analyte', headerName: 'Analyte', sortable: true, flex: 1, filter: 'agTextColumnFilter', floatingFilter: true},
+          {field: 'analyte', headerName: 'Analyte', sortable: true, flex: 1, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
+            if (params.data.count == 1){
+              const link = document.createElement("a");
+              link.href = this.$router.resolve(`/search/${params.data.dtxsid}`).href;
+              link.innerText = params.data.analyte;
+              link.addEventListener("click", e => {
+                e.preventDefault();
+                this.$router.push(`/search/${params.data.dtxsid}`);
+              });
+              return link;
+            } else {
+              return params.data.analyte
+            }
+          }},
           {field: 'link', headerName: 'Link', sortable: true, width: 70, cellRenderer: params => {
             return `<a href='${params.data.link}' target='_blank'>Link</a>`
           }}
@@ -145,14 +158,14 @@
       quickFilter(input) {
         this.gridApi.setQuickFilter(input)
       },
-      async downloadCompoundsInDocs() {
+      async downloadSubstancesInDocs() {
         const internal_id_list = Array(this.filtered_record_count).fill().map((_,idx) => this.gridApi.getDisplayedRowAtIndex(idx).data.internal_id)
         
-        await axios.post(`${this.BACKEND_LOCATION}/compounds_for_ids/`, {internal_id_list: internal_id_list}, {responseType: "blob"}).then(res => {
+        await axios.post(`${this.BACKEND_LOCATION}/substances_for_ids/`, {internal_id_list: internal_id_list}, {responseType: "blob"}).then(res => {
           let blob = new Blob([res.data], {type: res.headers['content-type']})
           let link = document.createElement('a')
           link.href = window.URL.createObjectURL(blob)
-          link.download = `fact_sheet_list_compounds_${timestampForFile()}.xlsx`
+          link.download = `fact_sheet_list_substances_${timestampForFile()}.xlsx`
           link.click()
         })
       },

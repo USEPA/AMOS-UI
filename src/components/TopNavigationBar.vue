@@ -9,7 +9,7 @@
   <div class="nav-bar">
     <div class="nav-bar-left">
       <input @keyup.enter="go()" type="text" v-model="searchTerm" name="search-term">
-      <button @click="go()">Compound Search</button>
+      <button @click="go()">Susbtance Search</button>
     </div>
     <div class="nav-bar-right">
       <router-link to="/">Home</router-link>
@@ -43,6 +43,7 @@
         <b-dropdown-item href="https://comptox.epa.gov/genra/" target="_blank">Generalized Read-Across (GenRA)</b-dropdown-item>
         <b-dropdown-item href="https://comptox.epa.gov/dashboard/chemical/pubmed-abstract-sifter/" target="_blank">Literature Abstract Sifter</b-dropdown-item>
         <b-dropdown-item href="https://ccte-cced-cheminformatics.epa.gov/" target="_blank">Cheminformatics PoC Modules</b-dropdown-item>
+        <b-dropdown-item href="https://ccte-cced-chemster.epa.gov" target="_blank">ChemSTER</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
       <button @click="store.showHeaderAndFooter = !store.showHeaderAndFooter">Toggle Header/Footer</button>

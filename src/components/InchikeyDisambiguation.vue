@@ -1,13 +1,13 @@
 <!--
-  This component is meant to be used as a modal dialog box when an InChIKey search returns multiple compounds with the
-  same first block.  It is essentially a list of information about the individual compounds, and clicking on one of the
+  This component is meant to be used as a modal dialog box when an InChIKey search returns multiple substances with the
+  same first block.  It is essentially a list of information about the individual substances, and clicking on one of the
   information boxes will fire an event that the parent page can capture and act upon.  If there is an exact match to the
   searched InChIKey, that will be highlighted by moving it to the top of the result list.
 
   This component takes three props:
   - searched_key: the searched InChIKey.
-  - substances: an object containing a list of compounds from the database.  Individual elements should have the
-  elements needed by the Disambiguation component.
+  - substances: an object containing a list of substances from the database.  Individual elements should have the
+  elements needed by the DisambiguationInfo component.
   - record_info: an object containing information on how many records of each type exist for each substance.  Keys to
   the top-level object are DTXSIDs, while the values are other dictionaries containing the result types.
 -->
@@ -24,14 +24,14 @@
       <h4>PARTIAL MATCHES:</h4>
       <br />
     </div>
-    <div class="compound-grid" v-for="s in substances">
+    <div class="substance-grid" v-for="s in substances">
       <DisambiguationInfo :substance_info="s" :record_info="record_counts[s.dtxsid]" @click="selectInchikey(s.dtxsid)" />
     </div>
   </div>
 </template>
 
 <script>
-  import CompoundTile from '@/components/CompoundTile.vue'
+  import SubstanceTile from '@/components/SubstanceTile.vue'
   import DisambiguationInfo from '@/components/DisambiguationInfo.vue'
 
   export default {
@@ -57,12 +57,12 @@
       }
     },
     props: {substances: Object, searchedKey: String, record_counts: Object},
-    components: {CompoundTile, DisambiguationInfo}
+    components: {SubstanceTile, DisambiguationInfo}
   }
 </script>
 
 <style>
-  .compound-grid {
+  .substance-grid {
     display: flex;
     flex-wrap: wrap;
     justify-content: left;

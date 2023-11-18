@@ -8,7 +8,7 @@
 
 <template>
   <div>
-    <p>Below is a list of methods currently in the database.  Double-click on a row to display the method and its compounds in another tab.  Cells in the table with a dashed underline have hovertext, usually for expanding out abbreviations in the cell content (it will take a second or two for the hovertext to appear).</p>
+    <p>Below is a list of methods currently in the database.  Double-click on a row to display the method and its substances in another tab.  Cells in the table with a dashed underline have hovertext, usually for expanding out abbreviations in the cell content (it will take a second or two for the hovertext to appear).</p>
     <p>{{method_info.length}} methods in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed.</p>
     <div>
       <label for="full-table-filter">Full Table Filter</label> &nbsp;
@@ -19,7 +19,7 @@
     <div class="button-array">
       <button @click="saveFiltersAsURL">Copy filters to clipboard</button>
       <button @click="downloadCurrentTable">Download Table</button>
-      <button @click="downloadCompoundsInMethods" :disabled="filtered_record_count==0">Download Compounds</button>
+      <button @click="downloadSubstancesInMethods" :disabled="filtered_record_count==0">Download Substances</button>
       <button @click="resetFilters">Reset Filters</button>
     </div>
     <ag-grid-vue
@@ -37,7 +37,7 @@
     <br />
     <p>Some usage notes:</p>
     <ul>
-      <li>There is an "Author(s)" field in the table that is hidden by default; searches from the full-table search field will still include it, however.</li>
+      <li>There are two fields in the table hidden by default -- an author and a publisher field.  Searches from the full-table search field will still include them, however.</li>
     </ul>
   </div>
 </template>
@@ -127,8 +127,9 @@
           {field: "matrix", headerName: "Matrix", sortable: true, flex: 1, tooltipField: "matrix"},
           {field: "limitation", headerName: "Limitation", width: 100, tooltipField: "limitation"},
           {field: "document_type", headerName: "Type", width: 80},
-          {field: "count", headerName: "#", width: 60, floatingFilter: false, sortable: true, headerTooltip: "Number of compounds in method."},
-          {field: "author", headerName: "Author(s)", hide: true}
+          {field: "count", headerName: "#", width: 60, floatingFilter: false, sortable: true, headerTooltip: "Number of substances in method."},
+          {field: "author", headerName: "Author(s)", hide: true},
+          {field: "publisher", headerName: "Publisher", hide: true}
         ]
       }
     },
@@ -184,14 +185,14 @@
       quickFilter(input) {
         this.gridApi.setQuickFilter(input)
       },
-      async downloadCompoundsInMethods() {
+      async downloadSubstancesInMethods() {
         const internal_id_list = Array(this.filtered_record_count).fill().map((_,idx) => this.gridApi.getDisplayedRowAtIndex(idx).data.internal_id)
         
-        await axios.post(`${this.BACKEND_LOCATION}/compounds_for_ids/`, {internal_id_list: internal_id_list}, {responseType: "blob"}).then(res => {
+        await axios.post(`${this.BACKEND_LOCATION}/substances_for_ids/`, {internal_id_list: internal_id_list}, {responseType: "blob"}).then(res => {
           let blob = new Blob([res.data], {type: res.headers['content-type']})
           let link = document.createElement('a')
           link.href = window.URL.createObjectURL(blob)
-          link.download = `method_list_compounds_${timestampForFile()}.xlsx`
+          link.download = `method_list_substances_${timestampForFile()}.xlsx`
           link.click()
         })
       },

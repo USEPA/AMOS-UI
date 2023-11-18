@@ -17,7 +17,7 @@
         <StoredPDFViewer style="width: 48vw;" :internalID="pdf_viewer_data.internal_id" recordType="method"/>
       </div>
       <div class="half-page-column">
-        <p>This is a list of the {{ results.length }} spectra associated with this method, organized by compound identifier.  Double-click on a row to show the spectrum in a modal window.</p>
+        <p>This is a list of the {{ results.length }} spectra associated with this method, organized by substance identifier.  Double-click on a row to show the spectrum in a modal window.</p>
         <ag-grid-vue
             class="ag-theme-balham"
             style="height:600px; width:100%"
@@ -62,7 +62,7 @@
         spectrum_internal_id: "",
         column_defs: [
           {field: 'dtxsid', headerName: 'DTXSID', sortable: true},
-          {field: 'preferred_name', headerName: 'Compound Name', sortable: true, flex: 1},
+          {field: 'preferred_name', headerName: 'Substance Name', sortable: true, flex: 1},
         ]
       }
     },

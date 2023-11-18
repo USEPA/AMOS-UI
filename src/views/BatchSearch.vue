@@ -1,5 +1,5 @@
 <!--
-  This page is used for batch searching compounds by DTXSID -- and only by DTXSID -- and returning information on the
+  This page is used for batch searching substances by DTXSID -- and only by DTXSID -- and returning information on the
   records in an Excel workbook.
 
   There are no URL route or query parameters associated with this page.
@@ -14,8 +14,8 @@
     results have been retrieved from the database; the file contains information on the records, 
     including links to their original sources, but does not contain the actual records themselves.
   </p>
-  <p>If you have a list of compounds with identifiers other than DTXSIDs, you can go <a href="https://comptox.epa.gov/dashboard/batch-search">here</a> to translate them to DTXSIDs.</p>
-  <p>Note: if two or more searched DTXSIDs are present in the same record (e.g., a method that covers multiple similar compounds), that record will appear once for every searched DTXSID that appears in it.</p>
+  <p>If you have a list of substances with identifiers other than DTXSIDs, you can go <a href="https://comptox.epa.gov/dashboard/batch-search">here</a> to translate them to DTXSIDs.</p>
+  <p>Note: if two or more searched DTXSIDs are present in the same record (e.g., a method that covers multiple similar substances), that record will appear once for every searched DTXSID that appears in it.</p>
   <div style="display: flex; margin-top: 40px">
     <div class="batch-search-controls">
       <h5>DTXSID List</h5>
@@ -30,7 +30,7 @@
       </div>
     </div>
   </div>
-  <b-alert variant="warning" dismissible v-model="status_boxes.show_empty_box_error">No compounds were entered in the text box.</b-alert>
+  <b-alert variant="warning" dismissible v-model="status_boxes.show_empty_box_error">No substances were entered in the text box.</b-alert>
 </template>
 
 <script>

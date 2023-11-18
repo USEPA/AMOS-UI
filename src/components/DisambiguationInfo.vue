@@ -1,10 +1,10 @@
 <!--
-  This component is used to display information on a compound.  It is intended to be used with the disambiguation modals
-  for synonym and InChIKey searches.
+  This component diplays some basic information on an individual substance and its presence in AMOS's database.  It is
+  the primary display element of the disambiguation modals for synonym and InChIKey searches.
 
   This component takes two props:
   - substance_info: an object containing information on the substance.
-  - record_info: an object containing counts of how many records of each type are available in AMOS.
+  - record_info: an object containing counts of how many records of each type are available in AMOS for the given substance.
 -->
 
 <template>
@@ -12,7 +12,7 @@
     <div class="disambiguation-content">
       <div class="chemical-image-highlight">
         <img v-if="image_link" class="chemical-image" :src="image_link"/>  
-        <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this compound.</div>
+        <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this substance.</div>
       </div>
       <div class="chemical-info">
         <ul style="list-style-type: none;">

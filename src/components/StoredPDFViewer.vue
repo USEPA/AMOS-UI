@@ -1,6 +1,6 @@
 <!--
   This comoponent is for displaying the PDF for a method or fact sheet (or, possibly in the future, a spectrum) along
-  with two possible views for the compound(s) that the document references.
+  with two possible views for the substance(s) that the document references.
 
   This component takes two props:
   - internalID, a string that matches the internal ID of a PDF document in the database
@@ -19,26 +19,29 @@
     </div>
     <div class="tab-bar">
       <a :class="viewer_mode == 'PDF' ? 'active' : ''" @click="updateTab('PDF')">PDF Viewer</a>
-      <a :class="viewer_mode == 'CompoundGrid' ? 'active' : ''" @click="updateTab('CompoundGrid')">Compounds ({{ compound_list.length }}) (grid)</a>
-      <a :class="viewer_mode == 'CompoundTable' ? 'active' : ''" @click="updateTab('CompoundTable')">Compounds ({{ compound_list.length }}) (table)</a>
+      <a :class="viewer_mode == 'SubstanceGrid' ? 'active' : ''" @click="updateTab('SubstanceGrid')">Substances ({{ substance_list.length }}) (grid)</a>
+      <a :class="viewer_mode == 'SubstanceTable' ? 'active' : ''" @click="updateTab('SubstanceTable')">Substances ({{ substance_list.length }}) (table)</a>
     </div>
 
     <iframe v-if="viewer_mode == 'PDF'" class="pdf-viewer-box" :src="`${target_pdf_url}`" type="application/pdf"></iframe>
 
-    <div class="compound-grid" v-else-if="viewer_mode == 'CompoundGrid'">
-      <div v-for="cl in compound_list">
-        <CompoundTile v-if="highlightedCompounds.includes(cl.dtxsid)" :dtxsid="`${cl.dtxsid}`" :preferred_name="`${cl.preferred_name}`" highlight/>
-        <CompoundTile v-else :dtxsid="`${cl.dtxsid}`" :preferred_name="`${cl.preferred_name}`"/>
+    <div v-else-if="viewer_mode == 'SubstanceGrid'">
+      <button @click="downloadSubstanceGridInfo">Download Substance Info</button>
+      <div class="substance-grid">
+        <div v-for="cl in substance_list">
+          <SubstanceTile v-if="highlightedSubstances.includes(cl.dtxsid)" :dtxsid="`${cl.dtxsid}`" :preferred_name="`${cl.preferred_name}`" highlight/>
+          <SubstanceTile v-else :dtxsid="`${cl.dtxsid}`" :preferred_name="`${cl.preferred_name}`"/>
+        </div>
       </div>
     </div>
 
-    <div v-else-if="viewer_mode == 'CompoundTable'">
-      <button @click="downloadCompoundInfo">Download Compound Info</button>
+    <div v-else-if="viewer_mode == 'SubstanceTable'">
+      <button @click="downloadSubstanceTableInfo">Download Substance Info</button>
       <ag-grid-vue
         class="ag-theme-balham"
         style="height:550px; width:100%"
         :columnDefs="column_defs"
-        :rowData="compound_list"
+        :rowData="substance_list"
         rowSelection="single"
         @grid-ready="onGridReady"
         :rowClassRules="rowClassRules"
@@ -55,7 +58,7 @@
   import '@/assets/style.css'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
 
-  import CompoundTile from '@/components/CompoundTile.vue'
+  import SubstanceTile from '@/components/SubstanceTile.vue'
 
   import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
   import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
@@ -74,7 +77,7 @@
         pdf_metadata: "",
         metadata_rows: {},
         viewer_mode: "PDF",
-        compound_list: [],
+        substance_list: [],
         has_associated_spectra: false,
         BACKEND_LOCATION,
         COMPTOX_PAGE_URL,
@@ -106,14 +109,14 @@
             return link;
           }},
           {field: 'casrn', headerName: 'CASRN', width: 90, filter: 'agTextColumnFilter', floatingFilter: true},
-          {field: 'preferred_name', headerName:'Compound Name', flex: 1, filter: 'agTextColumnFilter', floatingFilter: true}
+          {field: 'preferred_name', headerName:'Substance Name', flex: 1, filter: 'agTextColumnFilter', floatingFilter: true}
         ],
         rowClassRules: {
-          'substance-highlight': (params) => {return this.highlightedCompounds.includes(params.data.dtxsid)}
+          'substance-highlight': (params) => {return this.highlightedSubstances.includes(params.data.dtxsid)}
         }
       }
     },
-    props: {internalID: String, recordType: String, displayAdditionalInfo: Boolean, highlightedCompounds: {type: Array, default: []}},
+    props: {internalID: String, recordType: String, displayAdditionalInfo: Boolean, highlightedSubstances: {type: Array, default: []}},
     watch: {
       internalID(){
         this.metadata_rows = {}
@@ -137,18 +140,27 @@
       },
       async findDTXSIDs(){
         const response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.internalID}`)
-        this.compound_list = response.data.compound_list
-        for (let i=0; i<this.compound_list.length; i++) {
-          this.compound_list[i]["image_link"] = await getSubstanceImageLink(this.compound_list[i].dtxsid)
+        this.substance_list = response.data.substance_list
+        for (let i=0; i<this.substance_list.length; i++) {
+          this.substance_list[i]["image_link"] = await getSubstanceImageLink(this.substance_list[i].dtxsid)
         }
       },
       updateTab(tabName) {
         this.viewer_mode = tabName
       },
-      downloadCompoundInfo() {
+      async downloadSubstanceGridInfo() {
+        await axios.get(`${this.BACKEND_LOCATION}/get_substance_file_for_record/${this.internalID}`, {responseType: "blob"}).then(res => {
+          let blob = new Blob([res.data], {type: res.headers['content-type']})
+          let link = document.createElement('a')
+          link.href = window.URL.createObjectURL(blob)
+          link.download = `${this.internalID}_substance_list.xlsx`
+          link.click()
+        })
+      },
+      downloadSubstanceTableInfo() {
         this.gridApi.exportDataAsExcel({
           columnKeys: ["dtxsid", "casrn", "preferred_name"],
-          fileName: `${this.internalID}_compound_list.xlsx`
+          fileName: `${this.internalID}_substance_list.xlsx`
         });
       },
       onGridReady(params) {
@@ -156,7 +168,7 @@
         this.gridColumnApi = params.columnApi;
       }
     },
-    components: { AgGridVue, CompoundTile }
+    components: { AgGridVue, SubstanceTile }
   };
 </script>
 
@@ -167,7 +179,7 @@
     overflow: scroll;
   }
 
-  .compound-grid {
+  .substance-grid {
     display: flex;
     flex-wrap: wrap;
     justify-content: left;

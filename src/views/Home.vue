@@ -9,10 +9,15 @@
   <div class="home">
     <h1>Home Page</h1>
     <div class="about-this-app">
-      <p>The search will return records of all three types -- spectra, fact sheets, and methods.  The initial tab shown can be selected with the radio buttons below.</p>
+      <p>
+        AMOS (Analytical Spectra & Open Methods) is a web application that combines analytical chemistry data from multiple sources and of multiple
+        types into a searchable database.  Use the search bar below to run a general search for a single substance, or use the links in the navigation
+        bar above to access other functionality.  This application is easier to use on larger screens/windows.
+      </p>
+      <p>For more information about this app, see the <router-link to="/about">about</router-link> page.</p>
       <div>
         <input @keyup.enter="go_big_bar()" id="big-search-bar" name="big-search-bar" placeholder="Search name, InChIKey, DTXSID, or CASRN..." size="60" v-model="bigBarSearchTerm">
-        <button @click="go_big_bar()">Compound Search</button>
+        <button @click="go_big_bar()">Substance Search</button>
       </div>
       <div>
         <label><input type="radio" id="all-tab" v-model="initial_results_tab" value="all">All</label>
@@ -28,8 +33,6 @@
         <label for="susbtring-search">Search by substring (name only)</label>
       </div>
     </div>
-    <br />
-    For more information about this app, see the <router-link to="/about">about</router-link> page.
   </div>
 </template>
 
