@@ -1,4 +1,4 @@
-name: Docker
+name: Container-scanning
 
 # This workflow uses actions that are not certified by GitHub.
 # They are provided by a third-party and are governed by
@@ -20,7 +20,7 @@ env:
 
 
 jobs:
-  build-push:
+  container-scan:
 
     runs-on: th889
     environment: ${{ github.head_ref || github.ref_name }}
@@ -43,20 +43,22 @@ jobs:
 
       - name: Docker build
         run: docker build -f Dockerfile -t amos-ui-security-${{ github.head_ref || github.ref_name }} .
-          
+        
+      - name: Create Output Folder
+        run: mkdir output   
+        
       - name: Run security scan on the container
         uses: aquasecurity/trivy-action@0.12.0
         id:   scan
         with:
           image-ref: 'amos-ui-security-${{ github.head_ref || github.ref_name }}'
-          format: 'table'
+          format: template
+          template: "@/contrib/html.tpl"
+          output: ./output/trivy-report.html
           severity: 'CRITICAL,HIGH'
           
-      # Removing old packages and only keeping 3 untagged versions
-      - name: Delete Package Versions
-        uses: actions/delete-package-versions@v4.1.0
+      - name: Use the Upload Artifact GitHub Action
+        uses: actions/upload-artifact@v3
         with: 
-          package-name: amos-ui
-          package-type: 'container'
-          min-versions-to-keep: 3
-          delete-only-untagged-versions: 'true'   
+          name: container-scan-report
+          path: output
