@@ -72,8 +72,4 @@ jobs:
           name: amos-ui-container-scan-report
           path: /data/watchtower/amos/container-results/amos-ui
 
-      - name:  send email every monday and thursday
-        run: |
-           cd /data/watchtower/amos/container-results/amos-ui
-           ls -la
-           python email.py 
+      
