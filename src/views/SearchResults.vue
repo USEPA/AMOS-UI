@@ -41,14 +41,18 @@
       </div>
       <div v-if="all_results.length > 0">
         <div>
-          <input type="checkbox" id="single-point-spectra" v-model="include_single_point_spectra" @change="updateCheckboxFilters">
+          <input type="checkbox" id="single-point-spectra" v-model="result_filters.single_point_spectra" @change="updateCheckboxFilters">
           <label for="single-point-spectra">Display Single Point Spectra</label>
         </div>
         <div>
-          <input type="checkbox" id="ms-ready" v-model="include_ms_ready" @change="ms_ready_toggle">
+          <input type="checkbox" id="ms-ready" v-model="result_filters.ms_ready" @change="ms_ready_toggle">
           <label for="ms-ready">Include MS-Ready methods</label>
           &nbsp;
           <help-icon style="vertical-align:middle;" tooltipText="MS-Ready refers to a standardization of substances by collapsing isomers, salts, isotopes, etc., into a single form, identifiable by having the same first block of their InChIKey.  Selecting this will include methods from substances with the same MS-Ready form." />
+        </div>
+        <div>
+          <input type="checkbox" id="spectrabase" v-model="result_filters.spectrabase" @change="updateCheckboxFilters">
+          <label for="spectrabase">Include Spectrabase</label>
         </div>
       </div>
       <div v-if="!still_searching">
@@ -131,13 +135,12 @@
         BACKEND_LOCATION,
         COMPTOX_PAGE_URL,
         SOURCE_ABBREVIATION_MAPPING,
-        include_single_point_spectra: true,
         result_table_view_mode: "all",
         record_type_counts: {method: 0, "fact sheet": 0, spectrum: 0},
-        include_ms_ready: false,
         ms_ready_search_run: false,
+        result_filters: {ms_ready: false, single_point_spectra: true, spectrabase: false},
         columnDefs: [
-          {field: 'methodologies', headerName: 'Methodology', sortable: true, sort: 'asc', filter: 'agTextColumnFilter', floatingFilter: true, width: 150, suppressSizeToFit: true},
+          {field: 'methodologies', headerName: 'Methodology', sortable: true, sort: 'asc', filter: 'agTextColumnFilter', floatingFilter: true, width: 140, suppressSizeToFit: true},
           {field: 'source', headerName: 'Source', sortable: true, width: 110, suppressSizeToFit: true, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
               if (params.data.link === null) {
                 return params.data.source
@@ -167,6 +170,7 @@
             }
           },
           {field: 'method_number', headerName: 'Method #', width: 110, hide: true},
+          {field: 'method_type', headerName: 'Method Type', width: 120, hide: true},
           {field: 'count', headerName: '#', width: 35, sortable: true, headerTooltip: "Number of substances in record."},
           {field: 'description', headerName: 'Information', sortable: true, flex: 1, tooltipField: 'comment', filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params =>{
             if (params.data.description === null) {
@@ -235,22 +239,22 @@
       doesExternalFilterPass(node) {
         // Controls the filtering of records in the table -- so far, this amounts to handling the
         // toggling of single point spectra and switching between record types.
-        let singlePointSpectrum = false
-        if (node.data.description) {
-          if (!this.include_single_point_spectra & (node.data.description.includes("# PEAKS=1;") | node.data.description.endsWith("# PEAKS=1"))) {
-            singlePointSpectrum = true
+        if (!this.result_filters.single_point_spectra) {
+          if (node.data.description && (node.data.description.includes("# PEAKS=1;") | node.data.description.endsWith("# PEAKS=1"))) {
+            return false
           }
         }
 
-        // filter out result types based on selected 
-        let correctResultType = true
+        if (!this.result_filters.spectrabase && (node.data.source == "SpectraBase")) {
+          return false
+        }
+
+        // filter out result types based on selected tab
         if (this.result_table_view_mode != "all") {
-          if (node.data.record_type.toLowerCase() != this.result_table_view_mode) {
-            correctResultType = false
-          }
+          return node.data.record_type.toLowerCase() == this.result_table_view_mode
         }
 
-        return (!singlePointSpectrum) & correctResultType
+        return true
       },
       updateCheckboxFilters() {
         this.gridApi.onFilterChanged()
@@ -260,18 +264,23 @@
         if (tabName === "fact sheet"){
           this.gridColumnApi.setColumnVisible('methodologies', false)
           this.gridColumnApi.setColumnVisible('method_number', false)
+          this.gridColumnApi.setColumnVisible('method_type', false)
           this.gridColumnApi.setColumnVisible('record_type', true)
         } else if (tabName === "spectrum") {
           this.gridColumnApi.setColumnVisible('methodologies', true)
           this.gridColumnApi.setColumnVisible('method_number', false)
+          this.gridColumnApi.setColumnVisible('method_type', false)
           this.gridColumnApi.setColumnVisible('record_type', true)
         } else if (tabName === "method") {
           this.gridColumnApi.setColumnVisible('methodologies', true)
           this.gridColumnApi.setColumnVisible('method_number', true)
+          this.gridColumnApi.setColumnVisible('method_type', true)
           this.gridColumnApi.setColumnVisible('record_type', false)
         } else {
+          // "All" case
           this.gridColumnApi.setColumnVisible('methodologies', true)
           this.gridColumnApi.setColumnVisible('method_number', false)
+          this.gridColumnApi.setColumnVisible('method_type', false)
           this.gridColumnApi.setColumnVisible('record_type', true)
         }
         this.gridApi.onFilterChanged()
@@ -304,11 +313,11 @@
         }
       },
       async ms_ready_toggle() {
-        if (this.include_ms_ready) {
+        if (this.result_filters.ms_ready) {
           if (this.ms_ready_search_run == false) {
             const response = await axios.get(`${this.BACKEND_LOCATION}/get_ms_ready_methods/${this.substance_info.jchem_inchikey}`)
             const main_ids = this.results.substance.map(x => x.internal_id)
-            this.results.ms_ready = response.data.results.filter(x => {console.log(!main_ids.includes(x.internal_id)); return !main_ids.includes(x.internal_id)})
+            this.results.ms_ready = response.data.results.filter(x => !main_ids.includes(x.internal_id))
             this.ms_ready_search_run = true
           }
           this.all_results = this.results.substance.concat(this.results.ms_ready)
@@ -341,7 +350,7 @@
           this.disambiguation.synonym = true
         }
       } else {
-        // Search term matches one susbtance.
+        // Search term matches one substance.
         const search_results = await axios.get(`${this.BACKEND_LOCATION}/search/${response.data.substances.dtxsid}`)
         this.all_results = search_results.data.records
         this.results.substance = search_results.data.records

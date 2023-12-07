@@ -45,16 +45,7 @@
 
     <!-- Modal window that displays the metadata associated with the spectrum, using the spectrum_metadata field from the database. -->
     <b-modal v-model="show_metadata_modal" ref="metadata_modal">
-      <h5 v-if="spectrum_metadata && spectrum_metadata.Chromatography">Chromatography Info:</h5>
-      <ul v-if="spectrum_metadata && spectrum_metadata.Chromatography" style="list-style-type: none;" ref="metadata_modal">
-        <li v-for="c in Object.entries(spectrum_metadata.Chromatography)"><strong>{{c[0]}}:</strong> {{c[1]}}</li>
-      </ul>
-      <br />
-      <h5 v-if="spectrum_metadata && spectrum_metadata.Spectrometry">Spectrometry Info:</h5>
-      <ul v-if="spectrum_metadata && spectrum_metadata.Spectrometry" style="list-style-type: none;">
-        <li v-for="s in Object.entries(spectrum_metadata.Spectrometry)"><strong>{{s[0]}}:</strong> {{s[1]}}</li>
-      </ul>
-      <button @click="copyMetadata()">Copy to Clipboard</button>
+      <SpectrumMetadata :spectrumMetadata=spectrum_metadata />
     </b-modal>
   </div>
 </template>
@@ -63,9 +54,6 @@
   import axios from 'axios';
   import Dygraph from 'dygraphs';
   
-  import '@/assets/style.css'
-  import { BACKEND_LOCATION } from '@/assets/store';
-
   import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
   import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
@@ -73,11 +61,14 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
   
+  import '@/assets/style.css'
+  import { BACKEND_LOCATION } from '@/assets/store';
+  import SpectrumMetadata from '@/components/SpectrumMetadata.vue'
+  
 
   export default {
     data(){
       return {
-        spectrumString: "",
         spectrum: [],
         spectral_entropy: 0,
         normalized_entropy: 0,
@@ -163,25 +154,6 @@
       spectrumAsRows(spectrum) {
         return spectrum.map(function(x){return {"m/z":x[0], "intensity":x[1]}})
       },
-      copyMetadata() {
-        const chromatography = Object.entries(this.spectrum_metadata.Chromatography).map(x => `${x[0]}: ${x[1]}`).join("\n")
-        const spectrometry = Object.entries(this.spectrum_metadata.Spectrometry).map(x => `${x[0]}: ${x[1]}`).join("\n")
-        const data_string = `Chromatography:\n${chromatography}\n\nSpectrometry:\n${spectrometry}`
-        // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
-        // can't get that to work in this app, though, since it apparently requires a secured connection and the
-        // deployed version of this app doesn't have that.  So I'm sticking to this technically-depricated solution that
-        // I pulled out of CompTox's code, since it apparently works there.
-        const textarea = document.createElement('textarea')
-        textarea.value = data_string
-        document.body.appendChild(textarea)
-        textarea.select()
-        try {
-          document.execCommand('copy')
-        } catch (err) {
-          console.log('Cannot copy: ' + err)
-        }
-        document.body.removeChild(textarea)
-      },
       copySpectrum() {
         const spectrum_string = "m/z Intensity\n" + this.spectrum.map(x => `${x[0]} ${x[1]}`).join("\n");
         // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
@@ -200,7 +172,7 @@
         document.body.removeChild(textarea)
       }
     },
-    components: {AgGridVue}
+    components: {AgGridVue, SpectrumMetadata}
   };
 </script>
 

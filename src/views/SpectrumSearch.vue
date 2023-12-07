@@ -67,16 +67,7 @@
 
   <!-- Modal window that displays the metadata associated with the spectrum, using the spectrum_metadata field from the database. -->
   <b-modal v-model="show_modal.metadata" ref="metadata_modal">
-    <h5 v-if="spectrum_metadata && spectrum_metadata.Chromatography">Chromatography Info:</h5>
-    <ul v-if="spectrum_metadata && spectrum_metadata.Chromatography" style="list-style-type: none;" ref="metadata_modal">
-      <li v-for="c in Object.entries(spectrum_metadata.Chromatography)"><strong>{{c[0]}}:</strong> {{c[1]}}</li>
-    </ul>
-    <br />
-    <h5 v-if="spectrum_metadata && spectrum_metadata.Spectrometry">Spectrometry Info:</h5>
-    <ul v-if="spectrum_metadata && spectrum_metadata.Spectrometry" style="list-style-type: none;">
-      <li v-for="s in Object.entries(spectrum_metadata.Spectrometry)"><strong>{{s[0]}}:</strong> {{s[1]}}</li>
-    </ul>
-    <button @click="copyMetadata()">Copy to Clipboard</button>
+    <SpectrumMetadata :spectrumMetadata=spectrum_metadata />
   </b-modal>
   <b-alert variant="warning" dismissible v-model="error_messages.invalidFormat">There are issues with the contents of the user spectrum -- please check to ensure it is correct.</b-alert>
 </template>
@@ -95,6 +86,7 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import '@/assets/style.css'
+  import SpectrumMetadata from '@/components/SpectrumMetadata.vue'
 
   export default{
     data() {
@@ -237,7 +229,7 @@
         return selected_spectrum.map(function(x){return {"m/z":x[0], "intensity":x[1]}})
       }
     },
-    components: {AgGridVue}
+    components: {AgGridVue, SpectrumMetadata}
   }
 
 </script>

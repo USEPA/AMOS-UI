@@ -29,8 +29,8 @@
         <label><input type="radio" id="spectrum-tab" v-model="initial_results_tab" value="spectrum">Spectra</label>
       </div>
       <div>
-        <input type="checkbox" id="susbtring-search" v-model="substring_search">
-        <label for="susbtring-search">Search by substring (name only)</label>
+        <input type="checkbox" id="substring-search" v-model="substring_search">
+        <label for="substring-search">Search by substring (name only)</label>
       </div>
     </div>
   </div>

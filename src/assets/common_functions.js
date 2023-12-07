@@ -1,4 +1,3 @@
-
 import axios from 'axios'
 
 import { BACKEND_LOCATION, IMAGE_BY_DTXSID_API } from '@/assets/store'
@@ -9,23 +8,10 @@ import { BACKEND_LOCATION, IMAGE_BY_DTXSID_API } from '@/assets/store'
 const SPECTRUM_REGEX = /^[0-9][0-9.]*\s[0-9][0-9.]*(\n[0-9][0-9.]*\s[0-9][0-9.]*)*$/
 
 
-
 export async function doesImageExist(dtxsid) {
     // Quick check for whether an image at a given URL exists.  Intended for use with 
     const response = await axios.get(IMAGE_BY_DTXSID_API + dtxsid)
     return response.data.length > 0
-}
-
-export async function getSubstanceImage(dtxsid) {
-    const first_response = await axios.get(IMAGE_BY_DTXSID_API + dtxsid)
-    if (first_response.data.length > 0) {
-        return btoa(first_response.data)
-    }
-    const second_response = await axios.get(BACKEND_LOCATION + "/get_image_for_dtxsid/" + dtxsid)
-    if (second_response.data.length > 0) {
-        return btoa(second_response.data)
-    }
-    return null
 }
 
 export async function getSubstanceImageLink(dtxsid) {
@@ -43,6 +29,7 @@ export async function getSubstanceImageLink(dtxsid) {
 }
 
 export function timestampForFile() {
+    // Generates a timestamp for a file, in the format YYYY-MM-DD_HHMMSS.
     const now = new Date()
     const day = `${now.getFullYear()}-${(now.getMonth()+1).toString().padStart(2,"0")}-${now.getDate().toString().padStart(2,"0")}`
     const time = `${now.getHours().toString().padStart(2,"0")}${now.getMinutes().toString().padStart(2,"0")}${now.getSeconds().toString().padStart(2,"0")}`
@@ -50,5 +37,6 @@ export function timestampForFile() {
 }
 
 export function validateSpectrumInput(spectrum_text) {
+    // Intended to test the format of an input spectrum to see if it's valid.
     return SPECTRUM_REGEX.test(spectrum_text)
 }

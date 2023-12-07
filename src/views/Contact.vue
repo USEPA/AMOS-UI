@@ -6,7 +6,7 @@
   </p>
   <p>
     Gregory Janesch<br>
-    Email: <a href="mailto:Williams.Antony@epa.gov">Janesch.Gregory@epa.gov</a> <br>
+    Email: <a href="mailto:Janesch.Gregory@epa.gov">Janesch.Gregory@epa.gov</a> <br>
   </p>
 </template>
 

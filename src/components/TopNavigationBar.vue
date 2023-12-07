@@ -9,7 +9,7 @@
   <div class="nav-bar">
     <div class="nav-bar-left">
       <input @keyup.enter="go()" type="text" v-model="searchTerm" name="search-term">
-      <button @click="go()">Susbtance Search</button>
+      <button @click="go()">Substance Search</button>
     </div>
     <div class="nav-bar-right">
       <router-link to="/">Home</router-link>
@@ -32,6 +32,7 @@
         <b-dropdown-item to="/about">About this App</b-dropdown-item>
         <b-dropdown-item to="/contact">Contact Info</b-dropdown-item>
         <b-dropdown-item to="/data_sources">Data Sources</b-dropdown-item>
+        <b-dropdown-item to="/analyte_visualization">Analyte Visualization</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
       <b-nav-item-dropdown text="Related Applications" class="nav-dropdown">
