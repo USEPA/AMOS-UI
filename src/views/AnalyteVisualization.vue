@@ -1,9 +1,5 @@
 <template>
-  <p>This page has a visualization of the classes of method analytes in the database and the relationships between them.  There are two ways to interact with it:</p>
-  <ol>
-    <li>Hover over one of the circles in the plot to see a description of the analyte class -- this will also highlight any parent or child classes that are in the plot as well.  Clicking on a circle will open the method list in a new tab with a filter on that analyte.</li>
-    <li>The controls on the right can be used to find specific analyte classes, either by going through the full list or using the search bar.</li>
-  </ol>
+  <p>This page has a visualization of the classes of method analytes in the database and the relationships between them.  Hover over one of the circles in the plot to see a description of the analyte class -- this will also highlight any parent or child classes that are in the plot as well.  Clicking on a circle will open the method list in a new tab with a filter on that analyte.  You can also use the controls on the right to find specific analyte classes, either by going through the full list or using the search bar.</p>
   <p>The visualization can be zoomed in or out.</p>
   <div class="analyteClassContainer">
     <svg id="analyteClassSvg" width="1000" height="700"></svg>
