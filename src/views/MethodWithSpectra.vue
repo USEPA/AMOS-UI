@@ -71,7 +71,6 @@
         this.search_type = "invalid"
       } else {
         const response = await axios.get(`${this.BACKEND_LOCATION}/method_with_spectra/${this.$route.params.by_type}/${this.$route.params.internal_id}`)
-        console.log(response.data)
         this.pdf_viewer_data = {"internal_id": response.data.method_id}
         this.results = response.data.info
       }

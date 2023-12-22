@@ -17,7 +17,7 @@
         <h1 v-if="still_searching" class="text-that-can-overflow">Searching for "{{$route.params.search_term}}"...</h1>
         <h1 v-else-if="!still_searching & no_substance_match">No substance match found.</h1>
         <div v-else>
-          <h1 class="text-that-can-overflow">{{ all_results.length }} Results for "{{$route.params.search_term}}"</h1>
+          <h1 class="text-that-can-overflow">{{ result_count }} Results for "{{$route.params.search_term}}"</h1>
           <br/>
           <div class="chemical-box">
             <div class="chemical-image-highlight">
@@ -42,10 +42,10 @@
       <div v-if="all_results.length > 0">
         <div>
           <input type="checkbox" id="single-point-spectra" v-model="result_filters.single_point_spectra" @change="updateCheckboxFilters">
-          <label for="single-point-spectra">Display Single Point Spectra</label>
+          <label for="single-point-spectra">Include Single Point Spectra</label>
         </div>
         <div>
-          <input type="checkbox" id="ms-ready" v-model="result_filters.ms_ready" @change="ms_ready_toggle">
+          <input type="checkbox" id="ms-ready" v-model="result_filters.ms_ready" @change="updateCheckboxFilters">
           <label for="ms-ready">Include MS-Ready methods</label>
           &nbsp;
           <help-icon style="vertical-align:middle;" tooltipText="MS-Ready refers to a standardization of substances by collapsing isomers, salts, isotopes, etc., into a single form, identifiable by having the same first block of their InChIKey.  Selecting this will include methods from substances with the same MS-Ready form." />
@@ -60,7 +60,7 @@
         <p v-else-if="all_results.length==0">The search term "{{$route.params.search_term}}" matches a substance in the database; however, no data records were found.</p>
         <div v-else>
           <div class="tab-bar">
-            <a :class="result_table_view_mode == 'all' ? 'active' : ''" @click="updateTab('all')">All Results ({{all_results.length}})</a>
+            <a :class="result_table_view_mode == 'all' ? 'active' : ''" @click="updateTab('all')">All Results ({{result_count}})</a>
             <a :class="determineTabBarClass('method')" @click="updateTab('method')">Methods ({{record_type_counts.method}})</a>
             <a :class="determineTabBarClass('spectrum')" @click="updateTab('spectrum')">Spectra ({{record_type_counts.spectrum}})</a>
             <a :class="determineTabBarClass('fact sheet')" @click="updateTab('fact sheet')">Fact Sheets ({{record_type_counts["fact sheet"]}})</a>
@@ -136,6 +136,7 @@
         COMPTOX_PAGE_URL,
         SOURCE_ABBREVIATION_MAPPING,
         result_table_view_mode: "all",
+        result_count: 0,
         record_type_counts: {method: 0, "fact sheet": 0, spectrum: 0},
         ms_ready_search_run: false,
         result_filters: {ms_ready: false, single_point_spectra: true, spectrabase: false},
@@ -169,8 +170,8 @@
               }
             }
           },
-          {field: 'method_number', headerName: 'Method #', width: 110, hide: true},
-          {field: 'method_type', headerName: 'Method Type', width: 120, hide: true},
+          {field: 'method_number', headerName: 'Method #', width: 110, hide: true, filter: 'agTextColumnFilter', floatingFilter: true},
+          {field: 'method_type', headerName: 'Method Type', width: 120, hide: true, filter: 'agTextColumnFilter', floatingFilter: true},
           {field: 'count', headerName: '#', width: 35, sortable: true, headerTooltip: "Number of substances in record."},
           {field: 'description', headerName: 'Information', sortable: true, flex: 1, tooltipField: 'comment', filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params =>{
             if (params.data.description === null) {
@@ -205,6 +206,7 @@
 
         this.gridApi.onFilterChanged()   //regenerates the table with the filter settings
         this.gridApi.sizeColumnsToFit()
+        this.updateRecordCounts()
       },
       onRowSelected(event) {
         // Row selection creates two events -- one for the selection, one for the deselection.  Only
@@ -249,6 +251,10 @@
           return false
         }
 
+        if (node.data.ms_ready && !this.result_filters.ms_ready) {
+          return false
+        }
+
         // filter out result types based on selected tab
         if (this.result_table_view_mode != "all") {
           return node.data.record_type.toLowerCase() == this.result_table_view_mode
@@ -256,32 +262,37 @@
 
         return true
       },
-      updateCheckboxFilters() {
+      async updateCheckboxFilters() {
+        if (this.result_filters.ms_ready && (this.ms_ready_search_run == false)) {
+          await this.retrieve_ms_ready_methods()
+          this.ms_ready_search_run = true
+        }
         this.gridApi.onFilterChanged()
+        this.updateRecordCounts()
+      },
+      updateRecordCounts() {
+        var filtered_result_count = {method: 0, "fact sheet": 0, spectrum: 0}
+        this.gridApi.forEachNodeAfterFilter((rowNode, index) => {
+          filtered_result_count[rowNode.data.record_type.toLowerCase()] += 1
+        })
+        this.record_type_counts = filtered_result_count
+        this.result_count = this.gridApi.getDisplayedRowCount()
       },
       updateTab(tabName) {
         this.result_table_view_mode = tabName
         if (tabName === "fact sheet"){
-          this.gridColumnApi.setColumnVisible('methodologies', false)
-          this.gridColumnApi.setColumnVisible('method_number', false)
-          this.gridColumnApi.setColumnVisible('method_type', false)
-          this.gridColumnApi.setColumnVisible('record_type', true)
+          this.gridColumnApi.setColumnsVisible(['count'], true)
+          this.gridColumnApi.setColumnsVisible(['method_number', 'method_type', 'methodologies', 'record_type'], false)
         } else if (tabName === "spectrum") {
-          this.gridColumnApi.setColumnVisible('methodologies', true)
-          this.gridColumnApi.setColumnVisible('method_number', false)
-          this.gridColumnApi.setColumnVisible('method_type', false)
-          this.gridColumnApi.setColumnVisible('record_type', true)
+          this.gridColumnApi.setColumnsVisible(['methodologies'], true)
+          this.gridColumnApi.setColumnsVisible(['count', 'method_number', 'method_type', 'record_type'], false)
         } else if (tabName === "method") {
-          this.gridColumnApi.setColumnVisible('methodologies', true)
-          this.gridColumnApi.setColumnVisible('method_number', true)
-          this.gridColumnApi.setColumnVisible('method_type', true)
-          this.gridColumnApi.setColumnVisible('record_type', false)
+          this.gridColumnApi.setColumnsVisible(['count', 'method_number', 'method_type', 'methodologies'], true)
+          this.gridColumnApi.setColumnsVisible(['record_type'], false)
         } else {
           // "All" case
-          this.gridColumnApi.setColumnVisible('methodologies', true)
-          this.gridColumnApi.setColumnVisible('method_number', false)
-          this.gridColumnApi.setColumnVisible('method_type', false)
-          this.gridColumnApi.setColumnVisible('record_type', true)
+          this.gridColumnApi.setColumnsVisible(['count', 'methodologies', 'record_type'], true)
+          this.gridColumnApi.setColumnsVisible(['method_number', 'method_type'], false)
         }
         this.gridApi.onFilterChanged()
       },
@@ -327,6 +338,12 @@
           this.all_results = this.results.substance
           this.record_type_counts.method = this.record_type_counts.method - this.results.ms_ready.length
         }
+      },
+      async retrieve_ms_ready_methods() {
+        const response = await axios.get(`${this.BACKEND_LOCATION}/get_ms_ready_methods/${this.substance_info.jchem_inchikey}`)
+        const main_ids = this.results.substance.map(x => x.internal_id)
+        this.results.ms_ready = response.data.results.filter(x => !main_ids.includes(x.internal_id))
+        this.all_results = this.results.substance.concat(this.results.ms_ready)
       }
     },
     async created() {

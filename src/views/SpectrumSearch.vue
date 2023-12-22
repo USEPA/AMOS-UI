@@ -28,7 +28,13 @@
       <button @click="spectrum_search">Search</button>
     </div>
     <div class="half-page-column">
-      <div v-if="results.length > 0">
+      <div v-if="status.searching">
+        <p>Searching...</p>
+      </div>
+      <div v-else-if="!status.any_search_complete">
+        <p></p>
+      </div>
+      <div v-else-if="results.length > 0">
         Search found {{ results.length }} spectra covering {{ unique_substances }} substances.
         <ag-grid-vue
           class="ag-theme-balham"
@@ -42,15 +48,17 @@
           suppressAggFuncInHeader="true"
           :autoGroupColumnDef="autoGroupColumnDef"
         ></ag-grid-vue>
-        <div style="display: block;">
-          <div id="graph" ref="graph" style="display: flex;"></div>
-          <div v-if="any_row_selected">
+        <br />
+        <div style="display: flex; flex-direction: column; align-items: center">
+          <SpectrumPlot style="display: flex;" :spectrum="user_spectrum_array" :secondSpectrum="selected_spectrum" spectrumName="User Spectrum" :secondSpectrumName="selected_dtxsid" title="Spectrum Comparison"/>
+          <br />
+          <div style="display: flex;" v-if="any_row_selected">
             <button @click="show_modal.table = true">Show Points</button>
             <button v-if="spectrum_metadata" @click="show_modal.metadata = true">Spectrum Info</button>
           </div>
         </div>
       </div>
-      <p v-else>No results available.</p>
+      <p v-else>No spectra matching the specified parameters were found.</p>
     </div>
   </div>
   <!-- Modal window that displays the spectrum in an AG Grid table.-->
@@ -74,7 +82,6 @@
 
 <script>
   import axios from 'axios'
-  import Dygraph from 'dygraphs';
   import { validateSpectrumInput } from '@/assets/common_functions'
   import { BACKEND_LOCATION } from '@/assets/store'
 
@@ -87,6 +94,7 @@
 
   import '@/assets/style.css'
   import SpectrumMetadata from '@/components/SpectrumMetadata.vue'
+  import SpectrumPlot from '@/components/SpectrumPlot.vue'
 
   export default{
     data() {
@@ -107,6 +115,8 @@
         any_row_selected: false,
         spectrum_metadata: {},
         selected_spectrum: [],
+        selected_dtxsid: "",
+        status: {searching: false, any_search_complete: false},
         columnDefs: [
           {field: 'dtxsid', hide: true, headerName: "Substance", width: 300, rowGroup: true, cellRenderer: params => {
             return `${params.value} (${this.substance_mapping[params.value]})`
@@ -126,6 +136,7 @@
     },
     methods: {
       async spectrum_search() {
+        this.status.searching = true
         this.user_spectrum_string = this.user_spectrum_string.trim()
         if (validateSpectrumInput(this.user_spectrum_string) === false) {
           this.error_messages.invalidFormat = true
@@ -151,75 +162,18 @@
         this.results = response.data.results
         this.unique_substances = response.data.unique_substances
         this.substance_mapping = response.data.substance_mapping
+        this.status.any_search_complete = true
+        this.status.searching = false
       },
       onGridReady(params) {
         this.gridApi = params.api
       },
-      display_both_spectra(stored_spectrum, dtxsid) {
-        var spectrum = this.user_spectrum_array.map(x => [x[0],x[1],null]).concat(stored_spectrum.map(x => [x[0],null,x[1]]))
-        spectrum.sort((a,b) => {
-            // need to sort points by m/z because dygraph assumes the data is sorted on the independent variable
-            if (a[0] > b[0]) {
-                return 1
-            } else if (a[0] < b[0]) {
-                return -1
-            } else {
-                return 0
-            }
-        })
-        
-        if (spectrum.length == 1){
-            const padded_spectrum = [[spectrum[0][0] - 1, 0], spectrum[0], [spectrum[0][0] + 1, 0]]
-            const g = new Dygraph(document.getElementById("graph"), padded_spectrum, {
-                plotter: this.barChartPlotter,
-                includeZero: true,
-                labels: ["m/z", "User Spectrum", dtxsid],
-                title: "Combined Mass Spectra",
-                xlabel: "m/z",
-                ylabel: "Relative Intensity",
-                width: 600,
-                height: 400,
-                xRangePad: 100
-            })
-        } else {
-            const g = new Dygraph(document.getElementById("graph"), spectrum, {
-                plotter: this.barChartPlotter,
-                includeZero: true,
-                labels: ["m/z", "User Spectrum", dtxsid],
-                title: "Combined Mass Spectra",
-                xlabel: "m/z",
-                ylabel: "Relative Intensity",
-                width: 600,
-                height: 400,
-                xRangePad: 10,
-                series: {'User Spectrum':{color: "orange"}, [dtxsid]:{"color":"green"}}
-            })
-        }
-      },
-      barChartPlotter(e) {
-        const ctx = e.drawingContext
-        const {points} = e
-        const yBottom = e.dygraph.toDomYCoord(0)
-        const barWidth = 1
-
-        // Do the actual plotting.
-        for (let i = 0; i < points.length; i += 1) {
-          const p = points[i]
-          const centerX = p.canvasx
-
-          // center of the bar
-          ctx.fillRect(centerX - barWidth / 2, p.canvasy,
-          barWidth, yBottom - p.canvasy)
-          ctx.strokeRect(centerX - barWidth / 2, p.canvasy,
-          barWidth, yBottom - p.canvasy)
-        }
-      },
       onRowSelected(event) {
         if(event.event) {
-          this.show_plot = true
-          this.display_both_spectra(event.data.spectrum, event.data.dtxsid)
           this.selected_spectrum = event.data.spectrum
           this.spectrum_metadata = event.data.spectrum_metadata
+          this.selected_dtxsid = event.data.dtxsid
+          this.show_plot = true
           this.any_row_selected = true
         } else {
           this.show_plot = false
@@ -229,31 +183,7 @@
         return selected_spectrum.map(function(x){return {"m/z":x[0], "intensity":x[1]}})
       }
     },
-    components: {AgGridVue, SpectrumMetadata}
+    components: {AgGridVue, SpectrumMetadata, SpectrumPlot}
   }
 
 </script>
-
-<style>
-  .dygraph-label {
-    text-align: center;
-  }
-
-  .dygraph-title {
-    font-weight: bold;
-  }
-
-  .dygraph-label {
-    text-align: center;
-  }
-
-  .dygraph-ylabel {
-    transform: rotate(-90deg);
-    margin-left: 38px;
-  }
-
-  .dygraph-legend {
-    float: right;
-    margin-top: 22px;
-  }
-</style>

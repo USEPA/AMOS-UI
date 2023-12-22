@@ -41,7 +41,7 @@
         </div>
       </div>
       <div class="info-container" style="padding-left: 100px">
-        <div id="graph" ref="graph"></div>
+        <SpectrumPlot :spectrum="spectrum1" :secondSpectrum="spectrum2" :spectrumName="spectrum1_name" :secondSpectrumName="spectrum2_name" :title="plot_title"/>
         <br />
         <p v-if="entropy_display == 'entropy'"><strong>Spectral Entropy:</strong> {{ spectral_entropy.toFixed(4) }}</p>
         <p v-else-if="entropy_display == 'similarity'"><strong>Entropy Similarity:</strong> {{ entropy_similarity.toFixed(4) }}</p>
@@ -52,7 +52,6 @@
 
 <script>
   import axios from 'axios'
-  import Dygraph from 'dygraphs';
 
   import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
   import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
@@ -62,13 +61,18 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import { BACKEND_LOCATION } from '@/assets/store';
+  import SpectrumPlot from '@/components/SpectrumPlot.vue'
 
   export default {
     data() {
       return {
         spectrum_box_1: "1 100\n3 100\n5 100",
         spectrum_box_2: "2 100\n4 100\n6 100",
-        spectrum: [],
+        spectrum1: [],
+        spectrum2: [],
+        spectrum1_name: "",
+        spectrum2_name: "",
+        plot_title: "",
         spectral_entropy: 0,
         entropy_similarity: 0,
         entropy_display: null,
@@ -89,7 +93,6 @@
         this.dtxsid_mode = true
         this.dtxsids = this.$route.query.dtxsids.split(",")
         const response = await axios.post(`${this.BACKEND_LOCATION}/spectra_for_substances/`, {dtxsids: this.dtxsids})
-        console.log(response)
         this.database_spectra = response.data.spectra
         this.substance_mapping = response.data.substance_mapping
         if (this.$route.query.spectrum) {
@@ -99,105 +102,49 @@
     },
     methods: {
       async display_user_spectrum(box_contents, plot_title) {
-        this.spectrum = box_contents.split("\n").map(x => x.split(" ").map(y => Number(y)))
-        if (this.spectrum.length == 1){
-          this.spectrum = [[this.spectrum[0][0] - 1, 0], this.spectrum[0], [this.spectrum[0][0] + 1, 0]]
-        }
-        this.plotMassSpectra(this.spectrum, ["m/z", "Intensity"], plot_title)
-        this.spectral_entropy = await this.calculateSpectralEntropy(this.spectrum)
-        this.entropy_display = "entropy"
-      },
-      async plot_database_spectrum(spectrum, dtxsid) {
-        if (spectrum.length == 1){
-          spectrum = [[spectrum[0][0] - 1, 0], spectrum[0], [spectrum[0][0] + 1, 0]]
-        }
-        this.plotMassSpectra(spectrum, ["m/z", "Intensity"], "Spectrum for " + this.substance_mapping[dtxsid])
-        this.spectral_entropy = await this.calculateSpectralEntropy(spectrum)
+        this.spectrum1 = box_contents.split("\n").map(x => x.split(" ").map(y => Number(y)))
+        this.spectrum1_name = "Intensity"
+        this.plot_title = "User Spectrum"
+        this.spectral_entropy = await this.calculateSpectralEntropy(this.spectrum1)
         this.entropy_display = "entropy"
       },
       async onRowSelected(event) {
         if (event.event) {
-          this.plot_database_spectrum(event.data.spectrum, event.data.dtxsid)
+          this.display_database_spectrum()
         }
       },
       async display_database_spectrum() {
         const selected_rows = this.gridApi.getSelectedRows()
+        this.spectrum1_name = "Intensity"
+        this.plot_title = "Database Spectrum"
         if (selected_rows.length > 0) {
-          console.log(selected_rows)
-          const row = this.gridApi.getSelectedRows()[0]
-          this.plot_database_spectrum(row.spectrum, row.dtxsid)
+          const row = selected_rows[0]
+          this.spectrum1 = row.spectrum
+          this.spectral_entropy = await this.calculateSpectralEntropy(this.spectrum1)
+          this.entropy_display = "entropy"
         } else {
-          this.plot_database_spectrum([], "N/A")
+          this.spectrum1 = []
         }
       },
       async display_both_spectra() {
-          const spectrum1 = this.spectrum_box_1.split("\n").map(x => x.split(" ").map(y => Number(y)))
-          var spectrum2 = []
-          if(this.dtxsid_mode){
-            const selected_rows = this.gridApi.getSelectedRows()
-            
-            if(selected_rows.length > 0) {
-              spectrum2 = this.gridApi.getSelectedRows()[0].spectrum
-            } else {
-              spectrum2 = []
-            }
+          this.spectrum1 = this.spectrum_box_1.split("\n").map(x => x.split(" ").map(y => Number(y)))
+          this.plot_title = "Spectrum Comparison"
+          if (this.dtxsid_mode) {
+            this.spectrum2 = this.gridApi.getSelectedRows()[0].spectrum
+            this.spectrum1_name = "User Spectrum"
+            this.spectrum2_name = "Database Spectrum"
           } else {
-            spectrum2 = this.spectrum_box_2.split("\n").map(x => x.split(" ").map(y => Number(y)))
+            this.spectrum2 = this.spectrum_box_2.split("\n").map(x => x.split(" ").map(y => Number(y)))
+            this.spectrum1_name = "Spectrum #1"
+            this.spectrum2_name = "Spectrum #2"
           }
-          this.spectrum = spectrum1.map(x => [x[0],x[1],null]).concat(spectrum2.map(x => [x[0],null,x[1]]))
-          this.spectrum.sort((a,b) => {
-              // need to sort points by m/z because dygraph assumes the data is sorted on the independent variable
-              if (a[0] > b[0]) {
-                  return 1
-              } else if (a[0] < b[0]) {
-                  return -1
-              } else {
-                  return 0
-              }
-          })
-          if (this.spectrum.length == 1){
-            this.spectrum = [[this.spectrum[0][0] - 1, 0], this.spectrum[0], [this.spectrum[0][0] + 1, 0]]
-          }
-          this.plotMassSpectra(this.spectrum, ["m/z", "Spectrum #1 Intensity", "Spectrum #2 Intensity"], "Combined Mass Spectra", {'Spectrum #1 Intensity': {color: "orange"}, 'Spectrum 2 Intensity': {"color":"green"}})  
-          this.entropy_similarity = await this.calculateEntropySimilarity(spectrum1, spectrum2)
+          this.entropy_similarity = await this.calculateEntropySimilarity(this.spectrum1, this.spectrum2)
           this.entropy_display = "similarity"
-      },
-      plotMassSpectra(spectrum, plot_labels, plot_title, series) {
-        const g = new Dygraph(document.getElementById("graph"), spectrum, {
-            plotter: this.barChartPlotter,
-            includeZero: true,
-            labels: plot_labels,
-            title: plot_title,
-            xlabel: "m/z",
-            ylabel: "Relative Intensity",
-            width: 600,
-            height: 400,
-            xRangePad: 10,
-            series: series
-        })
-      },
-      barChartPlotter(e) {
-        const ctx = e.drawingContext
-        const {points} = e
-        const yBottom = e.dygraph.toDomYCoord(0)
-        const barWidth = 1
-
-        // Do the actual plotting.
-        for (let i = 0; i < points.length; i += 1) {
-          const p = points[i]
-          const centerX = p.canvasx
-
-          // center of the bar
-          ctx.fillRect(centerX - barWidth / 2, p.canvasy,
-          barWidth, yBottom - p.canvasy)
-          ctx.strokeRect(centerX - barWidth / 2, p.canvasy,
-          barWidth, yBottom - p.canvasy)
-        }
       },
       async calculateSpectralEntropy(spectrum) {
         // Calculates spectral entropy.
         // NOTE: This is currently not the same way that the spectral entropies stored in the database are calculated,
-        // since that a method of consolidating some peaks that isn't implemented here.
+        // since a method of consolidating some peaks that isn't implemented here.
         const response = await axios.post(`${this.BACKEND_LOCATION}/spectral_entropy/`, {spectrum: spectrum})
         return response.data.entropy
       },
@@ -209,62 +156,33 @@
         this.gridApi = params.api
       }
     },
-    components: { AgGridVue }
+    components: { AgGridVue, SpectrumPlot }
   }
 </script>
 
 <style>
-.dygraph-label {
-  text-align: center;
-}
+  .search-inputs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-.dygraph-title {
-  font-weight: bold;
-}
+  .display-stuff {
+    display: flex;
+    flex-direction: row;
+  }
 
-.dygraph-label {
-  text-align: center;
-}
+  .info-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 18px
+  }
 
-.dygraph-ylabel {
-  transform: rotate(-90deg);
-  margin-left: 38px;
-}
-
-.dygraph-legend {
-  float: right;
-  margin-top: 22px;
-}
-
-.search-inputs {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.display-stuff {
-  display: flex;
-  flex-direction: row;
-}
-
-.info-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 18px
-}
-
-.graph-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.button-array {
-  margin: 10px;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-}
-
+  .button-array {
+    margin: 10px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
 </style>

@@ -22,13 +22,13 @@
     category="Vendor methods collection"
     url="https://www.agilent.com"
     sourceID="Agilent"
-    substances="3640"
-    methods="356"
+    substances="3713"
+    methods="385"
   />
   <DataSourceDetails
     sourceName="Analytical QC"
     category="EPA-internal spectrum collection"
-    url="http://v2626umcth819.rtord.epa.gov:81/substances"
+    url="https://ccte-cced-aqcv2.epa.gov/"
     sourceID="Analytical QC"
     substances="9305"
     spectra="9305"
@@ -38,24 +38,24 @@
     category="Open-access spectrum collection"
     url="https://www.caymanchem.com/forensics/publications/csl"
     sourceID="Cayman"
-    substances="2171"
-    spectra="2260"
+    substances="2203"
+    spectra="2294"
   />
   <DataSourceDetails
     sourceName="Center for Forensic Science Research & Education"
     category="Open monographs collection"
     url="https://www.cfsre.org/nps-discovery/monographs"
     sourceID="CFSRE"
-    substances="84"
-    factSheets="74"
+    substances="92"
+    factSheets="82"
   />
   <DataSourceDetails
     sourceName="Centers for Disease Control and Prevention"
     category="Government methods collection"
     url="https://www.cdc.gov/index.htm"
     sourceID="CDC"
-    substances="1867"
-    factSheets="24"
+    substances="2399"
+    factSheets="677"
     methods="25"
   />
   <DataSourceDetails
@@ -71,8 +71,8 @@
     category="Open-access methods collection"
     url="https://www.eurl-pesticides.eu"
     sourceID="EURL"
-    substances="733"
-    methods="58"
+    substances="722"
+    methods="56"
   />
   <DataSourceDetails
     sourceName="Global Natural Products Social Molecular Networking"
@@ -87,8 +87,8 @@
     category="Open-access spectrum collection"
     url="https://hmdb.ca/"
     sourceID="HMDB"
-    substances="4819"
-    spectra="53315"
+    substances="3816"
+    spectra="43607"
   />
   <DataSourceDetails
     sourceName="Jozef Stefan Institute"
@@ -104,8 +104,8 @@
     category="Open-access spectral database"
     url="https://massbank.eu/MassBank/"
     sourceID="MassBank EU"
-    substances="13379"
-    spectra="89021"
+    substances="13823"
+    spectra="108840"
   />
   <DataSourceDetails
     sourceName="MassBank of North America"
@@ -121,7 +121,7 @@
     url="https://www.nemi.gov/home"
     sourceID="NEMI"
     substances="1565"
-    methods="124"
+    methods="123"
   />
   <DataSourceDetails
     sourceName="National Institute for Occupational Safety and Health"
@@ -136,8 +136,8 @@
     category="Government methods collection"
     url="https://www.nist.gov/"
     sourceID="NIST, NIST PFAS"
-    substances="870"
-    methods="51"
+    substances="893"
+    methods="59"
     spectra="68"
   />
   <DataSourceDetails
@@ -161,8 +161,8 @@
     category="Open spectrum and monographs collection"
     url="https://www.swgdrug.org/"
     sourceID="SWG"
-    substances="3397"
-    factSheets="471"
+    substances="3399"
+    factSheets="479"
     spectra="3319"
   />
   <DataSourceDetails
@@ -170,16 +170,16 @@
     category="Vendor methods collection"
     url="https://sciex.com/"
     sourceID="SCIEX"
-    substances="712"
-    methods="54"
+    substances="708"
+    methods="52"
   />
   <DataSourceDetails
     sourceName="Shimadzu"
     category="Vendor methods collection"
     url="https://www.shimadzu.com"
     sourceID="Shimadzu"
-    substances="2367"
-    methods="342"
+    substances="3399"
+    methods="444"
   />
   <DataSourceDetails
     sourceName="SpectraBase"
@@ -203,10 +203,10 @@
     category="Government methods collection"
     url="https://www.epa.gov/"
     sourceID="EPA, EPA MS Labs, EPA-ECM, EPA-OW, USEPA"
-    substances="3292"
-    factSheets="1049"
-    methods="1864"
-    spectra="470"
+    substances="3529"
+    factSheets="1455"
+    methods="1882"
+    spectra="417"
   />
   <DataSourceDetails
     sourceName="U.S. Geological Survey"

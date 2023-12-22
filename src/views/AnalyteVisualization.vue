@@ -1,3 +1,11 @@
+<!--
+  This page displays a D3 visualization of the various analyte classes that appear in AMOS's methods, and how they
+  relate to each other.  The nodes in this visualization link back to the methods list, pre-populating the "Analyte"
+  field there with the selected analyte.
+
+  Updating the data can be done using the HierarchyHelper.py script in the src/assets folder.
+-->
+
 <template>
   <p>This page has a visualization of the classes of method analytes in the database and the relationships between them.  Hover over one of the circles in the plot to see a description of the analyte class -- this will also highlight any parent or child classes that are in the plot as well.  Clicking on a circle will open the method list in a new tab with a filter on that analyte.  You can also use the controls on the right to find specific analyte classes, either by going through the full list or using the search bar.</p>
   <p>The visualization can be zoomed in or out.</p>

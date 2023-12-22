@@ -123,6 +123,9 @@
         this.pdf_name = ""
         this.loadPDF()
         this.findDTXSIDs()
+        if (this.viewer_mode == "SubstanceTable") {
+          this.gridApi.refreshCells()
+        }
       }
     },
     async created() {
@@ -140,10 +143,11 @@
       },
       async findDTXSIDs(){
         const response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.internalID}`)
-        this.substance_list = response.data.substance_list
-        for (let i=0; i<this.substance_list.length; i++) {
-          this.substance_list[i]["image_link"] = await getSubstanceImageLink(this.substance_list[i].dtxsid)
+        var temporary_list = response.data.substance_list
+        for (let i=0; i<temporary_list.length; i++) {
+          temporary_list[i]["image_link"] = await getSubstanceImageLink(temporary_list[i].dtxsid)
         }
+        this.substance_list = temporary_list
       },
       updateTab(tabName) {
         this.viewer_mode = tabName

@@ -2,9 +2,7 @@
   <div class="two-column-page">
     <div class="half-page-column">
       <p>Below is a plot of the spectrum as intensities versus mass-to-charge ratios (m/z).  Click and drag over a section of the horizontal axis to zoom; double click to zoom back out.  Intensities are scaled so that the highest peak has a value of 100.</p>
-      <div class="graph-container">
-        <div id="graph" ref="graph">graph_placeholder</div>
-      </div>
+      <SpectrumPlot :spectrum="spectrum" spectrumName="Intensity" />
       <br />
       <div class="info-container">
         <p style="font-weight: bold;">Information</p>
@@ -16,8 +14,6 @@
           <li><strong>SPLASH:</strong> <a :href="`https://www.google.com/search?q=${splash}`" target="_blank">{{ splash }}</a></li>
           <li v-if="has_associated_method">There's an associated method for this spectrum; click <router-link :to="`/method_with_spectra/spectrum/${internalID}`">here</router-link> to view.</li>
         </ul>
-      </div>
-      <div>
         <button @click="show_table_modal = true">Show Points</button>
       </div>
       <b-modal v-model="show_table_modal">
@@ -28,8 +24,8 @@
           :rowData="spectrumAsRows(spectrum)"
           rowSelection="single"
         ></ag-grid-vue>
-      <button @click="copySpectrum()">Copy to Clipboard</button>
-    </b-modal>
+        <button @click="copySpectrum()">Copy to Clipboard</button>
+      </b-modal>
     </div>
     <div class="half-page-column">
       <h3>Substance Info</h3>
@@ -60,7 +56,6 @@
 
 <script>
   import axios from 'axios';
-  import Dygraph from 'dygraphs';
 
   import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
   import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
@@ -73,6 +68,7 @@
   import { BACKEND_LOCATION } from '@/assets/store'
   import '@/assets/style.css'
   import SpectrumMetadata from '@/components/SpectrumMetadata.vue'
+  import SpectrumPlot from '@/components/SpectrumPlot.vue'
 
   export default {
     data() {
@@ -95,24 +91,6 @@
       }
     },
     methods: {
-      barChartPlotter(e) {
-        const ctx = e.drawingContext
-        const {points} = e
-        const yBottom = e.dygraph.toDomYCoord(0)
-        const barWidth = 1
-
-        // Do the actual plotting.
-        for (let i = 0; i < points.length; i += 1) {
-            const p = points[i]
-            const centerX = p.canvasx
-
-            // center of the bar
-            ctx.fillRect(centerX - barWidth / 2, p.canvasy,
-            barWidth, yBottom - p.canvasy)
-            ctx.strokeRect(centerX - barWidth / 2, p.canvasy,
-            barWidth, yBottom - p.canvasy)
-        }
-      },
       copySpectrum() {
         const spectrum_string = "m/z Intensity\n" + this.spectrum.map(x => `${x[0]} ${x[1]}`).join("\n");
         // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
@@ -139,52 +117,22 @@
       // Get spectrum
       const path = `${this.BACKEND_LOCATION}/get_spectrum/${this.$route.params.internal_id}`
       const response = await axios.get(path)
-      console.log(response.data)
       this.spectrum = response.data.spectrum
       this.spectral_entropy = response.data.spectral_entropy
       this.normalized_entropy = response.data.normalized_entropy
       this.spectrum_is_clean = this.spectral_entropy <= 3.0 & this.normalized_entropy <= 0.8
       this.splash = response.data.splash
-      this.has_associated_method = response.data.has_associated_method
-      
-      // set up plots
       this.spectrum_metadata = response.data.spectrum_metadata
-      if (this.spectrum.length == 1){
-        const padded_spectrum = [[this.spectrum[0][0] - 1, 0], this.spectrum[0], [this.spectrum[0][0] + 1, 0]]
-        const g = new Dygraph(document.getElementById("graph"), padded_spectrum, {
-          plotter: this.barChartPlotter,
-          includeZero: true,
-          labels: ["m/z", "Relative Intensity"],
-          title: "Mass Spectrum",
-          xlabel: "m/z",
-          ylabel: "Relative Intensity",
-          width: 600,
-          height: 400,
-          xRangePad: 100
-        })
-      } else {
-        const g = new Dygraph(document.getElementById("graph"), this.spectrum, {
-          plotter: this.barChartPlotter,
-          includeZero: true,
-          labels: ["m/z", "Relative Intensity"],
-          title: "Mass Spectrum",
-          xlabel: "m/z",
-          ylabel: "Relative Intensity",
-          width: 600,
-          height: 400,
-          xRangePad: 10
-        })
-      }
+      this.has_associated_method = response.data.has_associated_method
 
       // get substance info
       const dtxsid_response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.$route.params.internal_id}`)
       const dtxsid = dtxsid_response.data.substance_list[0].dtxsid
       const substance_response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${dtxsid}`)
-      console.log(dtxsid_response)
       this.substance_info = substance_response.data.substances
       this.image_link = await getSubstanceImageLink(this.substance_info.dtxsid)
     },
-    components: {AgGridVue, SpectrumMetadata}
+    components: {AgGridVue, SpectrumMetadata, SpectrumPlot}
   }
 </script>
 
@@ -196,39 +144,11 @@
     font-size: 18px
   }
 
-  .graph-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
   .clean-spectrum {
     color: #008888
   }
 
   .noisy-spectrum {
     color: #880000
-  }
-
-  .dygraph-label {
-    text-align: center;
-  }
-
-  .dygraph-title {
-    font-weight: bold;
-  }
-
-  .dygraph-label {
-    text-align: center;
-  }
-
-  .dygraph-ylabel {
-    transform: rotate(-90deg);
-    margin-left: 38px;
-  }
-
-  .dygraph-legend {
-    float: right;
-    margin-top: 22px;
   }
 </style>

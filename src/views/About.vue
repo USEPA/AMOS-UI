@@ -16,7 +16,7 @@
     </ul>
     <p>The primary functions of this app are as follows:</p>
     <ul>
-      <li>Performing general searches on all categories of records for specfic substances, and displaying information about those records.  Searching can be done by DTXSID, CAS registry number, InChIKey, or substance names.</li>
+      <li>Performing general searches on all categories of records for specfic substances, and displaying information about those records.  Searching can be done by DTXSID, CAS registry number, InChIKey, or substance names.  Substring searches can be done, but only on names.</li>
       <li>Viewing lists of fact sheets and methods in the database, along with displaying the documents themselves and the substances associated with them.</li>
       <li>Searching for all methods that cover a substance similar to one being searched.  This uses EPA calculations for the similarity between two substances and returns all methods containing at least one substance of sufficient similarity (similarity level is currently hardcoded on the Flask backend).  Searching can be done by DTXSID, CAS registry number, InChIKey, or name.</li>
       <li>Batch searching substances by DTXSID, and returning basic information for all records.</li>
@@ -24,40 +24,43 @@
     </ul>
     <p>The contents of the database are as follows:</p>
     <ul>
-      <li>Spectra: 210,207 in database and 600,248 externally linked</li>
-      <li>Fact Sheets: 4104 in database</li>
-      <li>Methods: 4293 in database</li>
-      <li>Unique sources: 149</li>
-      <li>Substances appearing in at least one record: 164,310</li>
+      <li>Spectra: 220,232 in database and 600,248 externally linked</li>
+      <li>Fact Sheets: 4,774 in database</li>
+      <li>Methods: 4,461 in database</li>
+      <li>Unique sources: 172</li>
+      <li>Substances appearing in at least one record: 164,815</li>
     </ul>
-    <br />
-    <p>Below is a chart detailing the breakdown of the methods currently in the database.  Click on a circle to zoom in and see more detail; click outside it to move to a higher level.</p>
-    <MethodsBubbleChart />
-    <br />
-    <p>This app was last updated on 2023-11-18.</p>
+  <br />
+  <p>This app was last updated on 2023-12-22.</p>
   </div>
 </template>
 
 <script>
   import axios from 'axios'
 
-  import MethodsBubbleChart from '@/components/MethodsBubbleChart.vue'
+  import { BACKEND_LOCATION } from '@/assets/store'
 
   export default {
     data() {
       return {
-        x: true
+        contents_search_done: false,
+        source_count: 0,
+        substances_appearing: 0,
+        result_types: {},
+        BACKEND_LOCATION
       }
     },
     methods: {
       async getDatabaseStats(){
-        1
+        const response = await axios.get(`${this.BACKEND_LOCATION}/database_summary`)
+        this.source_count = response.data.source_count
+        this.result_types = response.data.result_types
+        this.substances_appearing = response.data.substances_appearing
+        this.contents_search_done = true
       }
     },
-    components: {MethodsBubbleChart}
+    async created() {
+      await this.getDatabaseStats()
+    }
   }
 </script>
-
-<style>
-
-</style>

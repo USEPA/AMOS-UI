@@ -14,7 +14,7 @@
   <ul v-if="spectrumMetadata && spectrumMetadata.Spectrometry" style="list-style-type: none;">
     <li v-for="s in Object.entries(spectrumMetadata.Spectrometry)"><strong>{{s[0]}}:</strong> {{s[1]}}</li>
   </ul>
-  <span v-if="spectrumMetadata && spectrumMetadata.Author"><strong>Author:</strong> {{spectrumMetadata.Author}}</span>
+  <span v-if="spectrumMetadata && spectrumMetadata.Author"><strong>Author(s):</strong> {{spectrumMetadata.Author}}</span>
   <br />
   <span v-if="spectrumMetadata && spectrumMetadata.Date"><strong>Date:</strong> {{spectrumMetadata.Date}}</span>
   <br /><br />

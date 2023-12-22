@@ -31,6 +31,11 @@
     async created() {
       this.image_link = await getSubstanceImageLink(this.dtxsid)
     },
+    watch: {
+      async dtxsid() {
+        this.image_link = await getSubstanceImageLink(this.dtxsid)
+      }
+    },
     props: {dtxsid: String, preferred_name: String, highlight: Boolean}
   }
 </script>
