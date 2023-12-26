@@ -170,9 +170,9 @@
               }
             }
           },
-          {field: 'method_number', headerName: 'Method #', width: 110, hide: true, filter: 'agTextColumnFilter', floatingFilter: true},
-          {field: 'method_type', headerName: 'Method Type', width: 120, hide: true, filter: 'agTextColumnFilter', floatingFilter: true},
-          {field: 'count', headerName: '#', width: 35, sortable: true, headerTooltip: "Number of substances in record."},
+          {field: 'method_number', headerName: 'Method #', width: 110, suppressSizeToFit: true, hide: true, filter: 'agTextColumnFilter', floatingFilter: true},
+          {field: 'method_type', headerName: 'Method Type', width: 120, suppressSizeToFit: true, hide: true, filter: 'agTextColumnFilter', floatingFilter: true},
+          {field: 'count', headerName: '#', width: 35, suppressSizeToFit: true, sortable: true, headerTooltip: "Number of substances in record."},
           {field: 'description', headerName: 'Information', sortable: true, flex: 1, tooltipField: 'comment', filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params =>{
             if (params.data.description === null) {
               return "No description available."
@@ -239,8 +239,19 @@
         return true
       },
       doesExternalFilterPass(node) {
-        // Controls the filtering of records in the table -- so far, this amounts to handling the
-        // toggling of single point spectra and switching between record types.
+        const pass_checkbox_filters = this.checkboxFilter(node)
+        if (!pass_checkbox_filters) {
+          return false
+        }
+
+        // filter out result types based on selected tab
+        if (this.result_table_view_mode != "all") {
+          return node.data.record_type.toLowerCase() == this.result_table_view_mode
+        }
+
+        return true
+      },
+      checkboxFilter(node) {
         if (!this.result_filters.single_point_spectra) {
           if (node.data.description && (node.data.description.includes("# PEAKS=1;") | node.data.description.endsWith("# PEAKS=1"))) {
             return false
@@ -255,11 +266,6 @@
           return false
         }
 
-        // filter out result types based on selected tab
-        if (this.result_table_view_mode != "all") {
-          return node.data.record_type.toLowerCase() == this.result_table_view_mode
-        }
-
         return true
       },
       async updateCheckboxFilters() {
@@ -272,11 +278,13 @@
       },
       updateRecordCounts() {
         var filtered_result_count = {method: 0, "fact sheet": 0, spectrum: 0}
-        this.gridApi.forEachNodeAfterFilter((rowNode, index) => {
-          filtered_result_count[rowNode.data.record_type.toLowerCase()] += 1
+        this.gridApi.forEachNode((rowNode, index) => {
+          if (this.checkboxFilter(rowNode)){
+            filtered_result_count[rowNode.data.record_type.toLowerCase()] += 1
+          }
         })
         this.record_type_counts = filtered_result_count
-        this.result_count = this.gridApi.getDisplayedRowCount()
+        this.result_count = filtered_result_count["method"] + filtered_result_count["fact sheet"] + filtered_result_count["spectrum"]
       },
       updateTab(tabName) {
         this.result_table_view_mode = tabName
@@ -295,6 +303,7 @@
           this.gridColumnApi.setColumnsVisible(['method_number', 'method_type'], false)
         }
         this.gridApi.onFilterChanged()
+        this.gridApi.sizeColumnsToFit()
       },
       determineTabBarClass(tab_label) {
         if (this.record_type_counts[tab_label] == 0) {

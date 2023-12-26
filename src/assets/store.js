@@ -112,6 +112,32 @@ export const METHODOLOGY_MAPPING = {
     'XRF': {'full_name': 'X-ray flourescence'}
 }
 
+export const ANALYTICAL_QC_GRADES = {
+    A: "MW Confirmed, Purity >90%",
+    Ac: "Purity > 90% CAUTION, Low Conc. 5-30% of expected value",
+    B: "MW Confirmed, Purity 75-90%",
+    Bc: "Purity 75-90% CAUTION, Low Conc. 5-30% of expected value",
+    C: "MW Confirmed, Purity 50-75%",
+    Cc: "Purity 50-75% CAUTION, Low Conc. 5-30% of expected value",
+    D: "CAUTION Purity <50%",
+    F: "CAUTION Incorrect MW. Biological Activity Unreliable",
+    Fc: "CAUTION Very Low Conc. <5% of expected value. Biological Activity Unreliable",
+    Fns: "CAUTION No Sample Detected. Biological Activity Unreliable",
+    I: "ISOMERS Two or more isomers detected",
+    M: "DEFINED MIXTURE Two or more components",
+    ND: "Not Determined",
+    U: "Unknown/Inconclusive",
+    W: "Sample Withdrawn",
+    Z: "MW Confirmed, No Purity Info"
+}
+
+export const ANALYTICAL_QC_CALLS = {
+    L: "CAUTION: Physical loss",
+    S: "Stable",
+    T: "CAUTION: Chemical transformation",
+    X: "CAUTION: Unstable, reason undetermined"
+}
+
 export const store = reactive({
     showHeaderAndFooter: false,
 })

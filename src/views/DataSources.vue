@@ -22,8 +22,9 @@
     category="Vendor methods collection"
     url="https://www.agilent.com"
     sourceID="Agilent"
-    substances="3713"
+    substances="3723"
     methods="385"
+    spectra="72"
   />
   <DataSourceDetails
     sourceName="Analytical QC"
@@ -98,6 +99,14 @@
     substances="104"
     methods="1"
     spectra="5080"
+  />
+  <DataSourceDetails
+    sourceName="LECO"
+    category="Vendor methods collection"
+    url="https://www.leco.com"
+    sourceID="LECO"
+    substances="1427"
+    methods="65"
   />
   <DataSourceDetails
     sourceName="MassBank Europe"
