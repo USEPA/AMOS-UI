@@ -1,9 +1,9 @@
 <!--
-  This page is a viewer for a method PDF and its accompanying substance list.  Functionally, it is
+  This page is a viewer for a spectrum PDF and its accompanying substance list.  Functionally, it is
   essentially the StoredPDFViewer component, split out across a full webpage.
 
   This page takes no query parameters and one URL route parameter, internal_id, which is the
-  database ID of the method you are trying to view.
+  database ID of the fact sheet you are trying to view.
 -->
 
 <template>
@@ -14,7 +14,6 @@
           <a v-if="pdf_source_url" :href="pdf_source_url" target="_blank">{{pdf_name}}</a>
           <span v-else>{{pdf_name}}</span>
         </h2>
-        <p v-if="has_associated_spectra">This method has spectra associated with it.  Click <router-link :to="`/method_with_spectra/method/${$route.params.internal_id}`">here</router-link> to view.</p>
         <ul v-if="metadata_rows" style="list-style-type: none;">
           <li v-for="r in Object.entries(metadata_rows)"><strong>{{r[0]}}:</strong> {{r[1]}}</li>
         </ul>
@@ -91,7 +90,7 @@
               return image;
             } else {
               var p = document.createElement('div')
-              p.style = "width:70px;height:70px;padding-top:2px;padding-bottom:2px;text-align: center; line-height: 70px;";
+              p.style = "width:70px;height:70px;padding-top:2px;padding-bottom:2px; text-align: center; line-height: 70px;";
               p.innerText = "No structure."
               return p
             }
@@ -126,8 +125,8 @@
 
     methods: {
       async loadPDF(){
-        this.target_pdf_url = encodeURI(`${this.BACKEND_LOCATION}/get_pdf/method/${this.$route.params.internal_id}`)
-        const response = await axios.get(`${this.BACKEND_LOCATION}/get_pdf_metadata/method/${this.$route.params.internal_id}`)
+        this.target_pdf_url = encodeURI(`${this.BACKEND_LOCATION}/get_pdf/spectrum/${this.$route.params.internal_id}`)
+        const response = await axios.get(`${this.BACKEND_LOCATION}/get_pdf_metadata/spectrum/${this.$route.params.internal_id}`)
         this.pdf_name = response.data.pdf_name
         this.metadata_rows = response.data.metadata_rows
         this.has_associated_spectra = response.data.has_associated_spectra

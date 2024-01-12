@@ -18,9 +18,9 @@
       </ul>
     </div>
     <div class="tab-bar">
-      <a :class="viewer_mode == 'PDF' ? 'active' : ''" @click="updateTab('PDF')">PDF Viewer</a>
-      <a :class="viewer_mode == 'SubstanceGrid' ? 'active' : ''" @click="updateTab('SubstanceGrid')">Substances ({{ substance_list.length }}) (grid)</a>
-      <a :class="viewer_mode == 'SubstanceTable' ? 'active' : ''" @click="updateTab('SubstanceTable')">Substances ({{ substance_list.length }}) (table)</a>
+      <button :class="viewer_mode == 'PDF' ? 'active' : ''" @click="updateTab('PDF')">PDF Viewer</button>
+      <button :class="viewer_mode == 'SubstanceGrid' ? 'active' : ''" @click="updateTab('SubstanceGrid')">Substances ({{ substance_list.length }}) (grid)</button>
+      <button :class="viewer_mode == 'SubstanceTable' ? 'active' : ''" @click="updateTab('SubstanceTable')">Substances ({{ substance_list.length }}) (table)</button>
     </div>
 
     <iframe v-if="viewer_mode == 'PDF'" class="pdf-viewer-box" :src="`${target_pdf_url}`" type="application/pdf"></iframe>
@@ -87,6 +87,7 @@
               var image = document.createElement('img');
               image.src = params.data.image_link
               image.style = "width:70px;height:70px;padding-top:2px;padding-bottom:2px;";
+              image.alt = `Structure image for ${params.data.dtxsid}`
               return image;
             } else {
               var p = document.createElement('div')

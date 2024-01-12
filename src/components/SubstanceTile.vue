@@ -11,7 +11,7 @@
   <div :class="highlight ? 'substance-tile substance-highlight' : 'substance-tile'">
     <p style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"><router-link :to="`/search/${preferred_name}`"> {{preferred_name}} </router-link> </p>
     <div style="display: block; margin-left: auto; margin-right: auto; width:150px; height:150px;">
-      <img v-if="image_link" style="width:150px; height:150px;" :src="image_link"/>  
+      <img v-if="image_link" style="width:150px; height:150px;" :src="image_link" :alt="`Structure image for ${dtxsid}`"/>  
       <div v-else style="text-align: center; display: flex; align-items: center;">No structural representation was found for this substance.</div>
     </div>
     <a :href="`${COMPTOX_PAGE_URL}${dtxsid}`" target="_blank"> {{dtxsid}} ↗</a>

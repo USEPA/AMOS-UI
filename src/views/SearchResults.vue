@@ -21,7 +21,7 @@
           <br/>
           <div class="chemical-box">
             <div class="chemical-image-highlight">
-              <img v-if="image_link" class="chemical-image" :src="image_link"/>  
+              <img v-if="image_link" class="chemical-image" :src="image_link" :alt="`Structure image for ${substance_info.dtxsid}`"/>  
               <div v-else style="text-align: center; display: flex; align-items: center;">No structural representation was found for this substance.</div>
             </div>
             <div class="chemical-info">
@@ -60,10 +60,10 @@
         <p v-else-if="all_results.length==0">The search term "{{$route.params.search_term}}" matches a substance in the database; however, no data records were found.</p>
         <div v-else>
           <div class="tab-bar">
-            <a :class="result_table_view_mode == 'all' ? 'active' : ''" @click="updateTab('all')">All Results ({{result_count}})</a>
-            <a :class="determineTabBarClass('method')" @click="updateTab('method')">Methods ({{record_type_counts.method}})</a>
-            <a :class="determineTabBarClass('spectrum')" @click="updateTab('spectrum')">Spectra ({{record_type_counts.spectrum}})</a>
-            <a :class="determineTabBarClass('fact sheet')" @click="updateTab('fact sheet')">Fact Sheets ({{record_type_counts["fact sheet"]}})</a>
+            <button :class="result_table_view_mode == 'all' ? 'active' : ''" @click="updateTab('all')">All Results ({{result_count}})</button>
+            <button :class="determineTabBarClass('method')" @click="updateTab('method')">Methods ({{record_type_counts.method}})</button>
+            <button :class="determineTabBarClass('spectrum')" @click="updateTab('spectrum')">Spectra ({{record_type_counts.spectrum}})</button>
+            <button :class="determineTabBarClass('fact sheet')" @click="updateTab('fact sheet')">Fact Sheets ({{record_type_counts["fact sheet"]}})</button>
           </div>
           <ag-grid-vue
             class="ag-theme-balham"
@@ -398,17 +398,16 @@
 </script>
 
 <style>
-.info-paragraph {
-  text-align: center;
-  font-size: 20px;
-}
+  .info-paragraph {
+    text-align: center;
+    font-size: 20px;
+  }
 
-.has-hover-text {
-  text-decoration: underline dashed;
-}
+  .has-hover-text {
+    text-decoration: underline dashed;
+  }
 
-h1 {
-  font-size: 2em;
-}
-
+  h1 {
+    font-size: 2em;
+  }
 </style>

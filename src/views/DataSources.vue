@@ -6,7 +6,7 @@
 -->
 
 <template>
-  This page is meant to give descriptions of many of the data sources combined in this application.  Some sources with few records (one or two dozen, or less) are not listed here.
+  This page is meant to give descriptions of the more commonly appearing data sources combined in this application.  Sources with only a few records are not listed here.
   <br /><br />
   <DataSourceDetails
     sourceName="Agency for Toxic Substances and Disease Registry"
@@ -32,7 +32,7 @@
     url="https://ccte-cced-aqcv2.epa.gov/"
     sourceID="Analytical QC"
     substances="9305"
-    spectra="9305"
+    spectra="39523"
   />
   <DataSourceDetails
     sourceName="Cayman Spectral Library"
@@ -121,8 +121,8 @@
     category="Open-access spectral database"
     url="https://mona.fiehnlab.ucdavis.edu"
     sourceID="MoNA"
-    substances="7203"
-    spectra="48787"
+    substances="7228"
+    spectra="49580"
   />
   <DataSourceDetails
     sourceName="National Environmental Methods Index"
@@ -187,8 +187,8 @@
     category="Vendor methods collection"
     url="https://www.shimadzu.com"
     sourceID="Shimadzu"
-    substances="3399"
-    methods="444"
+    substances="3644"
+    methods="468"
   />
   <DataSourceDetails
     sourceName="SpectraBase"

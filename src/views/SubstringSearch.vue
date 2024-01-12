@@ -78,6 +78,7 @@
               var image = document.createElement('img');
               image.src = params.data.image_link
               image.style = "width:70px;height:70px;padding-top:2px;padding-bottom:2px;";
+              image.alt = `Structure image for ${params.data.dtxsid}`
               return image;
             } else {
               var p = document.createElement('div')

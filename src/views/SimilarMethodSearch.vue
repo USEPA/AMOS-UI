@@ -24,8 +24,8 @@
         <p>There are two tables below -- one lists all the methods containing a substance similar to {{ current_substance }}, while the other lists all similar substances found.  Clicking on a row will bring up the method or a comparison between the searched and selected substances, respectively.  Hover over a method or substance name to see the full name.  Methods in bold contain the searched substance.</p>
         <p>{{ dtxsid_counts.length }} distinct similar substances were found in  {{ Object.keys(ids_to_method_names).length }} methods.</p>
         <div class="tab-bar">
-          <a :class="tab_viewer_mode == 'Methods' ? 'active': ''" @click="updateTab('Methods')">Methods</a>
-          <a :class="tab_viewer_mode == 'Substances' ? 'active': ''" @click="updateTab('Substances')">Substances</a>
+          <button :class="tab_viewer_mode == 'Methods' ? 'active': ''" @click="updateTab('Methods')">Methods</button>
+          <button :class="tab_viewer_mode == 'Substances' ? 'active': ''" @click="updateTab('Substances')">Substances</button>
         </div>
         <div id="grid-theme-wrapper" class="modded-theme">
           <ag-grid-vue v-if="tab_viewer_mode == 'Methods'"
@@ -57,7 +57,7 @@
       <div style="display: flex; justify-content: center;">
         <div class="chemical-box" style="justify-content: left; width: 90%">
           <div class="chemical-image-highlight">
-            <img v-if="substance_info.searched_substance.image_link" class="chemical-image" :src="substance_info.searched_substance.image_link"/>  
+            <img v-if="substance_info.searched_substance.image_link" class="chemical-image" :src="substance_info.searched_substance.image_link" :alt="`Structure image for ${substance_info.searched_substance.dtxsid}`"/>  
             <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this substance.</div>
           </div>
           <div class="chemical-info">
@@ -77,7 +77,7 @@
       <div style="display: flex; justify-content: center;">
         <div class="chemical-box" style="justify-content: left; width: 90%">
           <div class="chemical-image-highlight">
-            <img v-if="substance_info.similar_substance.image_link" class="chemical-image" :src="substance_info.similar_substance.image_link"/>  
+            <img v-if="substance_info.similar_substance.image_link" class="chemical-image" :src="substance_info.similar_substance.image_link" :alt="`Structure image for ${substance_info.similar_substance.dtxsid}`"/>  
             <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this substance.</div>
           </div>
           <div class="chemical-info">
