@@ -38,7 +38,7 @@
         BACKEND_LOCATION,
         default_column_def: {resizable: true, filter: 'agTextColumnFilter', floatingFilter: true},
         column_defs: [
-          {field: 'internal_id', hide: true},
+          {field: 'internal_id', headerName: "internal ID", hide: true},
           {field: 'dtxsid', headerName: "DTXSID", width: 120},
           {field: 'casrn', headerName: "CASRN", width: 120},
           {field: 'preferred_name', headerName: "Preferred Name", flex: 1},
@@ -72,7 +72,7 @@
       }
     },
     async created() {
-      const response = await axios.get(`${this.BACKEND_LOCATION}/analytical_qc_list`)
+      const response = await axios.get(`${this.BACKEND_LOCATION}/analytical_qc_list/`)
       this.aqc_data = response.data.results
     }, 
     methods: {
