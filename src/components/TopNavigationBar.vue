@@ -8,13 +8,14 @@
 <template>
   <div class="nav-bar">
     <div class="nav-bar-left">
-      <input @keyup.enter="go()" type="text" v-model="searchTerm" name="search-term">
+      <input @keyup.enter="go()" type="text" v-model="searchTerm" name="search-term" title="General search input field">
       <button @click="go()">Substance Search</button>
     </div>
     <div class="nav-bar-right">
       <router-link to="/">Home</router-link>
       &emsp;
       <b-nav-item-dropdown text="Lists" class="nav-dropdown" style="background: #0e6993;">
+        <b-dropdown-item to="/analytical_qc_list">Analytical QC</b-dropdown-item>
         <b-dropdown-item to="/fact_sheet_list">Fact Sheets</b-dropdown-item>
         <b-dropdown-item to="/methods_list">Methods</b-dropdown-item>
       </b-nav-item-dropdown>
@@ -77,7 +78,7 @@
     justify-content: space-between;
     background: #0e6993;
     color: white;
-    font-family: Roboto;
+    /*font-family: Roboto;*/
     line-height: 1;
     text-align: center;
     margin-bottom: 10px;

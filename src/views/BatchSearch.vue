@@ -8,14 +8,13 @@
 <template>
   <p>
     This page allows for batch searching of information on substances by DTXSID.  DTXSIDs must be 
-    separated in the text field below by newlines.  If you have a list of identifiers other than 
-    DTXSIDs, you can go <a href="https://comptox.epa.gov/dashboard/batch-search">here</a> to 
-    translate them to DTXSIDs.  An Excel workbook will automatically attempt to download once the 
-    results have been retrieved from the database; the file contains information on the records, 
-    including links to their original sources, but does not contain the actual records themselves.
+    separated in the text field below by newlines.  An Excel workbook will automatically attempt to
+    download once the results have been retrieved from the database; the file contains information
+    on the records, including links to their original sources, but does not contain the actual
+    records themselves.
   </p>
   <p>If you have a list of substances with identifiers other than DTXSIDs, you can go <a href="https://comptox.epa.gov/dashboard/batch-search">here</a> to translate them to DTXSIDs.</p>
-  <p>Note: if two or more searched DTXSIDs are present in the same record (e.g., a method that covers multiple similar substances), that record will appear once for every searched DTXSID that appears in it.</p>
+  <p>Note: if two or more searched DTXSIDs are present in the same record (e.g., if you're searching for multiple similar substances, and a method happens to cover more than one of them), that record will appear once for every searched DTXSID that appears in it.</p>
   <div style="display: flex; margin-top: 40px">
     <div class="batch-search-controls">
       <h5>DTXSID List</h5>

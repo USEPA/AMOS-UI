@@ -24,14 +24,14 @@
     </ul>
     <p>The contents of the database are as follows:</p>
     <ul>
-      <li>Spectra: 220,304 in database and 600,248 externally linked</li>
+      <li>Spectra: 260,620 in database (39,523 of which are PDFs) and 590,943 externally linked</li>
       <li>Fact Sheets: 4,774 in database</li>
-      <li>Methods: 4,461 in database</li>
-      <li>Unique sources: 172</li>
-      <li>Substances appearing in at least one record: 164,815</li>
+      <li>Methods: 4,485 in database</li>
+      <li>Unique sources: 175</li>
+      <li>Substances appearing in at least one record: 164,896</li>
     </ul>
   <br />
-  <p>This app was last updated on 2023-12-26.</p>
+  <p>This app was last updated on 2024-01-12.</p>
   </div>
 </template>
 

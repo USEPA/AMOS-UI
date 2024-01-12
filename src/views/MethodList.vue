@@ -9,7 +9,7 @@
 <template>
   <div>
     <p>Below is a list of methods currently in the database.  Double-click on a row to display the method and its substances in another tab.  Cells in the table with a dashed underline have hovertext, usually for expanding out abbreviations in the cell content (it will take a second or two for the hovertext to appear).</p>
-    <p>{{method_info.length}} methods in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed.</p>
+    <p>{{method_info.length}} methods in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed, covering {{substance_count}} {{filtered_record_count == 1 ? "substance" : "substances"}}.</p>
     <div>
       <label for="full-table-filter">Full Table Filter</label> &nbsp;
       <input type="text" v-model="full_table_filter" name="full-table-filter" @keyup="quickFilter(full_table_filter)">
@@ -68,6 +68,7 @@
         default_column_def: {resizable: true, filter: 'agTextColumnFilter', floatingFilter: true, filterParams: {maxNumConditions: 1}},
         full_table_filter: "",
         filtered_record_count: 0,
+        substance_count: 0,
         column_defs: [
           {field: "method_number", headerName: "Method #", width: 100},
           {field: "method_name", headerName: "Name", tooltipField: 'method_name', sortable: true, flex: 2.5, cellClass: 'fake-link'},
@@ -179,8 +180,11 @@
         }
         document.body.removeChild(textarea)
       },
-      onFilterChanged(params) {
+      async onFilterChanged(params) {
         this.filtered_record_count = this.gridApi.getDisplayedRowCount()
+        const internal_id_list = Array(this.filtered_record_count).fill().map((_,idx) => this.gridApi.getDisplayedRowAtIndex(idx).data.internal_id)
+        const count_response = await axios.post(`${this.BACKEND_LOCATION}/count_substances_in_ids/`, {internal_id_list: internal_id_list})
+        this.substance_count = count_response.data.count
       },
       quickFilter(input) {
         this.gridApi.setQuickFilter(input)

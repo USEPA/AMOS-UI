@@ -11,7 +11,7 @@
       <p>
         This is a list of fact sheets available in the database.  Select a row in the table to view the fact sheet on the right side of the page.
       </p>
-      <p>{{fact_sheet_info.length}} fact sheets in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed.</p>
+      <p>{{fact_sheet_info.length}} fact sheets in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed, covering {{substance_count}} {{filtered_record_count == 1 ? "substance" : "substances"}}.</p>
       <div>
         <label for="full-table-filter">Full Table Filter</label> &nbsp;
         <input type="text" v-model="full_table_filter" name="full-table-filter" @keyup="quickFilter(full_table_filter)">
@@ -67,8 +67,11 @@
         filtered_record_count: 0,
         full_table_filter: "",
         default_column_def: {resizable: true},
+        substance_count: 0,
         column_defs: [
-          {field: 'internal_id', headerName: 'Doc ID', sortable: true, width: 80},
+          {field: 'internal_id', headerName: 'Doc ID', sortable: true, width: 80, comparator: (valA, valB, nodeA, nodeB, isDescending) => {
+            return Number.parseInt(valA.substring(3)) - Number.parseInt(valB.substring(3))
+          }},
           {field: 'fact_sheet_name', headerName: 'Fact Sheet Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, sort: "asc", flex: 1},
           {field: 'source', headerName: 'Source', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, width: 90, tooltipValueGetter: params => {
               if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source]) {
@@ -152,8 +155,11 @@
         }
         document.body.removeChild(textarea)
       },
-      onFilterChanged(params) {
+      async onFilterChanged(params) {
         this.filtered_record_count = this.gridApi.getDisplayedRowCount()
+        const internal_id_list = Array(this.filtered_record_count).fill().map((_,idx) => this.gridApi.getDisplayedRowAtIndex(idx).data.internal_id)
+        const count_response = await axios.post(`${this.BACKEND_LOCATION}/count_substances_in_ids/`, {internal_id_list: internal_id_list})
+        this.substance_count = count_response.data.count
       },
       quickFilter(input) {
         this.gridApi.setQuickFilter(input)

@@ -31,7 +31,7 @@
       <h3>Substance Info</h3>
       <div class="chemical-box">
         <div class="chemical-image-highlight">
-          <img v-if="image_link" class="chemical-image" :src="image_link"/>  
+          <img v-if="image_link" class="chemical-image" :src="image_link" :alt="`Structure image for ${substance_info.dtxsid}`"/>  
           <div v-else style="text-align: center; display: flex; align-items: center;">No structural representation was found for this substance.</div>
         </div>
         <div class="chemical-info">

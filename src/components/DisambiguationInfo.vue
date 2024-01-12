@@ -11,7 +11,7 @@
   <div @click="dummy" class="disambiguation-box">
     <div class="disambiguation-content">
       <div class="chemical-image-highlight">
-        <img v-if="image_link" class="chemical-image" :src="image_link"/>  
+        <img v-if="image_link" class="chemical-image" :src="image_link" :alt="`Structure image for ${substance_info.dtxsid}`"/>  
         <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this substance.</div>
       </div>
       <div class="chemical-info">

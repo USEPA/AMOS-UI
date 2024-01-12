@@ -61,6 +61,22 @@
   pointer-events: none;
 }
 
+.tab-bar button {
+  padding: 12px 24px;
+  border: 1px solid #0e6993;
+  background: #FFFFFF;
+}
+
+.tab-bar button.active {
+  background: rgb(14, 105, 147, 0.25);
+}
+
+.tab-bar button.disabled {
+  border: 1px solid #87b4c9;
+  color: #87b4c9;
+  pointer-events: none;
+}
+
 
 /***** AG-GRID TABLE FORMATTING *****/
 
