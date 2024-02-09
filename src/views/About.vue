@@ -54,7 +54,7 @@
     },
     methods: {
       async getDatabaseStats(){
-        const response = await axios.get(`${this.BACKEND_LOCATION}/database_summary`)
+        const response = await axios.get(`${this.BACKEND_LOCATION}/database_summary/`)
         this.result_info = response.data
         this.summary_retrieved = true
       }
