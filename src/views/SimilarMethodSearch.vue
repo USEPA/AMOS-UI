@@ -51,7 +51,7 @@
         </div>
       </div>
     </div>
-    <StoredPDFViewer style="width: 48vw;" v-if="right_side_viewer_mode == 'Methods'" :internalID="selected_row_data.internal_id" recordType="method" :highlightedSubstances="similar_substances"/>
+    <StoredPDFDisplay style="width: 48vw;" v-if="right_side_viewer_mode == 'Methods'" :internalID="selected_row_data.internal_id" recordType="method" :highlightedSubstances="similar_substances"/>
     <div class="half-page-column" v-else-if="right_side_viewer_mode == 'Substances'">
       <h4>Searched Substance:</h4>
       <div style="display: flex; justify-content: center;">
@@ -114,7 +114,7 @@
 
   import '@/assets/style.css'
   import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
-  import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
+  import StoredPDFDisplay from '@/components/StoredPDFDisplay.vue'
   import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
   import { getSubstanceImageLink } from '@/assets/common_functions'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
@@ -186,7 +186,7 @@
     components: {
       AgGridVue,
       InchikeyDisambiguation,
-      StoredPDFViewer,
+      StoredPDFDisplay,
       SynonymDisambiguation
     },
     methods: {

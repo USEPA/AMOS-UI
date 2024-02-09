@@ -22,16 +22,17 @@
       <li>Batch searching substances by DTXSID, and returning basic information for all records.</li>
       <li>Comparing a user-submitted spectrum to other spectra in the database, given an analyical methodology (currently just GC/MS or LC/MS) and mass range.</li>
     </ul>
-    <p>The contents of the database are as follows:</p>
-    <ul>
-      <li>Spectra: 260,620 in database (39,523 of which are PDFs) and 590,943 externally linked</li>
-      <li>Fact Sheets: 4,774 in database</li>
-      <li>Methods: 4,485 in database</li>
-      <li>Unique sources: 175</li>
-      <li>Substances appearing in at least one record: 164,896</li>
+    <p>The records in this application contain:</p>
+    <ul v-if="summary_retrieved">
+      <li>Spectra in database: {{ (result_info["Spectrum"]["Spectrum"] + result_info["Spectrum"]["PDF"]).toLocaleString() }} spectra in database ({{result_info["Spectrum"]["PDF"].toLocaleString()}} of which are PDFs), covering {{result_info["Substances"]["Internal Spectrum"].toLocaleString()}} substances</li>
+      <li>Externally linked spectra: {{ result_info["Spectrum"]["External"].toLocaleString() }} external links, covering {{ result_info["Substances"]["External Spectrum"].toLocaleString()}} substances</li>
+      <li>Fact Sheets: {{result_info["Fact Sheet"]["PDF"].toLocaleString()}} documents in database, covering {{ result_info["Substances"]["Internal Fact Sheet"].toLocaleString() }} substances</li>
+      <li>Methods: {{result_info["Method"]["PDF"].toLocaleString()}} documents in database, covering {{result_info["Substances"]["Internal Method"].toLocaleString()}} substances</li>
+      <li>Unique sources: {{result_info["Sources"]["Total"].toLocaleString()}}</li>
+      <li>Substances appearing in at least one record: {{result_info["Substances"]["Total"].toLocaleString()}}</li>
     </ul>
   <br />
-  <p>This app was last updated on 2024-01-12.</p>
+  <p>This app was last updated on 2024-02-09.</p>
   </div>
 </template>
 
@@ -44,6 +45,7 @@
     data() {
       return {
         contents_search_done: false,
+        summary_retrieved: false,
         source_count: 0,
         substances_appearing: 0,
         result_types: {},
@@ -53,10 +55,8 @@
     methods: {
       async getDatabaseStats(){
         const response = await axios.get(`${this.BACKEND_LOCATION}/database_summary`)
-        this.source_count = response.data.source_count
-        this.result_types = response.data.result_types
-        this.substances_appearing = response.data.substances_appearing
-        this.contents_search_done = true
+        this.result_info = response.data
+        this.summary_retrieved = true
       }
     },
     async created() {

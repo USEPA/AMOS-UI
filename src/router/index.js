@@ -14,13 +14,15 @@ const routes = [
   {path: "/method_with_spectra/:by_type/:internal_id", name: "Method With Associated Spectra", component: ()=>import('../views/MethodWithSpectra.vue')},
   {path: "/view_method/:internal_id", name: "Method Viewer", component: ()=>import('../views/MethodViewer.vue')},
   {path: "/view_fact_sheet/:internal_id", name: "Fact Sheet Viewer", component: ()=>import('../views/FactSheetViewer.vue')},
-  {path: "/spectrum_comparison", name: "Spectrum Comparison", component: ()=>import('../views/SpectrumComparison.vue')},
-  {path: "/spectrum_search", name: "Spectrum Search", component: ()=>import('../views/SpectrumSearch.vue')},
+  {path: "/mass_spectrum_comparison", name: "Mass Spectrum Comparison", component: ()=>import('../views/MassSpectrumComparison.vue')},
+  {path: "/mass_spectrum_search", name: "Mass Spectrum Search", component: ()=>import('../views/MassSpectrumSearch.vue')},
   {path: "/substring_search/:substring", name: "Substring Search", component: ()=>import('../views/SubstringSearch.vue')},
   {path: "/analyte_visualization", name: "Analyte Visualization", component: ()=>import('../views/AnalyteVisualization.vue')},
-  {path: "/view_spectrum/:internal_id", name: "Spectrum Viewer", component: ()=>import('../views/SpectrumDisplay.vue')},
+  {path: "/view_mass_spectrum/:internal_id", name: "Mass Spectrum Viewer", component: ()=>import('../views/MassSpectrumViewer.vue')},
   {path: "/view_spectrum_pdf/:internal_id", name: "Spectrum PDF Viewer", component: ()=>import('../views/SpectrumPDFViewer.vue')},
-  {path: "/analytical_qc_list", name: "Analytical QC List", component: ()=>import('../views/AnalyticalQCList.vue')}
+  {path: "/analytical_qc_list", name: "Analytical QC List", component: ()=>import('../views/AnalyticalQCList.vue')},
+  {path: "/related_applications", name: "Related Applications", component: ()=>import('../views/RelatedApplications.vue')},
+  {path: "/test_viz", name: "Test Viz", component: ()=>import('../views/TestViz.vue')}
 ]
 
 const router = createRouter({

@@ -88,8 +88,8 @@
     category="Open-access spectrum collection"
     url="https://hmdb.ca/"
     sourceID="HMDB"
-    substances="3816"
-    spectra="43607"
+    substances="3815"
+    spectra="43596"
   />
   <DataSourceDetails
     sourceName="Jozef Stefan Institute"
@@ -113,8 +113,8 @@
     category="Open-access spectral database"
     url="https://massbank.eu/MassBank/"
     sourceID="MassBank EU"
-    substances="13823"
-    spectra="108840"
+    substances="14273"
+    spectra="109765"
   />
   <DataSourceDetails
     sourceName="MassBank of North America"
@@ -187,8 +187,8 @@
     category="Vendor methods collection"
     url="https://www.shimadzu.com"
     sourceID="Shimadzu"
-    substances="3644"
-    methods="468"
+    substances="4229"
+    methods="611"
   />
   <DataSourceDetails
     sourceName="SpectraBase"
@@ -212,9 +212,9 @@
     category="Government methods collection"
     url="https://www.epa.gov/"
     sourceID="EPA, EPA MS Labs, EPA-ECM, EPA-OW, USEPA"
-    substances="3529"
-    factSheets="1455"
-    methods="1882"
+    substances="3531"
+    factSheets="1456"
+    methods="1878"
     spectra="417"
   />
   <DataSourceDetails

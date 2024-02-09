@@ -1,8 +1,16 @@
+<!--
+  This page displays a single mass spectrum, along with its associated metadata and information about the substance it
+  is describing.  It is largely similar to the MassSpectrumDisplay component, but spread out over a full page.
+
+  This page takes one URL parameter, the internal ID of the spectrum you're looking for.
+-->
+
+
 <template>
   <div class="two-column-page">
     <div class="half-page-column">
       <p>Below is a plot of the spectrum as intensities versus mass-to-charge ratios (m/z).  Click and drag over a section of the horizontal axis to zoom; double click to zoom back out.  Intensities are scaled so that the highest peak has a value of 100.</p>
-      <SpectrumPlot :spectrum="spectrum" spectrumName="Intensity" />
+      <MassSpectrumPlot :spectrum="spectrum" spectrumName="Intensity" />
       <br />
       <div class="info-container">
         <p style="font-weight: bold;">Information</p>
@@ -47,7 +55,7 @@
       </div>
       <br /> <br />
       <h3>Metadata</h3>
-      <SpectrumMetadata v-if="spectrum_metadata" :spectrumMetadata=spectrum_metadata />
+      <MassSpectrumMetadata v-if="spectrum_metadata" :spectrumMetadata=spectrum_metadata />
       <p v-else>No metadata available.</p>
     </div>
     
@@ -67,8 +75,8 @@
   import { getSubstanceImageLink } from '@/assets/common_functions'
   import { BACKEND_LOCATION } from '@/assets/store'
   import '@/assets/style.css'
-  import SpectrumMetadata from '@/components/SpectrumMetadata.vue'
-  import SpectrumPlot from '@/components/SpectrumPlot.vue'
+  import MassSpectrumMetadata from '@/components/MassSpectrumMetadata.vue'
+  import MassSpectrumPlot from '@/components/MassSpectrumPlot.vue'
 
   export default {
     data() {
@@ -115,7 +123,7 @@
     async created() {
       
       // Get spectrum
-      const path = `${this.BACKEND_LOCATION}/get_spectrum/${this.$route.params.internal_id}`
+      const path = `${this.BACKEND_LOCATION}/get_mass_spectrum/${this.$route.params.internal_id}`
       const response = await axios.get(path)
       this.spectrum = response.data.spectrum
       this.spectral_entropy = response.data.spectral_entropy
@@ -132,7 +140,7 @@
       this.substance_info = substance_response.data.substances
       this.image_link = await getSubstanceImageLink(this.substance_info.dtxsid)
     },
-    components: {AgGridVue, SpectrumMetadata, SpectrumPlot}
+    components: {AgGridVue, MassSpectrumMetadata, MassSpectrumPlot}
   }
 </script>
 

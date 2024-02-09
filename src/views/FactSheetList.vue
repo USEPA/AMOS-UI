@@ -36,7 +36,7 @@
         @filter-changed="onFilterChanged"
       ></ag-grid-vue>
     </div>
-    <StoredPDFViewer style="width: 48vw;" v-if="any_fact_sheet_selected" :internalID="selected_row_data.internal_id" recordType="fact sheet"/>
+    <StoredPDFDisplay style="width: 48vw;" v-if="any_fact_sheet_selected" :internalID="selected_row_data.internal_id" recordType="fact sheet"/>
   </div>
 </template>
 
@@ -53,7 +53,7 @@
   import { timestampForFile } from '@/assets/common_functions'
   import { BACKEND_LOCATION, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
   import '@/assets/style.css'
-  import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
+  import StoredPDFDisplay from '@/components/StoredPDFDisplay.vue'
   import HelpIcon from '@/components/HelpIcon.vue'
 
   export default {
@@ -189,7 +189,7 @@
     components: {
       AgGridVue,
       HelpIcon,
-      StoredPDFViewer
+      StoredPDFDisplay
     }
   }
 </script>

@@ -138,6 +138,18 @@ export const ANALYTICAL_QC_CALLS = {
     X: "CAUTION: Unstable, reason undetermined"
 }
 
+
+export const METHOD_DOCUMENT_TYPES = {
+    JNL: "Journal Article",
+    MEV: "Method Evaluation",
+    OTM: "Other Test Method",
+    RGM: "Regulatory Method",
+    SOP: "Standard Operating Procedure",
+    SRM: "Standard Reference Method",
+    VAN: "Vendor Application Note"
+}
+
+
 export const store = reactive({
     showHeaderAndFooter: false,
 })

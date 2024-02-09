@@ -11,7 +11,7 @@
 <template>
   <div class="spectrum-display-container">
     <p>Below is a plot of the spectrum as intensities versus mass-to-charge ratios (m/z).  Click and drag over a section of the horizontal axis to zoom; double click to zoom back out.  Intensities are scaled so that the highest peak has a value of 100.</p>
-    <SpectrumPlot :spectrum=spectrum spectrumName="Intensity"/>
+    <MassSpectrumPlot :spectrum=spectrum spectrumName="Intensity"/>
     <br />
     <div class="info-container">
       <p style="font-weight: bold;">Information</p>
@@ -43,7 +43,7 @@
 
     <!-- Modal window that displays the metadata associated with the spectrum, using the spectrum_metadata field from the database. -->
     <b-modal v-model="show_metadata_modal" ref="metadata_modal">
-      <SpectrumMetadata :spectrumMetadata=spectrum_metadata />
+      <MassSpectrumMetadata :spectrumMetadata=spectrum_metadata />
     </b-modal>
   </div>
 </template>
@@ -60,8 +60,8 @@
   
   import '@/assets/style.css'
   import { BACKEND_LOCATION } from '@/assets/store';
-  import SpectrumMetadata from '@/components/SpectrumMetadata.vue'
-  import SpectrumPlot from '@/components/SpectrumPlot.vue'
+  import MassSpectrumMetadata from '@/components/MassSpectrumMetadata.vue'
+  import MassSpectrumPlot from '@/components/MassSpectrumPlot.vue'
   
 
   export default {
@@ -96,8 +96,9 @@
     },
     methods: {
       async getSpectrumData() {
-        const path = `${this.BACKEND_LOCATION}/get_spectrum/${this.internalID}`
+        const path = `${this.BACKEND_LOCATION}/get_mass_spectrum/${this.internalID}`
         const response = await axios.get(path)
+        console.log(this.internalID)
         this.spectrum = response.data.spectrum
         this.spectral_entropy = response.data.spectral_entropy
         this.normalized_entropy = response.data.normalized_entropy
@@ -127,7 +128,7 @@
         document.body.removeChild(textarea)
       }
     },
-    components: {AgGridVue, SpectrumMetadata, SpectrumPlot}
+    components: {AgGridVue, MassSpectrumMetadata, MassSpectrumPlot}
   };
 </script>
 

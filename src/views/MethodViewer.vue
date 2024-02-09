@@ -1,6 +1,6 @@
 <!--
   This page is a viewer for a method PDF and its accompanying substance list.  Functionally, it is
-  essentially the StoredPDFViewer component, split out across a full webpage.
+  essentially the StoredPDFDisplay component, split out across a full webpage.
 
   This page takes no query parameters and one URL route parameter, internal_id, which is the
   database ID of the method you are trying to view.

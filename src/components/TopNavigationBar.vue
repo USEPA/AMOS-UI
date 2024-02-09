@@ -25,18 +25,19 @@
       <router-link to="/batch_search">Batch Search</router-link>
       &emsp;
       <b-nav-item-dropdown text="Other Pages" class="nav-dropdown">
-        <b-dropdown-item to="/spectrum_comparison">Spectrum Comparison</b-dropdown-item>
-        <b-dropdown-item to="/spectrum_search">Spectrum Search</b-dropdown-item>
+        <b-dropdown-item to="/mass_spectrum_comparison">Mass Spectrum Comparison</b-dropdown-item>
+        <b-dropdown-item to="/mass_spectrum_search">Mass Spectrum Search</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
       <b-nav-item-dropdown text="About" class="nav-dropdown">
         <b-dropdown-item to="/about">About this App</b-dropdown-item>
+        <b-dropdown-item to="/analyte_visualization">Analyte Visualization</b-dropdown-item>
         <b-dropdown-item to="/contact">Contact Info</b-dropdown-item>
         <b-dropdown-item to="/data_sources">Data Sources</b-dropdown-item>
-        <b-dropdown-item to="/analyte_visualization">Analyte Visualization</b-dropdown-item>
+        <b-dropdown-item to="/related_applications">Related Applications</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
-      <b-nav-item-dropdown text="Related Applications" class="nav-dropdown">
+      <!--<b-nav-item-dropdown text="Related Applications" class="nav-dropdown">
         <b-dropdown-item href="https://ccte-cced-chet.epa.gov/" target="_blank" class="normal-text">Chemical Transformations Database</b-dropdown-item>
         <b-dropdown-item href="https://ccte-cced-aqcv1.epa.gov/" target="_blank">Analytical QC</b-dropdown-item>
         <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:9004/molmass_web.py" target="_blank">Molecular Mass Calculator</b-dropdown-item>
@@ -47,7 +48,7 @@
         <b-dropdown-item href="https://ccte-cced-cheminformatics.epa.gov/" target="_blank">Cheminformatics PoC Modules</b-dropdown-item>
         <b-dropdown-item href="https://ccte-cced-chemster.epa.gov" target="_blank">ChemSTER</b-dropdown-item>
       </b-nav-item-dropdown>
-      &emsp;
+      &emsp;-->
       <button @click="store.showHeaderAndFooter = !store.showHeaderAndFooter">Toggle Header/Footer</button>
     </div>
   </div>
@@ -78,7 +79,6 @@
     justify-content: space-between;
     background: #0e6993;
     color: white;
-    /*font-family: Roboto;*/
     line-height: 1;
     text-align: center;
     margin-bottom: 10px;

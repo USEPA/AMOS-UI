@@ -41,7 +41,7 @@
         </div>
       </div>
       <div class="info-container" style="padding-left: 100px">
-        <SpectrumPlot :spectrum="spectrum1" :secondSpectrum="spectrum2" :spectrumName="spectrum1_name" :secondSpectrumName="spectrum2_name" :title="plot_title"/>
+        <MassSpectrumPlot :spectrum="spectrum1" :secondSpectrum="spectrum2" :spectrumName="spectrum1_name" :secondSpectrumName="spectrum2_name" :title="plot_title"/>
         <br />
         <p v-if="entropy_display == 'entropy'"><strong>Spectral Entropy:</strong> {{ spectral_entropy.toFixed(4) }}</p>
         <p v-else-if="entropy_display == 'similarity'"><strong>Entropy Similarity:</strong> {{ entropy_similarity.toFixed(4) }}</p>
@@ -61,7 +61,7 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import { BACKEND_LOCATION } from '@/assets/store';
-  import SpectrumPlot from '@/components/SpectrumPlot.vue'
+  import MassSpectrumPlot from '@/components/MassSpectrumPlot.vue'
 
   export default {
     data() {
@@ -92,7 +92,7 @@
       if (this.$route.query.dtxsids) {
         this.dtxsid_mode = true
         this.dtxsids = this.$route.query.dtxsids.split(",")
-        const response = await axios.post(`${this.BACKEND_LOCATION}/spectra_for_substances/`, {dtxsids: this.dtxsids})
+        const response = await axios.post(`${this.BACKEND_LOCATION}/mass_spectra_for_substances/`, {dtxsids: this.dtxsids})
         this.database_spectra = response.data.spectra
         this.substance_mapping = response.data.substance_mapping
         if (this.$route.query.spectrum) {
@@ -156,7 +156,7 @@
         this.gridApi = params.api
       }
     },
-    components: { AgGridVue, SpectrumPlot }
+    components: { AgGridVue, MassSpectrumPlot }
   }
 </script>
 

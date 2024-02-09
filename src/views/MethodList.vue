@@ -53,7 +53,7 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import { timestampForFile } from '@/assets/common_functions'
-  import { BACKEND_LOCATION, ANALYTE_MAPPING, METHODOLOGY_MAPPING, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
+  import { BACKEND_LOCATION, ANALYTE_MAPPING, METHOD_DOCUMENT_TYPES, METHODOLOGY_MAPPING, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
   import '@/assets/style.css'
   import HelpIcon from '@/components/HelpIcon.vue'
 
@@ -64,6 +64,7 @@
         BACKEND_LOCATION,
         SOURCE_ABBREVIATION_MAPPING,
         METHODOLOGY_MAPPING,
+        METHOD_DOCUMENT_TYPES,
         method_info: null,    //starting this as null instead of an empty array means the loading overlay will trigger
         default_column_def: {resizable: true, filter: 'agTextColumnFilter', floatingFilter: true, filterParams: {maxNumConditions: 1}},
         full_table_filter: "",
@@ -127,7 +128,16 @@
           {field: "chemical_class", headerName: "Chemical Class", sortable: true, flex: 1, tooltipField: "chemical_class"},
           {field: "matrix", headerName: "Matrix", sortable: true, flex: 1, tooltipField: "matrix"},
           {field: "limitation", headerName: "Limitation", width: 100, tooltipField: "limitation"},
-          {field: "document_type", headerName: "Type", width: 80},
+          {field: "document_type", headerName: "Type", width: 80, tooltipValueGetter: params => {
+              if (this.METHOD_DOCUMENT_TYPES[params.data.document_type]) {
+                return this.METHOD_DOCUMENT_TYPES[params.data.document_type]
+              }
+            }, cellClass: params => {
+              if (this.METHOD_DOCUMENT_TYPES[params.data.document_type]) {
+                return "has-hover-text"
+              }
+            }
+          },
           {field: "count", headerName: "#", width: 60, floatingFilter: false, sortable: true, headerTooltip: "Number of substances in method."},
           {field: "author", headerName: "Author(s)", hide: true},
           {field: "publisher", headerName: "Publisher", hide: true}

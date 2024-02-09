@@ -137,6 +137,7 @@
     methods: {
       async loadPDF(){
         this.target_pdf_url = encodeURI(`${this.BACKEND_LOCATION}/get_pdf/${this.recordType}/${this.internalID}`)
+        console.log(this.target_pdf_url)
         const response = await axios.get(`${this.BACKEND_LOCATION}/get_pdf_metadata/${this.recordType}/${this.internalID}`)
         this.pdf_name = response.data.pdf_name
         this.metadata_rows = response.data.metadata_rows

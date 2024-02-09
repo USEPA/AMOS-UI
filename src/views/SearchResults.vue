@@ -32,6 +32,14 @@
                 <li><strong>InChIKey:</strong> {{ substance_info.indigo_inchikey ? substance_info.indigo_inchikey : substance_info.jchem_inchikey}} </li>
                 <li><strong>Molecular Formula:</strong> {{ substance_info.molecular_formula }} </li>
                 <li><strong>Mass:</strong> {{ substance_info.monoisotopic_mass }} </li>
+                <li v-if="additional_sources.length > 0">
+                  <details>
+                    <summary>Additional Information Sources</summary>
+                    <ul>
+                      <li v-for="s in additional_sources"><a :href="s.link">{{s.source_name}}</a></li>
+                    </ul>
+                  </details>
+                </li>
                 <li>&nbsp;</li>
                 <li><button v-if="!still_searching" @click="downloadResultsAsExcel">Download Results</button></li>
               </ul>
@@ -83,8 +91,8 @@
     </div>
     <div class="half-page-column">
       <p class="info-paragraph" v-if="view_type == 'none'">Click on a row in the table to the left to display either a spectrum (if available) or a PDF file in this space.</p>
-      <SpectrumViewer v-else-if="view_type == 'Spectrum'" :internalID="selected_row_data.internal_id" displayAdditionalInfo/>
-      <StoredPDFViewer v-else-if="view_type == 'PDF'" :internalID="selected_row_data.internal_id" :recordType="selected_row_data.record_type" displayAdditionalInfo/>
+      <MassSpectrumDisplay v-else-if="view_type == 'Mass Spectrum'" :internalID="selected_row_data.internal_id" displayAdditionalInfo/>
+      <StoredPDFDisplay v-else-if="view_type == 'PDF'" :internalID="selected_row_data.internal_id" :recordType="selected_row_data.record_type" displayAdditionalInfo/>
       <p class="info-paragraph" v-else>This database does not contain anything for this record.  Click the hyperlink in the "Record Type" column to be directed to the source.</p>
     </div>
     <b-modal size="xl" v-model="disambiguation.inchikey">
@@ -111,8 +119,8 @@
   import '@/assets/style.css'
   import HelpIcon from '@/components/HelpIcon.vue'
   import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
-  import SpectrumViewer from '@/components/SpectrumViewer.vue'
-  import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
+  import MassSpectrumDisplay from '@/components/MassSpectrumDisplay.vue'
+  import StoredPDFDisplay from '@/components/StoredPDFDisplay.vue'
   import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
 
   export default {
@@ -139,6 +147,7 @@
         result_count: 0,
         record_type_counts: {method: 0, "fact sheet": 0, spectrum: 0},
         ms_ready_search_run: false,
+        additional_sources: [],
         result_filters: {ms_ready: false, single_point_spectra: true, spectrabase: false},
         columnDefs: [
           {field: 'methodologies', headerName: 'Methodology', sortable: true, sort: 'asc', filter: 'agTextColumnFilter', floatingFilter: true, width: 140, suppressSizeToFit: true},
@@ -214,7 +223,7 @@
         // event out.
         if (event.event){
           this.view_type = event.data.data_type
-          if (event.data.data_type == "Spectrum"){
+          if (event.data.data_type == "Mass Spectrum"){
             this.selected_row_data = event.data
           } else if (event.data.data_type == "PDF"){
             this.selected_row_data = event.data
@@ -378,6 +387,8 @@
       } else {
         // Search term matches one substance.
         const search_results = await axios.get(`${this.BACKEND_LOCATION}/search/${response.data.substances.dtxsid}`)
+        const additional_source_results = await axios.get(`${this.BACKEND_LOCATION}/additional_sources_for_substance/${response.data.substances.dtxsid}`)
+        this.additional_sources = additional_source_results.data
         this.all_results = search_results.data.records
         this.results.substance = search_results.data.records
         this.substance_info = response.data.substances
@@ -390,8 +401,8 @@
       AgGridVue,
       HelpIcon,
       InchikeyDisambiguation,
-      SpectrumViewer,
-      StoredPDFViewer,
+      MassSpectrumDisplay,
+      StoredPDFDisplay,
       SynonymDisambiguation
     }
   }

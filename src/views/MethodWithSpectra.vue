@@ -14,7 +14,7 @@
     <p v-if="search_type == 'invalid'">The search type {{ this.$route.params.by_type }} is invalid; it should be either "method" or "spectrum".</p>
     <div v-else class="two-column-page">
       <div class="half-page-column">
-        <StoredPDFViewer style="width: 48vw;" :internalID="pdf_viewer_data.internal_id" recordType="method"/>
+        <StoredPDFDisplay style="width: 48vw;" :internalID="pdf_viewer_data.internal_id" recordType="method"/>
       </div>
       <div class="half-page-column">
         <p>This is a list of the {{ results.length }} spectra associated with this method, organized by substance identifier.  Double-click on a row to show the spectrum in a modal window.</p>
@@ -31,7 +31,7 @@
     </div>
     <div>
       <b-modal scrollable size="lg" v-model="show_modal">
-        <SpectrumViewer :internalID="spectrum_internal_id"/>
+        <MassSpectrumDisplay :internalID="spectrum_internal_id"/>
       </b-modal>
     </div>
   </div>
@@ -49,8 +49,8 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
   
-  import SpectrumViewer from '@/components/SpectrumViewer.vue'
-  import StoredPDFViewer from '@/components/StoredPDFViewer.vue'
+  import MassSpectrumDisplay from '@/components/MassSpectrumDisplay.vue'
+  import StoredPDFDisplay from '@/components/StoredPDFDisplay.vue'
 
   export default {
     data(){
@@ -84,7 +84,7 @@
         this.show_modal = true
       }
     },
-    components: {AgGridVue, SpectrumViewer, StoredPDFViewer}
+    components: {AgGridVue, MassSpectrumDisplay, StoredPDFDisplay}
   }
 </script>
 

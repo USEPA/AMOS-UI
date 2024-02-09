@@ -50,7 +50,7 @@
         ></ag-grid-vue>
         <br />
         <div style="display: flex; flex-direction: column; align-items: center">
-          <SpectrumPlot style="display: flex;" :spectrum="user_spectrum_array" :secondSpectrum="selected_spectrum" spectrumName="User Spectrum" :secondSpectrumName="selected_dtxsid" title="Spectrum Comparison"/>
+          <MassSpectrumPlot style="display: flex;" :spectrum="user_spectrum_array" :secondSpectrum="selected_spectrum" spectrumName="User Spectrum" :secondSpectrumName="selected_dtxsid" title="Spectrum Comparison"/>
           <br />
           <div style="display: flex;" v-if="any_row_selected">
             <button @click="show_modal.table = true">Show Points</button>
@@ -75,7 +75,7 @@
 
   <!-- Modal window that displays the metadata associated with the spectrum, using the spectrum_metadata field from the database. -->
   <b-modal v-model="show_modal.metadata" ref="metadata_modal">
-    <SpectrumMetadata :spectrumMetadata=spectrum_metadata />
+    <MassSpectrumMetadata :spectrumMetadata=spectrum_metadata />
   </b-modal>
   <b-alert variant="warning" dismissible v-model="error_messages.invalidFormat">There are issues with the contents of the user spectrum -- please check to ensure it is correct.</b-alert>
 </template>
@@ -93,8 +93,8 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import '@/assets/style.css'
-  import SpectrumMetadata from '@/components/SpectrumMetadata.vue'
-  import SpectrumPlot from '@/components/SpectrumPlot.vue'
+  import MassSpectrumMetadata from '@/components/MassSpectrumMetadata.vue'
+  import MassSpectrumPlot from '@/components/MassSpectrumPlot.vue'
 
   export default{
     data() {
@@ -156,7 +156,7 @@
         }
         this.user_spectrum_array = this.user_spectrum_string.split("\n").map(x => x.split(" ").map(y => Number(y)))
         const response = await axios.post(
-          `${this.BACKEND_LOCATION}/spectrum_similarity_search/`,
+          `${this.BACKEND_LOCATION}/mass_spectrum_similarity_search/`,
           {upper_mass_limit: upper_mass_limit, lower_mass_limit: lower_mass_limit, methodology: this.methodology, spectrum: this.user_spectrum_array}
         )
         this.results = response.data.results
@@ -183,7 +183,7 @@
         return selected_spectrum.map(function(x){return {"m/z":x[0], "intensity":x[1]}})
       }
     },
-    components: {AgGridVue, SpectrumMetadata, SpectrumPlot}
+    components: {AgGridVue, MassSpectrumMetadata, MassSpectrumPlot}
   }
 
 </script>
