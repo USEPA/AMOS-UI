@@ -76,7 +76,7 @@
           {field: "year_published", headerName: "Year", width: 85, sortable: true, filter: 'agNumberColumnFilter'},
           {field: "methodology", headerName: "Methodology", width: 115, sortable: true, cellRenderer: params => {
               const methodology_html = params.data.methodologies.map(m => {
-                if (this.METHODOLOGY_MAPPING[m]) {
+                if (this.METHODOLOGY_MAPPING[m] && this.METHODOLOGY_MAPPING[m].full_name) {
                   return `<span class='has-hover-text' title='${this.METHODOLOGY_MAPPING[m].full_name}'>${m}</span>`
                 } else {
                   return m

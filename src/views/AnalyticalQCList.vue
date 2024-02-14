@@ -86,7 +86,6 @@
         1
       },
       onDoubleClick(event) {
-        console.log(event)
         window.open(`/view_spectrum_pdf/${event.data.internal_id}`)
       }
     },

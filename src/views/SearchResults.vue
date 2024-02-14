@@ -92,6 +92,7 @@
     <div class="half-page-column">
       <p class="info-paragraph" v-if="view_type == 'none'">Click on a row in the table to the left to display either a spectrum (if available) or a PDF file in this space.</p>
       <MassSpectrumDisplay v-else-if="view_type == 'Mass Spectrum'" :internalID="selected_row_data.internal_id" displayAdditionalInfo/>
+      <p v-else-if="view_type == 'NMR Spectrum'">A viewer for NMR spectra is currently under construction.</p>
       <StoredPDFDisplay v-else-if="view_type == 'PDF'" :internalID="selected_row_data.internal_id" :recordType="selected_row_data.record_type" displayAdditionalInfo/>
       <p class="info-paragraph" v-else>This database does not contain anything for this record.  Click the hyperlink in the "Record Type" column to be directed to the source.</p>
     </div>

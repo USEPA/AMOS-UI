@@ -98,7 +98,7 @@
       async getSpectrumData() {
         const path = `${this.BACKEND_LOCATION}/get_mass_spectrum/${this.internalID}`
         const response = await axios.get(path)
-        console.log(this.internalID)
+        
         this.spectrum = response.data.spectrum
         this.spectral_entropy = response.data.spectral_entropy
         this.normalized_entropy = response.data.normalized_entropy
