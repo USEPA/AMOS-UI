@@ -1,6 +1,6 @@
 <!--
-  This component is used to display a plot of spectrum stored in the database, along with some relevant information
-  about it.
+  This component is used to display a plot of a mass spectrum stored in the database, along with some supporting
+  information.
 
   This component takes two props:
   - internalID, a string corresponding to a unique ID in the database for a spectrum (with data in the database)

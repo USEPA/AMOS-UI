@@ -40,10 +40,12 @@
         column_defs: [
           {field: 'internal_id', headerName: "internal ID", hide: true},
           {field: 'dtxsid', headerName: "DTXSID", width: 120},
-          {field: 'casrn', headerName: "CASRN", width: 120},
+          {field: 'casrn', headerName: "CASRN", width: 110},
+          {field: 'sample_id', headerName: "Sample ID", width: 110},
           {field: 'preferred_name', headerName: "Preferred Name", flex: 1},
+          {field: 'study', headerName: "Source/Technique", width: 140},
           {field: 'experiment_date', headerName: "Experiment Date", width: 140},
-          {field: 'first_timepoint', headerName: "First Timepoint", width: 140, floatingFilter: false, cellRenderer: params => {
+          {field: 'first_timepoint', headerName: "First Timepoint", width: 140, filter: 'agSetColumnFilter', sortable: true, cellRenderer: params => {
             const m = params.data.first_timepoint
             if (this.ANALYTICAL_QC_GRADES[m]) {
               return `<span class='has-hover-text' title='${this.ANALYTICAL_QC_GRADES[m]}'>${m}</span>`
@@ -51,7 +53,7 @@
               return m
             }
           }},
-          {field: 'last_timepoint', headerName: "Last Timepoint", width: 140, floatingFilter: false, cellRenderer: params => {
+          {field: 'last_timepoint', headerName: "Last Timepoint", width: 140, filter: 'agSetColumnFilter', sortable: true, cellRenderer: params => {
             const m = params.data.last_timepoint
             if (this.ANALYTICAL_QC_GRADES[m]) {
               return `<span class='has-hover-text' title='${this.ANALYTICAL_QC_GRADES[m]}'>${m}</span>`
@@ -59,7 +61,7 @@
               return m
             }
           }},
-          {field: 'stability_call', headerName: "Stability Call", width: 120, floatingFilter: false, cellRenderer: params => {
+          {field: 'stability_call', headerName: "Stability Call", width: 120, filter: 'agSetColumnFilter', sortable: true, cellRenderer: params => {
             const m = params.data.stability_call
             if (this.ANALYTICAL_QC_CALLS[m]) {
               return `<span class='has-hover-text' title='${this.ANALYTICAL_QC_CALLS[m]}'>${m}</span>`

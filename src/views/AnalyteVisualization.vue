@@ -260,7 +260,7 @@
               })
           })
           .on('click', function(d) {
-            var myId = this.id.split("_")[0]
+            var myId = this.id.split("_")[0].replace(/([a-z0-9])([A-Z])/g, '$1 $2')
             var myURL = filterById(graph.nodes, myId).url
             window.open(
               myURL,

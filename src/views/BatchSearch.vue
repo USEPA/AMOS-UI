@@ -30,6 +30,7 @@
     </div>
   </div>
   <b-alert variant="warning" dismissible v-model="status_boxes.show_empty_box_error">No substances were entered in the text box.</b-alert>
+  <b-alert variant="warning" dismissible v-model="status_boxes.no_records_found">No records were found for the searched substances.</b-alert>
 </template>
 
 <script>
@@ -46,7 +47,8 @@
         include_spectrabase: true,
         search_box: "",
         status_boxes: {
-          show_empty_box_error: false
+          show_empty_box_error: false,
+          no_records_found: false
         },
         BACKEND_LOCATION
       }
@@ -57,11 +59,15 @@
         if(this.search_box != ""){
           const search_terms = this.search_box.split("\n")
           await axios.post(`${this.BACKEND_LOCATION}/batch_search`, {dtxsids: search_terms, base_url: window.location.origin, include_spectrabase: this.include_spectrabase}, {responseType: "blob"}).then(res => {
-            let blob = new Blob([res.data], {type: res.headers['content-type']})
-            let link = document.createElement('a')
-            link.href = window.URL.createObjectURL(blob)
-            link.download = `batch_search_${timestampForFile()}.xlsx`
-            link.click()
+            if (res.status == 204) {
+              this.status_boxes.no_records_found = true
+            } else {
+              let blob = new Blob([res.data], {type: res.headers['content-type']})
+              let link = document.createElement('a')
+              link.href = window.URL.createObjectURL(blob)
+              link.download = `batch_search_${timestampForFile()}.xlsx`
+              link.click()
+            }
           })
           
         } else {

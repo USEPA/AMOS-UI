@@ -88,8 +88,8 @@
     category="Open-access spectrum collection"
     url="https://hmdb.ca/"
     sourceID="HMDB"
-    substances="3815"
-    spectra="43596"
+    substances="3835"
+    spectra="44211"
   />
   <DataSourceDetails
     sourceName="Jozef Stefan Institute"
@@ -158,6 +158,14 @@
     factSheets="54"
   />
   <DataSourceDetails
+    sourceName="Natural Products Magnetic Resonance Database"
+    category="Open-access spectrum collection"
+    url="https://np-mrd.org"
+    sourceID="NP-MRD"
+    substances="490"
+    spectra="572"
+  />
+  <DataSourceDetails
     sourceName="New Jersey Department of Health"
     category="Government fact sheet collection"
     url="https://www.nj.gov/health"
@@ -187,8 +195,8 @@
     category="Vendor methods collection"
     url="https://www.shimadzu.com"
     sourceID="Shimadzu"
-    substances="4229"
-    methods="611"
+    substances="4582"
+    methods="736"
   />
   <DataSourceDetails
     sourceName="SpectraBase"
@@ -212,9 +220,9 @@
     category="Government methods collection"
     url="https://www.epa.gov/"
     sourceID="EPA, EPA MS Labs, EPA-ECM, EPA-OW, USEPA"
-    substances="3531"
+    substances="3541"
     factSheets="1456"
-    methods="1878"
+    methods="1880"
     spectra="417"
   />
   <DataSourceDetails

@@ -36,7 +36,7 @@
                   <details>
                     <summary>Additional Information Sources</summary>
                     <ul>
-                      <li v-for="s in additional_sources"><a :href="s.link">{{s.source_name}}</a></li>
+                      <li v-for="s in additional_sources"><a :href="s.link" target="_blank">{{s.source_name}}</a></li>
                     </ul>
                   </details>
                 </li>
@@ -92,7 +92,7 @@
     <div class="half-page-column">
       <p class="info-paragraph" v-if="view_type == 'none'">Click on a row in the table to the left to display either a spectrum (if available) or a PDF file in this space.</p>
       <MassSpectrumDisplay v-else-if="view_type == 'Mass Spectrum'" :internalID="selected_row_data.internal_id" displayAdditionalInfo/>
-      <p v-else-if="view_type == 'NMR Spectrum'">A viewer for NMR spectra is currently under construction.</p>
+      <NMRSpectrumDisplay v-else-if="view_type == 'NMR Spectrum'" :internalID="selected_row_data.internal_id"/>
       <StoredPDFDisplay v-else-if="view_type == 'PDF'" :internalID="selected_row_data.internal_id" :recordType="selected_row_data.record_type" displayAdditionalInfo/>
       <p class="info-paragraph" v-else>This database does not contain anything for this record.  Click the hyperlink in the "Record Type" column to be directed to the source.</p>
     </div>
@@ -121,6 +121,7 @@
   import HelpIcon from '@/components/HelpIcon.vue'
   import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
   import MassSpectrumDisplay from '@/components/MassSpectrumDisplay.vue'
+  import NMRSpectrumDisplay from '@/components/NMRSpectrumDisplay.vue'
   import StoredPDFDisplay from '@/components/StoredPDFDisplay.vue'
   import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
 
@@ -224,9 +225,7 @@
         // event out.
         if (event.event){
           this.view_type = event.data.data_type
-          if (event.data.data_type == "Mass Spectrum"){
-            this.selected_row_data = event.data
-          } else if (event.data.data_type == "PDF"){
+          if (event.data.data_type !== null){
             this.selected_row_data = event.data
           }
         }
@@ -403,6 +402,7 @@
       HelpIcon,
       InchikeyDisambiguation,
       MassSpectrumDisplay,
+      NMRSpectrumDisplay,
       StoredPDFDisplay,
       SynonymDisambiguation
     }
