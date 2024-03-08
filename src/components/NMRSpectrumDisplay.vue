@@ -9,7 +9,7 @@
   <p>NOTE: This component for displaying NMR spectra is currently under construction.</p>
   <div class="spectrum-display-container">
     <div class="graph-container">
-      <h5>NMR Spectrum Plot</h5>
+      <h5>{{nucleus}} NMR Spectrum</h5>
       <svg width="600" height="400" id="plot"></svg>
     </div>
     <br />
@@ -61,7 +61,6 @@
       async getNMRSpectrum() {
         const path = `${this.BACKEND_LOCATION}/get_nmr_spectrum/${this.internalID}`
         const response = await axios.get(path)
-        console.log(response)
 
         this.frequency = response.data.frequency
         this.nucleus = response.data.nucleus

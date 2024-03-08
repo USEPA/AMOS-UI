@@ -27,6 +27,7 @@
 
     <div v-else-if="viewer_mode == 'SubstanceGrid'">
       <button @click="downloadSubstanceGridInfo">Download Substance Info</button>
+      <button @click="copySubstancesToClipboard">Copy DTXSID List</button>
       <div class="substance-grid">
         <div v-for="cl in substance_list">
           <SubstanceTile v-if="highlightedSubstances.includes(cl.dtxsid)" :dtxsid="`${cl.dtxsid}`" :preferred_name="`${cl.preferred_name}`" highlight/>
@@ -37,6 +38,7 @@
 
     <div v-else-if="viewer_mode == 'SubstanceTable'">
       <button @click="downloadSubstanceTableInfo">Download Substance Info</button>
+      <button @click="copySubstancesToClipboard">Copy DTXSID List</button>
       <ag-grid-vue
         class="ag-theme-balham"
         style="height:550px; width:100%"
@@ -167,6 +169,23 @@
           columnKeys: ["dtxsid", "casrn", "preferred_name"],
           fileName: `${this.internalID}_substance_list.xlsx`
         });
+      },
+      copySubstancesToClipboard() {
+        const dtxsid_list_string = this.substance_list.map(x => x.dtxsid).join("\n")
+        // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
+        // can't get that to work in this app, though, since it apparently requires a secured connection and the
+        // deployed version of this app doesn't have that.  So I'm sticking to this technically-depricated solution that
+        // I pulled out of CompTox's code, since it apparently works there.
+        const textarea = document.createElement('textarea')
+        textarea.value = dtxsid_list_string
+        document.body.appendChild(textarea)
+        textarea.select()
+        try {
+          document.execCommand('copy')
+        } catch (err) {
+          console.log('Cannot copy: ' + err)
+        }
+        document.body.removeChild(textarea)
       },
       onGridReady(params) {
         this.gridApi = params.api;

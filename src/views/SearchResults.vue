@@ -80,7 +80,7 @@
             :columnDefs="columnDefs"
             :rowData="all_results"
             rowSelection="single"
-            @first-data-rendered="onGridReady"
+            @grid-ready="onGridReady"
             @row-selected="onRowSelected"
             :isExternalFilterPresent="isExternalFilterPresent"
             :doesExternalFilterPass="doesExternalFilterPass"
@@ -116,7 +116,7 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import { getSubstanceImageLink } from '@/assets/common_functions'
-  import { BACKEND_LOCATION, COMPTOX_PAGE_URL, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
+  import { BACKEND_LOCATION, COMPTOX_PAGE_URL, METHOD_DOCUMENT_TYPES, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
   import '@/assets/style.css'
   import HelpIcon from '@/components/HelpIcon.vue'
   import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
@@ -144,6 +144,7 @@
         tooltipShowDelay: 500,
         BACKEND_LOCATION,
         COMPTOX_PAGE_URL,
+        METHOD_DOCUMENT_TYPES,
         SOURCE_ABBREVIATION_MAPPING,
         result_table_view_mode: "all",
         result_count: 0,
@@ -182,7 +183,15 @@
             }
           },
           {field: 'method_number', headerName: 'Method #', width: 110, suppressSizeToFit: true, hide: true, filter: 'agTextColumnFilter', floatingFilter: true},
-          {field: 'method_type', headerName: 'Method Type', width: 120, suppressSizeToFit: true, hide: true, filter: 'agTextColumnFilter', floatingFilter: true},
+          {field: 'method_type', headerName: 'Method Type', width: 120, suppressSizeToFit: true, hide: true, filter: 'agTextColumnFilter', floatingFilter: true, tooltipValueGetter: params => {
+              if (this.METHOD_DOCUMENT_TYPES[params.data.method_type]) {
+                return this.METHOD_DOCUMENT_TYPES[params.data.method_type]
+              }
+            }, cellClass: params => {
+              if (this.METHOD_DOCUMENT_TYPES[params.data.method_type]) {
+                return "has-hover-text"
+              }
+            }},
           {field: 'count', headerName: '#', width: 35, suppressSizeToFit: true, sortable: true, headerTooltip: "Number of substances in record."},
           {field: 'description', headerName: 'Information', sortable: true, flex: 1, tooltipField: 'comment', filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params =>{
             if (params.data.description === null) {
@@ -197,9 +206,10 @@
     },
     methods: {
       onGridReady(params) {
+        console.log("opened")
         this.gridApi = params.api
         this.gridColumnApi = params.columnApi
-
+        console.log("started")
         // Sometimes we might want to pre-select a row when the all_results load; this logic takes care of it
         if (typeof(this.$route.query.initial_row_selected) === "string") {
           this.gridApi.forEachNode(node => {
@@ -214,10 +224,11 @@
         if (typeof(this.$route.query.initial_results_tab) === "string") {
           this.updateTab(this.$route.query.initial_results_tab) 
         }
-
+        console.log("got most way")
         this.gridApi.onFilterChanged()   //regenerates the table with the filter settings
         this.gridApi.sizeColumnsToFit()
         this.updateRecordCounts()
+        console.log("got all way")
       },
       onRowSelected(event) {
         // Row selection creates two events -- one for the selection, one for the deselection.  Only

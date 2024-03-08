@@ -14,7 +14,7 @@
     url="https://www.atsdr.cdc.gov"
     sourceID="ATSDR"
     substances="1033"
-    factSheets="181"
+    factSheets="182"
     methods="40"
   />
   <DataSourceDetails
@@ -39,8 +39,8 @@
     category="Open-access spectrum collection"
     url="https://www.caymanchem.com/forensics/publications/csl"
     sourceID="Cayman"
-    substances="2203"
-    spectra="2294"
+    substances="2252"
+    spectra="2348"
   />
   <DataSourceDetails
     sourceName="Center for Forensic Science Research & Education"
@@ -88,8 +88,8 @@
     category="Open-access spectrum collection"
     url="https://hmdb.ca/"
     sourceID="HMDB"
-    substances="3835"
-    spectra="44211"
+    substances="3858"
+    spectra="44451"
   />
   <DataSourceDetails
     sourceName="Jozef Stefan Institute"
@@ -113,8 +113,8 @@
     category="Open-access spectral database"
     url="https://massbank.eu/MassBank/"
     sourceID="MassBank EU"
-    substances="14273"
-    spectra="109765"
+    substances="14707"
+    spectra="110462"
   />
   <DataSourceDetails
     sourceName="MassBank of North America"
@@ -162,8 +162,8 @@
     category="Open-access spectrum collection"
     url="https://np-mrd.org"
     sourceID="NP-MRD"
-    substances="490"
-    spectra="572"
+    substances="514"
+    spectra="597"
   />
   <DataSourceDetails
     sourceName="New Jersey Department of Health"
@@ -221,7 +221,7 @@
     url="https://www.epa.gov/"
     sourceID="EPA, EPA MS Labs, EPA-ECM, EPA-OW, USEPA"
     substances="3541"
-    factSheets="1456"
+    factSheets="1457"
     methods="1880"
     spectra="417"
   />

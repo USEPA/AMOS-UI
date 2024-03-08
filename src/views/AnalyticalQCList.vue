@@ -1,6 +1,9 @@
 <template>
   <p>This page lists records from the EPA's Analytical QC project.  There are approximately 40,000 records in total, so it will take a moment to load the full list.</p>
   <p>Double-click a row to open the corresponding document in a new tab.</p>
+  <div class="button-array">
+    <button @click="downloadCurrentTable">Download Table</button>
+  </div>
   <ag-grid-vue
     class="ag-theme-balham"
     style="height:800px; width:100%"
@@ -26,7 +29,7 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import '@/assets/style.css'
-  import { getSubstanceImageLink } from '@/assets/common_functions'
+  import { getSubstanceImageLink, timestampForFile } from '@/assets/common_functions'
   import { ANALYTICAL_QC_CALLS, ANALYTICAL_QC_GRADES, BACKEND_LOCATION } from '@/assets/store'
 
   export default {
@@ -39,11 +42,11 @@
         default_column_def: {resizable: true, filter: 'agTextColumnFilter', floatingFilter: true},
         column_defs: [
           {field: 'internal_id', headerName: "internal ID", hide: true},
-          {field: 'dtxsid', headerName: "DTXSID", width: 120},
-          {field: 'casrn', headerName: "CASRN", width: 110},
-          {field: 'sample_id', headerName: "Sample ID", width: 110},
-          {field: 'preferred_name', headerName: "Preferred Name", flex: 1},
-          {field: 'study', headerName: "Source/Technique", width: 140},
+          {field: 'dtxsid', headerName: "DTXSID", width: 120, sortable: true},
+          {field: 'casrn', headerName: "CASRN", width: 110, sortable: true},
+          {field: 'sample_id', headerName: "Sample ID", width: 110, sortable: true},
+          {field: 'preferred_name', headerName: "Preferred Name", flex: 1, sortable: true},
+          {field: 'study', headerName: "Source/Technique", width: 140, sortable: true, filter: 'agMultiColumnFilter'},
           {field: 'experiment_date', headerName: "Experiment Date", width: 140},
           {field: 'first_timepoint', headerName: "First Timepoint", width: 140, filter: 'agSetColumnFilter', sortable: true, cellRenderer: params => {
             const m = params.data.first_timepoint
@@ -89,6 +92,11 @@
       },
       onDoubleClick(event) {
         window.open(`/view_spectrum_pdf/${event.data.internal_id}`)
+      },
+      downloadCurrentTable() {
+        this.gridApi.exportDataAsExcel({
+          fileName: `fact_sheet_list_${timestampForFile()}.xlsx`
+        });
       }
     },
     components: { AgGridVue }
