@@ -14,7 +14,10 @@
         types into a searchable database.  Use the search bar below to run a general search for a single substance, or use the links in the navigation
         bar above to access other functionality.  This application is easier to use on larger screens/windows.
       </p>
-      <p>For more information about this app, see the <router-link to="/about">about</router-link> page.</p>
+      <p>
+        For more information about this app, see the <router-link to="/about">about</router-link> page or
+        <a href="https://work.epa.gov/ccte/amos-analytical-methods-and-open-spectral-database-help">the manual</a>.
+      </p>
       <div>
         <input @keyup.enter="go_big_bar()" id="big-search-bar" name="big-search-bar" placeholder="Search name, InChIKey, DTXSID, or CASRN..." size="60" v-model="bigBarSearchTerm">
         <button @click="go_big_bar()">Substance Search</button>

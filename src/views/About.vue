@@ -7,7 +7,7 @@
 <template>
   <div class="About">
     <h1>About</h1>
-    <p>This web application is designed to perform searches on and allow examination of a collection of publicly available experimental analytical chemistry data from several sources, most of which are focused on mass spectra. This app was written using Vue 3 and Bootstrap on the front end, with a Flask-based Python API accessing a PostgreSQL database behind the scenes.</p>
+    <p>This web application is designed to perform searches on and allow examination of a collection of publicly available experimental analytical chemistry data from several sources, most of which are focused on mass spectra. This app was written using Vue 3 and Bootstrap on the front end, with a Flask-based Python API accessing a PostgreSQL database behind the scenes.  A manual with details about the functioning of various pages is available <a href="https://work.epa.gov/ccte/amos-analytical-methods-and-open-spectral-database-help">here</a>.</p>
     <p>The database contains a mixture of data types that can be divided into three categories.</p>
     <ul>
       <li><b>Spectra</b> of various types.  These are primarily mass spectra, mainly GC/MS and LC/MS, and a smaller number of NMR spectra.  Some other types of spectra such as Raman or IR are linked to.</li>
@@ -32,7 +32,7 @@
       <li>Substances appearing in at least one record: {{result_info["Substances"]["Total"].toLocaleString()}}</li>
     </ul>
   <br />
-  <p>This app was last updated on 2024-03-08.</p>
+  <p>This app was last updated on 2024-03-15.</p>
   </div>
 </template>
 
