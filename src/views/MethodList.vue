@@ -38,6 +38,7 @@
     <p>Some usage notes:</p>
     <ul>
       <li>There are two fields in the table hidden by default -- an author and a publisher field.  Searches from the full-table search field will still include them, however.</li>
+      <li>If you wish to hide or show columns, hover over a column name, click on the menu icon that appears on the right, and use the rightmost tab to toggle columns.</li>
     </ul>
   </div>
 </template>
@@ -127,7 +128,7 @@
           },
           {field: "chemical_class", headerName: "Chemical Class", sortable: true, flex: 1, tooltipField: "chemical_class"},
           {field: "matrix", headerName: "Matrix", sortable: true, flex: 1, tooltipField: "matrix"},
-          {field: "limitation", headerName: "Limitation", width: 100, tooltipField: "limitation"},
+          {field: "limitation", headerName: "Limits", width: 100, tooltipField: "limitation"},
           {field: "document_type", headerName: "Type", width: 80, tooltipValueGetter: params => {
               if (this.METHOD_DOCUMENT_TYPES[params.data.document_type]) {
                 return this.METHOD_DOCUMENT_TYPES[params.data.document_type]

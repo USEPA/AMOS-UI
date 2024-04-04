@@ -7,11 +7,11 @@
 
 <template>
   <div class="spectrum-display-container">
-    <p>Below is a plot of the selected NMR spectrum.  Use the mouse wheel to zoom in and out, and hover over the plot with the mouse to see individual points; this may lag somewhat for larger spectra (100,000 points or so).</p>
-    <p>NOTE: This component for displaying NMR spectra is currently under construction.</p>
+    <p>Below is a plot of the selected NMR spectrum.  Use the mouse wheel to zoom in and out or double click to zoom in.  Hover over the plot with the mouse to see individual points; this may lag somewhat for larger spectra (64k points or so).</p>
     <div class="graph-container">
       <h5>{{nucleus}} NMR Spectrum</h5>
       <svg width="600" height="400" id="plot"></svg>
+      <button id="zoomReset">Reset Zoom</button>
     </div>
     <br />
     <div class="info-container">
@@ -19,7 +19,7 @@
       <ul style="list-style-type: none;">
         <li><strong>Nucleus:</strong> {{ nucleus }}</li>
         <li><strong>Frequency:</strong> {{ frequency }} MHz</li>
-        <li><strong>Temperature:</strong> {{ temperature ? temperature : "Unknown" }}</li>
+        <li><strong>Temperature:</strong> {{ temperature ? `${temperature} °C` : "Unknown" }}</li>
         <li><strong>Solvent:</strong> {{ solvent ? solvent : "Unknown" }}</li>
       </ul>
     </div>
@@ -88,11 +88,12 @@
         var svg = d3.select("#plot")
         var width = svg.attr("width")
         var height = svg.attr("height")
+        const margins = {right: 40, left: 40, top: 40, bottom: 40}
         const margin = 40
 
         svg.selectAll("*").remove();
 
-        // construct the scales for the axes; we want the horizontal axis to go from most positive to most negative, so make sure that's set up correctly
+        // construct the scales for the axes; we want the horizontal axis to go from most positive to most negative, so make sure that's set up correctly in the range
         var ppm_scale = d3.scaleLinear().domain(d3.extent(this.spectrum, d => d["ppm"])).range([width-margin, margin])
         let ppm_rescale = ppm_scale.copy()
         var intensity_scale = d3.scaleLinear().domain(d3.extent(this.spectrum, d => d["intensity"])).range([height-margin, margin]).nice()
@@ -103,7 +104,7 @@
         svg.append("g").call(d3.axisLeft(intensity_scale)).attr("transform", `translate(${margin},0)`)
 
         // make the axis labels
-        svg.append("text").attr("x", width/2).attr("y", height).attr("text-anchor", "middle").attr("fill", "currentColor").text(this.x_units)
+        svg.append("text").attr("x", width/2).attr("y", height - margins.bottom/4).attr("text-anchor", "middle").attr("fill", "currentColor").text(this.x_units)
         svg.append("text").attr("transform", "rotate(-90)").attr("x", -height/2).attr("y", margin/4).attr("text-anchor", "middle").attr("fill", "currentColor").text("Intensity")
         
         const clippingRect = svg.append("clipPath").attr("id", "clippy").append("rect").attr("width", width - 2*margin).attr("height", height - 2*margin).attr("transform", `translate(${margin}, ${margin})`).attr("fill", "none")
@@ -118,13 +119,16 @@
 
         var spectrum = this.spectrum
 
-
-        const zoom = d3.zoom().on("zoom", function(event){
+        const extent = [[margin, margin], [width-margin, height-margin]]
+        const zoom = d3.zoom().scaleExtent([1,1000]).extent(extent).translateExtent(extent).on("zoom", function(event){
           ppm_rescale = event.transform.rescaleX(ppm_scale)
           ppm_axis_g.call(ppm_axis.scale(ppm_rescale))
           path.attr("d", linemaker(spectrum))
         })  //.scaleExtent([1,40]).translateExtent([[0,0],[width,height]])
         svg.call(zoom)
+
+        // add zoom reset button
+        svg.append("button").attr("id", "zoom_reset").attr("text", "Reset Zoom")
 
         // add description text to the plot
         focus.append("text").attr("class", "locationtext").attr("text-anchor", "end").attr("x", width).attr("y", margin/2)
@@ -140,6 +144,12 @@
             focus.select("circle.y").attr("transform", `translate(${ppm_rescale(spectrum[x_index]["ppm"])}, ${intensity_scale(spectrum[x_index]["intensity"])})`)
             focus.select("text.locationtext").text(`PPM: ${spectrum[x_index]["ppm"].toFixed(6)}; Intensity: ${spectrum[x_index]["intensity"].toFixed(3)}`)
           })
+        
+        d3.select("#zoomReset").on("click", function(){
+          console.log("zoom reset clicked")
+          svg.call(zoom.transform, d3.zoomIdentity)
+        })
+        
       },
     }
   }

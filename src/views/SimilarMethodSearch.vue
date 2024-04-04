@@ -15,6 +15,17 @@
         <input @keyup.enter="methodSearch(searched_substance)" type="text" size="30" v-model="searched_substance" name="search-dtxsid">
         <button @click="methodSearch(searched_substance)">Method Search</button>
       </div>
+      <div style="margin-top: 10px">
+        <label for="similarity-select">Filter minimum substance similarity</label> &nbsp;
+        <select id="similarity-select" v-model="min_similarity" style="width: 300">
+          <option :value="0.5">0.5</option>
+          <option :value="0.6">0.6</option>
+          <option :value="0.7">0.7</option>
+          <option :value="0.8">0.8</option>
+          <option :value="0.9">0.9</option>
+          <option :value="1.0">1.0</option>
+        </select>
+      </div>
       <br />
       <p v-if="searching">Searching -- this may take 20-30 seconds...</p>
       <p v-else-if="!search_complete">This page allows for searching for methods that contain either a given chemical or other chemicals similar to it.  A name, InChIKey, CASRN, or DTXSID can be searched on.</p>
@@ -37,7 +48,10 @@
             suppressAggFuncInHeader="true"
             rowSelection="single"
             @row-selected="methodsRowSelected"
+            @grid-ready="onGridReady"
             :rowClassRules="methodsRowClassRules"
+            :isExternalFilterPresent="isExternalFilterPresent"
+            :doesExternalFilterPass="doesExternalFilterPass"
           ></ag-grid-vue>
           <ag-grid-vue v-if="tab_viewer_mode == 'Substances'"
             class="ag-theme-balham"
@@ -141,14 +155,15 @@
         right_side_viewer_mode: "N/A",
         substance_info: {searched_substance: {}, similar_substance: {}},
         similar_substances: [],
+        min_similarity: 0.5,
         result_column_defs: [
-          {field: "internal_id", rowGroup: true, hide: true, sortable: true, cellRenderer: params => {
+          {field: "internal_id", rowGroup: true, hide: true, sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
             const title_text = this.ids_to_method_names[params.value] + " (" + params.node.allChildrenCount + ")";
             return `<span title='${title_text}'>${this.ids_to_method_names[params.value]}</span>`
           }},
-          {field: "source", headerName: "Source", width: 90, suppressSizeToFit: true, sortable: true, aggFunc: 'first'},
-          {field: "methodology", headerName: "Methodology", width: 120, suppressSizeToFit: true, sortable: true, aggFunc: 'first'},
-          {field: "year_published", headerName: "Year", width: 70, suppressSizeToFit: true, sortable: true, aggFunc: 'first'},
+          {field: "source", headerName: "Source", width: 90, suppressSizeToFit: true, filter: 'agTextColumnFilter', floatingFilter: true, sortable: true, aggFunc: 'first'},
+          {field: "methodology", headerName: "Methodology", width: 120, suppressSizeToFit: true, filter: 'agTextColumnFilter', floatingFilter: true, sortable: true, aggFunc: 'first'},
+          {field: "year_published", headerName: "Year", width: 70, suppressSizeToFit: true, filter: 'agNumberColumnFilter', floatingFilter: true, sortable: true, aggFunc: 'first'},
           {field: "similarity", headerName: "Similarity", width: 95, suppressSizeToFit: true, sortable: true, sort: 'desc', aggFunc: 'max', cellRenderer:'agGroupCellRenderer', cellRendererParams: {
             innerRenderer: params => {return params.value.toFixed(2)}
           }},
@@ -172,7 +187,7 @@
             }
           }
         },
-        autoGroupColumnDef: {headerName: 'Method Name (# substances)', width: 210, sortable: true, comparator: (valueA, valueB, nodeA, nodeB, isDescending) => {
+        autoGroupColumnDef: {headerName: 'Method Name (# substances)', filter: true, width: 210, sortable: true, comparator: (valueA, valueB, nodeA, nodeB, isDescending) => {
           // Need to be able to sort the groups by method name, not internal id, so map them and then compare.
           const nameA = this.ids_to_method_names[valueA]
           const nameB = this.ids_to_method_names[valueB]
@@ -181,13 +196,24 @@
       }
     },
     async created() {
-      1
+      if (typeof(this.$route.query.search_term) === "string") {
+        this.searched_substance = this.$route.query.search_term
+        this.methodSearch(this.searched_substance)
+      }
     },
     components: {
       AgGridVue,
       InchikeyDisambiguation,
       StoredPDFDisplay,
       SynonymDisambiguation
+    },
+    watch: {
+      min_similarity(new_sim, old_sim) {
+        // when the minimum similarity changes, filter results as appropriate
+        if (this.search_complete & this.found_substance & (this.results.length > 0)) {
+          this.gridApi.onFilterChanged()
+        }
+      }
     },
     methods: {
       async methodSearch(searched_substance) {
@@ -223,7 +249,8 @@
         }
       },
       onGridReady(params) {
-        1
+        this.gridApi = params.api
+        this.gridColumnApi = params.columnApi
       },
       methodsRowSelected(event) {
         if (event.event){
@@ -266,6 +293,12 @@
         if (params.node.data.dtxsid == this.substance_info.searched_substance.dtxsid) {
           return "emphasized-row"
         }
+      },
+      isExternalFilterPresent() {
+        return true
+      },
+      doesExternalFilterPass(node) {
+        return node.data.similarity >= this.min_similarity
       }
     }
   }

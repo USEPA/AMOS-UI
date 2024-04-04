@@ -32,7 +32,7 @@
       <li>Substances appearing in at least one record: {{result_info["Substances"]["Total"].toLocaleString()}}</li>
     </ul>
   <br />
-  <p>This app was last updated on 2024-03-15.</p>
+  <p>This app was last updated on 2024-04-04.</p>
   </div>
 </template>
 

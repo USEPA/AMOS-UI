@@ -65,7 +65,10 @@
       </div>
       <div v-if="!still_searching">
         <p v-if="no_substance_match">There is no substance in this database that matches the search term "{{$route.params.search_term}}" -- if something should be here, please check the search term for typos.</p>
-        <p v-else-if="all_results.length==0">The search term "{{$route.params.search_term}}" matches a substance in the database; however, no data records were found.</p>
+        <div v-else-if="all_results.length==0">
+          <p>The search term "{{$route.params.search_term}}" matches a substance in the database; however, no data records were found.</p>
+          <p>If you are looking for methods containing the searched substance, you can run a search for methods with similar structures <router-link :to="`/similar_method_search?search_term=${$route.params.search_term}`">here</router-link>.</p>
+        </div>
         <div v-else>
           <div class="tab-bar">
             <button :class="result_table_view_mode == 'all' ? 'active' : ''" @click="updateTab('all')">All Results ({{result_count}})</button>
@@ -206,10 +209,9 @@
     },
     methods: {
       onGridReady(params) {
-        console.log("opened")
         this.gridApi = params.api
         this.gridColumnApi = params.columnApi
-        console.log("started")
+        
         // Sometimes we might want to pre-select a row when the all_results load; this logic takes care of it
         if (typeof(this.$route.query.initial_row_selected) === "string") {
           this.gridApi.forEachNode(node => {
@@ -224,11 +226,9 @@
         if (typeof(this.$route.query.initial_results_tab) === "string") {
           this.updateTab(this.$route.query.initial_results_tab) 
         }
-        console.log("got most way")
         this.gridApi.onFilterChanged()   //regenerates the table with the filter settings
         this.gridApi.sizeColumnsToFit()
         this.updateRecordCounts()
-        console.log("got all way")
       },
       onRowSelected(event) {
         // Row selection creates two events -- one for the selection, one for the deselection.  Only
@@ -378,7 +378,8 @@
     async created() {
       // Start by trying to get the DTXSID for the search term.
       const response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${this.$route.params.search_term}`)
-      // There are three possibilities: no search term found, search term found, search term is ambiguous (matches multiple substances by synonym/InChIKey).
+      // There are three possibilities: no search term found, search term found, search term is ambiguous (matches
+      // multiple substances by synonym or first block of InChIKey).
       if (response.data.substances === null) {
         // No substance found.
         this.no_substance_match = true
@@ -406,6 +407,10 @@
         this.record_type_counts = search_results.data.record_type_counts
         this.image_link = await getSubstanceImageLink(this.substance_info.dtxsid)
         this.still_searching = false
+        
+        if (!this.all_results.some(x => {return x.source != "SpectraBase"})) {
+          this.result_filters.spectrabase = true
+        }
       }
     },
     components: {
