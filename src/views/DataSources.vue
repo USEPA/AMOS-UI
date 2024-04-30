@@ -35,6 +35,30 @@
     spectra="39523"
   />
   <DataSourceDetails
+    sourceName="Bruker"
+    category="Vendor methods collection"
+    url="https://www.bruker.com/"
+    sourceID="Bruker"
+    substances="591"
+    methods="42"
+  />
+  <DataSourceDetails
+    sourceName="California Environmental Protection Agency Office of Environmental Health Hazard Assessment"
+    category="Open-access fact sheet collection"
+    url="https://oehha.ca.gov/"
+    sourceID="OEHHA"
+    substances="110"
+    factSheets="98"
+  />
+  <DataSourceDetails
+    sourceName="Canadian Food Inspection Agency"
+    category="Spectrum collection (not open, supplied to EPA)"
+    url="https://inspection.canada.ca/eng/1297964599443/1297965645317"
+    sourceID="Canadian Food Inspection Agency"
+    substances="962"
+    spectra="962"
+  />
+  <DataSourceDetails
     sourceName="Cayman Spectral Library"
     category="Open-access spectrum collection"
     url="https://www.caymanchem.com/forensics/publications/csl"
@@ -47,8 +71,8 @@
     category="Open monographs collection"
     url="https://www.cfsre.org/nps-discovery/monographs"
     sourceID="CFSRE"
-    substances="92"
-    factSheets="82"
+    substances="94"
+    factSheets="83"
   />
   <DataSourceDetails
     sourceName="Centers for Disease Control and Prevention"
@@ -60,11 +84,20 @@
     methods="25"
   />
   <DataSourceDetails
+    sourceName="Drinking Water Treatability Database"
+    category="Open-access EPA fact sheet collection"
+    url="https://tdb.epa.gov/"
+    sourceID="TDB"
+    substances="161"
+    factSheets="72"
+  />
+  <DataSourceDetails
     sourceName="Drug Enforcement Administration"
     category="Government methods collection"
     url="https://www.dea.gov"
     sourceID="DEA"
-    substances="18"
+    substances="252"
+    factSheets="25"
     methods="33"
   />
   <DataSourceDetails
@@ -80,16 +113,16 @@
     category="Open-access spectrum libraries"
     url="https://gnps.ucsd.edu"
     sourceID="GNPS"
-    substances="1930"
-    spectra="7820"
+    substances="1976"
+    spectra="7914"
   />
   <DataSourceDetails
     sourceName="Human Metabolome Database"
     category="Open-access spectrum collection"
     url="https://hmdb.ca/"
     sourceID="HMDB"
-    substances="3858"
-    spectra="44451"
+    substances="3857"
+    spectra="44450"
   />
   <DataSourceDetails
     sourceName="Jozef Stefan Institute"
@@ -113,16 +146,16 @@
     category="Open-access spectral database"
     url="https://massbank.eu/MassBank/"
     sourceID="MassBank EU"
-    substances="14707"
-    spectra="110462"
+    substances="14721"
+    spectra="111061"
   />
   <DataSourceDetails
     sourceName="MassBank of North America"
     category="Open-access spectral database"
     url="https://mona.fiehnlab.ucdavis.edu"
     sourceID="MoNA"
-    substances="7228"
-    spectra="49580"
+    substances="7315"
+    spectra="50738"
   />
   <DataSourceDetails
     sourceName="National Environmental Methods Index"
@@ -195,8 +228,8 @@
     category="Vendor methods collection"
     url="https://www.shimadzu.com"
     sourceID="Shimadzu"
-    substances="4582"
-    methods="736"
+    substances="4855"
+    methods="841"
   />
   <DataSourceDetails
     sourceName="SpectraBase"
@@ -205,6 +238,14 @@
     sourceID="SpectraBase"
     substances="149764"
     spectra="590943"
+  />
+  <DataSourceDetails
+    sourceName="UC Davis Fiehn Lab"
+    category="Open-access spectrum collection"
+    url="https://fiehnlab.ucdavis.edu/projects/vocbinbase"
+    sourceID="UC Davis Fiehn Lab"
+    substances="192"
+    spectra="192"
   />
   <DataSourceDetails
     sourceName="U.S. Department of Agriculture"
@@ -220,10 +261,10 @@
     category="Government methods collection"
     url="https://www.epa.gov/"
     sourceID="EPA, EPA MS Labs, EPA-ECM, EPA-OW, USEPA"
-    substances="3541"
-    factSheets="1457"
-    methods="1880"
-    spectra="417"
+    substances="3566"
+    factSheets="1460"
+    methods="1893"
+    spectra="537"
   />
   <DataSourceDetails
     sourceName="U.S. Geological Survey"
@@ -248,6 +289,14 @@
     sourceID="OSHA"
     substances="465"
     methods="327"
+  />
+  <DataSourceDetails
+    sourceName="Waters"
+    category="Vendor methods collection"
+    url="https://www.waters.com/nextgen/us/en.html"
+    sourceID="Waters"
+    substances="1480"
+    methods="154"
   />
   <br />
 </template>

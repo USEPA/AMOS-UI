@@ -41,10 +41,16 @@
         </div>
       </div>
       <div class="info-container" style="padding-left: 100px">
-        <MassSpectrumPlot :spectrum="spectrum1" :secondSpectrum="spectrum2" :spectrumName="spectrum1_name" :secondSpectrumName="spectrum2_name" :title="plot_title"/>
-        <br />
-        <p v-if="entropy_display == 'entropy'"><strong>Spectral Entropy:</strong> {{ spectral_entropy.toFixed(4) }}</p>
-        <p v-else-if="entropy_display == 'similarity'"><strong>Entropy Similarity:</strong> {{ entropy_similarity.toFixed(4) }}</p>
+        <div v-if="spectrum_display == 'single'">
+          <SingleMassSpectrumPlot :spectrum="spectrum1" />
+          <br />
+          <p><strong>Spectral Entropy:</strong> {{ spectral_entropy.toFixed(4) }}</p>
+        </div>
+        <div v-else-if="spectrum_display == 'dual'">
+          <DualMassSpectrumPlot :spectrum1="spectrum1" :spectrum2="spectrum2" :spectrum1_name="spectrum1_name" :spectrum2_name="spectrum2_name"/>
+          <br />
+          <p><strong>Entropy Similarity:</strong> {{ entropy_similarity.toFixed(4) }}</p>
+        </div>
       </div>
     </div>
   </div>
@@ -61,7 +67,8 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import { BACKEND_LOCATION } from '@/assets/store';
-  import MassSpectrumPlot from '@/components/MassSpectrumPlot.vue'
+  import DualMassSpectrumPlot from '@/components/DualMassSpectrumPlot.vue'
+  import SingleMassSpectrumPlot from '@/components/SingleMassSpectrumPlot.vue'
 
   export default {
     data() {
@@ -75,6 +82,7 @@
         plot_title: "",
         spectral_entropy: 0,
         entropy_similarity: 0,
+        spectrum_display: null,
         entropy_display: null,
         dtxsid_mode: false,
         dtxsids: [],
@@ -101,27 +109,25 @@
       }
     },
     methods: {
-      async display_user_spectrum(box_contents, plot_title) {
-        this.spectrum1 = box_contents.split("\n").map(x => x.split(" ").map(y => Number(y)))
-        this.spectrum1_name = "Intensity"
-        this.plot_title = "User Spectrum"
-        this.spectral_entropy = await this.calculateSpectralEntropy(this.spectrum1)
-        this.entropy_display = "entropy"
-      },
       async onRowSelected(event) {
         if (event.event) {
           this.display_database_spectrum()
         }
       },
+      async display_user_spectrum(box_contents) {
+        this.spectrum1 = box_contents.split("\n").map(x => x.split(" ").map(y => Number(y)))
+        this.plot_title = "User Spectrum"
+        this.spectral_entropy = await this.calculateSpectralEntropy(this.spectrum1)
+        this.spectrum_display = "single"
+      },
       async display_database_spectrum() {
         const selected_rows = this.gridApi.getSelectedRows()
-        this.spectrum1_name = "Intensity"
         this.plot_title = "Database Spectrum"
         if (selected_rows.length > 0) {
           const row = selected_rows[0]
           this.spectrum1 = row.spectrum
           this.spectral_entropy = await this.calculateSpectralEntropy(this.spectrum1)
-          this.entropy_display = "entropy"
+          this.spectrum_display = "single"
         } else {
           this.spectrum1 = []
         }
@@ -139,7 +145,7 @@
             this.spectrum2_name = "Spectrum #2"
           }
           this.entropy_similarity = await this.calculateEntropySimilarity(this.spectrum1, this.spectrum2)
-          this.entropy_display = "similarity"
+          this.spectrum_display = "dual"
       },
       async calculateSpectralEntropy(spectrum) {
         // Calculates spectral entropy.
@@ -156,7 +162,7 @@
         this.gridApi = params.api
       }
     },
-    components: { AgGridVue, MassSpectrumPlot }
+    components: { AgGridVue, DualMassSpectrumPlot, SingleMassSpectrumPlot }
   }
 </script>
 

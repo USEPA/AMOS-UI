@@ -17,22 +17,24 @@
 <template>
   <details>
     <summary>{{ sourceName }}</summary>
-    <strong>Source Name:</strong> {{ sourceName }}
-    <br />
-    <strong>Category:</strong> {{ category }}
-    <br />
-    <strong>URL:</strong> <a :href="url">{{ url }}</a>
-    <br />
-    <strong>Data Source ID(s):</strong> {{ sourceID }}
-    <br />
-    <strong>Number of substances in data: </strong> {{ substances }}
-    <br />
-    <strong>Records in AMOS: </strong>
-    <span v-if="spectra">{{ spectra }} {{spectra == 1 ? "spectrum" : "spectra"}}</span>
-    <span v-if="spectra && (factSheets || methods)">, </span>
-    <span v-if="factSheets">{{ factSheets }} fact sheet{{factSheets == 1 ? "" : "s"}}</span>
-    <span v-if="factSheets && methods">, </span>
-    <span v-if="methods">{{ methods }} method{{methods == 1 ? "" : "s"}}</span>
+    <div class="contents">
+      <strong>Source Name:</strong> {{ sourceName }}
+      <br />
+      <strong>Category:</strong> {{ category }}
+      <br />
+      <strong>URL:</strong> <a :href="url">{{ url }}</a>
+      <br />
+      <strong>Data Source ID(s):</strong> {{ sourceID }}
+      <br />
+      <strong>Number of substances in data: </strong> {{ substances }}
+      <br />
+      <strong>Records in AMOS: </strong>
+      <span v-if="spectra">{{ spectra }} {{spectra == 1 ? "spectrum" : "spectra"}}</span>
+      <span v-if="spectra && (factSheets || methods)">, </span>
+      <span v-if="factSheets">{{ factSheets }} fact sheet{{factSheets == 1 ? "" : "s"}}</span>
+      <span v-if="factSheets && methods">, </span>
+      <span v-if="methods">{{ methods }} method{{methods == 1 ? "" : "s"}}</span>
+    </div>
   </details>
 </template>
 
@@ -46,3 +48,14 @@
     props: {sourceName: String, category: String, url: String, sourceID: String, substances: Number, spectra: Number, factSheets: Number, methods: Number}
   }
 </script>
+
+<style>
+  .contents {
+    margin-left: 20px
+  }
+
+  details[open] {
+    margin-top: 10px;
+    margin-bottom: 10px
+  }
+</style>

@@ -6,17 +6,21 @@
 -->
 
 <template>
-  <h5 v-if="spectrumMetadata && spectrumMetadata.Chromatography">Chromatography Info:</h5>
-  <ul v-if="spectrumMetadata && spectrumMetadata.Chromatography" style="list-style-type: none;" ref="metadata_modal">
-    <li v-for="c in Object.entries(spectrumMetadata.Chromatography)"><strong>{{c[0]}}:</strong> {{c[1]}}</li>
-  </ul>
-  <h5 v-if="spectrumMetadata && spectrumMetadata.Spectrometry">Spectrometry Info:</h5>
-  <ul v-if="spectrumMetadata && spectrumMetadata.Spectrometry" style="list-style-type: none;">
-    <li v-for="s in Object.entries(spectrumMetadata.Spectrometry)"><strong>{{s[0]}}:</strong> {{s[1]}}</li>
-  </ul>
-  <span v-if="spectrumMetadata && spectrumMetadata.Author"><strong>Author(s):</strong> {{spectrumMetadata.Author}}</span>
+  <div v-if="spectrumMetadata.Chromatography && (Object.keys(spectrumMetadata.Chromatography).length > 0)">
+    <h5>Chromatography Info:</h5>
+    <ul style="list-style-type: none;" ref="metadata_modal">
+      <li v-for="c in Object.entries(spectrumMetadata.Chromatography)"><strong>{{c[0]}}:</strong> {{c[1]}}</li>
+    </ul>
+  </div>
+  <div v-if="spectrumMetadata.Spectrometry && (Object.keys(spectrumMetadata.Spectrometry).length > 0)">
+    <h5 >Spectrometry Info:</h5>
+    <ul style="list-style-type: none;">
+      <li v-for="s in Object.entries(spectrumMetadata.Spectrometry)"><strong>{{s[0]}}:</strong> {{s[1]}}</li>
+    </ul>
+  </div>
+  <span v-if="spectrumMetadata.Author"><strong>Author(s):</strong> {{spectrumMetadata.Author}}</span>
   <br />
-  <span v-if="spectrumMetadata && spectrumMetadata.Date"><strong>Date:</strong> {{spectrumMetadata.Date}}</span>
+  <span v-if="spectrumMetadata.Date"><strong>Date:</strong> {{spectrumMetadata.Date}}</span>
   <br /><br />
   <button @click="copyMetadata()">Copy to Clipboard</button>
 </template>

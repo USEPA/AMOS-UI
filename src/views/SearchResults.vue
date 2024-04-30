@@ -13,7 +13,7 @@
 <template>
   <div class="two-column-page">
     <div class="half-page-column">
-      <div class="all_results-header">
+      <div>
         <h1 v-if="still_searching" class="text-that-can-overflow">Searching for "{{$route.params.search_term}}"...</h1>
         <h1 v-else-if="!still_searching & no_substance_match">No substance match found.</h1>
         <div v-else>
@@ -32,35 +32,41 @@
                 <li><strong>InChIKey:</strong> {{ substance_info.indigo_inchikey ? substance_info.indigo_inchikey : substance_info.jchem_inchikey}} </li>
                 <li><strong>Molecular Formula:</strong> {{ substance_info.molecular_formula }} </li>
                 <li><strong>Mass:</strong> {{ substance_info.monoisotopic_mass }} </li>
+                <li v-if="classification">
+                  <ClassyFireDisplay :kingdom="classification.kingdom" :superklass="classification.superklass" :klass="classification.klass" :subklass="classification.subklass" />
+                </li>
                 <li v-if="additional_sources.length > 0">
                   <details>
-                    <summary>Additional Information Sources</summary>
+                    <summary><strong>Additional Information Sources</strong></summary>
                     <ul>
                       <li v-for="s in additional_sources"><a :href="s.link" target="_blank">{{s.source_name}}</a></li>
                     </ul>
                   </details>
                 </li>
-                <li>&nbsp;</li>
-                <li><button v-if="!still_searching" @click="downloadResultsAsExcel">Download Results</button></li>
               </ul>
             </div>
           </div>
         </div>
       </div>
-      <div v-if="all_results.length > 0">
-        <div>
-          <input type="checkbox" id="single-point-spectra" v-model="result_filters.single_point_spectra" @change="updateCheckboxFilters">
-          <label for="single-point-spectra">Include Single Point Spectra</label>
+      <div v-if="all_results.length > 0" style="display: flex; flex-direction: row;">
+        <div style="width: 40%">
+          <div>
+            <input type="checkbox" id="single-point-spectra" v-model="result_filters.single_point_spectra" @change="updateCheckboxFilters">
+            <label for="single-point-spectra">Include Single Point Spectra</label>
+          </div>
+          <div>
+            <input type="checkbox" id="ms-ready" v-model="result_filters.ms_ready" @change="updateCheckboxFilters">
+            <label for="ms-ready">Include MS-Ready methods</label>
+            &nbsp;
+            <help-icon style="vertical-align:middle;" tooltipText="MS-Ready refers to a standardization of substances by collapsing isomers, salts, isotopes, etc., into a single form, identifiable by having the same first block of their InChIKey.  Selecting this will include methods from substances with the same MS-Ready form." />
+          </div>
+          <div>
+            <input type="checkbox" id="spectrabase" v-model="result_filters.spectrabase" @change="updateCheckboxFilters">
+            <label for="spectrabase">Include Spectrabase</label>
+          </div>
         </div>
-        <div>
-          <input type="checkbox" id="ms-ready" v-model="result_filters.ms_ready" @change="updateCheckboxFilters">
-          <label for="ms-ready">Include MS-Ready methods</label>
-          &nbsp;
-          <help-icon style="vertical-align:middle;" tooltipText="MS-Ready refers to a standardization of substances by collapsing isomers, salts, isotopes, etc., into a single form, identifiable by having the same first block of their InChIKey.  Selecting this will include methods from substances with the same MS-Ready form." />
-        </div>
-        <div>
-          <input type="checkbox" id="spectrabase" v-model="result_filters.spectrabase" @change="updateCheckboxFilters">
-          <label for="spectrabase">Include Spectrabase</label>
+        <div style="width: 60%; display: flex; align-items: center;">
+          <button v-if="!still_searching" @click="downloadResultsAsExcel">Download Results</button>
         </div>
       </div>
       <div v-if="!still_searching">
@@ -88,6 +94,7 @@
             :isExternalFilterPresent="isExternalFilterPresent"
             :doesExternalFilterPass="doesExternalFilterPass"
             :postSortRows="postSortRows"
+            :loadingOverlayComponent="SimilarMethodRedirect"
           ></ag-grid-vue>
         </div>
       </div>
@@ -121,10 +128,12 @@
   import { getSubstanceImageLink } from '@/assets/common_functions'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL, METHOD_DOCUMENT_TYPES, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
   import '@/assets/style.css'
+  import ClassyFireDisplay from '@/components/ClassyFireDisplay.vue'
   import HelpIcon from '@/components/HelpIcon.vue'
   import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
   import MassSpectrumDisplay from '@/components/MassSpectrumDisplay.vue'
   import NMRSpectrumDisplay from '@/components/NMRSpectrumDisplay.vue'
+  import SimilarMethodRedirect from '@/components/SimilarMethodRedirect.vue'
   import StoredPDFDisplay from '@/components/StoredPDFDisplay.vue'
   import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
 
@@ -151,6 +160,7 @@
         SOURCE_ABBREVIATION_MAPPING,
         result_table_view_mode: "all",
         result_count: 0,
+        classification: null,
         record_type_counts: {method: 0, "fact sheet": 0, spectrum: 0},
         ms_ready_search_run: false,
         additional_sources: [],
@@ -317,6 +327,9 @@
         } else if (tabName === "method") {
           this.gridColumnApi.setColumnsVisible(['count', 'method_number', 'method_type', 'methodologies'], true)
           this.gridColumnApi.setColumnsVisible(['record_type'], false)
+          if (this.record_type_counts.method == 0) {
+            this.gridApi.value.showLoadingOverlay()
+          }
         } else {
           // "All" case
           this.gridColumnApi.setColumnsVisible(['count', 'methodologies', 'record_type'], true)
@@ -400,6 +413,10 @@
         // Search term matches one substance.
         const search_results = await axios.get(`${this.BACKEND_LOCATION}/search/${response.data.substances.dtxsid}`)
         const additional_source_results = await axios.get(`${this.BACKEND_LOCATION}/additional_sources_for_substance/${response.data.substances.dtxsid}`)
+        const classyfire = await axios.get(`${this.BACKEND_LOCATION}/get_classification_for_dtxsid/${response.data.substances.dtxsid}`)
+        if (classyfire.status == 200) {
+          this.classification = classyfire.data
+        }
         this.additional_sources = additional_source_results.data
         this.all_results = search_results.data.records
         this.results.substance = search_results.data.records
@@ -415,10 +432,12 @@
     },
     components: {
       AgGridVue,
+      ClassyFireDisplay,
       HelpIcon,
       InchikeyDisambiguation,
       MassSpectrumDisplay,
       NMRSpectrumDisplay,
+      SimilarMethodRedirect,
       StoredPDFDisplay,
       SynonymDisambiguation
     }

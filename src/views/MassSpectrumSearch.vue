@@ -49,10 +49,10 @@
           :autoGroupColumnDef="autoGroupColumnDef"
         ></ag-grid-vue>
         <br />
-        <div style="display: flex; flex-direction: column; align-items: center">
-          <MassSpectrumPlot style="display: flex;" :spectrum="user_spectrum_array" :secondSpectrum="selected_spectrum" spectrumName="User Spectrum" :secondSpectrumName="selected_dtxsid" title="Spectrum Comparison"/>
+        <div v-if="any_row_selected" style="display: flex; flex-direction: column; align-items: center">
+          <DualMassSpectrumPlot style="display: flex;" :spectrum1="user_spectrum_array" :spectrum2="selected_spectrum" spectrum1_name="User Spectrum" :spectrum2_name="selected_dtxsid"/>
           <br />
-          <div style="display: flex;" v-if="any_row_selected">
+          <div style="display: flex;">
             <button @click="show_modal.table = true">Show Points</button>
             <button v-if="spectrum_metadata" @click="show_modal.metadata = true">Spectrum Info</button>
           </div>
@@ -93,8 +93,8 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import '@/assets/style.css'
+  import DualMassSpectrumPlot from '@/components/DualMassSpectrumPlot.vue'
   import MassSpectrumMetadata from '@/components/MassSpectrumMetadata.vue'
-  import MassSpectrumPlot from '@/components/MassSpectrumPlot.vue'
 
   export default{
     data() {
@@ -183,7 +183,7 @@
         return selected_spectrum.map(function(x){return {"m/z":x[0], "intensity":x[1]}})
       }
     },
-    components: {AgGridVue, MassSpectrumMetadata, MassSpectrumPlot}
+    components: {AgGridVue, DualMassSpectrumPlot, MassSpectrumMetadata}
   }
 
 </script>

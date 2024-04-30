@@ -7,7 +7,7 @@
 
 <template>
   <div class="spectrum-display-container">
-    <p>Below is a plot of the selected NMR spectrum.  Use the mouse wheel to zoom in and out or double click to zoom in.  Hover over the plot with the mouse to see individual points; this may lag somewhat for larger spectra (64k points or so).</p>
+    <p>Below is a plot of the selected NMR spectrum.  Use the mouse wheel to zoom in and out or double click to zoom in.  Hover over the plot with the mouse to see individual points; this may lag somewhat for larger spectra (64k points or so).  Intensities are scaled so that the maximum is 10.</p>
     <div class="graph-container">
       <h5>{{nucleus}} NMR Spectrum</h5>
       <svg width="600" height="400" id="plot"></svg>
@@ -113,9 +113,9 @@
         var linemaker = d3.line().x(d => ppm_rescale(d["ppm"])).y(d => intensity_scale(d["intensity"]))
         var path = svg.append("path").attr("fill", "none").attr("stroke", "red").attr("d", linemaker(this.spectrum)).attr("clip-path", "url(#clippy)")
 
-        // make a circle to add to the plot (plan on removing this later)
+        // make a circle to add to the plot 
         var focus = svg.append("g").style("display", "none")
-        focus.append("circle").attr("class", "y").style("fill", "none").style("stroke", "blue").attr("r", 4)
+        focus.append("circle").attr("class", "y").style("fill", "red").style("stroke", "red").attr("r", 4)
 
         var spectrum = this.spectrum
 
@@ -124,17 +124,14 @@
           ppm_rescale = event.transform.rescaleX(ppm_scale)
           ppm_axis_g.call(ppm_axis.scale(ppm_rescale))
           path.attr("d", linemaker(spectrum))
-        })  //.scaleExtent([1,40]).translateExtent([[0,0],[width,height]])
+        })
         svg.call(zoom)
-
-        // add zoom reset button
-        svg.append("button").attr("id", "zoom_reset").attr("text", "Reset Zoom")
 
         // add description text to the plot
         focus.append("text").attr("class", "locationtext").attr("text-anchor", "end").attr("x", width).attr("y", margin/2)
 
         // the rect is the selection area for the cursor, while the rest of this block is implementing the mouseover functionality
-        svg.append("rect").attr("width", width).attr("height", height).style("fill", "none").style("pointer-events", "all")
+        svg.append("rect").attr("width", width - 2*margin).attr("height", height - 2*margin).attr("transform", `translate(${margin}, ${margin})`).style("fill", "none").style("pointer-events", "all")
           .on("mouseover", function() {focus.style("display", null)})
           .on("mouseout", function() {focus.style("display", "none")})
           .on("mousemove", function(event) {
@@ -146,7 +143,6 @@
           })
         
         d3.select("#zoomReset").on("click", function(){
-          console.log("zoom reset clicked")
           svg.call(zoom.transform, d3.zoomIdentity)
         })
         

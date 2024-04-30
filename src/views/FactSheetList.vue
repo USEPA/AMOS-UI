@@ -34,6 +34,7 @@
         @first-data-rendered="onGridReady"
         @row-selected="onRowSelected"
         @filter-changed="onFilterChanged"
+        :tooltipShowDelay="400"
       ></ag-grid-vue>
     </div>
     <StoredPDFDisplay style="width: 48vw;" v-if="any_fact_sheet_selected" :internalID="selected_row_data.internal_id" recordType="fact sheet"/>
@@ -72,7 +73,7 @@
           {field: 'internal_id', headerName: 'Doc ID', sortable: true, width: 80, comparator: (valA, valB, nodeA, nodeB, isDescending) => {
             return Number.parseInt(valA.substring(3)) - Number.parseInt(valB.substring(3))
           }},
-          {field: 'fact_sheet_name', headerName: 'Fact Sheet Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, sort: "asc", flex: 1},
+          {field: 'fact_sheet_name', headerName: 'Fact Sheet Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, sort: "asc", flex: 1, tooltipField: 'fact_sheet_name'},
           {field: 'source', headerName: 'Source', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, width: 90, tooltipValueGetter: params => {
               if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source]) {
                 return this.SOURCE_ABBREVIATION_MAPPING[params.data.source].full_name
@@ -114,6 +115,7 @@
     methods: {
       onGridReady(params) {
         this.gridApi = params.api;
+        this.gridColumnApi = params.columnApi;
         for (const k of Object.keys(this.$route.query)) {
           if (k === "full_table") {
             this.full_table_filter = this.$route.query[k]
@@ -180,8 +182,13 @@
         this.quickFilter("")
       },
       downloadCurrentTable() {
+        var columns = this.gridColumnApi.getAllDisplayedColumns().map(x => x.colId)
+        if (!columns.includes("link")) {
+          columns.push("link")
+        }
         this.gridApi.exportDataAsExcel({
-          fileName: `fact_sheet_list_${timestampForFile()}.xlsx`
+          fileName: `fact_sheet_list_${timestampForFile()}.xlsx`,
+          columnKeys: columns
         });
       }
     },

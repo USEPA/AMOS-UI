@@ -10,7 +10,7 @@
   <div class="two-column-page">
     <div class="half-page-column">
       <p>Below is a plot of the spectrum as intensities versus mass-to-charge ratios (m/z).  Click and drag over a section of the horizontal axis to zoom; double click to zoom back out.  Intensities are scaled so that the highest peak has a value of 100.</p>
-      <MassSpectrumPlot :spectrum="spectrum" spectrumName="Intensity" />
+      <SingleMassSpectrumPlot :spectrum="spectrum" />
       <br />
       <div class="info-container">
         <p style="font-weight: bold;">Information</p>
@@ -76,7 +76,7 @@
   import { BACKEND_LOCATION } from '@/assets/store'
   import '@/assets/style.css'
   import MassSpectrumMetadata from '@/components/MassSpectrumMetadata.vue'
-  import MassSpectrumPlot from '@/components/MassSpectrumPlot.vue'
+  import SingleMassSpectrumPlot from '@/components/SingleMassSpectrumPlot.vue'
 
   export default {
     data() {
@@ -140,7 +140,7 @@
       this.substance_info = substance_response.data.substances
       this.image_link = await getSubstanceImageLink(this.substance_info.dtxsid)
     },
-    components: {AgGridVue, MassSpectrumMetadata, MassSpectrumPlot}
+    components: {AgGridVue, MassSpectrumMetadata, SingleMassSpectrumPlot}
   }
 </script>
 

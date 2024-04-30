@@ -10,8 +10,8 @@
 
 <template>
   <div class="spectrum-display-container">
-    <p>Below is a plot of the spectrum as intensities versus mass-to-charge ratios (m/z).  Click and drag over a section of the horizontal axis to zoom; double click to zoom back out.  Intensities are scaled so that the highest peak has a value of 100.</p>
-    <MassSpectrumPlot :spectrum=spectrum spectrumName="Intensity"/>
+    <p>Below is a plot of the spectrum as intensities versus mass-to-charge ratios (m/z).  Scroll up or down to zoom in or out, or use the "reset zoom" button to fully zoom out.  Hover over peaks to see the exact m/z and intensity values.  Intensities are scaled so that the highest peak has a value of 100.</p>
+    <SingleMassSpectrumPlot :spectrum=spectrum />
     <br />
     <div class="info-container">
       <p style="font-weight: bold;">Information</p>
@@ -61,7 +61,7 @@
   import '@/assets/style.css'
   import { BACKEND_LOCATION } from '@/assets/store';
   import MassSpectrumMetadata from '@/components/MassSpectrumMetadata.vue'
-  import MassSpectrumPlot from '@/components/MassSpectrumPlot.vue'
+  import SingleMassSpectrumPlot from '@/components/SingleMassSpectrumPlot.vue'
   
 
   export default {
@@ -106,6 +106,7 @@
         this.splash = response.data.splash
         this.has_associated_method = response.data.has_associated_method
         this.spectrum_metadata = response.data.spectrum_metadata
+        
       },
       spectrumAsRows(spectrum) {
         return spectrum.map(function(x){return {"m/z":x[0], "intensity":x[1]}})
@@ -128,7 +129,7 @@
         document.body.removeChild(textarea)
       }
     },
-    components: {AgGridVue, MassSpectrumMetadata, MassSpectrumPlot}
+    components: {AgGridVue, MassSpectrumMetadata, SingleMassSpectrumPlot}
   };
 </script>
 

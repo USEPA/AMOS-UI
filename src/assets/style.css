@@ -25,15 +25,15 @@
   /*font-weight: bold !important;*/
 }
 
-.two-column-page {
-  display: flex;
-  justify-content: space-between;
-}
-
 .text-that-can-overflow {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.two-column-page {
+  display: flex;
+  justify-content: space-between;
 }
 
 
@@ -85,7 +85,7 @@
 }
 
 
-/* STUFF FOR CHEMICAL IMAGE DISPLAY */
+/***** STUFF FOR CHEMICAL IMAGE DISPLAY *****/
 
 .chemical-box {
   display: flex;
@@ -112,6 +112,8 @@
   font-size: 18px;
   line-height: 1.1;
 }
+
+
 
 /***** SEARCH RESULTS & METADATA HEADER *****/
 .results-header {

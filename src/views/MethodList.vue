@@ -141,7 +141,8 @@
           },
           {field: "count", headerName: "#", width: 60, floatingFilter: false, sortable: true, headerTooltip: "Number of substances in method."},
           {field: "author", headerName: "Author(s)", hide: true},
-          {field: "publisher", headerName: "Publisher", hide: true}
+          {field: "publisher", headerName: "Publisher", hide: true},
+          {field: "link", headerName: "Link", hide: true}
         ]
       }
     },
@@ -212,8 +213,12 @@
         })
       },
       downloadCurrentTable() {
+        var visible_columns = this.gridColumnApi.getAllDisplayedColumns().map(x => x.colId)
+        visible_columns.push("link")
+        console.log(visible_columns)
         this.gridApi.exportDataAsExcel({
-          fileName: `method_list_${timestampForFile()}.xlsx`
+          fileName: `method_list_${timestampForFile()}.xlsx`,
+          columnKeys: visible_columns
         });
       },
       resetFilters() {
