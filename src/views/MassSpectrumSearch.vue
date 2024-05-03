@@ -22,6 +22,7 @@
       <br />
       <div>
         <h5>User Spectrum</h5>
+        Note: spectrum will be automatically rescaled to a maximum intensity of 100 in plots.
         <textarea type="text" class="batch-search-input" style="width:250px;" rows="12" v-model="user_spectrum_string"></textarea>
       </div>
       <br />
@@ -92,6 +93,7 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
+  import { rescaleSpectrum } from '@/assets/common_functions'
   import '@/assets/style.css'
   import DualMassSpectrumPlot from '@/components/DualMassSpectrumPlot.vue'
   import MassSpectrumMetadata from '@/components/MassSpectrumMetadata.vue'
@@ -155,6 +157,7 @@
           console.log("Unknown value for error_type.")
         }
         this.user_spectrum_array = this.user_spectrum_string.split("\n").map(x => x.split(" ").map(y => Number(y)))
+        this.user_spectrum_array = rescaleSpectrum(this.user_spectrum_array)
         const response = await axios.post(
           `${this.BACKEND_LOCATION}/mass_spectrum_similarity_search/`,
           {upper_mass_limit: upper_mass_limit, lower_mass_limit: lower_mass_limit, methodology: this.methodology, spectrum: this.user_spectrum_array}

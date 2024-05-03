@@ -31,7 +31,7 @@
                 <li><strong>CASRN:</strong> {{ substance_info.casrn }} </li>
                 <li><strong>InChIKey:</strong> {{ substance_info.indigo_inchikey ? substance_info.indigo_inchikey : substance_info.jchem_inchikey}} </li>
                 <li><strong>Molecular Formula:</strong> {{ substance_info.molecular_formula }} </li>
-                <li><strong>Mass:</strong> {{ substance_info.monoisotopic_mass }} </li>
+                <li><strong>Monoisotopic Mass:</strong> {{ substance_info.monoisotopic_mass }} </li>
                 <li v-if="classification">
                   <ClassyFireDisplay :kingdom="classification.kingdom" :superklass="classification.superklass" :klass="classification.klass" :subklass="classification.subklass" />
                 </li>

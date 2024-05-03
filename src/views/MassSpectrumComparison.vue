@@ -66,6 +66,7 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
+  import { rescaleSpectrum } from '@/assets/common_functions'
   import { BACKEND_LOCATION } from '@/assets/store';
   import DualMassSpectrumPlot from '@/components/DualMassSpectrumPlot.vue'
   import SingleMassSpectrumPlot from '@/components/SingleMassSpectrumPlot.vue'
@@ -116,6 +117,7 @@
       },
       async display_user_spectrum(box_contents) {
         this.spectrum1 = box_contents.split("\n").map(x => x.split(" ").map(y => Number(y)))
+        this.spectrum1 = rescaleSpectrum(this.spectrum1)
         this.plot_title = "User Spectrum"
         this.spectral_entropy = await this.calculateSpectralEntropy(this.spectrum1)
         this.spectrum_display = "single"
@@ -134,13 +136,16 @@
       },
       async display_both_spectra() {
           this.spectrum1 = this.spectrum_box_1.split("\n").map(x => x.split(" ").map(y => Number(y)))
+          this.spectrum1 = rescaleSpectrum(this.spectrum1)
           this.plot_title = "Spectrum Comparison"
           if (this.dtxsid_mode) {
             this.spectrum2 = this.gridApi.getSelectedRows()[0].spectrum
+            this.spectrum2 = rescaleSpectrum(this.spectrum2)
             this.spectrum1_name = "User Spectrum"
             this.spectrum2_name = "Database Spectrum"
           } else {
             this.spectrum2 = this.spectrum_box_2.split("\n").map(x => x.split(" ").map(y => Number(y)))
+            this.spectrum2 = rescaleSpectrum(this.spectrum2)
             this.spectrum1_name = "Spectrum #1"
             this.spectrum2_name = "Spectrum #2"
           }

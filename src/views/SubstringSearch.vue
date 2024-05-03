@@ -40,7 +40,7 @@
       @row-double-clicked="onDoubleClick"
       :isExternalFilterPresent="isExternalFilterPresent"
       :doesExternalFilterPass="doesExternalFilterPass"
-      @first-data-rendered="onGridReady"
+      @grid-ready="onGridReady"
       @filter-changed="onFilterChanged"
     ></ag-grid-vue>
   </div>

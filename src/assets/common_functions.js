@@ -28,6 +28,15 @@ export async function getSubstanceImageLink(dtxsid) {
     return null
 }
 
+export function rescaleSpectrum(spectrum) {
+    // Rescales a given spectrum so that the maximum intensity is 100.
+    const max_intensity = Math.max(...spectrum.map(x => x[1]))
+    for (let i=0; i<spectrum.length; i++) {
+        spectrum[i][1] = 100 * spectrum[i][1]/max_intensity
+    }
+    return spectrum
+}
+
 export function timestampForFile() {
     // Generates a timestamp for a file, in the format YYYY-MM-DD_HHMMSS.
     const now = new Date()

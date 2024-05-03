@@ -21,7 +21,7 @@
           <li><strong>CASRN:</strong> {{ substance_info.casrn }} </li>
           <li><strong>InChIKey:</strong> {{ substance_info.indigo_inchikey ? substance_info.indigo_inchikey : substance_info.jchem_inchikey}} </li>
           <li><strong>Molecular Formula:</strong> {{ substance_info.molecular_formula }} </li>
-          <li><strong>Mass:</strong> {{ substance_info.monoisotopic_mass }} </li>
+          <li><strong>Monoisotopic Mass:</strong> {{ substance_info.monoisotopic_mass }} </li>
           <li><br /></li>
           <li v-if="record_info">Records available:
             <span v-if="record_info.Spectrum">{{ record_info.Spectrum }} spectra</span>

@@ -81,7 +81,7 @@
               <li><strong>CASRN:</strong> {{ substance_info.searched_substance.casrn }} </li>
               <li><strong>InChIKey:</strong> {{ substance_info.searched_substance.indigo_inchikey ? substance_info.searched_substance.indigo_inchikey : substance_info.searched_substance.jchem_inchikey}} </li>
               <li><strong>Molecular Formula:</strong> {{ substance_info.searched_substance.molecular_formula }} </li>
-              <li><strong>Mass:</strong> {{ substance_info.searched_substance.monoisotopic_mass }} </li>
+              <li><strong>Monoisotopic Mass:</strong> {{ substance_info.searched_substance.monoisotopic_mass }} </li>
             </ul>
           </div>
         </div>
@@ -101,7 +101,7 @@
               <li><strong>CASRN:</strong> {{ substance_info.similar_substance.casrn }} </li>
               <li><strong>InChIKey:</strong> {{ substance_info.similar_substance.indigo_inchikey ? substance_info.similar_substance.indigo_inchikey : substance_info.similar_substance.jchem_inchikey}} </li>
               <li><strong>Molecular Formula:</strong> {{ substance_info.similar_substance.molecular_formula }} </li>
-              <li><strong>Mass:</strong> {{ substance_info.similar_substance.monoisotopic_mass }} </li>
+              <li><strong>Monoisotopic Mass:</strong> {{ substance_info.similar_substance.monoisotopic_mass }} </li>
             </ul>
           </div>
         </div>
