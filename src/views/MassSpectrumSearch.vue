@@ -23,6 +23,7 @@
       <div>
         <h5>User Spectrum</h5>
         Note: spectrum will be automatically rescaled to a maximum intensity of 100 in plots.
+        <br />
         <textarea type="text" class="batch-search-input" style="width:250px;" rows="12" v-model="user_spectrum_string"></textarea>
       </div>
       <br />
