@@ -65,11 +65,12 @@
         </div>
       </div>
     </div>
-    <StoredPDFDisplay style="width: 48vw;" v-if="right_side_viewer_mode == 'Methods'" :internalID="selected_row_data.internal_id" recordType="method" :highlightedSubstances="similar_substances"/>
+    <StoredPDFDisplay style="width: 48vw;" v-if="right_side_viewer_mode == 'Methods'" :internalID="selected_row_data.internal_id" recordType="method" :highlightedSubstances="highlighted_substances"/>
     <div class="half-page-column" v-else-if="right_side_viewer_mode == 'Substances'">
       <h4>Searched Substance:</h4>
       <div style="display: flex; justify-content: center;">
-        <div class="chemical-box" style="justify-content: left; width: 90%">
+        <BasicSubstanceDisplay style="justify-content: left; width: 90%" :substanceInfo="substance_info.searched_substance" :classification="classyfire.searched_substance" />
+        <!-- <div class="chemical-box" style="justify-content: left; width: 90%">
           <div class="chemical-image-highlight">
             <img v-if="substance_info.searched_substance.image_link" class="chemical-image" :src="substance_info.searched_substance.image_link" :alt="`Structure image for ${substance_info.searched_substance.dtxsid}`"/>  
             <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this substance.</div>
@@ -84,12 +85,13 @@
               <li><strong>Monoisotopic Mass:</strong> {{ substance_info.searched_substance.monoisotopic_mass }} </li>
             </ul>
           </div>
-        </div>
+        </div> -->
       </div>
       <br />
       <h4>Selected Substance From Table:</h4>
       <div style="display: flex; justify-content: center;">
-        <div class="chemical-box" style="justify-content: left; width: 90%">
+        <BasicSubstanceDisplay style="justify-content: left; width: 90%" :substanceInfo="substance_info.similar_substance" :classification="classyfire.similar_substance"/>
+        <!-- <div class="chemical-box" style="justify-content: left; width: 90%">
           <div class="chemical-image-highlight">
             <img v-if="substance_info.similar_substance.image_link" class="chemical-image" :src="substance_info.similar_substance.image_link" :alt="`Structure image for ${substance_info.similar_substance.dtxsid}`"/>  
             <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this substance.</div>
@@ -104,7 +106,7 @@
               <li><strong>Monoisotopic Mass:</strong> {{ substance_info.similar_substance.monoisotopic_mass }} </li>
             </ul>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -126,12 +128,13 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
+  import { getSubstanceImageLink } from '@/assets/common_functions'
+  import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
   import '@/assets/style.css'
+  import BasicSubstanceDisplay from '@/components/BasicSubstanceDisplay.vue'
   import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
   import StoredPDFDisplay from '@/components/StoredPDFDisplay.vue'
   import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
-  import { getSubstanceImageLink } from '@/assets/common_functions'
-  import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
   
   export default{
     data() {
@@ -154,8 +157,9 @@
         tab_viewer_mode: "Methods",
         right_side_viewer_mode: "N/A",
         substance_info: {searched_substance: {}, similar_substance: {}},
-        similar_substances: [],
+        highlighted_substances: [],
         min_similarity: 0.5,
+        classyfire: {searched_substance: null, similar_substance: null},
         result_column_defs: [
           {field: "internal_id", rowGroup: true, hide: true, sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
             const title_text = this.ids_to_method_names[params.value] + " (" + params.node.allChildrenCount + ")";
@@ -203,6 +207,7 @@
     },
     components: {
       AgGridVue,
+      BasicSubstanceDisplay,
       InchikeyDisambiguation,
       StoredPDFDisplay,
       SynonymDisambiguation
@@ -212,10 +217,14 @@
         // when the minimum similarity changes, filter results as appropriate
         if (this.search_complete & this.found_substance & (this.results.length > 0)) {
           this.gridApi.onFilterChanged()
+          this.updateHighlightedSubstances()
         }
       }
     },
     methods: {
+      updateHighlightedSubstances() {
+        this.highlighted_substances = this.dtxsid_counts.filter(x => x.similarity >= this.min_similarity).map(x => x.dtxsid)
+      },
       async methodSearch(searched_substance) {
         // variable setup
         this.results = null
@@ -239,7 +248,13 @@
           this.substance_info.searched_substance.image_link = await getSubstanceImageLink(response.data.substances.dtxsid)
           const methods_response = await axios.get(`${this.BACKEND_LOCATION}/get_similar_methods/${response.data.substances.dtxsid}`)
           this.dtxsid_counts = methods_response.data.dtxsid_counts
-          this.similar_substances = this.dtxsid_counts.map(x => x.dtxsid)
+          const classyfire_response = await axios.get(`${this.BACKEND_LOCATION}/get_classification_for_dtxsid/${response.data.substances.dtxsid}`)
+          if ((classyfire_response.status == 200) & (classyfire_response.data.kingdom !== null)) {
+            this.classyfire.searched_substance = classyfire_response.data
+          } else {
+            this.classyfire.searched_substance = null
+          }
+          this.updateHighlightedSubstances()
           this.current_substance = searched_substance.trim()  // should be whatever the user chooses
           this.found_substance = true
           this.results = methods_response.data.results
@@ -275,9 +290,15 @@
       },
       async substancesRowSelected(event) {
         if (event.event) {
-          const response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${event.data.dtxsid}`)
-          this.substance_info.similar_substance = response.data.substances
-          this.substance_info.similar_substance.image_link = await getSubstanceImageLink(response.data.substances.dtxsid)
+          const substance_response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${event.data.dtxsid}`)
+          this.substance_info.similar_substance = substance_response.data.substances
+          this.substance_info.similar_substance.image_link = await getSubstanceImageLink(substance_response.data.substances.dtxsid)
+          const classyfire_response = await axios.get(`${this.BACKEND_LOCATION}/get_classification_for_dtxsid/${substance_response.data.substances.dtxsid}`)
+          if ((classyfire_response.status == 200) & (classyfire_response.data.kingdom !== null)) {
+            this.classyfire.similar_substance = classyfire_response.data
+          } else {
+            this.classyfire.similar_substance = null
+          }
           this.right_side_viewer_mode = "Substances"
         }
       },

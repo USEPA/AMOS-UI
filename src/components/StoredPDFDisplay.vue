@@ -129,6 +129,12 @@
         if (this.viewer_mode == "SubstanceTable") {
           this.gridApi.refreshCells()
         }
+      },
+      highlightedSubstances() {
+        console.log(this.highlightedSubstances)
+        if (this.viewer_mode == "SubstanceTable") {
+          this.gridApi.redrawRows()
+        }
       }
     },
     async created() {

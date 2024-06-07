@@ -42,7 +42,7 @@
     </b-modal>
 
     <!-- Modal window that displays the metadata associated with the spectrum, using the spectrum_metadata field from the database. -->
-    <b-modal v-model="show_metadata_modal" ref="metadata_modal">
+    <b-modal v-if="spectrum_metadata" v-model="show_metadata_modal" ref="metadata_modal">
       <MassSpectrumMetadata :spectrumMetadata=spectrum_metadata />
     </b-modal>
   </div>

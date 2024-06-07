@@ -37,6 +37,7 @@
     </div>
     <div class="half-page-column">
       <h3>Substance Info</h3>
+      <!-- <BasicSubstanceDisplay :substanceInfo="substance_info" /> -->
       <div class="chemical-box">
         <div class="chemical-image-highlight">
           <img v-if="image_link" class="chemical-image" :src="image_link" :alt="`Structure image for ${substance_info.dtxsid}`"/>  
@@ -75,6 +76,7 @@
   import { getSubstanceImageLink } from '@/assets/common_functions'
   import { BACKEND_LOCATION } from '@/assets/store'
   import '@/assets/style.css'
+  import BasicSubstanceDisplay from '@/components/BasicSubstanceDisplay.vue'
   import MassSpectrumMetadata from '@/components/MassSpectrumMetadata.vue'
   import SingleMassSpectrumPlot from '@/components/SingleMassSpectrumPlot.vue'
 
@@ -140,7 +142,7 @@
       this.substance_info = substance_response.data.substances
       this.image_link = await getSubstanceImageLink(this.substance_info.dtxsid)
     },
-    components: {AgGridVue, MassSpectrumMetadata, SingleMassSpectrumPlot}
+    components: {AgGridVue, BasicSubstanceDisplay, MassSpectrumMetadata, SingleMassSpectrumPlot}
   }
 </script>
 

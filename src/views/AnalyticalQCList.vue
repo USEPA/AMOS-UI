@@ -3,6 +3,7 @@
   <p>Double-click a row to open the corresponding document in a new tab.</p>
   <div class="button-array">
     <button @click="downloadCurrentTable">Download Table</button>
+    <button @click="downloadSubstances">Download Substances</button>
   </div>
   <ag-grid-vue
     class="ag-theme-balham"
@@ -30,7 +31,7 @@
 
   import '@/assets/style.css'
   import { getSubstanceImageLink, timestampForFile } from '@/assets/common_functions'
-  import { ANALYTICAL_QC_CALLS, ANALYTICAL_QC_GRADES, BACKEND_LOCATION } from '@/assets/store'
+  import { ANALYTICAL_QC_CALLS, ANALYTICAL_QC_GRADES, BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
 
   export default {
     data() {
@@ -39,11 +40,15 @@
         ANALYTICAL_QC_GRADES,
         aqc_data: [],
         BACKEND_LOCATION,
+        COMPTOX_PAGE_URL,
         default_column_def: {resizable: true, filter: 'agTextColumnFilter', floatingFilter: true},
         column_defs: [
           {field: 'internal_id', headerName: "internal ID", hide: true},
-          {field: 'dtxsid', headerName: "DTXSID", width: 120, sortable: true},
+          {field: 'dtxsid', headerName: 'DTXSID', width: 120, sortable: true, cellRenderer: params => {
+            return "<a href='" + this.COMPTOX_PAGE_URL + params.data.dtxsid + "' target='_blank'>" + params.data.dtxsid + "</a>"
+          }},
           {field: 'casrn', headerName: "CASRN", width: 110, sortable: true},
+          {field: 'molecular_formula', headerName: "Formula", width: 110},
           {field: 'sample_id', headerName: "Sample ID", width: 110, sortable: true},
           {field: 'preferred_name', headerName: "Preferred Name", flex: 1, sortable: true},
           {field: 'study', headerName: "Source/Technique", width: 140, sortable: true, filter: 'agMultiColumnFilter'},
@@ -72,14 +77,15 @@
               return m
             }
           }},
-          {field: 'annotation', headerName: "Annotation", flex: 1}
+          {field: 'annotation', headerName: "Annotation", flex: 1},
+          {field: 'flags', headerName: "Flags", flex: 1}
         ]
       }
     },
     async created() {
       const response = await axios.get(`${this.BACKEND_LOCATION}/analytical_qc_list/`)
       this.aqc_data = response.data.results
-    }, 
+    },
     methods: {
       onGridReady(params) {
         this.gridApi = params.api;
@@ -95,7 +101,22 @@
       },
       downloadCurrentTable() {
         this.gridApi.exportDataAsExcel({
-          fileName: `fact_sheet_list_${timestampForFile()}.xlsx`
+          fileName: `analytical_qc_${timestampForFile()}.xlsx`
+        });
+      },
+      downloadSubstances() {
+        var seen_dtxsids = []
+        var rows_to_keep = []
+        this.gridApi.forEachNodeAfterFilter( (rowNode, index) => {
+          if (!seen_dtxsids.includes(rowNode.data.dtxsid)) {
+            seen_dtxsids.push(rowNode.data.dtxsid)
+            rows_to_keep.push(index)
+          }
+        })
+        this.gridApi.exportDataAsExcel({
+          fileName: `analytical_qc_substances_${timestampForFile()}.xlsx`,
+          columnKeys: ["dtxsid", "casrn", "preferred_name"],
+          shouldRowBeSkipped: params => {return !rows_to_keep.includes(params.node.rowIndex)}
         });
       }
     },

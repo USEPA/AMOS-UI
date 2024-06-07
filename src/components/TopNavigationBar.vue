@@ -20,13 +20,15 @@
         <b-dropdown-item to="/methods_list">Methods</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
-      <router-link to="/similar_method_search">Similar Method Search</router-link>
-      &emsp;
-      <router-link to="/batch_search">Batch Search</router-link>
+      <b-nav-item-dropdown text="Additional Searches" class="nav-dropdown">
+        <b-dropdown-item to="/batch_search">Batch Search</b-dropdown-item>
+        <b-dropdown-item to="/classification_search">Classification Search</b-dropdown-item>
+        <b-dropdown-item to="/mass_spectrum_search">Mass Spectrum Search</b-dropdown-item>
+        <b-dropdown-item to="/similar_method_search">Similar Method Search</b-dropdown-item>
+      </b-nav-item-dropdown>
       &emsp;
       <b-nav-item-dropdown text="Other Pages" class="nav-dropdown">
         <b-dropdown-item to="/mass_spectrum_comparison">Mass Spectrum Comparison</b-dropdown-item>
-        <b-dropdown-item to="/mass_spectrum_search">Mass Spectrum Search</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
       <b-nav-item-dropdown text="About" class="nav-dropdown">

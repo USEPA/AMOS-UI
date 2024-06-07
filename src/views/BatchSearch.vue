@@ -24,8 +24,40 @@
     <div class="batch-search-options" style="display: block">
       <h5>Search Options</h5>
       <div style="display: flex">
-        <input type="checkbox" id="include-spectrabase" v-model="include_spectrabase" checked>
-        <label for="include-spectrabase"><span class="has-hover-text" title="SpectraBase contains a lot of non-MS spectra, and their data requires an account, so it may not be desirable to include these results.">Include SpectraBase</span></label>
+        <div class="option-sets">
+          <strong>Record Types</strong>
+          <br />
+          <input type="checkbox" id="include-fact-sheets" v-model="record_types['Fact Sheet']" checked>
+          <label for="include-fact-sheets">Fact Sheets</label>
+          <br />
+          <input type="checkbox" id="include-methods" v-model="record_types.Method" checked>
+          <label for="include-methods">Methods</label>
+          <br />
+          <input type="checkbox" id="include-spectra" v-model="record_types.Spectrum" checked>
+          <label for="include-spectra">Spectra</label>
+          <br />
+        </div>
+        <div class="option-sets">
+          <strong>Methodologies</strong>
+          <br />
+          <input type="checkbox" id="methodologies-all" v-model="methodologies.all" checked>
+          <label for="methodologies-all">All</label>
+          <br />
+          <input type="checkbox" id="methodologies-gcms" v-model="methodologies['GC/MS']" checked :disabled="methodologies.all">
+          <label for="methodologies-gcms">GC/MS</label>
+          <br />
+          <input type="checkbox" id="methodologies-lcms" v-model="methodologies['LC/MS']" checked :disabled="methodologies.all">
+          <label for="methodologies-lcms">LC/MS</label>
+          <br />
+          <input type="checkbox" id="methodologies-nmr" v-model="methodologies.NMR" checked :disabled="methodologies.all">
+          <label for="methodologies-nmr">NMR</label>
+        </div>
+        <div class="option-sets">
+          <strong>Other</strong>
+          <br />
+          <input type="checkbox" id="include-spectrabase" v-model="include_spectrabase" checked>
+          <label for="include-spectrabase"><span class="has-hover-text" title="SpectraBase contains a lot of non-MS spectra, and their data requires an account, so it may not be desirable to include these results.">Include SpectraBase</span></label>
+        </div>
       </div>
     </div>
   </div>
@@ -50,15 +82,25 @@
           show_empty_box_error: false,
           no_records_found: false
         },
+        record_types: {"Fact Sheet": true, "Method": true, "Spectrum": true},
+        methodologies: {all: true, "GC/MS": true, "LC/MS": true, "NMR": true},
         BACKEND_LOCATION
       }
     },
     methods: {
       async batch_search() {
         this.status_boxes.show_empty_box_error = false
+        this.status_boxes.no_records_found = false
         if(this.search_box != ""){
           const search_terms = this.search_box.split("\n")
-          await axios.post(`${this.BACKEND_LOCATION}/batch_search`, {dtxsids: search_terms, base_url: window.location.origin, include_spectrabase: this.include_spectrabase}, {responseType: "blob"}).then(res => {
+          const parameters = {
+            dtxsids: search_terms,
+            base_url: window.location.origin,
+            include_spectrabase: this.include_spectrabase,
+            record_types: this.record_types,
+            methodologies: this.methodologies
+          }
+          await axios.post(`${this.BACKEND_LOCATION}/batch_search`, parameters, {responseType: "blob"}).then(res => {
             if (res.status == 204) {
               this.status_boxes.no_records_found = true
             } else {
@@ -98,5 +140,9 @@
   }
   .batch-search-options {
     margin-left: 100px
+  }
+
+  .option-sets {
+    margin-right: 50px
   }
 </style>

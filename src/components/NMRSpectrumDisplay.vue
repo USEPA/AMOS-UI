@@ -22,6 +22,7 @@
         <li><strong>Temperature:</strong> {{ temperature ? `${temperature} °C` : "Unknown" }}</li>
         <li><strong>Solvent:</strong> {{ solvent ? solvent : "Unknown" }}</li>
       </ul>
+      <button @click="downloadNMRSpectrum">Download Spectrum</button>
     </div>
   </div>
 </template>
@@ -83,6 +84,15 @@
         this.spectrum = spectrum_array.map(x => {
           return {ppm: x[0], intensity: x[1]}
         })
+      },
+      downloadNMRSpectrum() {
+        const spectrum_string = "PPM Intensity\n" + this.spectrum.map(x => `${x.ppm} ${x.intensity}`).join("\n")
+        var file = new Blob([spectrum_string], {type: "text/plain"})
+        var a = document.createElement("a")
+        a.setAttribute('download', true)
+        a.href = window.URL.createObjectURL(file)
+        a.download = "nmr spectrum.txt"
+        a.click()
       },
       createNMRSpectrumPlot() {
         var svg = d3.select("#plot")

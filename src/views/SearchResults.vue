@@ -25,25 +25,47 @@
               <div v-else style="text-align: center; display: flex; align-items: center;">No structural representation was found for this substance.</div>
             </div>
             <div class="chemical-info">
-              <ul style="list-style-type: none;">
-                <li><strong>(Preferred) Name:</strong> {{ substance_info.preferred_name }} </li>
-                <li><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substance_info.dtxsid}`">{{ substance_info.dtxsid }}</a> </li>
-                <li><strong>CASRN:</strong> {{ substance_info.casrn }} </li>
-                <li><strong>InChIKey:</strong> {{ substance_info.indigo_inchikey ? substance_info.indigo_inchikey : substance_info.jchem_inchikey}} </li>
-                <li><strong>Molecular Formula:</strong> {{ substance_info.molecular_formula }} </li>
-                <li><strong>Monoisotopic Mass:</strong> {{ substance_info.monoisotopic_mass }} </li>
-                <li v-if="classification">
-                  <ClassyFireDisplay :kingdom="classification.kingdom" :superklass="classification.superklass" :klass="classification.klass" :subklass="classification.subklass" />
-                </li>
-                <li v-if="additional_sources.length > 0">
-                  <details>
-                    <summary><strong>Additional Information Sources</strong></summary>
-                    <ul>
-                      <li v-for="s in additional_sources"><a :href="s.link" target="_blank">{{s.source_name}}</a></li>
-                    </ul>
-                  </details>
-                </li>
-              </ul>
+              <table style="margin-left: 30px;">
+                <tr>
+                  <td><button class="copy-button" title="Copy Name" @click="copyToClipboard(substance_info.preferred_name)">⎘</button></td>
+                  <td><strong>(Preferred) Name:</strong> {{ substance_info.preferred_name }}</td>
+                </tr>
+                <tr>
+                  <td><button class="copy-button" title="Copy DTXSID" @click="copyToClipboard(substance_info.dtxsid)">⎘</button></td>
+                  <td><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substance_info.dtxsid}`">{{ substance_info.dtxsid }}</a></td>
+                </tr>
+                <tr>
+                  <td><button class="copy-button" title="Copy CASRN" @click="copyToClipboard(substance_info.casrn)">⎘</button></td>
+                  <td><strong>CASRN:</strong> {{ substance_info.casrn }}</td>
+                </tr>
+                <tr>
+                  <td><button class="copy-button" title="Copy InChIKey" @click="copyToClipboard(substance_info.indigo_inchikey ? substance_info.indigo_inchikey : substance_info.jchem_inchikey)">⎘</button></td>
+                  <td><strong>InChIKey:</strong> {{ substance_info.indigo_inchikey ? substance_info.indigo_inchikey : substance_info.jchem_inchikey}}</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td><strong>Molecular Formula:</strong> {{ substance_info.molecular_formula }}</td>
+                </tr>
+                <tr>
+                  <td></td>
+                  <td><strong>Monoisotopic Mass:</strong> {{ substance_info.monoisotopic_mass }}</td>
+                </tr>
+                <tr v-if="classification">
+                  <td></td>
+                  <td><ClassyFireDisplay :kingdom="classification.kingdom" :superklass="classification.superklass" :klass="classification.klass" :subklass="classification.subklass" /></td>
+                </tr>
+                <tr v-if="additional_sources.length > 0">
+                  <td></td>
+                  <td>
+                    <details>
+                      <summary><strong>Additional Information Sources</strong></summary>
+                      <ul>
+                        <li v-for="s in additional_sources"><a :href="s.link" target="_blank">{{s.source_name}}</a></li>
+                      </ul>
+                    </details>
+                  </td>
+                </tr>
+              </table>
             </div>
           </div>
         </div>
@@ -204,8 +226,10 @@
               if (this.METHOD_DOCUMENT_TYPES[params.data.method_type]) {
                 return "has-hover-text"
               }
-            }},
+            }
+          },
           {field: 'count', headerName: '#', width: 35, suppressSizeToFit: true, sortable: true, headerTooltip: "Number of substances in record."},
+          {field: 'spectrum_rating', headerName: "Rating", width: 80, suppressSizeToFit: true, hide: true, filter: 'agTextColumnFilter'},
           {field: 'description', headerName: 'Information', sortable: true, flex: 1, tooltipField: 'comment', filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params =>{
             if (params.data.description === null) {
               return "No description available."
@@ -320,20 +344,20 @@
         this.result_table_view_mode = tabName
         if (tabName === "fact sheet"){
           this.gridColumnApi.setColumnsVisible(['count'], true)
-          this.gridColumnApi.setColumnsVisible(['method_number', 'method_type', 'methodologies', 'record_type'], false)
+          this.gridColumnApi.setColumnsVisible(['method_number', 'method_type', 'methodologies', 'record_type', 'spectrum_rating'], false)
         } else if (tabName === "spectrum") {
-          this.gridColumnApi.setColumnsVisible(['methodologies'], true)
+          this.gridColumnApi.setColumnsVisible(['methodologies', 'spectrum_rating'], true)
           this.gridColumnApi.setColumnsVisible(['count', 'method_number', 'method_type', 'record_type'], false)
         } else if (tabName === "method") {
           this.gridColumnApi.setColumnsVisible(['count', 'method_number', 'method_type', 'methodologies'], true)
-          this.gridColumnApi.setColumnsVisible(['record_type'], false)
+          this.gridColumnApi.setColumnsVisible(['record_type', 'spectrum_rating'], false)
           if (this.record_type_counts.method == 0) {
             this.gridApi.value.showLoadingOverlay()
           }
         } else {
           // "All" case
           this.gridColumnApi.setColumnsVisible(['count', 'methodologies', 'record_type'], true)
-          this.gridColumnApi.setColumnsVisible(['method_number', 'method_type'], false)
+          this.gridColumnApi.setColumnsVisible(['method_number', 'method_type', 'spectrum_rating'], false)
         }
         this.gridApi.onFilterChanged()
         this.gridApi.sizeColumnsToFit()
@@ -386,6 +410,22 @@
         const main_ids = this.results.substance.map(x => x.internal_id)
         this.results.ms_ready = response.data.results.filter(x => !main_ids.includes(x.internal_id))
         this.all_results = this.results.substance.concat(this.results.ms_ready)
+      },
+      copyToClipboard(text) {
+        // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
+        // can't get that to work in this app, though, since it apparently requires a secured connection and the
+        // deployed version of this app doesn't have that.  So I'm sticking to this technically-depricated solution that
+        // I pulled out of CompTox's code, since it apparently works there.
+        const textarea = document.createElement('textarea')
+        textarea.value = text
+        document.body.appendChild(textarea)
+        textarea.select()
+        try {
+          document.execCommand('copy')
+        } catch (err) {
+          console.log('Cannot copy: ' + err)
+        }
+        document.body.removeChild(textarea)
       }
     },
     async created() {
@@ -414,7 +454,7 @@
         const search_results = await axios.get(`${this.BACKEND_LOCATION}/search/${response.data.substances.dtxsid}`)
         const additional_source_results = await axios.get(`${this.BACKEND_LOCATION}/additional_sources_for_substance/${response.data.substances.dtxsid}`)
         const classyfire = await axios.get(`${this.BACKEND_LOCATION}/get_classification_for_dtxsid/${response.data.substances.dtxsid}`)
-        if (classyfire.status == 200) {
+        if ((classyfire.status == 200) & (classyfire.data.kingdom !== null)) {
           this.classification = classyfire.data
         }
         this.additional_sources = additional_source_results.data
@@ -456,5 +496,11 @@
 
   h1 {
     font-size: 2em;
+  }
+
+  .copy-button {
+    padding: 0px 5px 0px 0px;
+    border: none;
+    background: none;
   }
 </style>

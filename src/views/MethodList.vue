@@ -215,7 +215,6 @@
       downloadCurrentTable() {
         var visible_columns = this.gridColumnApi.getAllDisplayedColumns().map(x => x.colId)
         visible_columns.push("link")
-        console.log(visible_columns)
         this.gridApi.exportDataAsExcel({
           fileName: `method_list_${timestampForFile()}.xlsx`,
           columnKeys: visible_columns

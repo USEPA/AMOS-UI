@@ -22,8 +22,9 @@
     category="Vendor methods collection"
     url="https://www.agilent.com"
     sourceID="Agilent"
-    substances="3723"
-    methods="385"
+    substances="3701"
+    factSheets="2"
+    methods="383"
     spectra="72"
   />
   <DataSourceDetails
@@ -40,7 +41,7 @@
     url="https://www.bruker.com/"
     sourceID="Bruker"
     substances="591"
-    methods="42"
+    methods="39"
   />
   <DataSourceDetails
     sourceName="California Environmental Protection Agency Office of Environmental Health Hazard Assessment"
@@ -63,8 +64,8 @@
     category="Open-access spectrum collection"
     url="https://www.caymanchem.com/forensics/publications/csl"
     sourceID="Cayman"
-    substances="2252"
-    spectra="2348"
+    substances="2286"
+    spectra="2392"
   />
   <DataSourceDetails
     sourceName="Center for Forensic Science Research & Education"
@@ -113,16 +114,16 @@
     category="Open-access spectrum libraries"
     url="https://gnps.ucsd.edu"
     sourceID="GNPS"
-    substances="1976"
-    spectra="7914"
+    substances="5647"
+    spectra="21749"
   />
   <DataSourceDetails
     sourceName="Human Metabolome Database"
     category="Open-access spectrum collection"
     url="https://hmdb.ca/"
     sourceID="HMDB"
-    substances="3857"
-    spectra="44450"
+    substances="3937"
+    spectra="45268"
   />
   <DataSourceDetails
     sourceName="Jozef Stefan Institute"
@@ -138,24 +139,24 @@
     category="Vendor methods collection"
     url="https://www.leco.com"
     sourceID="LECO"
-    substances="1427"
-    methods="65"
+    substances="1432"
+    methods="66"
   />
   <DataSourceDetails
     sourceName="MassBank Europe"
     category="Open-access spectral database"
     url="https://massbank.eu/MassBank/"
     sourceID="MassBank EU"
-    substances="14721"
-    spectra="111061"
+    substances="14808"
+    spectra="113721"
   />
   <DataSourceDetails
     sourceName="MassBank of North America"
     category="Open-access spectral database"
     url="https://mona.fiehnlab.ucdavis.edu"
     sourceID="MoNA"
-    substances="7315"
-    spectra="50738"
+    substances="5715"
+    spectra="45487"
   />
   <DataSourceDetails
     sourceName="National Environmental Methods Index"
@@ -178,8 +179,8 @@
     category="Government methods collection"
     url="https://www.nist.gov/"
     sourceID="NIST, NIST PFAS"
-    substances="893"
-    methods="59"
+    substances="905"
+    methods="61"
     spectra="68"
   />
   <DataSourceDetails
@@ -228,8 +229,8 @@
     category="Vendor methods collection"
     url="https://www.shimadzu.com"
     sourceID="Shimadzu"
-    substances="4855"
-    methods="841"
+    substances="5352"
+    methods="1009"
   />
   <DataSourceDetails
     sourceName="SpectraBase"
@@ -261,8 +262,8 @@
     category="Government methods collection"
     url="https://www.epa.gov/"
     sourceID="EPA, EPA MS Labs, EPA-ECM, EPA-OW, USEPA"
-    substances="3566"
-    factSheets="1460"
+    substances="3561"
+    factSheets="1464"
     methods="1893"
     spectra="537"
   />
@@ -295,8 +296,8 @@
     category="Vendor methods collection"
     url="https://www.waters.com/nextgen/us/en.html"
     sourceID="Waters"
-    substances="1480"
-    methods="154"
+    substances="1910"
+    methods="264"
   />
   <br />
 </template>

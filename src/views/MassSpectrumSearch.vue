@@ -1,5 +1,5 @@
 <template>
-  <p>This page is intended for searching the database for spectra.  Currently, this is just being done by mass (with a margin of error) and the methodology of the spectrum.</p>
+  <p>This page is intended for searching the database for spectra.  Currently, this is just being done by mass (with a margin of error) and the methodology of the spectrum.  The prepopulated values below are an example using a caffeine spectrum copied directly from the database.</p>
   <div class="two-column-page">
     <div class="half-page-column">
       <h5>Mass Information</h5>
@@ -52,11 +52,13 @@
         ></ag-grid-vue>
         <br />
         <div v-if="any_row_selected" style="display: flex; flex-direction: column; align-items: center">
-          <DualMassSpectrumPlot style="display: flex;" :spectrum1="user_spectrum_array" :spectrum2="selected_spectrum" spectrum1_name="User Spectrum" :spectrum2_name="selected_dtxsid"/>
+          <DualMassSpectrumPlot style="display: flex;" :spectrum1="user_spectrum_array" :spectrum2="row_data.spectrum" spectrum1_name="User Spectrum" :spectrum2_name="row_data.dtxsid"/>
+          <br />
+          <p><strong>Source</strong>: <a :href="row_data.link" target="_blank">{{ row_data.source }}</a></p>
           <br />
           <div style="display: flex;">
             <button @click="show_modal.table = true">Show Points</button>
-            <button v-if="spectrum_metadata" @click="show_modal.metadata = true">Spectrum Info</button>
+            <button v-if="row_data.spectrum_metadata" @click="show_modal.metadata = true">Spectrum Info</button>
           </div>
         </div>
       </div>
@@ -69,15 +71,15 @@
       class="ag-theme-balham"
       style="height:600px; width:100%"
       :columnDefs="column_defs"
-      :rowData="spectrumAsRows(selected_spectrum)"
+      :rowData="spectrumAsRows(row_data.spectrum)"
       rowSelection="single"
     ></ag-grid-vue>
     <button @click="copySpectrum()">Copy to Clipboard</button>
   </b-modal>
 
   <!-- Modal window that displays the metadata associated with the spectrum, using the spectrum_metadata field from the database. -->
-  <b-modal v-model="show_modal.metadata" ref="metadata_modal">
-    <MassSpectrumMetadata :spectrumMetadata=spectrum_metadata />
+  <b-modal v-if="row_data.spectrum_metadata" v-model="show_modal.metadata" ref="metadata_modal">
+    <MassSpectrumMetadata :spectrumMetadata=row_data.spectrum_metadata />
   </b-modal>
   <b-alert variant="warning" dismissible v-model="error_messages.invalidFormat">There are issues with the contents of the user spectrum -- please check to ensure it is correct.</b-alert>
 </template>
@@ -85,7 +87,7 @@
 <script>
   import axios from 'axios'
   import { validateSpectrumInput } from '@/assets/common_functions'
-  import { BACKEND_LOCATION } from '@/assets/store'
+  import { BACKEND_LOCATION, COMPTOX_PAGE_URL, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
 
   import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
   import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
@@ -112,17 +114,17 @@
         user_spectrum_array: [],
         show_plot: false,
         BACKEND_LOCATION,
+        COMPTOX_PAGE_URL,
+        SOURCE_ABBREVIATION_MAPPING,
         error_messages: {invalidFormat: false},
         substance_mapping: {},
         show_modal: {metadata: false, table: false},
         any_row_selected: false,
-        spectrum_metadata: {},
-        selected_spectrum: [],
-        selected_dtxsid: "",
+        row_data: {spectrum: [], spectrum_metadata: {}, dtxsid: "", source: "", link: ""},
         status: {searching: false, any_search_complete: false},
         columnDefs: [
           {field: 'dtxsid', hide: true, headerName: "Substance", width: 300, rowGroup: true, cellRenderer: params => {
-            return `${params.value} (${this.substance_mapping[params.value]})`
+            return "<a href='" + this.$router.resolve(`/search/${params.value}`).href + "' target='_blank'>" + params.value + "</a> (" + this.substance_mapping[params.value] + ")"
           }},
           {field: 'similarity', headerName: "Similarity", width: 100, sort: "desc", aggFunc: 'max', cellRenderer:'agGroupCellRenderer', cellRendererParams: {
             innerRenderer: params => {return params.value.toFixed(4)}
@@ -174,9 +176,7 @@
       },
       onRowSelected(event) {
         if(event.event) {
-          this.selected_spectrum = event.data.spectrum
-          this.spectrum_metadata = event.data.spectrum_metadata
-          this.selected_dtxsid = event.data.dtxsid
+          this.row_data = event.data
           this.show_plot = true
           this.any_row_selected = true
         } else {

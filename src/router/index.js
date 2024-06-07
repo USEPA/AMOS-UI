@@ -22,6 +22,7 @@ const routes = [
   {path: "/view_spectrum_pdf/:internal_id", name: "Spectrum PDF Viewer", component: ()=>import('../views/SpectrumPDFViewer.vue')},
   {path: "/analytical_qc_list", name: "Analytical QC List", component: ()=>import('../views/AnalyticalQCList.vue')},
   {path: "/related_applications", name: "Related Applications", component: ()=>import('../views/RelatedApplications.vue')},
+  {path: "/classification_search", name: "Classification Search", component: ()=>import('../views/ClassyFireClassificationSearch.vue')},
   {path: "/test_viz", name: "Test Viz", component: ()=>import('../views/TestViz.vue')}
 ]
 
