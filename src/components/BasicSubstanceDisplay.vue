@@ -13,7 +13,7 @@
           </tr>
           <tr>
             <td><button class="copy-button" title="Copy DTXSID" @click="copyToClipboard(substanceInfo.dtxsid)">⎘</button></td>
-            <td><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substanceInfo.dtxsid}`">{{ substanceInfo.dtxsid }}</a></td>
+            <td><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substanceInfo.dtxsid}`" target="_blank">{{ substanceInfo.dtxsid }}</a></td>
           </tr>
           <tr>
             <td><button class="copy-button" title="Copy CASRN" @click="copyToClipboard(substanceInfo.casrn)">⎘</button></td>
@@ -43,7 +43,7 @@
 
 <script>
 
-  import { getSubstanceImageLink } from '@/assets/common_functions'
+  import { imageLinkForSubstance } from '@/assets/common_functions'
   import '@/assets/style.css'
   import { COMPTOX_PAGE_URL } from '@/assets/store'
   import ClassyFireDisplay from '@/components/ClassyFireDisplay.vue'
@@ -57,13 +57,12 @@
       }
     },
     watch: {
-      async substanceInfo() {
-        this.image_link = await getSubstanceImageLink(this.substanceInfo.dtxsid)
+      substanceInfo() {
+        this.image_link = imageLinkForSubstance(this.substanceInfo.dtxsid, this.substanceInfo.image_in_comptox)
       }
     },
-    async created() {
-      console.log(this.substanceInfo)
-      this.image_link = await getSubstanceImageLink(this.substanceInfo.dtxsid)
+    created() {
+      this.image_link = imageLinkForSubstance(this.substanceInfo.dtxsid, this.substanceInfo.image_in_comptox)
     },
     methods: {
       copyToClipboard(text) {

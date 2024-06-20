@@ -32,7 +32,7 @@
                 </tr>
                 <tr>
                   <td><button class="copy-button" title="Copy DTXSID" @click="copyToClipboard(substance_info.dtxsid)">⎘</button></td>
-                  <td><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substance_info.dtxsid}`">{{ substance_info.dtxsid }}</a></td>
+                  <td><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substance_info.dtxsid}`" target="_blank">{{ substance_info.dtxsid }}</a></td>
                 </tr>
                 <tr>
                   <td><button class="copy-button" title="Copy CASRN" @click="copyToClipboard(substance_info.casrn)">⎘</button></td>
@@ -140,14 +140,14 @@
 <script>
   import axios from 'axios'
 
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import 'ag-grid-community/styles/ag-grid.css'
+  import 'ag-grid-community/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { getSubstanceImageLink } from '@/assets/common_functions'
+  import { imageLinkForSubstance } from '@/assets/common_functions'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL, METHOD_DOCUMENT_TYPES, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
   import '@/assets/style.css'
   import ClassyFireDisplay from '@/components/ClassyFireDisplay.vue'
@@ -163,7 +163,6 @@
     data(){
       return {
         view_type: "none",
-        ambiguity_type: "",
         disambiguation: {inchikey: false, synonym: false},
         possible_substances: [],
         selected_row_data: {},
@@ -439,14 +438,14 @@
         this.still_searching = false
       } else if (response.data.ambiguity) {
         // Search term is ambiguous.
-        this.ambiguity_type = response.data.ambiguity
+        const ambiguity_type = response.data.ambiguity
         this.possible_substances = response.data.substances
         const dtxsids = this.possible_substances.map(ps => ps.dtxsid)
         this.record_counts_by_dtxsid = await axios.post(`${this.BACKEND_LOCATION}/record_counts_by_dtxsid/`, {dtxsids: dtxsids})
         this.record_counts_by_dtxsid = this.record_counts_by_dtxsid.data
-        if (response.data.ambiguity == "inchikey") {
+        if (ambiguity_type == "inchikey") {
           this.disambiguation.inchikey = true
-        } else if (response.data.ambiguity == "synonym") {
+        } else if (ambiguity_type == "synonym") {
           this.disambiguation.synonym = true
         }
       } else {
@@ -462,7 +461,7 @@
         this.results.substance = search_results.data.records
         this.substance_info = response.data.substances
         this.record_type_counts = search_results.data.record_type_counts
-        this.image_link = await getSubstanceImageLink(this.substance_info.dtxsid)
+        this.image_link = imageLinkForSubstance(this.substance_info.dtxsid, this.substance_info.image_in_comptox)
         this.still_searching = false
         
         if (!this.all_results.some(x => {return x.source != "SpectraBase"})) {

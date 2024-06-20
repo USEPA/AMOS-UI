@@ -37,23 +37,7 @@
     </div>
     <div class="half-page-column">
       <h3>Substance Info</h3>
-      <!-- <BasicSubstanceDisplay :substanceInfo="substance_info" /> -->
-      <div class="chemical-box">
-        <div class="chemical-image-highlight">
-          <img v-if="image_link" class="chemical-image" :src="image_link" :alt="`Structure image for ${substance_info.dtxsid}`"/>  
-          <div v-else style="text-align: center; display: flex; align-items: center;">No structural representation was found for this substance.</div>
-        </div>
-        <div class="chemical-info">
-          <ul style="list-style-type: none;">
-            <li><strong>(Preferred) Name:</strong> {{ substance_info.preferred_name }} </li>
-            <li><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substance_info.dtxsid}`">{{ substance_info.dtxsid }}</a> </li>
-            <li><strong>CASRN:</strong> {{ substance_info.casrn }} </li>
-            <li><strong>InChIKey:</strong> {{ substance_info.indigo_inchikey ? substance_info.indigo_inchikey : substance_info.jchem_inchikey}} </li>
-            <li><strong>Molecular Formula:</strong> {{ substance_info.molecular_formula }} </li>
-            <li><strong>Monoisotopic Mass:</strong> {{ substance_info.monoisotopic_mass }} </li>
-          </ul>
-        </div>
-      </div>
+      <BasicSubstanceDisplay :substanceInfo="substance_info" />
       <br /> <br />
       <h3>Metadata</h3>
       <MassSpectrumMetadata v-if="spectrum_metadata" :spectrumMetadata=spectrum_metadata />
@@ -66,14 +50,13 @@
 <script>
   import axios from 'axios';
 
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import 'ag-grid-community/styles/ag-grid.css'
+  import 'ag-grid-community/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { getSubstanceImageLink } from '@/assets/common_functions'
   import { BACKEND_LOCATION } from '@/assets/store'
   import '@/assets/style.css'
   import BasicSubstanceDisplay from '@/components/BasicSubstanceDisplay.vue'
@@ -140,7 +123,6 @@
       const dtxsid = dtxsid_response.data.substance_list[0].dtxsid
       const substance_response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${dtxsid}`)
       this.substance_info = substance_response.data.substances
-      this.image_link = await getSubstanceImageLink(this.substance_info.dtxsid)
     },
     components: {AgGridVue, BasicSubstanceDisplay, MassSpectrumMetadata, SingleMassSpectrumPlot}
   }

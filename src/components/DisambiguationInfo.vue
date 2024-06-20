@@ -38,9 +38,7 @@
 </template>
 
 <script>
-  import axios from 'axios'
-
-  import { getSubstanceImageLink } from '@/assets/common_functions'
+  import { imageLinkForSubstance } from '@/assets/common_functions'
   import '@/assets/style.css'
 
   export default {
@@ -51,7 +49,7 @@
       }
     },
     async created() {
-      this.image_link = await getSubstanceImageLink(this.substance_info.dtxsid)
+      this.image_link = imageLinkForSubstance(this.substance_info.dtxsid, this.substance_info.image_in_comptox)
     },
     methods: {
       dummy() {

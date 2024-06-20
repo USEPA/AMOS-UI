@@ -42,8 +42,8 @@
   import '@/assets/style.css'
   import { BACKEND_LOCATION } from '@/assets/store'
 
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import 'ag-grid-community/styles/ag-grid.css'
+  import 'ag-grid-community/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'

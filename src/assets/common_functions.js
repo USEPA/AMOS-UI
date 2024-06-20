@@ -14,18 +14,18 @@ export async function doesImageExist(dtxsid) {
     return response.data.length > 0
 }
 
-export async function getSubstanceImageLink(dtxsid) {
-    // Checks the CCTE API for a substance image; if it doesn't find one, check the Flask backend.  Return the API or
-    // Flask link if an image was found on either of those, or null if no link was found.
-    const first_response = await axios.get(IMAGE_BY_DTXSID_API + dtxsid)
-    if (first_response.data.length > 0) {
+export function imageLinkForSubstance(dtxsid, image_in_comptox) {
+    // Determines the link for a substance's image, based on the DTXSID and a database flag for the location -- the 
+    // flag can be either true (use CompTox's API), false (use AMOS's stored image), or null (no image exists).
+    // Note: I don't intend to store the links directly in the database, since BACKEND_LOCATION is an environment
+    // variable that changes between the local and deployed versions (maybe more in the future)
+    if (image_in_comptox === true) {
         return IMAGE_BY_DTXSID_API + dtxsid
-    }
-    const second_response = await axios.get(BACKEND_LOCATION + "/get_image_for_dtxsid/" + dtxsid)
-    if (second_response.data.length > 0) {
-        return BACKEND_LOCATION + "/get_image_for_dtxsid/" + dtxsid
-    }
-    return null
+      } else if (image_in_comptox === false) {
+        return `${BACKEND_LOCATION}/get_image_for_dtxsid/${dtxsid}`
+      } else {
+        return null
+      }
 }
 
 export function rescaleSpectrum(spectrum) {

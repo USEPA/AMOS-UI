@@ -73,20 +73,21 @@
 <script>
   import axios from 'axios'
 
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import 'ag-grid-community/styles/ag-grid.css'
+  import 'ag-grid-community/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { getSubstanceImageLink } from '@/assets/common_functions'
+  import { imageLinkForSubstance } from '@/assets/common_functions'
   import { BACKEND_LOCATION } from '@/assets/store'
 
   export default {
     data() {
       return {
         BACKEND_LOCATION,
+        IMAGE_BY_DTXSID_API: "https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/",
         klasses: [],
         subklasses: [],
         superklasses: [],
@@ -118,11 +119,11 @@
           {field: 'preferred_name', headerName: 'Preferred Name', sortable: true, sort: 'asc', flex: 1},
           {field: 'monoisotopic_mass', headerName: 'Monoisotopic Mass', width: 150, filter: 'agNumberColumnFilter'},
           {field: 'molecular_formula', headerName: 'Formula', width: 120},
-          {field: 'search', headerName: 'Search', width: 100, wrapText: true, cellRenderer: params => {
-            if (params.data.count > 0) {
+          {field: 'data_available', headerName: 'AMOS Data?', width: 120, filter: 'agSetColumnFilter', wrapText: true, cellRenderer: params => {
+            if (params.data.data_available == "Yes") {
               const link = document.createElement("a")
               link.href = this.$router.resolve(`/search/${params.data.dtxsid}`).href
-              link.innerText = "Search"
+              link.innerText = "Yes"
               link.target = "_blank"
                link.addEventListener("click", e => {
                 e.preventDefault()
@@ -130,7 +131,7 @@
               });
               return link
             } else {
-              return "No data."
+              return "No"
             }
           }}
         ]
@@ -175,9 +176,9 @@
         const response = await axios.post(`${this.BACKEND_LOCATION}/substances_for_classification/`, {kingdom: this.kingdom, superklass: this.superklass, klass: this.klass, subklass: this.subklass})
         var found_substances = response.data.substances
         for (let i=0; i<found_substances.length; i++) {
-          found_substances[i]["image_link"] = await getSubstanceImageLink(found_substances[i].dtxsid)
+          found_substances[i]["image_link"] = imageLinkForSubstance(found_substances[i].dtxsid, found_substances[i].image_in_comptox)
+          found_substances[i]["data_available"] = found_substances[i].count > 0 ? "Yes" : "No"
         }
-        console.log(found_substances)
         this.substances = found_substances
         this.state.searching = false
       },

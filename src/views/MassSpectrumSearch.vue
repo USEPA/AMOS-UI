@@ -1,5 +1,5 @@
 <template>
-  <p>This page is intended for searching the database for spectra.  Currently, this is just being done by mass (with a margin of error) and the methodology of the spectrum.  The prepopulated values below are an example using a caffeine spectrum copied directly from the database.</p>
+  <p>This page is for searching the database for mass spectra similar to a user-supplied one.  Currently, this is just being done by mass (with a margin of error) and the methodology of the spectrum.  The prepopulated values below are an example using a caffeine spectrum copied directly from the database.</p>
   <div class="two-column-page">
     <div class="half-page-column">
       <h5>Mass Information</h5>
@@ -89,8 +89,8 @@
   import { validateSpectrumInput } from '@/assets/common_functions'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
 
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import 'ag-grid-community/styles/ag-grid.css'
+  import 'ag-grid-community/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'

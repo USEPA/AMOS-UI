@@ -6,7 +6,7 @@
   This component takes three props:
   - synonym: the searched synonym.
   - substances: an object containing a list of substances from the database.  Individual elements should have the
-  elements needed by the Disambiguation component.
+  elements needed by the DisambiguationInfo component.
   - record_info: an object containing information on how many records of each type exist for each substance.  Keys to
   the top-level object are DTXSIDs, while the values are other dictionaries containing the result types.
 -->

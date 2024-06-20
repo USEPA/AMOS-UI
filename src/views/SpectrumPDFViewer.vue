@@ -31,7 +31,7 @@
         <button @click="copySubstancesToClipboard">Copy DTXSID List</button>
         <div class="substance-grid">
           <div v-for="cl in substance_list">
-            <SubstanceTile :dtxsid="`${cl.dtxsid}`" :preferred_name="`${cl.preferred_name}`" />
+            <SubstanceTile  :substance_info="cl" />
           </div>
         </div>
       </div>
@@ -57,13 +57,13 @@
   import axios from 'axios'
 
   import '@/assets/style.css'
-  import { getSubstanceImageLink } from '@/assets/common_functions'
+  import { imageLinkForSubstance } from '@/assets/common_functions'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
   
   import SubstanceTile from '@/components/SubstanceTile.vue'
   
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import 'ag-grid-community/styles/ag-grid.css'
+  import 'ag-grid-community/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
@@ -137,7 +137,7 @@
         const response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.$route.params.internal_id}`)
         this.substance_list = response.data.substance_list
         for (let i=0; i<this.substance_list.length; i++) {
-          this.substance_list[i]["image_link"] = await getSubstanceImageLink(this.substance_list[i].dtxsid)
+          this.substance_list[i]["image_link"] = imageLinkForSubstance(this.substance_list[i].dtxsid, this.substance_list[i].image_in_comptox)
         }
       },
       updateTab(tabName) {

@@ -24,21 +24,21 @@
       <h4>PARTIAL MATCHES:</h4>
       <br />
     </div>
-    <div class="substance-grid" v-for="s in substances">
+    <div class="substance-grid" v-for="s in non_exact_matches">
       <DisambiguationInfo :substance_info="s" :record_info="record_counts[s.dtxsid]" @click="selectInchikey(s.dtxsid)" />
     </div>
   </div>
 </template>
 
 <script>
-  import SubstanceTile from '@/components/SubstanceTile.vue'
   import DisambiguationInfo from '@/components/DisambiguationInfo.vue'
 
   export default {
 
     data() {
       return {
-        exact_match: null
+        exact_match: null,
+        non_exact_matches: null
       }
     },
     updated() {
@@ -49,6 +49,7 @@
       if (jchem_inchikeys.includes(this.searchedKey) || indigo_inchikeys.includes(this.searchedKey)) {
         const match_index = this.substances.findIndex(s => s.jchem_inchikey==this.searchedKey || s.indigo_inchikey==this.searchedKey)
         this.exact_match = this.substances.splice(match_index, 1)[0]
+        this.non_exact_matches = this.substances
       }
     },
     methods: {
@@ -57,7 +58,7 @@
       }
     },
     props: {substances: Object, searchedKey: String, record_counts: Object},
-    components: {SubstanceTile, DisambiguationInfo}
+    components: {DisambiguationInfo}
   }
 </script>
 

@@ -11,41 +11,60 @@
       <p>
         This is a list of fact sheets available in the database.  Select a row in the table to view the fact sheet on the right side of the page.
       </p>
-      <p>{{fact_sheet_info.length}} fact sheets in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed, covering {{substance_count}} {{filtered_record_count == 1 ? "substance" : "substances"}}.</p>
-      <div>
-        <label for="full-table-filter">Full Table Filter</label> &nbsp;
-        <input type="text" v-model="full_table_filter" name="full-table-filter" @keyup="quickFilter(full_table_filter)">
-        &nbsp;
-        <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." />
+      <div v-if="status.loading">
+        Loading...
       </div>
-      <div class="button-array">
-        <button @click="saveFiltersAsURL">Copy filters to clipboard</button>
-        <button @click="downloadCurrentTable">Download Table</button>
-        <button @click="downloadSubstancesInDocs" :disabled="filtered_record_count==0">Download Substances</button>
-        <button @click="resetFilters">Reset Filters</button>
+      <div v-else>
+        <p>{{fact_sheet_info.length}} fact sheets in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed, covering {{substance_count}} {{filtered_record_count == 1 ? "substance" : "substances"}}.</p>
+        <div style="padding-bottom: 10px;">
+          <label for="full-table-filter">Full Table Filter</label> &nbsp;
+          <input type="text" v-model="full_table_filter" name="full-table-filter" @keyup="quickFilter(full_table_filter)">
+          &nbsp;
+          <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." />
+        </div>
+        <div>
+          <label for="full-table-filter">Substance Filter</label> &nbsp;
+          <input type="text" v-model="substance_identifier" name="full-table-filter">
+          <button @click="filterBySubstance(substance_identifier)" :disabled="status.filter_by_substance==true">Filter</button>
+          <button @click="clearSubstanceFilter" :disabled="status.filter_by_substance==false">Clear Filter</button>
+        </div>
+        <div class="button-array">
+          <button @click="saveFiltersAsURL">Copy filters to clipboard</button>
+          <button @click="downloadCurrentTable">Download Table</button>
+          <button @click="downloadSubstancesInDocs" :disabled="filtered_record_count==0">Download Substances</button>
+          <button @click="resetFilters">Reset Filters</button>
+        </div>
+        <ag-grid-vue
+          class="ag-theme-balham"
+          style="height:800px; width:100%"
+          :defaultColDef="default_column_def"
+          :columnDefs="column_defs"
+          :rowData="fact_sheet_info"
+          rowSelection="single"
+          @first-data-rendered="onGridReady"
+          @row-selected="onRowSelected"
+          @filter-changed="onFilterChanged"
+          :isExternalFilterPresent="isExternalFilterPresent"
+          :doesExternalFilterPass="doesExternalFilterPass"
+          :tooltipShowDelay="400"
+        ></ag-grid-vue>
       </div>
-      <ag-grid-vue
-        class="ag-theme-balham"
-        style="height:800px; width:100%"
-        :defaultColDef="default_column_def"
-        :columnDefs="column_defs"
-        :rowData="fact_sheet_info"
-        rowSelection="single"
-        @first-data-rendered="onGridReady"
-        @row-selected="onRowSelected"
-        @filter-changed="onFilterChanged"
-        :tooltipShowDelay="400"
-      ></ag-grid-vue>
     </div>
     <StoredPDFDisplay style="width: 48vw;" v-if="any_fact_sheet_selected" :internalID="selected_row_data.internal_id" recordType="fact sheet"/>
+    <b-modal size="xl" v-model="disambiguation.inchikey">
+      <InchikeyDisambiguation :searchedKey="$route.params.search_term" :substances="possible_substances" :record_counts="record_counts_by_dtxsid" @inchikeySelected="disambiguate" />
+    </b-modal>
+    <b-modal size="xl" v-model="disambiguation.synonym">
+      <SynonymDisambiguation :synonym="$route.params.search_term" :substances="possible_substances" :record_counts="record_counts_by_dtxsid" @synonymSelected="disambiguate" />
+    </b-modal>
   </div>
 </template>
 
 <script>
   import axios from 'axios'
   
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import 'ag-grid-community/styles/ag-grid.css'
+  import 'ag-grid-community/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
@@ -54,7 +73,9 @@
   import { timestampForFile } from '@/assets/common_functions'
   import { BACKEND_LOCATION, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
   import '@/assets/style.css'
+  import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
   import StoredPDFDisplay from '@/components/StoredPDFDisplay.vue'
+  import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
   import HelpIcon from '@/components/HelpIcon.vue'
 
   export default {
@@ -67,8 +88,14 @@
         BACKEND_LOCATION,
         filtered_record_count: 0,
         full_table_filter: "",
+        substance_identifier: "",
         default_column_def: {resizable: true},
         substance_count: 0,
+        disambiguation: {inchikey: false, synonym: false},
+        status: {loading: true, substance_searching: false, filter_by_substance: false},
+        fact_sheets_with_substance: [],
+        possible_substances: [],
+        record_counts_by_dtxsid: {},
         column_defs: [
           {field: 'internal_id', headerName: 'Doc ID', sortable: true, width: 80, comparator: (valA, valB, nodeA, nodeB, isDescending) => {
             return Number.parseInt(valA.substring(3)) - Number.parseInt(valB.substring(3))
@@ -110,6 +137,7 @@
       const path = `${this.BACKEND_LOCATION}/fact_sheet_list`
       const response = await axios.get(path)
       this.fact_sheet_info = response.data.results
+      this.status.loading = false
     },
 
     methods: {
@@ -133,6 +161,56 @@
           this.any_fact_sheet_selected = true
           this.target_pdf_url = `${this.BACKEND_LOCATION}/get_pdf/fact sheet/${event.data.internal_id}`
         }
+      },
+      async filterBySubstance(identifier) {
+        const response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${identifier}`)
+        // There are three possibilities: no search term found, search term found, search term is ambiguous (matches
+        // multiple substances by synonym or first block of InChIKey).
+        if (response.data.substances === null) {
+          // No substance found.
+          this.no_substance_match = true
+          this.still_searching = false
+        } else if (response.data.ambiguity) {
+          // Search term is ambiguous.
+          const ambiguity_type = response.data.ambiguity
+          this.possible_substances = response.data.substances
+          const dtxsids = this.possible_substances.map(ps => ps.dtxsid)
+          this.record_counts_by_dtxsid = await axios.post(`${this.BACKEND_LOCATION}/record_counts_by_dtxsid/`, {dtxsids: dtxsids})
+          this.record_counts_by_dtxsid = this.record_counts_by_dtxsid.data
+          if (ambiguity_type == "inchikey") {
+            this.disambiguation.inchikey = true
+          } else if (ambiguity_type == "synonym") {
+            this.disambiguation.synonym = true
+          }
+        } else {
+          // Search term matches one substance.
+          const fact_sheet_response = await axios.get(`${this.BACKEND_LOCATION}/fact_sheets_for_substance/${response.data.substances.dtxsid}`)
+          this.fact_sheets_with_substance = fact_sheet_response.data.internal_ids
+          this.status.filter_by_substance = true
+          this.gridApi.onFilterChanged()
+          console.log(fact_sheet_response)
+        }
+      },
+      isExternalFilterPresent() {
+        return this.status.filter_by_substance
+      },
+      doesExternalFilterPass(node) {
+        // filter out result types based on selected tab
+        if (this.fact_sheets_with_substance.includes(node.data.internal_id)) {
+          return true
+        } else {
+          return false
+        }
+      },
+      disambiguate(dtxsid) {
+        this.disambiguation.inchikey = false
+        this.disambiguation.synonym = false
+        this.filterBySubstance(dtxsid)
+      },
+      clearSubstanceFilter() {
+        this.status.filter_by_substance = false
+        this.substance_identifier = ""
+        this.gridApi.onFilterChanged()
       },
       saveFiltersAsURL() {
         const current_filters = this.gridApi.getFilterModel();
@@ -196,7 +274,9 @@
     components: {
       AgGridVue,
       HelpIcon,
-      StoredPDFDisplay
+      InchikeyDisambiguation,
+      StoredPDFDisplay,
+      SynonymDisambiguation
     }
   }
 </script>

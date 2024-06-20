@@ -22,15 +22,15 @@
 <script>
   import axios from 'axios'
 
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import 'ag-grid-community/styles/ag-grid.css'
+  import 'ag-grid-community/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import '@/assets/style.css'
-  import { getSubstanceImageLink, timestampForFile } from '@/assets/common_functions'
+  import { timestampForFile } from '@/assets/common_functions'
   import { ANALYTICAL_QC_CALLS, ANALYTICAL_QC_GRADES, BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
 
   export default {
@@ -44,15 +44,16 @@
         default_column_def: {resizable: true, filter: 'agTextColumnFilter', floatingFilter: true},
         column_defs: [
           {field: 'internal_id', headerName: "internal ID", hide: true},
-          {field: 'dtxsid', headerName: 'DTXSID', width: 120, sortable: true, cellRenderer: params => {
+          {field: 'dtxsid', headerName: 'DTXSID', width: 115, sortable: true, cellRenderer: params => {
             return "<a href='" + this.COMPTOX_PAGE_URL + params.data.dtxsid + "' target='_blank'>" + params.data.dtxsid + "</a>"
           }},
-          {field: 'casrn', headerName: "CASRN", width: 110, sortable: true},
-          {field: 'molecular_formula', headerName: "Formula", width: 110},
+          {field: 'casrn', headerName: "CASRN", width: 100, sortable: true},
+          {field: 'molecular_formula', headerName: "Formula", width: 110, sortable: true},
           {field: 'sample_id', headerName: "Sample ID", width: 110, sortable: true},
           {field: 'preferred_name', headerName: "Preferred Name", flex: 1, sortable: true},
           {field: 'study', headerName: "Source/Technique", width: 140, sortable: true, filter: 'agMultiColumnFilter'},
           {field: 'experiment_date', headerName: "Experiment Date", width: 140},
+          {field: 'timepoint', headerName: "Timepoint", width: 100, filter: 'agSetColumnFilter'},
           {field: 'first_timepoint', headerName: "First Timepoint", width: 140, filter: 'agSetColumnFilter', sortable: true, cellRenderer: params => {
             const m = params.data.first_timepoint
             if (this.ANALYTICAL_QC_GRADES[m]) {
@@ -78,7 +79,7 @@
             }
           }},
           {field: 'annotation', headerName: "Annotation", flex: 1},
-          {field: 'flags', headerName: "Flags", flex: 1}
+          {field: 'flags', headerName: "Substance Flags", flex: 1}
         ]
       }
     },

@@ -12,7 +12,7 @@
       <button @click="go()">Substance Search</button>
     </div>
     <div class="nav-bar-right">
-      <router-link to="/">Home</router-link>
+      <router-link to="/" style="padding: 1px">Home</router-link>
       &emsp;
       <b-nav-item-dropdown text="Lists" class="nav-dropdown" style="background: #0e6993;">
         <b-dropdown-item to="/analytical_qc_list">Analytical QC</b-dropdown-item>
@@ -39,18 +39,6 @@
         <b-dropdown-item to="/related_applications">Related Applications</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
-      <!--<b-nav-item-dropdown text="Related Applications" class="nav-dropdown">
-        <b-dropdown-item href="https://ccte-cced-chet.epa.gov/" target="_blank" class="normal-text">Chemical Transformations Database</b-dropdown-item>
-        <b-dropdown-item href="https://ccte-cced-aqcv1.epa.gov/" target="_blank">Analytical QC</b-dropdown-item>
-        <b-dropdown-item href="http://v2626umcth819.rtord.epa.gov:9004/molmass_web.py" target="_blank">Molecular Mass Calculator</b-dropdown-item>
-        <b-dropdown-item href="https://aop-dev.rtpnc.epa.gov/nta-ui/nta.html" target="_blank">CFM-ID Spectral Search</b-dropdown-item>
-        <b-dropdown-item href="https://comptox.epa.gov/dashboard/" target="_blank">CompTox Chemicals Dashboard (public)</b-dropdown-item>
-        <b-dropdown-item href="https://comptox.epa.gov/genra/" target="_blank">Generalized Read-Across (GenRA)</b-dropdown-item>
-        <b-dropdown-item href="https://comptox.epa.gov/dashboard/chemical/pubmed-abstract-sifter/" target="_blank">Literature Abstract Sifter</b-dropdown-item>
-        <b-dropdown-item href="https://ccte-cced-cheminformatics.epa.gov/" target="_blank">Cheminformatics PoC Modules</b-dropdown-item>
-        <b-dropdown-item href="https://ccte-cced-chemster.epa.gov" target="_blank">ChemSTER</b-dropdown-item>
-      </b-nav-item-dropdown>
-      &emsp;-->
       <button @click="store.showHeaderAndFooter = !store.showHeaderAndFooter">Toggle Header/Footer</button>
     </div>
   </div>

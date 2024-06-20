@@ -30,8 +30,8 @@
       <button @click="copySubstancesToClipboard">Copy DTXSID List</button>
       <div class="substance-grid">
         <div v-for="cl in substance_list">
-          <SubstanceTile v-if="highlightedSubstances.includes(cl.dtxsid)" :dtxsid="`${cl.dtxsid}`" :preferred_name="`${cl.preferred_name}`" highlight/>
-          <SubstanceTile v-else :dtxsid="`${cl.dtxsid}`" :preferred_name="`${cl.preferred_name}`"/>
+          <SubstanceTile v-if="highlightedSubstances.includes(cl.dtxsid)" :substance_info="cl" highlight/>
+          <SubstanceTile v-else :substance_info="cl"/>
         </div>
       </div>
     </div>
@@ -55,15 +55,15 @@
 
 <script>
   import axios from 'axios'
-  import { getSubstanceImageLink } from '@/assets/common_functions'
+  import { imageLinkForSubstance } from '@/assets/common_functions'
 
   import '@/assets/style.css'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
 
   import SubstanceTile from '@/components/SubstanceTile.vue'
 
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import 'ag-grid-community/styles/ag-grid.css'
+  import 'ag-grid-community/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
@@ -154,7 +154,7 @@
         const response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.internalID}`)
         var temporary_list = response.data.substance_list
         for (let i=0; i<temporary_list.length; i++) {
-          temporary_list[i]["image_link"] = await getSubstanceImageLink(temporary_list[i].dtxsid)
+          temporary_list[i]["image_link"] = imageLinkForSubstance(temporary_list[i].dtxsid, temporary_list[i].image_in_comptox)
         }
         this.substance_list = temporary_list
       },

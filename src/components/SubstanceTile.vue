@@ -9,17 +9,17 @@
 
 <template>
   <div :class="highlight ? 'substance-tile substance-highlight' : 'substance-tile'">
-    <p style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"><router-link :to="`/search/${dtxsid}`" target="_blank"> {{preferred_name}} </router-link> </p>
+    <p style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"><router-link :to="`/search/${substance_info.dtxsid}`" target="_blank"> {{substance_info.preferred_name}} </router-link> </p>
     <div style="display: block; margin-left: auto; margin-right: auto; width:150px; height:150px;">
-      <img v-if="image_link" style="width:150px; height:150px;" :src="image_link" :alt="`Structure image for ${dtxsid}`"/>  
+      <img v-if="substance_info.image_link" style="width:150px; height:150px;" :src="substance_info.image_link" :alt="`Structure image for ${substance_info.dtxsid}`"/>  
       <div v-else style="text-align: center; display: flex; align-items: center;">No structural representation was found for this substance.</div>
     </div>
-    <a :href="`${COMPTOX_PAGE_URL}${dtxsid}`" target="_blank"> {{dtxsid}} ↗</a>
+    <a :href="`${COMPTOX_PAGE_URL}${substance_info.dtxsid}`" target="_blank"> {{substance_info.dtxsid}} ↗</a>
   </div>
 </template>
 
 <script>
-  import { getSubstanceImageLink } from '@/assets/common_functions'
+  import { imageLinkForSubstance } from '@/assets/common_functions'
   import { COMPTOX_PAGE_URL } from '@/assets/store'
 
   import '@/assets/style.css'
@@ -28,15 +28,15 @@
     data() {
       return {COMPTOX_PAGE_URL, image_link: ""}
     },
-    async created() {
-      this.image_link = await getSubstanceImageLink(this.dtxsid)
+    created() {
+      this.image_link = imageLinkForSubstance(this.substance_info.dtxsid, this.substance_info.image_in_comptox)
     },
     watch: {
-      async dtxsid() {
-        this.image_link = await getSubstanceImageLink(this.dtxsid)
+      dtxsid() {
+        this.image_link = imageLinkForSubstance(this.substance_info.dtxsid, this.substance_info.image_in_comptox)
       }
     },
-    props: {dtxsid: String, preferred_name: String, highlight: Boolean}
+    props: {substance_info: Object, highlight: Boolean}
   }
 </script>
 

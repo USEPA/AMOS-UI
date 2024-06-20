@@ -46,8 +46,8 @@
 <script>
   import axios from 'axios'
 
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import 'ag-grid-community/styles/ag-grid.css'
+  import 'ag-grid-community/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
@@ -75,15 +75,17 @@
           {field: "method_number", headerName: "Method #", width: 100},
           {field: "method_name", headerName: "Name", tooltipField: 'method_name', sortable: true, flex: 2.5, cellClass: 'fake-link'},
           {field: "year_published", headerName: "Year", width: 85, sortable: true, filter: 'agNumberColumnFilter'},
-          {field: "methodology", headerName: "Methodology", width: 115, sortable: true, cellRenderer: params => {
-              const methodology_html = params.data.methodologies.map(m => {
-                if (this.METHODOLOGY_MAPPING[m] && this.METHODOLOGY_MAPPING[m].full_name) {
-                  return `<span class='has-hover-text' title='${this.METHODOLOGY_MAPPING[m].full_name}'>${m}</span>`
-                } else {
-                  return m
-                }
-              })
-              return methodology_html.join("; ")
+          {field: "methodologies", headerName: "Methodology", width: 115, sortable: true, cellRenderer: params => {
+              if (params.data.methodologies) {
+                const methodology_html = params.data.methodologies.map(m => {
+                  if (this.METHODOLOGY_MAPPING[m] && this.METHODOLOGY_MAPPING[m].full_name) {
+                    return `<span class='has-hover-text' title='${this.METHODOLOGY_MAPPING[m].full_name}'>${m}</span>`
+                  } else {
+                    return m
+                  }
+                })
+                return methodology_html.join("; ")
+              }
             }
           },
           {field: "source", headerName: "Source", width: 95, sortable: true, tooltipValueGetter: params => {

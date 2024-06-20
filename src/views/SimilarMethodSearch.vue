@@ -70,43 +70,11 @@
       <h4>Searched Substance:</h4>
       <div style="display: flex; justify-content: center;">
         <BasicSubstanceDisplay style="justify-content: left; width: 90%" :substanceInfo="substance_info.searched_substance" :classification="classyfire.searched_substance" />
-        <!-- <div class="chemical-box" style="justify-content: left; width: 90%">
-          <div class="chemical-image-highlight">
-            <img v-if="substance_info.searched_substance.image_link" class="chemical-image" :src="substance_info.searched_substance.image_link" :alt="`Structure image for ${substance_info.searched_substance.dtxsid}`"/>  
-            <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this substance.</div>
-          </div>
-          <div class="chemical-info">
-            <ul style="list-style-type: none;">
-              <li><strong>(Preferred) Name:</strong> {{ substance_info.searched_substance.preferred_name }} </li>
-              <li><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substance_info.searched_substance.dtxsid}`">{{ substance_info.searched_substance.dtxsid }}</a> </li>
-              <li><strong>CASRN:</strong> {{ substance_info.searched_substance.casrn }} </li>
-              <li><strong>InChIKey:</strong> {{ substance_info.searched_substance.indigo_inchikey ? substance_info.searched_substance.indigo_inchikey : substance_info.searched_substance.jchem_inchikey}} </li>
-              <li><strong>Molecular Formula:</strong> {{ substance_info.searched_substance.molecular_formula }} </li>
-              <li><strong>Monoisotopic Mass:</strong> {{ substance_info.searched_substance.monoisotopic_mass }} </li>
-            </ul>
-          </div>
-        </div> -->
       </div>
       <br />
       <h4>Selected Substance From Table:</h4>
       <div style="display: flex; justify-content: center;">
         <BasicSubstanceDisplay style="justify-content: left; width: 90%" :substanceInfo="substance_info.similar_substance" :classification="classyfire.similar_substance"/>
-        <!-- <div class="chemical-box" style="justify-content: left; width: 90%">
-          <div class="chemical-image-highlight">
-            <img v-if="substance_info.similar_substance.image_link" class="chemical-image" :src="substance_info.similar_substance.image_link" :alt="`Structure image for ${substance_info.similar_substance.dtxsid}`"/>  
-            <div v-else style="text-align: center; display: flex; align-items: center;">No image was found for this substance.</div>
-          </div>
-          <div class="chemical-info">
-            <ul style="list-style-type: none;">
-              <li><strong>(Preferred) Name:</strong> {{ substance_info.similar_substance.preferred_name }} </li>
-              <li><strong>DTXSID:</strong> <a :href="`${COMPTOX_PAGE_URL}${substance_info.similar_substance.dtxsid}`">{{ substance_info.similar_substance.dtxsid }}</a> </li>
-              <li><strong>CASRN:</strong> {{ substance_info.similar_substance.casrn }} </li>
-              <li><strong>InChIKey:</strong> {{ substance_info.similar_substance.indigo_inchikey ? substance_info.similar_substance.indigo_inchikey : substance_info.similar_substance.jchem_inchikey}} </li>
-              <li><strong>Molecular Formula:</strong> {{ substance_info.similar_substance.molecular_formula }} </li>
-              <li><strong>Monoisotopic Mass:</strong> {{ substance_info.similar_substance.monoisotopic_mass }} </li>
-            </ul>
-          </div>
-        </div> -->
       </div>
     </div>
   </div>
@@ -121,14 +89,14 @@
 <script>
   import axios from 'axios'
 
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import 'ag-grid-community/styles/ag-grid.css'
+  import 'ag-grid-community/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { getSubstanceImageLink } from '@/assets/common_functions'
+  import { imageLinkForSubstance } from '@/assets/common_functions'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
   import '@/assets/style.css'
   import BasicSubstanceDisplay from '@/components/BasicSubstanceDisplay.vue'
@@ -245,7 +213,7 @@
           }
         } else {
           this.substance_info.searched_substance = response.data.substances
-          this.substance_info.searched_substance.image_link = await getSubstanceImageLink(response.data.substances.dtxsid)
+          this.substance_info.searched_substance.image_link = await imageLinkForSubstance(response.data.substances.dtxsid, response.data.substances.image_in_comptox)
           const methods_response = await axios.get(`${this.BACKEND_LOCATION}/get_similar_methods/${response.data.substances.dtxsid}`)
           this.dtxsid_counts = methods_response.data.dtxsid_counts
           const classyfire_response = await axios.get(`${this.BACKEND_LOCATION}/get_classification_for_dtxsid/${response.data.substances.dtxsid}`)
@@ -292,7 +260,7 @@
         if (event.event) {
           const substance_response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${event.data.dtxsid}`)
           this.substance_info.similar_substance = substance_response.data.substances
-          this.substance_info.similar_substance.image_link = await getSubstanceImageLink(substance_response.data.substances.dtxsid)
+          this.substance_info.similar_substance.image_link = imageLinkForSubstance(substance_response.data.substances.dtxsid, substance_response.data.substances.image_in_comptox)
           const classyfire_response = await axios.get(`${this.BACKEND_LOCATION}/get_classification_for_dtxsid/${substance_response.data.substances.dtxsid}`)
           if ((classyfire_response.status == 200) & (classyfire_response.data.kingdom !== null)) {
             this.classyfire.similar_substance = classyfire_response.data

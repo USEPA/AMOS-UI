@@ -50,14 +50,14 @@
 <script>
   import axios from 'axios'
 
-  import '/node_modules/ag-grid-community/dist/styles/ag-grid.css'
-  import '/node_modules/ag-grid-community/dist/styles/ag-theme-balham.css'
+  import 'ag-grid-community/styles/ag-grid.css'
+  import 'ag-grid-community/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { getSubstanceImageLink } from '@/assets/common_functions'
+  import { imageLinkForSubstance } from '@/assets/common_functions'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
   import '@/assets/style.css'
   
@@ -107,7 +107,7 @@
       const response = await axios.get(`${this.BACKEND_LOCATION}/substring_search/${this.$route.params.substring}`)
       var match_info = response.data.info_list
       for (let i=0; i<match_info.length; i++) {
-        match_info[i]["image_link"] = await getSubstanceImageLink(match_info[i].dtxsid)
+        match_info[i]["image_link"] = imageLinkForSubstance(match_info[i].dtxsid, match_info[i].image_in_comptox)
       }
       this.info_list = match_info
       this.loaded = true
