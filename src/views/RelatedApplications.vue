@@ -1,3 +1,7 @@
+<!--
+  This page is a list of EPA-built pplications which may be of interest to users of AMOS.  This page takes no query or URL parameters.
+-->
+
 <template>
   <p>AMOS is one of a number of EPA applications that organize and show data on substances.  Below are several more.</p>
   <h5><a href="https://ccte-cced-aqcv2.epa.gov/" target="_blank">Analytical QC</a></h5>

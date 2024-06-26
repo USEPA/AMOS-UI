@@ -11,51 +11,47 @@
       <p>
         This is a list of fact sheets available in the database.  Select a row in the table to view the fact sheet on the right side of the page.
       </p>
-      <div v-if="status.loading">
-        Loading...
+      <div v-if="status.loading">Loading...</div>
+      <p v-else>{{fact_sheet_info.length}} fact sheets in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed, covering {{substance_count}} {{filtered_record_count == 1 ? "substance" : "substances"}}.</p>
+      <div style="padding-bottom: 10px;">
+        <label for="full-table-filter">Full Table Filter</label> &nbsp;
+        <input type="text" v-model="full_table_filter" name="full-table-filter" @keyup="quickFilter(full_table_filter)">
+        &nbsp;
+        <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." />
       </div>
-      <div v-else>
-        <p>{{fact_sheet_info.length}} fact sheets in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed, covering {{substance_count}} {{filtered_record_count == 1 ? "substance" : "substances"}}.</p>
-        <div style="padding-bottom: 10px;">
-          <label for="full-table-filter">Full Table Filter</label> &nbsp;
-          <input type="text" v-model="full_table_filter" name="full-table-filter" @keyup="quickFilter(full_table_filter)">
-          &nbsp;
-          <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." />
-        </div>
-        <div>
-          <label for="full-table-filter">Substance Filter</label> &nbsp;
-          <input type="text" v-model="substance_identifier" name="full-table-filter">
-          <button @click="filterBySubstance(substance_identifier)" :disabled="status.filter_by_substance==true">Filter</button>
-          <button @click="clearSubstanceFilter" :disabled="status.filter_by_substance==false">Clear Filter</button>
-        </div>
-        <div class="button-array">
-          <button @click="saveFiltersAsURL">Copy filters to clipboard</button>
-          <button @click="downloadCurrentTable">Download Table</button>
-          <button @click="downloadSubstancesInDocs" :disabled="filtered_record_count==0">Download Substances</button>
-          <button @click="resetFilters">Reset Filters</button>
-        </div>
-        <ag-grid-vue
-          class="ag-theme-balham"
-          style="height:800px; width:100%"
-          :defaultColDef="default_column_def"
-          :columnDefs="column_defs"
-          :rowData="fact_sheet_info"
-          rowSelection="single"
-          @first-data-rendered="onGridReady"
-          @row-selected="onRowSelected"
-          @filter-changed="onFilterChanged"
-          :isExternalFilterPresent="isExternalFilterPresent"
-          :doesExternalFilterPass="doesExternalFilterPass"
-          :tooltipShowDelay="400"
-        ></ag-grid-vue>
+      <div>
+        <label for="full-table-filter">Substance Filter</label> &nbsp;
+        <input type="text" v-model="substance_identifier" name="full-table-filter">
+        <button @click="filterBySubstance(substance_identifier)" :disabled="status.filter_by_substance==true">Filter</button>
+        <button @click="clearSubstanceFilter" :disabled="status.filter_by_substance==false">Clear Filter</button>
       </div>
+      <div class="button-array">
+        <button @click="saveFiltersAsURL">Copy filters to clipboard</button>
+        <button @click="downloadCurrentTable">Download Table</button>
+        <button @click="downloadSubstancesInDocs" :disabled="filtered_record_count==0">Download Substances</button>
+        <button @click="resetFilters">Reset Filters</button>
+      </div>
+      <ag-grid-vue
+        class="ag-theme-balham"
+        style="height:800px; width:100%"
+        :defaultColDef="default_column_def"
+        :columnDefs="column_defs"
+        :rowData="fact_sheet_info"
+        rowSelection="single"
+        @first-data-rendered="onGridReady"
+        @row-selected="onRowSelected"
+        @filter-changed="onFilterChanged"
+        :isExternalFilterPresent="isExternalFilterPresent"
+        :doesExternalFilterPass="doesExternalFilterPass"
+        :tooltipShowDelay="400"
+      ></ag-grid-vue>
     </div>
     <StoredPDFDisplay style="width: 48vw;" v-if="any_fact_sheet_selected" :internalID="selected_row_data.internal_id" recordType="fact sheet"/>
     <b-modal size="xl" v-model="disambiguation.inchikey">
-      <InchikeyDisambiguation :searchedKey="$route.params.search_term" :substances="possible_substances" :record_counts="record_counts_by_dtxsid" @inchikeySelected="disambiguate" />
+      <InchikeyDisambiguation :searchedKey="substance_identifier" :substances="possible_substances" :record_counts="record_counts_by_dtxsid" @inchikeySelected="disambiguate" />
     </b-modal>
     <b-modal size="xl" v-model="disambiguation.synonym">
-      <SynonymDisambiguation :synonym="$route.params.search_term" :substances="possible_substances" :record_counts="record_counts_by_dtxsid" @synonymSelected="disambiguate" />
+      <SynonymDisambiguation :synonym="substance_identifier" :substances="possible_substances" :record_counts="record_counts_by_dtxsid" @synonymSelected="disambiguate" />
     </b-modal>
   </div>
 </template>

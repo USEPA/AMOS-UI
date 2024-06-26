@@ -1,0 +1,25 @@
+<template>
+  <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
+  <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
+  <details>
+    <summary>2024-06-26</summary>
+    <ul>
+      <li>Hyperlinked DTXSIDs in ClassyFire search to CompTox.</li>
+      <li>Added a substance filter to the fact sheet list.</li>
+      <li>Widened the search fields on the ClassyFireClassificationSearch (they now scale with window size).</li>
+      <li>Added basic loading messages to the method list and Analytical QC list.</li>
+      <li>Moved the analyte visualization from the "About" dropdown to "Other Pages".</li>
+      <li>Assorted changes to the Analytical QC list.</li>
+    </ul>
+  </details>
+  <details>
+    <summary>2024-06-20</summary>
+    <ul>
+      <li>Changed the logic for locating substance images; this should significantly speed up image-heavy operations.</li>
+      <li>Clarified the column in the ClassyFire search that describes whether there is data for a substance in AMOS or not.</li>
+      <li>Added a substance filter to the fact sheet list that allows searching for one substance in the fact sheet list.</li>
+      <li>Added a column for timepoints to the Analytical QC list.</li>
+      <li>Fixed an issue with the InChIKey disambiguation modal where the wrong images were being displayed next to substances if an exact match was found.</li>
+    </ul>
+  </details>
+</template>

@@ -32,7 +32,7 @@
     category="EPA-internal spectrum collection"
     url="https://ccte-cced-aqcv2.epa.gov/"
     sourceID="Analytical QC"
-    substances="9305"
+    substances="9187"
     spectra="39523"
   />
   <DataSourceDetails
@@ -40,8 +40,8 @@
     category="Vendor methods collection"
     url="https://www.bruker.com/"
     sourceID="Bruker"
-    substances="591"
-    methods="39"
+    substances="635"
+    methods="44"
   />
   <DataSourceDetails
     sourceName="California Environmental Protection Agency Office of Environmental Health Hazard Assessment"
@@ -110,6 +110,14 @@
     methods="56"
   />
   <DataSourceDetails
+    sourceName="Food & Agricultural Organization of the United Nations"
+    category="United Nations fact sheet collection"
+    url="https://www.fao.org/home/en"
+    sourceID="FAO"
+    substances="278"
+    factSheets="1309"
+  />
+  <DataSourceDetails
     sourceName="Global Natural Products Social Molecular Networking"
     category="Open-access spectrum libraries"
     url="https://gnps.ucsd.edu"
@@ -155,8 +163,8 @@
     category="Open-access spectral database"
     url="https://mona.fiehnlab.ucdavis.edu"
     sourceID="MoNA"
-    substances="5715"
-    spectra="45487"
+    substances="5531"
+    spectra="38414"
   />
   <DataSourceDetails
     sourceName="National Environmental Methods Index"
@@ -222,15 +230,15 @@
     url="https://sciex.com/"
     sourceID="SCIEX"
     substances="708"
-    methods="52"
+    methods="53"
   />
   <DataSourceDetails
     sourceName="Shimadzu"
     category="Vendor methods collection"
     url="https://www.shimadzu.com"
     sourceID="Shimadzu"
-    substances="5352"
-    methods="1009"
+    substances="5527"
+    methods="1058"
   />
   <DataSourceDetails
     sourceName="SpectraBase"
@@ -261,10 +269,10 @@
     sourceName="U.S. Environmental Protection Agency"
     category="Government methods collection"
     url="https://www.epa.gov/"
-    sourceID="EPA, EPA MS Labs, EPA-ECM, EPA-OW, USEPA"
-    substances="3561"
-    factSheets="1464"
-    methods="1893"
+    sourceID="EPA, APPRIL, EPA MS Labs, EPA-ECM, EPA-OW, USEPA"
+    substances="4226"
+    factSheets="19872"
+    methods="1894"
     spectra="537"
   />
   <DataSourceDetails
@@ -296,8 +304,8 @@
     category="Vendor methods collection"
     url="https://www.waters.com/nextgen/us/en.html"
     sourceID="Waters"
-    substances="1910"
-    methods="264"
+    substances="1906"
+    methods="261"
   />
   <br />
 </template>

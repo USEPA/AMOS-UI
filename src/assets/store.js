@@ -14,8 +14,9 @@ export const ANALYTE_MAPPING = {
 }
 
 export const SOURCE_ABBREVIATION_MAPPING = {
-    'ACSOmega': {'full_name': 'ACS Omega', 'link': 'https://pubs.acs.org/journal/acsodf'},
+	'ACSOmega': {'full_name': 'ACS Omega', 'link': 'https://pubs.acs.org/journal/acsodf'},
 	'ANL': {'full_name': 'Argonne National Laboratory', 'link': 'https://www.anl.gov/'},
+	'APPRIL': {'link': 'https://ordspub.epa.gov/ords/pesticides/f?p=APPRIL_PUBLIC:2::::::', 'full_name': 'Active Pesticide Product Registration Informational Listing'},
 	'ASTM': {'full_name': 'ASTM International', 'link': 'https://www.astm.org/'},
 	'ATSDR': {'full_name': 'Agency for Toxic Substances and Diseas Registry', 'link': 'https://www.atsdr.cdc.gov/'},
 	'Acta Chromatogr.': {'full_name': 'Acta Chromatographica', 'link': 'https://akjournals.com/view/journals/1326/1326-overview.xml'},
@@ -77,6 +78,7 @@ export const SOURCE_ABBREVIATION_MAPPING = {
 	'Environmental Technology': {'link': 'https://www.tandfonline.com/journals/tent20'},
 	'Eurofins': {'full_name': 'Eurofins Scientific', 'link': 'https://www.eurofins.com/'},
 	'European Journal of Pharmaceutical Sciences': {'link': 'https://www.sciencedirect.com/journal/european-journal-of-pharmaceutical-sciences'},
+	'FAO': {'link': 'https://www.fao.org/home/en', 'full_name': 'Food & Agricultural Organization of the United Nations'},
 	'FCRIS': {'full_name': 'Food Contaminant and Residue Information System', 'link': 'https://www.iaea.org/resources/databases/food-contaminant-and-residue-information-system'},
 	'FCT': {'full_name': 'Food Chemistry Toxicology', 'link': 'https://www.sciencedirect.com/journal/food-and-chemical-toxicology'},
 	'FDA': {'full_name': 'United States Food and Drug Administration', 'link': 'https://www.fda.gov/'},

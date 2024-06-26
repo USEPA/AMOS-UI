@@ -9,31 +9,34 @@
 <template>
   <div>
     <p>Below is a list of methods currently in the database.  Double-click on a row to display the method and its substances in another tab.  Cells in the table with a dashed underline have hovertext, usually for expanding out abbreviations in the cell content (it will take a second or two for the hovertext to appear).</p>
-    <p>{{method_info.length}} methods in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed, covering {{substance_count}} {{substance_count == 1 ? "substance" : "substances"}}.</p>
-    <div>
-      <label for="full-table-filter">Full Table Filter</label> &nbsp;
-      <input type="text" v-model="full_table_filter" name="full-table-filter" @keyup="quickFilter(full_table_filter)">
-      &nbsp;
-      <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." />
+    <p v-if="status.loading">Loading...</p>
+    <div v-else>
+      <p>{{method_info.length}} methods in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed, covering {{substance_count}} {{substance_count == 1 ? "substance" : "substances"}}.</p>
+      <div>
+        <label for="full-table-filter">Full Table Filter</label> &nbsp;
+        <input type="text" v-model="full_table_filter" name="full-table-filter" @keyup="quickFilter(full_table_filter)">
+        &nbsp;
+        <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." />
+      </div>
+      <div class="button-array">
+        <button @click="saveFiltersAsURL">Copy filters to clipboard</button>
+        <button @click="downloadCurrentTable">Download Table</button>
+        <button @click="downloadSubstancesInMethods" :disabled="filtered_record_count==0">Download Substances</button>
+        <button @click="resetFilters">Reset Filters</button>
+      </div>
+      <ag-grid-vue
+        class="ag-theme-balham"
+        style="height:600px; width:100%"
+        :defaultColDef="default_column_def"
+        :columnDefs="column_defs"
+        :rowData="method_info"
+        @grid-ready="onGridReady"
+        rowSelection="single"
+        @row-double-clicked="onDoubleClick"
+        @filter-changed="onFilterChanged"
+        :tooltipShowDelay="500"
+      ></ag-grid-vue>
     </div>
-    <div class="button-array">
-      <button @click="saveFiltersAsURL">Copy filters to clipboard</button>
-      <button @click="downloadCurrentTable">Download Table</button>
-      <button @click="downloadSubstancesInMethods" :disabled="filtered_record_count==0">Download Substances</button>
-      <button @click="resetFilters">Reset Filters</button>
-    </div>
-    <ag-grid-vue
-      class="ag-theme-balham"
-      style="height:600px; width:100%"
-      :defaultColDef="default_column_def"
-      :columnDefs="column_defs"
-      :rowData="method_info"
-      @grid-ready="onGridReady"
-      rowSelection="single"
-      @row-double-clicked="onDoubleClick"
-      @filter-changed="onFilterChanged"
-      :tooltipShowDelay="400"
-    ></ag-grid-vue>
     <br />
     <p>Some usage notes:</p>
     <ul>
@@ -71,6 +74,7 @@
         full_table_filter: "",
         filtered_record_count: 0,
         substance_count: 0,
+        status: {loading: true},
         column_defs: [
           {field: "method_number", headerName: "Method #", width: 100},
           {field: "method_name", headerName: "Name", tooltipField: 'method_name', sortable: true, flex: 2.5, cellClass: 'fake-link'},
@@ -152,6 +156,7 @@
       const path = `${this.BACKEND_LOCATION}/method_list`
       const response = await axios.get(path)
       this.method_info = response.data.results
+      this.status.loading = false
     },
     methods: {
       onDoubleClick(event) {

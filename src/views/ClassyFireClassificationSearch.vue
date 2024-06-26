@@ -81,12 +81,13 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import { imageLinkForSubstance } from '@/assets/common_functions'
-  import { BACKEND_LOCATION } from '@/assets/store'
+  import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
 
   export default {
     data() {
       return {
         BACKEND_LOCATION,
+        COMPTOX_PAGE_URL,
         IMAGE_BY_DTXSID_API: "https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/",
         klasses: [],
         subklasses: [],
@@ -114,7 +115,9 @@
               return p
             }
           }},
-          {field: 'dtxsid', headerName: 'DTXSID', width: 130},
+          {field: 'dtxsid', headerName: 'DTXSID', width: 115, cellRenderer: params => {
+            return "<a href='" + this.COMPTOX_PAGE_URL + params.data.dtxsid + "' target='_blank'>" + params.data.dtxsid + "</a>"
+          }},
           {field: 'casrn', headerName: 'CASRN', width: 120},
           {field: 'preferred_name', headerName: 'Preferred Name', sortable: true, sort: 'asc', flex: 1},
           {field: 'monoisotopic_mass', headerName: 'Monoisotopic Mass', width: 150, filter: 'agNumberColumnFilter'},
@@ -204,9 +207,17 @@
 
 
 <style>
+  .classyfire-input {
+    width: 20%
+  }
+
   .classyfire-input label {
     display: block;
     padding-bottom: 4px;
+  }
+
+  .classyfire-input input {
+    width: 100%
   }
 
   .ag-row .ag-cell {

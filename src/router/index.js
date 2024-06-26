@@ -23,7 +23,8 @@ const routes = [
   {path: "/analytical_qc_list", name: "Analytical QC List", component: ()=>import('../views/AnalyticalQCList.vue')},
   {path: "/related_applications", name: "Related Applications", component: ()=>import('../views/RelatedApplications.vue')},
   {path: "/classification_search", name: "Classification Search", component: ()=>import('../views/ClassyFireClassificationSearch.vue')},
-  {path: "/test_viz", name: "Test Viz", component: ()=>import('../views/TestViz.vue')}
+  {path: "/test_viz", name: "Test Viz", component: ()=>import('../views/TestViz.vue')},
+  {path: "/release_notes", name: "Release Notes", component: ()=>import('../views/ReleaseNotes.vue')}
 ]
 
 const router = createRouter({

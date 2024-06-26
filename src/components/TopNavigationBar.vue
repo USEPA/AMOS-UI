@@ -28,15 +28,16 @@
       </b-nav-item-dropdown>
       &emsp;
       <b-nav-item-dropdown text="Other Pages" class="nav-dropdown">
+        <b-dropdown-item to="/analyte_visualization">Analyte Visualization</b-dropdown-item>
         <b-dropdown-item to="/mass_spectrum_comparison">Mass Spectrum Comparison</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
       <b-nav-item-dropdown text="About" class="nav-dropdown">
         <b-dropdown-item to="/about">About this App</b-dropdown-item>
-        <b-dropdown-item to="/analyte_visualization">Analyte Visualization</b-dropdown-item>
         <b-dropdown-item to="/contact">Contact Info</b-dropdown-item>
         <b-dropdown-item to="/data_sources">Data Sources</b-dropdown-item>
         <b-dropdown-item to="/related_applications">Related Applications</b-dropdown-item>
+        <b-dropdown-item to="/release_notes">Release Notes</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
       <button @click="store.showHeaderAndFooter = !store.showHeaderAndFooter">Toggle Header/Footer</button>

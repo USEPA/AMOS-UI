@@ -31,8 +31,6 @@
       <li>Unique sources: {{result_info["Sources"]["Total"].toLocaleString()}}</li>
       <li>Substances appearing in at least one record: {{result_info["Substances"]["Total"].toLocaleString()}}</li>
     </ul>
-  <br />
-  <p>This app was last updated on 2024-06-07.</p>
   </div>
 </template>
 
