@@ -2,6 +2,13 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2024-06-28</summary>
+    <ul>
+      <li>Tweaked the navigation bar to include the application name, a link to the home page, and date of last update on the left side.</li>
+      <li>Fixed an bug where the similar method search could error out if some methodologies for the method hadn't been curated.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2024-06-26</summary>
     <ul>
       <li>Hyperlinked DTXSIDs in ClassyFire search to CompTox.</li>

@@ -8,11 +8,15 @@
 <template>
   <div class="nav-bar">
     <div class="nav-bar-left">
+      <div style="text-align: start;">
+        <router-link to="/" style="font-size: larger">AMOS</router-link>
+        <div style="font-size: smaller">Version: 2024-06-28</div>
+      </div>
+      &emsp;
       <input @keyup.enter="go()" type="text" v-model="searchTerm" name="search-term" title="General search input field">
       <button @click="go()">Substance Search</button>
     </div>
     <div class="nav-bar-right">
-      <router-link to="/" style="padding: 1px">Home</router-link>
       &emsp;
       <b-nav-item-dropdown text="Lists" class="nav-dropdown" style="background: #0e6993;">
         <b-dropdown-item to="/analytical_qc_list">Analytical QC</b-dropdown-item>
@@ -75,17 +79,23 @@
     margin-bottom: 10px;
   }
 
+  .nav-bar-left {
+    display: flex;
+    align-items: center;
+  }
+
+
   .nav-bar-right {
     display: flex;
     align-items: center;
   }
 
-  .nav-bar-right a{
+  .nav-bar a{
     color: white;
     text-decoration: none;
   }
 
-  .nav-bar-right a:hover{
+  .nav-bar a:hover{
     color: white;
     text-decoration: underline;
   }
