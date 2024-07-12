@@ -117,6 +117,7 @@
             :doesExternalFilterPass="doesExternalFilterPass"
             :postSortRows="postSortRows"
             :loadingOverlayComponent="SimilarMethodRedirect"
+            :suppressCopyRowsToClipboard="true"
           ></ag-grid-vue>
         </div>
       </div>

@@ -53,10 +53,19 @@
           <label for="methodologies-nmr">NMR</label>
         </div>
         <div class="option-sets">
+          <strong>Substance Info</strong>
+          <br />
+          <input type="checkbox" id="include-classyfire" v-model="include_classyfire">
+          <label for="include-classyfire"><span class="has-hover-text" title="Includes the top four levels of ClassyFire classifications with the substance information.">Include ClassyFire</span></label>
+        </div>
+        <div class="option-sets">
           <strong>Other</strong>
           <br />
           <input type="checkbox" id="include-spectrabase" v-model="include_spectrabase" checked>
-          <label for="include-spectrabase"><span class="has-hover-text" title="SpectraBase contains a lot of non-MS spectra, and their data requires an account, so it may not be desirable to include these results.">Include SpectraBase</span></label>
+          <label for="include-spectrabase"><span class="has-hover-text" title="SpectraBase contains a lot of non-MS spectra, and their data requires an account, so it may not be desirable to include these results.">Include SpectraBase records</span></label>
+          <br />
+          <input type="checkbox" id="include-analyticalqc" v-model="include_analyticalqc">
+          <label for="include-analyticalqc"><span class="has-hover-text" title="Some additional, project-specific information exists for records from Analytical QC.">Include additional Analytical QC info</span></label>
         </div>
       </div>
     </div>
@@ -76,7 +85,9 @@
     data() {
       return {
         batch_search_params: {},
+        include_classyfire: true,
         include_spectrabase: true,
+        include_analyticalqc: false,
         search_box: "",
         status_boxes: {
           show_empty_box_error: false,
@@ -94,11 +105,13 @@
         if(this.search_box != ""){
           const search_terms = this.search_box.split("\n")
           const parameters = {
-            dtxsids: search_terms,
             base_url: window.location.origin,
+            dtxsids: search_terms,
+            include_analyticalqc: this.include_analyticalqc,
+            include_classyfire: this.include_classyfire,
             include_spectrabase: this.include_spectrabase,
-            record_types: this.record_types,
-            methodologies: this.methodologies
+            methodologies: this.methodologies,
+            record_types: this.record_types
           }
           await axios.post(`${this.BACKEND_LOCATION}/batch_search`, parameters, {responseType: "blob"}).then(res => {
             if (res.status == 204) {

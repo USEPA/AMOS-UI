@@ -6,7 +6,7 @@
 -->
 
 <template>
-  <p>Use the inputs below to specify a ClassfyFire classification, and then use "Get Substances" to view a list of all available substances under that classification.</p>
+  <p>Use the inputs below to specify a ClassyFire classification, and then use "Get Substances" to view a list of all available substances under that classification.</p>
   <div style="display: flex; flex-direction: row; justify-content: space-around">
     <div class="classyfire-input">
       <label for="kingdom"><strong>Kingdom</strong></label>
@@ -58,7 +58,7 @@
   <button @click="downloadSearchResults">Download Table</button>
   <br />
   <p v-if="state.searching">Searching -- this may take a moment...</p>
-  <p v-else>{{ substances.length }} substances found.</p>
+  <p v-else>{{ substances.length }} substances found; {{ filtered_record_count }} are currently displayed.</p>
   <ag-grid-vue
     class="ag-theme-balham"
     style="height:600px; width:100%"
@@ -66,7 +66,9 @@
     :columnDefs="columnDefs"
     :rowData="substances"
     @grid-ready="onGridReady"
+    @filter-changed="onFilterChanged"
     rowSelection="single"
+    :suppressCopyRowsToClipboard="true"
   ></ag-grid-vue>
 </template>
 
@@ -97,6 +99,7 @@
         klass: "",
         subklass: "",
         substances: [],
+        filtered_record_count: 0,
         state: {searching: false},
         disabled: {superklass: true, klass: true, subklass: true},
         defaultColDef: {filter: 'agTextColumnFilter', floatingFilter: true},
@@ -145,10 +148,27 @@
         1 //console.log(this.kingdom)
       }
     },
+    created() {
+      const query_params = Object.keys(this.$route.query)
+      if (["kingdom", "superclass", "class", "subclass"].every(x => query_params.includes(x))) {
+        this.kingdom = this.$route.query.kingdom
+        this.superklass = this.$route.query.superclass
+        this.klass = this.$route.query.class
+        this.subklass = this.$route.query.subclass
+        this.disabled.superklass = false
+        this.disabled.klass = false
+        this.disabled.subklass = false
+        this.getSubstances()
+      } else {
+        // may just delete this case later on
+        console.log("some missing")
+      }
+    },
     methods: {
       onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
+        this.gridApi.onFilterChanged()
       },
       async getSuperklasses() {
         const response = await axios.post(`${this.BACKEND_LOCATION}/next_level_classification/`, {kingdom: this.kingdom})
@@ -184,6 +204,7 @@
         }
         this.substances = found_substances
         this.state.searching = false
+        this.gridApi.onFilterChanged()
       },
       resetSelection() {
         this.disabled.superklass = true
@@ -193,6 +214,9 @@
         this.superklass = ""
         this.klass = ""
         this.subklass = ""
+      },
+      onFilterChanged(params) {
+        this.filtered_record_count = this.gridApi.getDisplayedRowCount()
       },
       downloadSearchResults() {
         this.gridApi.exportDataAsExcel({

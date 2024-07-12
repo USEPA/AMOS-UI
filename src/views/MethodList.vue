@@ -35,6 +35,7 @@
         @row-double-clicked="onDoubleClick"
         @filter-changed="onFilterChanged"
         :tooltipShowDelay="500"
+        :suppressCopyRowsToClipboard="true"
       ></ag-grid-vue>
     </div>
     <br />
@@ -75,6 +76,8 @@
         filtered_record_count: 0,
         substance_count: 0,
         status: {loading: true},
+        NUMBER_COLUMNS: ["year"],
+        TEXT_COLUMNS: ["analyte", "chemical_class", "document_type", "limitation", "method_name", "method_number", "methodologies", "source"],
         column_defs: [
           {field: "method_number", headerName: "Method #", width: 100},
           {field: "method_name", headerName: "Name", tooltipField: 'method_name', sortable: true, flex: 2.5, cellClass: 'fake-link'},

@@ -47,6 +47,7 @@
           :rowData="substance_list"
           rowSelection="single"
           @grid-ready="onGridReady"
+          :suppressCopyRowsToClipboard="true"
         ></ag-grid-vue>
       </div>
       <p v-else>Illegal value for 'viewer_mode' selected.  Current value is {{viewer_mode}}.</p>

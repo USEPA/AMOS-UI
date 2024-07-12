@@ -26,6 +26,7 @@
             rowSelection="single"
             @row-selected="onRowSelected"
             @row-double-clicked="onDoubleClick"
+            :suppressCopyRowsToClipboard="true"
           ></ag-grid-vue>
       </div>
     </div>

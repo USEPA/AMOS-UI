@@ -25,6 +25,7 @@
     @row-selected="onRowSelected"
     @filter-changed="onFilterChanged"
     :tooltipShowDelay="500"
+    :suppressCopyRowsToClipboard="true"
   ></ag-grid-vue>
 </template>
 
@@ -39,7 +40,7 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import '@/assets/style.css'
-  import { timestampForFile } from '@/assets/common_functions'
+  import { filtersToURL, queryParamsToFilters, timestampForFile } from '@/assets/common_functions'
   import { ANALYTICAL_QC_CALLS, ANALYTICAL_QC_GRADES, BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
 
   export default {
@@ -106,19 +107,14 @@
         this.gridApi = params.api
         this.gridColumnApi = params.columnApi
         this.gridApi.onFilterChanged();
-        for (const k of Object.keys(this.$route.query)) {
-          if (this.SET_FILTER_COLUMNS.includes(k)) {
-            if (this.$route.query[k] !== "") {
-              var values = this.$route.query[k].split("_")
-              this.gridApi.getFilterInstance(k).setModel({type: "set", values: values})
-            }
-          } else if (this.TEXT_FILTER_COLUMNS.includes(k)) {
-            var text = this.$route.query[k]
-            this.gridApi.getFilterInstance(k).setModel({type: "contains", filter: text})
-          } else {
-            // maybe code up a warning for this case
-            continue
-          }
+        const query_params = Object.keys(this.$route.query)
+        if (query_params.length == 0) {
+          var set_filter_values = this.gridApi.getFilterInstance("study").getValues()
+          set_filter_values = set_filter_values.filter(x => x !== "NIST GCMS")
+          this.gridApi.getFilterInstance("study").setModel({type: 'set', values: set_filter_values})
+        } else {
+          const filter_object = queryParamsToFilters(this.$route.query, [], this.SET_FILTER_COLUMNS, this.TEXT_FILTER_COLUMNS)
+          this.gridApi.setFilterModel(filter_object)
         }
         this.gridApi.onFilterChanged();
         this.gridColumnApi.applyColumnState({state: [
@@ -146,18 +142,8 @@
       },
       saveFiltersAsURL() {
         const all_filters = this.gridApi.getFilterModel();
-        var url = window.location.origin + this.$route.path + "?"
-        const active_filters = Object.keys(all_filters)
-        for (let k of active_filters) {
-          var current_filter = all_filters[k]
-          if (current_filter.filterType == "text") {
-            url = url + `${k}=${current_filter.filter}&`
-          } else if (current_filter.filterType == "set") {
-            url = url + `${k}=${current_filter.values.join("_")}&`
-          } else {
-            continue
-          }
-        }
+        const base_url = window.location.origin + this.$route.path
+        const url = filtersToURL(base_url, all_filters)
         
         // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
         // can't get that to work in this app, though, since it apparently requires a secured connection and the
@@ -177,7 +163,7 @@
       downloadSubstances() {
         var seen_dtxsids = []
         var rows_to_keep = []
-        this.gridApi.forEachNodeAfterFilter( (rowNode, index) => {
+        this.gridApi.forEachNodeAfterFilterAndSort( (rowNode, index) => {
           if (!seen_dtxsids.includes(rowNode.data.dtxsid)) {
             seen_dtxsids.push(rowNode.data.dtxsid)
             rows_to_keep.push(index)

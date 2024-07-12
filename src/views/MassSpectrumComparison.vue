@@ -26,6 +26,7 @@
               rowSelection="single"
               @row-selected="display_database_spectrum"
               @first-data-rendered="onGridReady"
+              :suppressCopyRowsToClipboard="true"
             ></ag-grid-vue>
           </div>
           <div v-else class="search-inputs" style="padding-left: 100px">

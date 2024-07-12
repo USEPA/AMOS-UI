@@ -2,6 +2,17 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2024-07-12</summary>
+    <ul>
+      <li>Expanded the table in the fact sheet list to cover all of the page. Individual fact sheets now open in new tabs, like in the methods list.</li>
+      <li>Altered all AG Grid tables to make copy operations only copy the selected cell to the clipboard instead of the entire row.</li>
+      <li>Added options for including substance-level ClassyFire info and additional Analytical QC info in batch search results.</li>
+      <li>Hyperlinked the last level of a ClassyFire display to the ClassyFire search page, which will pre-fill the fields and run a search with the given classification.</li>
+      <li>Fixed an issue with the substance download for the Analytical QC list -- substances are now properly being deduplicated.</li>
+      <li>Changed "Classification"  to "ClassyFire" for that search in its URL and the navigation bar.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2024-06-28</summary>
     <ul>
       <li>Tweaked the navigation bar to include the application name, a link to the home page, and date of last update on the left side.</li>

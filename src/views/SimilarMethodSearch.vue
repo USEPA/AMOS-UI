@@ -52,6 +52,7 @@
             :rowClassRules="methodsRowClassRules"
             :isExternalFilterPresent="isExternalFilterPresent"
             :doesExternalFilterPass="doesExternalFilterPass"
+            :suppressCopyRowsToClipboard="true"
           ></ag-grid-vue>
           <ag-grid-vue v-if="tab_viewer_mode == 'Substances'"
             class="ag-theme-balham"
@@ -62,6 +63,7 @@
             @row-selected="substancesRowSelected"
             :getRowClass="getRowClass"
             ></ag-grid-vue>
+            :suppressCopyRowsToClipboard="true"
         </div>
       </div>
     </div>

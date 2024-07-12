@@ -42,6 +42,7 @@
       :doesExternalFilterPass="doesExternalFilterPass"
       @grid-ready="onGridReady"
       @filter-changed="onFilterChanged"
+      :suppressCopyRowsToClipboard="true"
     ></ag-grid-vue>
   </div>
   <p v-else>Searching -- this may take a few moments...</p>

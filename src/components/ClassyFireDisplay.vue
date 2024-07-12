@@ -8,7 +8,7 @@
       <br />
       &nbsp; &nbsp; ⮡  {{ klass }}
       <br />
-      &nbsp; &nbsp; &nbsp; ⮡  {{ subklass }}
+      &nbsp; &nbsp; &nbsp; ⮡  <router-link :to="`/classyfire_search?kingdom=${kingdom}&superclass=${superklass}&class=${klass}&subclass=${subklass}`" target="_blank">{{ subklass }}</router-link>
     </div>
   </details>
 </template>

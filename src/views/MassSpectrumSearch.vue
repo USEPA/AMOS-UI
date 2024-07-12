@@ -49,6 +49,7 @@
           @first-data-rendered="onGridReady"
           suppressAggFuncInHeader="true"
           :autoGroupColumnDef="autoGroupColumnDef"
+          :suppressCopyRowsToClipboard="true"
         ></ag-grid-vue>
         <br />
         <div v-if="any_row_selected" style="display: flex; flex-direction: column; align-items: center">
@@ -73,6 +74,7 @@
       :columnDefs="column_defs"
       :rowData="spectrumAsRows(row_data.spectrum)"
       rowSelection="single"
+      :suppressCopyRowsToClipboard="true"
     ></ag-grid-vue>
     <button @click="copySpectrum()">Copy to Clipboard</button>
   </b-modal>

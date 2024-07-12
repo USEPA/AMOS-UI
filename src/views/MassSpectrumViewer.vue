@@ -31,6 +31,7 @@
           :columnDefs="column_defs"
           :rowData="spectrumAsRows(spectrum)"
           rowSelection="single"
+          :suppressCopyRowsToClipboard="true"
         ></ag-grid-vue>
         <button @click="copySpectrum()">Copy to Clipboard</button>
       </b-modal>

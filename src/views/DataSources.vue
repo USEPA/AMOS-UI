@@ -32,8 +32,8 @@
     category="EPA-internal spectrum collection"
     url="https://ccte-cced-aqcv2.epa.gov/"
     sourceID="Analytical QC"
-    substances="9187"
-    spectra="39523"
+    substances="8828"
+    spectra="36293"
   />
   <DataSourceDetails
     sourceName="Bruker"
@@ -83,6 +83,14 @@
     substances="2399"
     factSheets="677"
     methods="25"
+  />
+  <DataSourceDetails
+    sourceName="Czech Academy of Sciences"
+    category="Open-access spectrum collection"
+    url="https://chemrxiv.org/engage/chemrxiv/article-details/663ccc0a91aefa6ce19236c2"
+    sourceID="Czech Academy of Sciences"
+    substances="6166"
+    spectra="404422"
   />
   <DataSourceDetails
     sourceName="Drinking Water Treatability Database"
@@ -163,8 +171,8 @@
     category="Open-access spectral database"
     url="https://mona.fiehnlab.ucdavis.edu"
     sourceID="MoNA"
-    substances="5531"
-    spectra="38414"
+    substances="5537"
+    spectra="38456"
   />
   <DataSourceDetails
     sourceName="National Environmental Methods Index"
@@ -237,8 +245,8 @@
     category="Vendor methods collection"
     url="https://www.shimadzu.com"
     sourceID="Shimadzu"
-    substances="5527"
-    methods="1058"
+    substances="5792"
+    methods="1113"
   />
   <DataSourceDetails
     sourceName="SpectraBase"
@@ -304,8 +312,8 @@
     category="Vendor methods collection"
     url="https://www.waters.com/nextgen/us/en.html"
     sourceID="Waters"
-    substances="1906"
-    methods="261"
+    substances="1907"
+    methods="262"
   />
   <br />
 </template>
