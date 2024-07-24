@@ -65,7 +65,7 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { timestampForFile } from '@/assets/common_functions'
+  import { filtersToURL, queryParamsToFilters, sourceAbbreviationTooltip, timestampForFile } from '@/assets/common_functions'
   import { BACKEND_LOCATION, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
   import '@/assets/style.css'
   import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
@@ -91,22 +91,22 @@
         fact_sheets_with_substance: [],
         possible_substances: [],
         record_counts_by_dtxsid: {},
+        NUMERIC_COLUMNS: [],
+        TEXT_COLUMNS: ['analyte', 'document_type', 'fact_sheet_name', 'functional_classes', 'internal_id', 'source'],
         column_defs: [
           {field: 'internal_id', headerName: 'Doc ID', sortable: true, width: 80, comparator: (valA, valB, nodeA, nodeB, isDescending) => {
             return Number.parseInt(valA.substring(3)) - Number.parseInt(valB.substring(3))
           }},
           {field: 'fact_sheet_name', headerName: 'Fact Sheet Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, sort: "asc", flex: 1, tooltipField: 'fact_sheet_name'},
           {field: 'source', headerName: 'Source', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, width: 90, tooltipValueGetter: params => {
-              if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source]) {
-                return this.SOURCE_ABBREVIATION_MAPPING[params.data.source].full_name
-              }
+              return sourceAbbreviationTooltip(params.data.source)
             }, cellClass: params => {
               if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source] && this.SOURCE_ABBREVIATION_MAPPING[params.data.source].full_name) {
                 return "has-hover-text"
               }
             }
           },
-          {field: 'document_type', headerName: 'Type', sortable: true, width: 90},
+          {field: 'document_type', headerName: 'Type', sortable: true, width: 90, filter: 'agTextColumnFilter', floatingFilter: true},
           {field: 'analyte', headerName: 'Analyte', sortable: true, flex: 1, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
             if (params.data.count == 1){
               const link = document.createElement("a");
@@ -121,6 +121,7 @@
               return params.data.analyte
             }
           }},
+          {field: 'functional_classes', headerName: 'Functional Classes', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true},
           {field: 'link', headerName: 'Link', sortable: true, width: 70, cellRenderer: params => {
             return `<a href='${params.data.link}' target='_blank'>Link</a>`
           }}
@@ -139,15 +140,15 @@
       onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
-        for (const k of Object.keys(this.$route.query)) {
-          if (k === "full_table") {
-            this.full_table_filter = this.$route.query[k]
-            this.gridApi.setQuickFilter(this.full_table_filter)
-          } else {
-            const filter_params = this.$route.query[k].split("_")
-            this.gridApi.getFilterInstance(k).setModel({type: filter_params[0], filter: filter_params[1]})
-          }
+        
+        // load query parameters
+        if (Object.keys(this.$route.query).includes("full_table")) {
+          this.full_table_filter = this.$route.query["full_table"]
+          this.gridApi.setQuickFilter(this.full_table_filter)
         }
+        const filter_object = queryParamsToFilters(this.$route.query, this.NUMERIC_COLUMNS, [], this.TEXT_COLUMNS)
+        this.gridApi.setFilterModel(filter_object)
+
         this.gridApi.onFilterChanged();
       },
       onRowSelected(event){
@@ -212,11 +213,10 @@
       },
       saveFiltersAsURL() {
         const current_filters = this.gridApi.getFilterModel();
-        var url = window.location.origin + this.$route.path + "?"
+        var url = filtersToURL(window.location.origin + this.$route.path, current_filters)
         if (this.full_table_filter) {
-          url = url + `full_table=${this.full_table_filter}&`
+          url = url + `full_table=${this.full_table_filter}`
         }
-        url = url + Object.keys(current_filters).map(x => `${x}=${current_filters[x].type}_${current_filters[x].filter}`).join("&")
 
         // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
         // can't get that to work in this app, though, since it apparently requires a secured connection and the

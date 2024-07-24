@@ -71,7 +71,7 @@
     <ag-grid-vue
       class="ag-theme-balham"
       style="height:600px; width:100%"
-      :columnDefs="column_defs"
+      :columnDefs="spectrum_table_column_defs"
       :rowData="spectrumAsRows(row_data.spectrum)"
       rowSelection="single"
       :suppressCopyRowsToClipboard="true"
@@ -89,7 +89,7 @@
 <script>
   import axios from 'axios'
   import { validateSpectrumInput } from '@/assets/common_functions'
-  import { BACKEND_LOCATION, COMPTOX_PAGE_URL, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
+  import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
 
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
@@ -117,7 +117,6 @@
         show_plot: false,
         BACKEND_LOCATION,
         COMPTOX_PAGE_URL,
-        SOURCE_ABBREVIATION_MAPPING,
         error_messages: {invalidFormat: false},
         substance_mapping: {},
         show_modal: {metadata: false, table: false},
@@ -135,7 +134,7 @@
           {field: 'internal_id', headerName: 'Internal ID', hide: true}
         ],
         autoGroupColumnDef: {headerName: 'DTXSID (Name)', width: 300, sortable: true},
-        column_defs: [
+        spectrum_table_column_defs: [
           {field:'m/z', headerName:'m/z', flex: 1, sortable: true},
           {field:'intensity', headerName:'Peak Intensity', flex: 1, sortable: true}
         ]

@@ -57,7 +57,7 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { timestampForFile } from '@/assets/common_functions'
+  import { filtersToURL, queryParamsToFilters, sourceAbbreviationTooltip, timestampForFile } from '@/assets/common_functions'
   import { BACKEND_LOCATION, ANALYTE_MAPPING, METHOD_DOCUMENT_TYPES, METHODOLOGY_MAPPING, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
   import '@/assets/style.css'
   import HelpIcon from '@/components/HelpIcon.vue'
@@ -76,8 +76,8 @@
         filtered_record_count: 0,
         substance_count: 0,
         status: {loading: true},
-        NUMBER_COLUMNS: ["year"],
-        TEXT_COLUMNS: ["analyte", "chemical_class", "document_type", "limitation", "method_name", "method_number", "methodologies", "source"],
+        NUMERIC_COLUMNS: ["year_published"],
+        TEXT_COLUMNS: ["analyte", "author", "chemical_class", "document_type", "limitation", "matrix", "method_name", "method_number", "methodologies", "publisher", "source"],
         column_defs: [
           {field: "method_number", headerName: "Method #", width: 100},
           {field: "method_name", headerName: "Name", tooltipField: 'method_name', sortable: true, flex: 2.5, cellClass: 'fake-link'},
@@ -96,9 +96,7 @@
             }
           },
           {field: "source", headerName: "Source", width: 95, sortable: true, tooltipValueGetter: params => {
-              if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source]) {
-                return this.SOURCE_ABBREVIATION_MAPPING[params.data.source].full_name
-              }
+              return sourceAbbreviationTooltip(params.data.source)
             }, cellRenderer: params => {
               const src = params.data.source
               if (this.SOURCE_ABBREVIATION_MAPPING[src]) {
@@ -168,24 +166,23 @@
       onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
-        for (const k of Object.keys(this.$route.query)) {
-          if (k === "full_table") {
-            this.full_table_filter = this.$route.query[k]
-            this.gridApi.setQuickFilter(this.full_table_filter)
-          } else {
-            const filter_params = this.$route.query[k].split("_")
-            this.gridApi.getFilterInstance(k).setModel({type: filter_params[0], filter: filter_params[1]})
-          }
+        
+        // load query parameters
+        if (Object.keys(this.$route.query).includes("full_table")) {
+          this.full_table_filter = this.$route.query["full_table"]
+          this.gridApi.setQuickFilter(this.full_table_filter)
         }
+        const filter_object = queryParamsToFilters(this.$route.query, this.NUMERIC_COLUMNS, [], this.TEXT_COLUMNS)
+        this.gridApi.setFilterModel(filter_object)
+
         this.gridApi.onFilterChanged();
       },
       saveFiltersAsURL() {
         const current_filters = this.gridApi.getFilterModel();
-        var url = window.location.origin + this.$route.path + "?"
+        var url = filtersToURL(window.location.origin + this.$route.path, current_filters)
         if (this.full_table_filter) {
-          url = url + `full_table=${this.full_table_filter}&`
+          url = url + `full_table=${this.full_table_filter}`
         }
-        url = url + Object.keys(current_filters).map(x => `${x}=${current_filters[x].type}_${current_filters[x].filter}`).join("&")
 
         // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
         // can't get that to work in this app, though, since it apparently requires a secured connection and the

@@ -148,7 +148,7 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { imageLinkForSubstance } from '@/assets/common_functions'
+  import { imageLinkForSubstance, sourceAbbreviationTooltip } from '@/assets/common_functions'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL, METHOD_DOCUMENT_TYPES, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
   import '@/assets/style.css'
   import ClassyFireDisplay from '@/components/ClassyFireDisplay.vue'
@@ -193,19 +193,12 @@
               if (params.data.link === null) {
                 return params.data.source
               } else if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source] && this.SOURCE_ABBREVIATION_MAPPING[params.data.source].full_name) {
-                // adding has-hover-text here is needed since URL formatting apparently overrides supplying has-hover-text via cellClass
                 return "<a href='" + params.data.link + "' target='_blank' class='has-hover-text'>" + params.data.source + "</a>";
               } else {
                 return "<a href='" + params.data.link + "' target='_blank'>" + params.data.source + "</a>";
               }
-            }, cellClass: params => {
-              if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source] && this.SOURCE_ABBREVIATION_MAPPING[params.data.source].full_name) {
-                return "has-hover-text"
-              }
             }, tooltipValueGetter: params => {
-              if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source]) {
-                return this.SOURCE_ABBREVIATION_MAPPING[params.data.source].full_name
-              }
+              return sourceAbbreviationTooltip(params.data.source)
             }
           },
           {field: 'record_type', headerName: 'Record Type', width: 110, suppressSizeToFit: true,

@@ -8,7 +8,7 @@
 <template>
   <div class="home">
     <h1>Home Page</h1>
-    <div class="about-this-app">
+    <div>
       <p>
         AMOS (Analytical Methods & Open Spectra) is a web application that combines analytical chemistry data from multiple sources and of multiple
         types into a searchable database.  Use the search bar below to run a general search for a single substance, or use the links in the navigation

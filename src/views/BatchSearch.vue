@@ -27,15 +27,18 @@
         <div class="option-sets">
           <strong>Record Types</strong>
           <br />
-          <input type="checkbox" id="include-fact-sheets" v-model="record_types['Fact Sheet']" checked>
+          <input type="checkbox" id="include-fact-sheets" v-model="record_types['Fact Sheet']" checked  :disabled="record_types.AnalyticalQCOnly">
           <label for="include-fact-sheets">Fact Sheets</label>
           <br />
-          <input type="checkbox" id="include-methods" v-model="record_types.Method" checked>
+          <input type="checkbox" id="include-methods" v-model="record_types.Method" checked :disabled="record_types.AnalyticalQCOnly">
           <label for="include-methods">Methods</label>
           <br />
-          <input type="checkbox" id="include-spectra" v-model="record_types.Spectrum" checked>
+          <input type="checkbox" id="include-spectra" v-model="record_types.Spectrum" checked :disabled="record_types.AnalyticalQCOnly">
           <label for="include-spectra">Spectra</label>
           <br />
+          <br />
+          <input type="checkbox" id="analytical-qc-only" v-model="record_types.AnalyticalQCOnly">
+          <label for="analytical-qc-only">Analytical QC only</label>
         </div>
         <div class="option-sets">
           <strong>Methodologies</strong>
@@ -64,9 +67,14 @@
           <input type="checkbox" id="include-spectrabase" v-model="include_spectrabase" checked>
           <label for="include-spectrabase"><span class="has-hover-text" title="SpectraBase contains a lot of non-MS spectra, and their data requires an account, so it may not be desirable to include these results.">Include SpectraBase records</span></label>
           <br />
-          <input type="checkbox" id="include-analyticalqc" v-model="include_analyticalqc">
-          <label for="include-analyticalqc"><span class="has-hover-text" title="Some additional, project-specific information exists for records from Analytical QC.">Include additional Analytical QC info</span></label>
+          <!-- <input type="checkbox" id="include-analyticalqc" v-model="include_analyticalqc">
+          <label for="include-analyticalqc"><span class="has-hover-text" title="Some additional, project-specific information exists for records from Analytical QC.">Include additional Analytical QC info</span></label> -->
         </div>
+      </div>
+      <br />
+      <div>
+        <button @click="mass_select(true)" class="batch-search-button">Select All</button>
+        <button @click="mass_select(false)" class="batch-search-button">Deselect All</button>
       </div>
     </div>
   </div>
@@ -93,9 +101,16 @@
           show_empty_box_error: false,
           no_records_found: false
         },
-        record_types: {"Fact Sheet": true, "Method": true, "Spectrum": true},
+        record_types: {"Fact Sheet": true, "Method": true, "Spectrum": true, "AnalyticalQCOnly": false},
         methodologies: {all: true, "GC/MS": true, "LC/MS": true, "NMR": true},
         BACKEND_LOCATION
+      }
+    },
+    created() {
+      const query_params = Object.keys(this.$route.query)
+      if (query_params.includes("dtxsids")) {
+        const dtxsid_list = this.$route.query.dtxsids.split(";")
+        this.search_box = dtxsid_list.join("\n")
       }
     },
     methods: {
@@ -113,14 +128,23 @@
             methodologies: this.methodologies,
             record_types: this.record_types
           }
-          await axios.post(`${this.BACKEND_LOCATION}/batch_search`, parameters, {responseType: "blob"}).then(res => {
+          var endpoint = ""
+          var filename = ""
+          if (this.record_types.AnalyticalQCOnly == true) {
+            endpoint = `${this.BACKEND_LOCATION}/analytical_qc_batch_search`
+            filename = `analytical_qc_batch_search_${timestampForFile()}.xlsx`
+          } else {
+            endpoint = `${this.BACKEND_LOCATION}/batch_search`
+            filename = `batch_search_${timestampForFile()}.xlsx`
+          }
+          await axios.post(endpoint, parameters, {responseType: "blob"}).then(res => {
             if (res.status == 204) {
               this.status_boxes.no_records_found = true
             } else {
               let blob = new Blob([res.data], {type: res.headers['content-type']})
               let link = document.createElement('a')
               link.href = window.URL.createObjectURL(blob)
-              link.download = `batch_search_${timestampForFile()}.xlsx`
+              link.download = filename
               link.click()
             }
           })
@@ -128,6 +152,13 @@
         } else {
           this.status_boxes.show_empty_box_error = true
         }
+      },
+      mass_select(state) {
+        this.include_classyfire = state
+        this.include_spectrabase = state
+        this.include_analyticalqc = state
+        this.record_types = {"Fact Sheet": state, "Method": state, "Spectrum": state, "AnalyticalQCOnly": false}
+        this.methodologies = {all: state, "GC/MS": state, "LC/MS": state, "NMR": state}
       }
     }
   }

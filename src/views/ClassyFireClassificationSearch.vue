@@ -1,8 +1,10 @@
 <!--
-  This page is for viewing
+  This page is for locating substances that are members of a ClassyFire classification (the first four levels, at
+  least).
 
-  This page takes one URL route parameter:
-  - Substring, which is the substring being searched for 
+  This page accepts four URL query parameters -- sending a kingdom, superclass, class, and subclass will pre-start a
+  search for that classification.  Note that all four parameters must be passed, otherwise the parameters will be
+  ignored.
 -->
 
 <template>
@@ -11,10 +13,9 @@
     <div class="classyfire-input">
       <label for="kingdom"><strong>Kingdom</strong></label>
       <p>2 kingdoms available.</p>
-      <input type="text" id="kingdom" list="kingdom-values" v-model="kingdom"/>
+      <input type="text" id="kingdom" list="kingdom-values" v-model="kingdom" :disabled="disabled.kingdom"/>
       <datalist id="kingdom-values">
-        <option>Organic compounds</option>
-        <option>Inorganic compounds</option>
+        <option v-for="kingdom in kingdoms">{{ kingdom }}</option>
       </datalist>
       <br />
       <button @click="getSuperklasses">Get Superclasses</button>
@@ -53,10 +54,22 @@
       <button @click="getSubstances">Get Substances</button>
     </div>
   </div>
+  <b-alert variant="warning" dismissible v-model="status_boxes.bad_query_params">{{ status_boxes.bad_params_message }}</b-alert>
+  <b-alert variant="warning" dismissible v-model="status_boxes.incomplete_query_params">An incomplete set of classification levels was passed in the URL.</b-alert>
   <br />
+  <!--
   <button @click="resetSelection">Reset Selection</button>
   <button @click="downloadSearchResults">Download Table</button>
-  <br />
+  <button @click="sendToBatchSearch">Send Selected Substances to Batch Search</button>
+  -->
+  <div style="display: flex; flex-direction: row; justify-content: space-between">
+    <div>
+      <button @click="classificationToURL">Copy Classification to URL</button>
+      <button @click="resetSelection">Reset Selection</button>
+      <button @click="downloadSearchResults">Download Table</button>
+    </div>
+    <button @click="sendToBatchSearch">Send Selected Substances to Batch Search</button>
+  </div>
   <p v-if="state.searching">Searching -- this may take a moment...</p>
   <p v-else>{{ substances.length }} substances found; {{ filtered_record_count }} are currently displayed.</p>
   <ag-grid-vue
@@ -67,7 +80,7 @@
     :rowData="substances"
     @grid-ready="onGridReady"
     @filter-changed="onFilterChanged"
-    rowSelection="single"
+    rowSelection="multiple"
     :suppressCopyRowsToClipboard="true"
   ></ag-grid-vue>
 </template>
@@ -84,6 +97,7 @@
 
   import { imageLinkForSubstance } from '@/assets/common_functions'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
+  import RecordCountFilter from '@/components/RecordCountFilter.vue'
 
   export default {
     data() {
@@ -91,6 +105,7 @@
         BACKEND_LOCATION,
         COMPTOX_PAGE_URL,
         IMAGE_BY_DTXSID_API: "https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/",
+        kingdoms: ["Inorganic compounds", "Organic compounds"],
         klasses: [],
         subklasses: [],
         superklasses: [],
@@ -99,12 +114,13 @@
         klass: "",
         subklass: "",
         substances: [],
+        status_boxes: {bad_query_params: false, bad_params_message: "", incomplete_query_params: false},
         filtered_record_count: 0,
         state: {searching: false},
-        disabled: {superklass: true, klass: true, subklass: true},
-        defaultColDef: {filter: 'agTextColumnFilter', floatingFilter: true},
+        disabled: {kingdom: false, superklass: true, klass: true, subklass: true},
+        defaultColDef: {filter: 'agTextColumnFilter', floatingFilter: true, resizable: true},
         columnDefs: [
-          {field:'image', headerName:'Structure', floatingFilter: false, autoHeight: true, width: 100, wrapText: true, cellRenderer: (params) => {
+          {field:'image', headerName:'Structure', checkboxSelection: true, floatingFilter: false, autoHeight: true, width: 120, wrapText: true, cellRenderer: (params) => {
             if (params.data.image_link) {
               var image = document.createElement('img');
               image.src = params.data.image_link
@@ -125,19 +141,46 @@
           {field: 'preferred_name', headerName: 'Preferred Name', sortable: true, sort: 'asc', flex: 1},
           {field: 'monoisotopic_mass', headerName: 'Monoisotopic Mass', width: 150, filter: 'agNumberColumnFilter'},
           {field: 'molecular_formula', headerName: 'Formula', width: 120},
-          {field: 'data_available', headerName: 'AMOS Data?', width: 120, filter: 'agSetColumnFilter', wrapText: true, cellRenderer: params => {
-            if (params.data.data_available == "Yes") {
-              const link = document.createElement("a")
-              link.href = this.$router.resolve(`/search/${params.data.dtxsid}`).href
-              link.innerText = "Yes"
-              link.target = "_blank"
-               link.addEventListener("click", e => {
-                e.preventDefault()
-                window.open(this.$router.resolve(`/search/${params.data.dtxsid}`).href)
+          {field: 'spectra', headerName: "Spectra", width: 110, filter: RecordCountFilter, filterParams: {record_name: "spectra"}, cellRenderer: params => {
+            if (params.data.spectra > 0) {
+              const link = document.createElement("a");
+              link.href = this.$router.resolve(`/search/${params.data.dtxsid}?initial_results_tab=spectrum`).href;
+              link.innerText = params.data.spectra;
+              link.addEventListener("click", e => {
+                e.preventDefault();
+                window.open(`/search/${params.data.dtxsid}?initial_results_tab=spectrum`);
               });
-              return link
+              return link;
             } else {
-              return "No"
+              return 0
+            }
+          }},
+          {field: 'methods', headerName: "Methods", width: 110, filter: RecordCountFilter, filterParams: {record_name: "methods"}, cellRenderer: params => {
+            if (params.data.methods > 0) {
+              const link = document.createElement("a");
+              link.href = this.$router.resolve(`/search/${params.data.dtxsid}?initial_results_tab=method`).href;
+              link.innerText = params.data.methods;
+              link.addEventListener("click", e => {
+                e.preventDefault();
+                window.open(`/search/${params.data.dtxsid}?initial_results_tab=method`);
+              });
+              return link;
+            } else {
+              return 0
+            }
+          }},
+          {field: 'fact_sheets', headerName: "Fact Sheets", width: 110, filter: RecordCountFilter, filterParams: {record_name: "fact sheets"}, cellRenderer: params => {
+            if (params.data.fact_sheets > 0) {
+              const link = document.createElement("a");
+              link.href = this.$router.resolve(`/search/${params.data.dtxsid}?initial_results_tab=fact+sheet`).href;
+              link.innerText = params.data.fact_sheets;
+              link.addEventListener("click", e => {
+                e.preventDefault();
+                window.open(`/search/${params.data.dtxsid}?initial_results_tab=fact+sheet`);
+              });
+              return link;
+            } else {
+              return 0
             }
           }}
         ]
@@ -148,23 +191,76 @@
         1 //console.log(this.kingdom)
       }
     },
-    created() {
+    async created() {
       const query_params = Object.keys(this.$route.query)
-      if (["kingdom", "superclass", "class", "subclass"].every(x => query_params.includes(x))) {
-        this.kingdom = this.$route.query.kingdom
+      fieldfiller: if (["kingdom", "superclass", "class", "subclass"].every(x => query_params.includes(x))) {
+        /* this.kingdom = this.$route.query.kingdom
         this.superklass = this.$route.query.superclass
         this.klass = this.$route.query.class
         this.subklass = this.$route.query.subclass
         this.disabled.superklass = false
         this.disabled.klass = false
         this.disabled.subklass = false
-        this.getSubstances()
-      } else {
-        // may just delete this case later on
-        console.log("some missing")
+        this.getSubstances() */
+        this.kingdom = this.$route.query.kingdom
+        if (!this.kingdoms.includes(this.$route.query.kingdom)) {
+          this.status_boxes.bad_params_message = `Invalid kingdom '${this.$route.query.kingdom}'.`
+          this.status_boxes.bad_query_params = true
+          break fieldfiller
+        }
+        await this.getSuperklasses()
+        this.superklass = this.$route.query.superclass
+        if (!this.superklasses.includes(this.superklass)) {
+          this.status_boxes.bad_params_message = `Invalid superclass '${this.superklass}' for kingdom '${this.kingdom}'.`
+          this.status_boxes.bad_query_params = true
+          break fieldfiller
+        }
+        await this.getKlasses()
+        this.klass = this.$route.query.class
+        if (!this.klasses.includes(this.klass)) {
+          this.status_boxes.bad_params_message = `Invalid class '${this.klass}' for kingdom '${this.kingdom}', superclass '${this.superklass}'.`
+          this.status_boxes.bad_query_params = true
+          break fieldfiller
+        }
+        await this.getSubklasses()
+        this.subklass = this.$route.query.subclass
+        if (!this.subklasses.includes(this.subklass)) {
+          this.status_boxes.bad_params_message = `Invalid subclass '${this.subklass}' for kingdom '${this.kingdom}', superclass '${this.superklass}', class '${this.klass}'.`
+          this.status_boxes.bad_query_params = true
+          break fieldfiller
+        }
+        await this.getSubstances()
+      } else { 
+        this.status_boxes.incomplete_query_params = true
+        console.log("Some query parameters are missing.")
       }
     },
     methods: {
+      sendToBatchSearch() {
+        const dtxsid_list = this.gridApi.getSelectedRows().map(node => node.dtxsid)
+        const target_href = `/batch_search?dtxsids=${dtxsid_list.join(";")}`
+        console.log(dtxsid_list)
+        window.open(target_href)
+      },
+      classificationToURL() {
+        const parameters = `kingdom=${this.kingdom}&superclass=${this.superklass}&class=${this.klass}&subclass=${this.subklass}`
+        const url = `${window.location.origin}${this.$route.path}?${parameters}`
+
+        // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
+        // can't get that to work in this app, though, since it apparently requires a secured connection and the
+        // deployed version of this app doesn't have that.  So I'm sticking to this technically-depricated solution that
+        // I pulled out of CompTox's code, since it apparently works there.
+        const textarea = document.createElement('textarea')
+        textarea.value = url
+        document.body.appendChild(textarea)
+        textarea.select()
+        try {
+          document.execCommand('copy')
+        } catch (err) {
+          console.log('Cannot copy: ' + err)
+        }
+        document.body.removeChild(textarea)
+      },
       onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
@@ -225,7 +321,7 @@
         })
       }
     },
-    components: {AgGridVue}
+    components: {AgGridVue, RecordCountFilter}
   }
 </script>
 

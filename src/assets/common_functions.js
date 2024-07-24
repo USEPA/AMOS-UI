@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { BACKEND_LOCATION, IMAGE_BY_DTXSID_API } from '@/assets/store'
+import { BACKEND_LOCATION, IMAGE_BY_DTXSID_API, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
 
 
 // Intended to check for valid inputs to spectrum fields, which would be a series of one or more lines where each line
@@ -53,7 +53,7 @@ export function queryParamsToFilters(params, numeric_filters, set_filters, text_
     var filter_info = {}
     for (const k of param_names) {
         if (numeric_filters.includes(k)) {
-            var number = Float(params[k])
+            var number = Number(params[k])
             filter_info[k] = {filterType: 'number', filter: number, type: 'equals'}
         }
         else if (set_filters.includes(k)) {
@@ -79,6 +79,13 @@ export function rescaleSpectrum(spectrum) {
         spectrum[i][1] = 100 * spectrum[i][1]/max_intensity
     }
     return spectrum
+}
+
+export function sourceAbbreviationTooltip(source_name) {
+    // Standardized function for getting full names of sources in tooltips for source fields in tables.
+    if (SOURCE_ABBREVIATION_MAPPING[source_name]) {
+        return SOURCE_ABBREVIATION_MAPPING[source_name].full_name
+    }
 }
 
 export function timestampForFile() {

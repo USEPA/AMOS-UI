@@ -4,7 +4,7 @@
 -->
 
 <template>
-  <p>This page lists records from the EPA's Analytical QC project.  There are approximately 40,000 records in total, so it will take a moment to load the full list.  Double-click a row to open the corresponding document in a new tab.</p>
+  <p>This page lists records from the EPA's Analytical QC project.  There are approximately 36,000 records in total, so it will take a moment to load the full list.  Double-click a row to open the corresponding document in a new tab.</p>
   <p v-if="status.loading">Loading...</p>
   <p v-else>{{counts.visible_records}} records {{counts.visible_records == 1 ? "is" : "are"}} currently displayed, covering {{counts.substances}} {{counts.substances == 1 ? "substance" : "substances"}} and {{counts.samples}} {{counts.samples == 1 ? "sample" : "samples"}}.</p>
   <div class="button-array">
@@ -109,6 +109,7 @@
         this.gridApi.onFilterChanged();
         const query_params = Object.keys(this.$route.query)
         if (query_params.length == 0) {
+          // filter NIST GCMS records out by default if no query parameters were passed
           var set_filter_values = this.gridApi.getFilterInstance("study").getValues()
           set_filter_values = set_filter_values.filter(x => x !== "NIST GCMS")
           this.gridApi.getFilterInstance("study").setModel({type: 'set', values: set_filter_values})

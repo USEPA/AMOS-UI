@@ -122,24 +122,24 @@
     category="United Nations fact sheet collection"
     url="https://www.fao.org/home/en"
     sourceID="FAO"
-    substances="278"
-    factSheets="1309"
+    substances="279"
+    factSheets="1310"
   />
   <DataSourceDetails
     sourceName="Global Natural Products Social Molecular Networking"
     category="Open-access spectrum libraries"
     url="https://gnps.ucsd.edu"
     sourceID="GNPS"
-    substances="5647"
-    spectra="21749"
+    substances="5656"
+    spectra="21763"
   />
   <DataSourceDetails
     sourceName="Human Metabolome Database"
     category="Open-access spectrum collection"
     url="https://hmdb.ca/"
     sourceID="HMDB"
-    substances="3937"
-    spectra="45268"
+    substances="3936"
+    spectra="45304"
   />
   <DataSourceDetails
     sourceName="Jozef Stefan Institute"
@@ -163,16 +163,16 @@
     category="Open-access spectral database"
     url="https://massbank.eu/MassBank/"
     sourceID="MassBank EU"
-    substances="14808"
-    spectra="113721"
+    substances="14809"
+    spectra="113740"
   />
   <DataSourceDetails
     sourceName="MassBank of North America"
     category="Open-access spectral database"
     url="https://mona.fiehnlab.ucdavis.edu"
     sourceID="MoNA"
-    substances="5537"
-    spectra="38456"
+    substances="5536"
+    spectra="38455"
   />
   <DataSourceDetails
     sourceName="National Environmental Methods Index"
@@ -228,9 +228,9 @@
     category="Open spectrum and monographs collection"
     url="https://www.swgdrug.org/"
     sourceID="SWG"
-    substances="3399"
-    factSheets="479"
-    spectra="3319"
+    substances="3441"
+    factSheets="481"
+    spectra="3358"
   />
   <DataSourceDetails
     sourceName="SCIEX"
@@ -261,8 +261,8 @@
     category="Open-access spectrum collection"
     url="https://fiehnlab.ucdavis.edu/projects/vocbinbase"
     sourceID="UC Davis Fiehn Lab"
-    substances="192"
-    spectra="192"
+    substances="211"
+    spectra="211"
   />
   <DataSourceDetails
     sourceName="U.S. Department of Agriculture"
@@ -278,9 +278,9 @@
     category="Government methods collection"
     url="https://www.epa.gov/"
     sourceID="EPA, APPRIL, EPA MS Labs, EPA-ECM, EPA-OW, USEPA"
-    substances="4226"
-    factSheets="19872"
-    methods="1894"
+    substances="4247"
+    factSheets="19873"
+    methods="1897"
     spectra="537"
   />
   <DataSourceDetails

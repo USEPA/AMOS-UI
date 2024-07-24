@@ -2,6 +2,19 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2024-07-24</summary>
+    <ul>
+      <li>Split the data filter on the ClassyFire search into three -- fact sheets, methods, and spectra -- and added a custom filter for selecting whether you want to view data with or without records of that type.</li>
+      <li>Fixed an issue with the ClassyFire search where prepopulating the fields using URL query parameters would leave counts for superclasses/classes/subclasses at zero.</li>
+      <li>Added ability to send selected substances from the ClassyFire search to the batch search.</li>
+      <li>Added a button for copying URL to prepopulate the ClassyFire search to clipboard.</li>
+      <li>Added some warning messages to the ClassyFire search for when URL query parameters are bad.</li>
+      <li>Added a batch search option for getting only Analytical QC records.</li>
+      <li>Added buttons to the batch search to select/deselect most options.</li>
+      <li>Added functional use classes to the fact sheet list.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2024-07-12</summary>
     <ul>
       <li>Expanded the table in the fact sheet list to cover all of the page. Individual fact sheets now open in new tabs, like in the methods list.</li>
