@@ -94,10 +94,10 @@
         NUMERIC_COLUMNS: [],
         TEXT_COLUMNS: ['analyte', 'document_type', 'fact_sheet_name', 'functional_classes', 'internal_id', 'source'],
         column_defs: [
-          {field: 'internal_id', headerName: 'Doc ID', sortable: true, width: 80, comparator: (valA, valB, nodeA, nodeB, isDescending) => {
+          {field: 'internal_id', headerName: 'Doc ID', sortable: true, sort: "asc", width: 80, comparator: (valA, valB, nodeA, nodeB, isDescending) => {
             return Number.parseInt(valA.substring(3)) - Number.parseInt(valB.substring(3))
           }},
-          {field: 'fact_sheet_name', headerName: 'Fact Sheet Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, sort: "asc", flex: 1, tooltipField: 'fact_sheet_name'},
+          {field: 'fact_sheet_name', headerName: 'Fact Sheet Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, flex: 1.5, tooltipField: 'fact_sheet_name'},
           {field: 'source', headerName: 'Source', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, width: 90, tooltipValueGetter: params => {
               return sourceAbbreviationTooltip(params.data.source)
             }, cellClass: params => {
@@ -121,7 +121,7 @@
               return params.data.analyte
             }
           }},
-          {field: 'functional_classes', headerName: 'Functional Classes', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true},
+          {field: 'functional_classes', headerName: 'Functional Classes', sortable: true, flex: 1.5, filter: 'agTextColumnFilter', floatingFilter: true},
           {field: 'link', headerName: 'Link', sortable: true, width: 70, cellRenderer: params => {
             return `<a href='${params.data.link}' target='_blank'>Link</a>`
           }}

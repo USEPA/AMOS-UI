@@ -62,8 +62,8 @@
             rowSelection="single"
             @row-selected="substancesRowSelected"
             :getRowClass="getRowClass"
-            ></ag-grid-vue>
             :suppressCopyRowsToClipboard="true"
+          ></ag-grid-vue>
         </div>
       </div>
     </div>

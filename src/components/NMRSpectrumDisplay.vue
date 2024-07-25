@@ -70,13 +70,11 @@
         this.solvent = response.data.solvent
         this.x_units = response.data.x_units
 
+        // all spectra in database should have first_x as the most negative PPM and last_x as the most positive PPM
         var intensities = response.data.intensities
         var first_x = response.data.first_x
         var last_x = response.data.last_x
-        if (first_x > last_x) {
-          [first_x, last_x] = [last_x, first_x]
-          intensities.reverse()
-        }
+        
         const num_points = intensities.length
         const step = (last_x - first_x)/(num_points-1)
         var ppm = Array.from({length: num_points}, (_, i) => first_x + i*step)

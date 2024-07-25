@@ -141,7 +141,7 @@
           {field: 'preferred_name', headerName: 'Preferred Name', sortable: true, sort: 'asc', flex: 1},
           {field: 'monoisotopic_mass', headerName: 'Monoisotopic Mass', width: 150, filter: 'agNumberColumnFilter'},
           {field: 'molecular_formula', headerName: 'Formula', width: 120},
-          {field: 'spectra', headerName: "Spectra", width: 110, filter: RecordCountFilter, filterParams: {record_name: "spectra"}, cellRenderer: params => {
+          {field: 'spectra', headerName: "Spectra", width: 110, sortable: true, filter: RecordCountFilter, filterParams: {record_name: "spectra"}, cellRenderer: params => {
             if (params.data.spectra > 0) {
               const link = document.createElement("a");
               link.href = this.$router.resolve(`/search/${params.data.dtxsid}?initial_results_tab=spectrum`).href;
@@ -155,7 +155,7 @@
               return 0
             }
           }},
-          {field: 'methods', headerName: "Methods", width: 110, filter: RecordCountFilter, filterParams: {record_name: "methods"}, cellRenderer: params => {
+          {field: 'methods', headerName: "Methods", width: 110, sortable: true, filter: RecordCountFilter, filterParams: {record_name: "methods"}, cellRenderer: params => {
             if (params.data.methods > 0) {
               const link = document.createElement("a");
               link.href = this.$router.resolve(`/search/${params.data.dtxsid}?initial_results_tab=method`).href;
@@ -169,7 +169,7 @@
               return 0
             }
           }},
-          {field: 'fact_sheets', headerName: "Fact Sheets", width: 110, filter: RecordCountFilter, filterParams: {record_name: "fact sheets"}, cellRenderer: params => {
+          {field: 'fact_sheets', headerName: "Fact Sheets", width: 110, sortable: true, filter: RecordCountFilter, filterParams: {record_name: "fact sheets"}, cellRenderer: params => {
             if (params.data.fact_sheets > 0) {
               const link = document.createElement("a");
               link.href = this.$router.resolve(`/search/${params.data.dtxsid}?initial_results_tab=fact+sheet`).href;
@@ -230,7 +230,7 @@
           break fieldfiller
         }
         await this.getSubstances()
-      } else { 
+      } else if (query_params.length > 0) { 
         this.status_boxes.incomplete_query_params = true
         console.log("Some query parameters are missing.")
       }
@@ -262,9 +262,15 @@
         document.body.removeChild(textarea)
       },
       onGridReady(params) {
-        this.gridApi = params.api;
-        this.gridColumnApi = params.columnApi;
+        this.gridApi = params.api
+        this.gridColumnApi = params.columnApi
         this.gridApi.onFilterChanged()
+
+        this.gridColumnApi.applyColumnState({state: [
+          {colId: "methods", sort: "asc", sortIndex: 0},
+          {colId: "fact_sheets", sort: "asc", sortIndex: 1},
+          {colId: "spectra", sort: "asc", sortIndex: 2}
+        ]})
       },
       async getSuperklasses() {
         const response = await axios.post(`${this.BACKEND_LOCATION}/next_level_classification/`, {kingdom: this.kingdom})
