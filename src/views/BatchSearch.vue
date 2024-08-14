@@ -64,8 +64,8 @@
         <div class="option-sets">
           <strong>Other</strong>
           <br />
-          <input type="checkbox" id="include-spectrabase" v-model="include_spectrabase" checked>
-          <label for="include-spectrabase"><span class="has-hover-text" title="SpectraBase contains a lot of non-MS spectra, and their data requires an account, so it may not be desirable to include these results.">Include SpectraBase records</span></label>
+          <input type="checkbox" id="include-external-links" v-model="include_external_links" checked>
+          <label for="include-external-links"><span class="has-hover-text" title="For some sources, AMOS only contains external links to data instead of the actual data.  These other sources may require logins or other information to access their data.">Include externally linked records</span></label>
           <br />
           <!-- <input type="checkbox" id="include-analyticalqc" v-model="include_analyticalqc">
           <label for="include-analyticalqc"><span class="has-hover-text" title="Some additional, project-specific information exists for records from Analytical QC.">Include additional Analytical QC info</span></label> -->
@@ -94,7 +94,7 @@
       return {
         batch_search_params: {},
         include_classyfire: true,
-        include_spectrabase: true,
+        include_external_links: true,
         include_analyticalqc: false,
         search_box: "",
         status_boxes: {
@@ -124,7 +124,7 @@
             dtxsids: search_terms,
             include_analyticalqc: this.include_analyticalqc,
             include_classyfire: this.include_classyfire,
-            include_spectrabase: this.include_spectrabase,
+            include_external_links: this.include_external_links,
             methodologies: this.methodologies,
             record_types: this.record_types
           }
@@ -155,7 +155,7 @@
       },
       mass_select(state) {
         this.include_classyfire = state
-        this.include_spectrabase = state
+        this.include_external_links = state
         this.include_analyticalqc = state
         this.record_types = {"Fact Sheet": state, "Method": state, "Spectrum": state, "AnalyticalQCOnly": false}
         this.methodologies = {all: state, "GC/MS": state, "LC/MS": state, "NMR": state}

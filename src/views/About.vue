@@ -10,7 +10,7 @@
     <p>This web application is designed to perform searches on and allow examination of a collection of publicly available experimental analytical chemistry data from several sources, most of which are focused on mass spectra. This app was written using Vue 3 and Bootstrap on the front end, with a Flask-based Python API accessing a PostgreSQL database behind the scenes.  A manual with details about the functioning of various pages is available <a href="https://work.epa.gov/ccte/amos-analytical-methods-and-open-spectral-database-help">here</a>.</p>
     <p>The database contains a mixture of data types that can be divided into three categories.</p>
     <ul>
-      <li><b>Spectra</b> of various types.  These are primarily mass spectra, mainly GC/MS and LC/MS, and a smaller number of NMR spectra.  Some other types of spectra such as Raman or IR are linked to.</li>
+      <li><b>Spectra</b> of various types.  These are primarily mass spectra, mainly GC/MS and LC/MS, and a smaller number of NMR spectra.  Some spectra (including other types such as IR or Raman) are merely linked to and not stored directly in this database.</li>
       <li><b>Analytical methods</b> that document full testing procedures for an analysis, including information like sample matrices, limits of detection, etc.  These cover one or more substances -- typically several, but as many as a few hundred for a few documents.</li>
       <li><b>Fact sheets</b>, which are supplemental documents of various kinds.  These range from brief, relatively non-technical overviews of a substance to monographs that detail multiple experimental spectra.</li>
     </ul>
@@ -18,8 +18,8 @@
     <ul>
       <li>Performing general searches on all categories of records for specfic substances, and displaying information about those records.  Searching can be done by DTXSID, CAS registry number, InChIKey, or substance names.  Substring searches can be done, but only on names.</li>
       <li>Viewing lists of fact sheets and methods in the database, along with displaying the documents themselves and the substances associated with them.</li>
-      <li>Searching for all methods that cover a substance similar to one being searched.  This uses EPA calculations for the similarity between two substances and returns all methods containing at least one substance of sufficient similarity (similarity level is currently hardcoded on the Flask backend).  Searching can be done by DTXSID, CAS registry number, InChIKey, or name.</li>
-      <li>Batch searching substances by DTXSID, and returning basic information for all records.</li>
+      <li>Searching for all methods and fact sheets that cover a substance similar to one being searched.  This uses EPA calculations for the similarity between two substances and returns all methods and fact sheets containing at least one substance of sufficient similarity (similarity level is currently hardcoded on the Flask backend).  Searching can be done by DTXSID, CAS registry number, InChIKey, or name.</li>
+      <li>Batch searching substances by DTXSID, and returning basic information for those records.</li>
       <li>Comparing a user-submitted spectrum to other spectra in the database, given an analyical methodology (currently just GC/MS or LC/MS) and mass range.</li>
     </ul>
     <p>The records in this application contain:</p>

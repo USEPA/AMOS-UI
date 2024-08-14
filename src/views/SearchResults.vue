@@ -74,7 +74,7 @@
         <div style="width: 40%">
           <div>
             <input type="checkbox" id="single-point-spectra" v-model="result_filters.single_point_spectra" @change="updateCheckboxFilters">
-            <label for="single-point-spectra">Include Single Point Spectra</label>
+            <label for="single-point-spectra">Include single-point spectra</label>
           </div>
           <div>
             <input type="checkbox" id="ms-ready" v-model="result_filters.ms_ready" @change="updateCheckboxFilters">
@@ -83,8 +83,8 @@
             <help-icon style="vertical-align:middle;" tooltipText="MS-Ready refers to a standardization of substances by collapsing isomers, salts, isotopes, etc., into a single form, identifiable by having the same first block of their InChIKey.  Selecting this will include methods from substances with the same MS-Ready form." />
           </div>
           <div>
-            <input type="checkbox" id="spectrabase" v-model="result_filters.spectrabase" @change="updateCheckboxFilters">
-            <label for="spectrabase">Include Spectrabase</label>
+            <input type="checkbox" id="external_links" v-model="result_filters.external_links" @change="updateCheckboxFilters">
+            <label for="external_links">Include external links</label>
           </div>
         </div>
         <div style="width: 60%; display: flex; align-items: center;">
@@ -186,7 +186,7 @@
         record_type_counts: {method: 0, "fact sheet": 0, spectrum: 0},
         ms_ready_search_run: false,
         additional_sources: [],
-        result_filters: {ms_ready: false, single_point_spectra: true, spectrabase: false},
+        result_filters: {ms_ready: false, single_point_spectra: true, external_links: false},
         columnDefs: [
           {field: 'methodologies', headerName: 'Methodology', sortable: true, sort: 'asc', filter: 'agTextColumnFilter', floatingFilter: true, width: 140, suppressSizeToFit: true},
           {field: 'source', headerName: 'Source', sortable: true, width: 110, suppressSizeToFit: true, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
@@ -305,7 +305,7 @@
           }
         }
 
-        if (!this.result_filters.spectrabase && (node.data.source == "SpectraBase")) {
+        if (!this.result_filters.external_links && (!node.data.data_type)) {
           return false
         }
 
@@ -458,8 +458,9 @@
         this.image_link = imageLinkForSubstance(this.substance_info.dtxsid, this.substance_info.image_in_comptox)
         this.still_searching = false
         
-        if (!this.all_results.some(x => {return x.source != "SpectraBase"})) {
-          this.result_filters.spectrabase = true
+        // if no non-external links are available, then show the externally linked records by default
+        if (!this.all_results.some(x => {return x.data_type})) {
+          this.result_filters.external_links = true
         }
       }
     },

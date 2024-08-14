@@ -31,12 +31,14 @@
 </template>
 
 <script>
+import { sortSubstancesByRecordCount } from '@/assets/common_functions'
   import DisambiguationInfo from '@/components/DisambiguationInfo.vue'
 
   export default {
 
     data() {
       return {
+        substance_list: [],
         exact_match: null,
         non_exact_matches: null
       }
@@ -44,12 +46,13 @@
     updated() {
       // this function seems to be needed (as opposed to the usual "created()" or something else) to properly get the
       // component to show the case where an exact match for the searched InChIKey exists
-      const jchem_inchikeys = this.substances.map(x => x.jchem_inchikey)
-      const indigo_inchikeys = this.substances.map(x => x.indigo_inchikey)
+      this.substance_list = sortSubstancesByRecordCount(this.substances, this.record_counts)
+      const jchem_inchikeys = this.substance_list.map(x => x.jchem_inchikey)
+      const indigo_inchikeys = this.substance_list.map(x => x.indigo_inchikey)
       if (jchem_inchikeys.includes(this.searchedKey) || indigo_inchikeys.includes(this.searchedKey)) {
-        const match_index = this.substances.findIndex(s => s.jchem_inchikey==this.searchedKey || s.indigo_inchikey==this.searchedKey)
-        this.exact_match = this.substances.splice(match_index, 1)[0]
-        this.non_exact_matches = this.substances
+        const match_index = this.substance_list.findIndex(s => s.jchem_inchikey==this.searchedKey || s.indigo_inchikey==this.searchedKey)
+        this.exact_match = this.substance_list.splice(match_index, 1)[0]
+        this.non_exact_matches = this.substance_list
       }
     },
     methods: {

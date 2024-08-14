@@ -1,7 +1,7 @@
 <!--
-  This page shows results for a method similarity search.  An individual substance is searched for (by name, DTXSID,
-  CASRN, or InChIKey) and the search returns a list of all methods which contain either the searched substance or at
-  least one substance that is sufficiently similar to the searched substance.
+  This page shows results for a structure similarity search.  An individual substance is searched for (by name, DTXSID,
+  CASRN, or InChIKey) and the search returns all methods and fact sheets which contain either the searched substance or
+  at least one substance that is sufficiently similar to the searched substance.
 
   This page takes no URL route or query parameters.
 -->
@@ -12,8 +12,8 @@
       <p></p>
       <div>
         <label for="search-dtxsid">Substance Identifier</label> &nbsp;
-        <input @keyup.enter="methodSearch(searched_substance)" type="text" size="30" v-model="searched_substance" name="search-dtxsid">
-        <button @click="methodSearch(searched_substance)">Method Search</button>
+        <input @keyup.enter="documentSearch(searched_substance)" type="text" size="30" v-model="searched_substance" name="search-dtxsid">
+        <button @click="documentSearch(searched_substance)">Search</button>
       </div>
       <div style="margin-top: 10px">
         <label for="similarity-select">Filter minimum substance similarity</label> &nbsp;
@@ -28,31 +28,49 @@
       </div>
       <br />
       <p v-if="searching">Searching -- this may take 20-30 seconds...</p>
-      <p v-else-if="!search_complete">This page allows for searching for methods that contain either a given chemical or other chemicals similar to it.  A name, InChIKey, CASRN, or DTXSID can be searched on.</p>
+      <p v-else-if="!search_complete">This page allows for searching for methods and fact sheets that contain either a given chemical or other chemicals similar to it.  A name, InChIKey, CASRN, or DTXSID can be searched on.</p>
       <p v-else-if="!found_substance">"{{ current_substance }}" was not recognized as a known substance.</p>
-      <p v-else-if="dtxsid_counts.length == 0">The substance "{{ current_substance }}" was recognized, however no methods containing it or similar substances for it were found.</p>
+      <p v-else-if="dtxsid_counts.length == 0">The substance "{{ current_substance }}" was recognized, however no methods or fact sheets containing it or similar substances for it were found.</p>
       <div v-else>
-        <p>There are two tables below -- one lists all the methods containing a substance similar to {{ current_substance }}, while the other lists all similar substances found.  Clicking on a row will bring up the method or a comparison between the searched and selected substances, respectively.  Hover over a method or substance name to see the full name.  Methods in bold contain the searched substance.</p>
-        <p>{{ dtxsid_counts.length }} distinct similar substances were found in  {{ Object.keys(ids_to_method_names).length }} methods.</p>
+        <p>The tabbed area below has three tables -- one lists all the methods containing a substance similar to {{ current_substance }}, one lists all fact sheets containing a similar substance, and the third lists all similar substances found.  Clicking on a row will bring up the method or a comparison between the searched and selected substances, respectively.  Hover over a method or substance name to see the full name.  Methods and fact sheets in bold contain the searched substance.</p>
+        <p>{{ dtxsid_counts.length }} distinct similar substances were found in  {{ Object.keys(ids_to_method_names).length }} methods and {{ Object.keys(ids_to_fact_sheet_names).length }} fact sheets.</p>
         <div class="tab-bar">
           <button :class="tab_viewer_mode == 'Methods' ? 'active': ''" @click="updateTab('Methods')">Methods</button>
+          <button :class="tab_viewer_mode == 'Fact Sheets' ? 'active': ''" @click="updateTab('Fact Sheets')">Fact Sheets</button>
           <button :class="tab_viewer_mode == 'Substances' ? 'active': ''" @click="updateTab('Substances')">Substances</button>
         </div>
-        <div id="grid-theme-wrapper" class="modded-theme">
+        <div id="grid-theme-wrapper">
           <ag-grid-vue v-if="tab_viewer_mode == 'Methods'"
             class="ag-theme-balham"
             style="height:600px; width:100%"
-            :columnDefs="result_column_defs"
-            :rowData="results"
-            :autoGroupColumnDef="autoGroupColumnDef"
+            :columnDefs="method_column_defs"
+            :rowData="method_results"
+            :autoGroupColumnDef="methodsGroupColumnDef"
             suppressAggFuncInHeader="true"
             rowSelection="single"
-            @row-selected="methodsRowSelected"
-            @grid-ready="onGridReady"
+            @row-selected="documentRowSelected"
+            @grid-ready="methodsGridReady"
             :rowClassRules="methodsRowClassRules"
             :isExternalFilterPresent="isExternalFilterPresent"
             :doesExternalFilterPass="doesExternalFilterPass"
             :suppressCopyRowsToClipboard="true"
+            :defaultColDef="defaultColDef"
+          ></ag-grid-vue>
+          <ag-grid-vue v-if="tab_viewer_mode == 'Fact Sheets'"
+            class="ag-theme-balham"
+            style="height:600px; width:100%"
+            :columnDefs="fact_sheet_column_defs"
+            :rowData="fact_sheet_results"
+            :autoGroupColumnDef="factSheetsGroupColumnDef"
+            suppressAggFuncInHeader="true"
+            rowSelection="single"
+            @row-selected="documentRowSelected"
+            @grid-ready="factSheetsGridReady"
+            :rowClassRules="methodsRowClassRules"
+            :isExternalFilterPresent="isExternalFilterPresent"
+            :doesExternalFilterPass="doesExternalFilterPass"
+            :suppressCopyRowsToClipboard="true"
+            :defaultColDef="defaultColDef"
           ></ag-grid-vue>
           <ag-grid-vue v-if="tab_viewer_mode == 'Substances'"
             class="ag-theme-balham"
@@ -68,6 +86,7 @@
       </div>
     </div>
     <StoredPDFDisplay style="width: 48vw;" v-if="right_side_viewer_mode == 'Methods'" :internalID="selected_row_data.internal_id" recordType="method" :highlightedSubstances="highlighted_substances"/>
+    <StoredPDFDisplay style="width: 48vw;" v-if="right_side_viewer_mode == 'Fact Sheets'" :internalID="selected_row_data.internal_id" recordType="fact sheet" :highlightedSubstances="highlighted_substances"/>
     <div class="half-page-column" v-else-if="right_side_viewer_mode == 'Substances'">
       <h4>Searched Substance:</h4>
       <div style="display: flex; justify-content: center;">
@@ -111,7 +130,8 @@
       return {
         BACKEND_LOCATION,
         COMPTOX_PAGE_URL,
-        results: null,
+        method_results: null,
+        fact_sheet_results: null,
         any_row_selected: false,
         searching: false,
         search_complete: false,
@@ -123,6 +143,7 @@
         searched_substance: "",
         current_substance: "",
         ids_to_method_names: "",
+        ids_to_fact_sheet_names: "",
         current_method_shown_id: "",
         tab_viewer_mode: "Methods",
         right_side_viewer_mode: "N/A",
@@ -130,19 +151,32 @@
         highlighted_substances: [],
         min_similarity: 0.5,
         classyfire: {searched_substance: null, similar_substance: null},
-        result_column_defs: [
-          {field: "internal_id", rowGroup: true, hide: true, sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
-            const title_text = this.ids_to_method_names[params.value] + " (" + params.node.allChildrenCount + ")";
+        defaultColDef: {filter: true, floatingFilter: true},
+        method_column_defs: [
+          {field: "internal_id", rowGroup: true, hide: true, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
+            const title_text = this.ids_to_method_names[params.value] + " (" + params.node.allChildrenCount + ")"
             return `<span title='${title_text}'>${this.ids_to_method_names[params.value]}</span>`
           }},
-          {field: "source", headerName: "Source", width: 90, suppressSizeToFit: true, filter: 'agTextColumnFilter', floatingFilter: true, sortable: true, aggFunc: 'first'},
-          {field: "methodology", headerName: "Methodology", width: 120, suppressSizeToFit: true, filter: 'agTextColumnFilter', floatingFilter: true, sortable: true, aggFunc: 'first'},
-          {field: "year_published", headerName: "Year", width: 70, suppressSizeToFit: true, filter: 'agNumberColumnFilter', floatingFilter: true, sortable: true, aggFunc: 'first'},
-          {field: "similarity", headerName: "Similarity", width: 95, suppressSizeToFit: true, sortable: true, sort: 'desc', aggFunc: 'max', cellRenderer:'agGroupCellRenderer', cellRendererParams: {
+          {field: "source", headerName: "Source", width: 90, suppressSizeToFit: true, filter: 'agTextColumnFilter', sortable: true, aggFunc: 'first'},
+          {field: "methodology", headerName: "Methodology", width: 120, suppressSizeToFit: true, filter: 'agTextColumnFilter', sortable: true, aggFunc: 'first'},
+          {field: "year_published", headerName: "Year", width: 70, suppressSizeToFit: true, filter: 'agNumberColumnFilter', sortable: true, aggFunc: 'first'},
+          {field: "similarity", headerName: "Similarity", width: 95, suppressSizeToFit: true, filter: false, sortable: true, sort: 'desc', aggFunc: 'max', cellRenderer:'agGroupCellRenderer', cellRendererParams: {
             innerRenderer: params => {return params.value.toFixed(2)}
           }},
-          {field: "dtxsid", headerName: "Similar DTXSID", width: 125, suppressSizeToFit: true, sortable: true},
-          {field: "substance_name", headerName: "Substance Name"}
+          {field: "dtxsid", headerName: "Similar DTXSID", width: 125, suppressSizeToFit: true, filter: false},
+          {field: "substance_name", headerName: "Substance Name", filter: false}
+        ],
+        fact_sheet_column_defs: [
+          {field: "internal_id", rowGroup: true, hide: true, sortable: true, flex: 1, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
+            const title_text = this.ids_to_fact_sheet_names[params.value] + " (" + params.node.allChildrenCount + ")";
+            return `<span title='${title_text}'>${this.ids_to_fact_sheet_names[params.value]}</span>`
+          }},
+          {field: "source", headerName: "Source", width: 90, suppressSizeToFit: true, filter: 'agTextColumnFilter', floatingFilter: true, sortable: true, aggFunc: 'first'},
+          {field: "similarity", headerName: "Similarity", width: 95, suppressSizeToFit: true, filter: false, sortable: true, sort: 'desc', aggFunc: 'max', cellRenderer:'agGroupCellRenderer', cellRendererParams: {
+            innerRenderer: params => {return params.value.toFixed(2)}
+          }},
+          {field: "dtxsid", headerName: "Similar DTXSID", width: 125, suppressSizeToFit: true, filter: false},
+          {field: "substance_name", headerName: "Substance Name", filter: false}
         ],
         count_column_defs: [
           {field: "dtxsid", headerName: "DTXSID", sortable: true, width: 125},
@@ -150,7 +184,8 @@
           {field: "similarity", headerName: "Similarity", sortable: true, sort: 'desc', width: 110, cellRenderer: 
             params => {return params.data.similarity.toFixed(2)}
           },
-          {field: "num_methods", headerName: "# Methods", sortable: true, width: 110},
+          {field: "num_methods", headerName: "Methods", sortable: true, width: 100},
+          {field: "num_fact_sheets", headerName: "Fact Sheets", sortable: true, width: 100}
         ],
         methodsRowClassRules: {
           "emphasized-row": function(params) {
@@ -161,18 +196,33 @@
             }
           }
         },
-        autoGroupColumnDef: {headerName: 'Method Name (# substances)', filter: true, width: 210, sortable: true, comparator: (valueA, valueB, nodeA, nodeB, isDescending) => {
+        /* methodsGroupColumnDef: {filter: 'agTextColumnFilter', filterValueGetter: (params) => {
+          return this.ids_to_method_names[params.data.internal_id]
+        }}, */
+        methodsGroupColumnDef: {headerName: 'Method Name (# substances)', filter: 'agTextColumnFilter', width: 210, sortable: true,
+          filterValueGetter: (params) => {return this.ids_to_method_names[params.data.internal_id]},
+          comparator: (valueA, valueB, nodeA, nodeB, isDescending) => {
           // Need to be able to sort the groups by method name, not internal id, so map them and then compare.
-          const nameA = this.ids_to_method_names[valueA]
-          const nameB = this.ids_to_method_names[valueB]
-          return nameA == nameB ? 0 : nameA > nameB ? 1 : -1
-        }}
+            const nameA = this.ids_to_method_names[valueA]
+            const nameB = this.ids_to_method_names[valueB]
+            return nameA == nameB ? 0 : nameA > nameB ? 1 : -1
+          }
+        },
+        factSheetsGroupColumnDef: {headerName: 'Fact Sheet Name (# substances)', filter: 'agTextColumnFilter', sortable: true,
+          filterValueGetter: (params) => {return this.ids_to_fact_sheet_names[params.data.internal_id]},
+          comparator: (valueA, valueB, nodeA, nodeB, isDescending) => {
+            // Need to be able to sort the groups by method name, not internal id, so map them and then compare.
+            const nameA = this.ids_to_fact_sheet_names[valueA]
+            const nameB = this.ids_to_fact_sheet_names[valueB]
+            return nameA == nameB ? 0 : nameA > nameB ? 1 : -1
+          }
+        } 
       }
     },
     async created() {
       if (typeof(this.$route.query.search_term) === "string") {
         this.searched_substance = this.$route.query.search_term
-        this.methodSearch(this.searched_substance)
+        this.documentSearch(this.searched_substance)
       }
     },
     components: {
@@ -185,8 +235,13 @@
     watch: {
       min_similarity(new_sim, old_sim) {
         // when the minimum similarity changes, filter results as appropriate
-        if (this.search_complete & this.found_substance & (this.results.length > 0)) {
-          this.gridApi.onFilterChanged()
+        if (this.search_complete & this.found_substance) {
+          if ((this.tab_viewer_mode == "Methods") & this.method_results.length > 0) {
+            this.methodsGridApi.onFilterChanged()
+            this.updateHighlightedSubstances()
+          }
+          else if ((this.tab_viewer_mode == "Fact Sheets") & this.fact_sheet_results.length > 0)
+          this.factSheetsGridApi.onFilterChanged()
           this.updateHighlightedSubstances()
         }
       }
@@ -195,7 +250,7 @@
       updateHighlightedSubstances() {
         this.highlighted_substances = this.dtxsid_counts.filter(x => x.similarity >= this.min_similarity).map(x => x.dtxsid)
       },
-      async methodSearch(searched_substance) {
+      async documentSearch(searched_substance) {
         // variable setup
         this.results = null
         this.searching = true
@@ -216,7 +271,7 @@
         } else {
           this.substance_info.searched_substance = response.data.substances
           this.substance_info.searched_substance.image_link = await imageLinkForSubstance(response.data.substances.dtxsid, response.data.substances.image_in_comptox)
-          const methods_response = await axios.get(`${this.BACKEND_LOCATION}/get_similar_methods/${response.data.substances.dtxsid}`)
+          const methods_response = await axios.get(`${this.BACKEND_LOCATION}/get_similar_structures/${response.data.substances.dtxsid}`)
           this.dtxsid_counts = methods_response.data.dtxsid_counts
           const classyfire_response = await axios.get(`${this.BACKEND_LOCATION}/get_classification_for_dtxsid/${response.data.substances.dtxsid}`)
           if ((classyfire_response.status == 200) & (classyfire_response.data.kingdom !== null)) {
@@ -227,34 +282,44 @@
           this.updateHighlightedSubstances()
           this.current_substance = searched_substance.trim()  // should be whatever the user chooses
           this.found_substance = true
-          this.results = methods_response.data.results
+          this.method_results = methods_response.data.method_results
+          this.fact_sheet_results = methods_response.data.fact_sheet_results
           this.ids_to_method_names = methods_response.data.ids_to_method_names
+          this.ids_to_fact_sheet_names = methods_response.data.ids_to_fact_sheet_names
           this.searching = false
           this.search_complete = true
         }
       },
-      onGridReady(params) {
-        this.gridApi = params.api
-        this.gridColumnApi = params.columnApi
+      methodsGridReady(params) {
+        this.methodsGridApi = params.api
+        // this.methodsGridColumnApi = params.columnApi
       },
-      methodsRowSelected(event) {
+      factSheetsGridReady(params) {
+        this.factSheetsGridApi = params.api
+        // this.factSheetsridColumnApi = params.columnApi
+      },
+      documentRowSelected(event) {
         if (event.event){
-          var new_method_id = ""
+          var new_doc_id = ""
           var source = ""
           // There are two possibilities: either a group header row has been slected, or not.  In the former case, the
           // event.data field will not exist, but it does exist in the latter case, so it's useful for distinguishing
           // the two.
           if (event.data) {
-            new_method_id = event.data.internal_id
+            new_doc_id = event.data.internal_id
             source = event.data.source
           } else {
-            new_method_id = event.node.key
+            new_doc_id = event.node.key
             source = event.node.aggData.source
           }
-          if (new_method_id != this.current_method_shown_id) {
-            this.current_method_shown_id = new_method_id
-            this.selected_row_data = {internal_id: new_method_id, source}
-            this.right_side_viewer_mode = "Methods"
+          if (new_doc_id != this.current_method_shown_id) {
+            this.current_method_shown_id = new_doc_id
+            this.selected_row_data = {internal_id: new_doc_id, source}
+            if (this.current_method_shown_id.substring(0,3) == "GJ-") {
+              this.right_side_viewer_mode = "Methods"
+            } else {
+              this.right_side_viewer_mode = "Fact Sheets"
+            }
           }
         }
       },
@@ -275,7 +340,7 @@
       disambiguate(dtxsid) {
         this.disambiguation.inchikey = false
         this.disambiguation.synonym = false
-        this.methodSearch(dtxsid)
+        this.documentSearch(dtxsid)
       },
       updateTab(tab_name) {
         this.tab_viewer_mode = tab_name

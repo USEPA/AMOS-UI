@@ -18,12 +18,22 @@ export function filtersToURL(base_url, filter_list) {
     for (let k of active_filter_keys) {
         var current_filter = filter_list[k]
         if (current_filter.filterType == "text") {
-            param_string = param_string + `${k}=${current_filter.filter}&`
-        } else if (current_filter.filterType == "set") {
-            param_string = param_string + `${k}=${current_filter.values.join("_")}&`
+            if (current_filter.type == "blank" || current_filter.type == "notBlank") {
+                param_string = param_string + `${k}=${current_filter.type}&`
+            } else {
+                param_string = param_string + `${k}=${current_filter.type}_${current_filter.filter}`
+            }
         } else if (current_filter.filterType == "number") {
+            if (current_filter.type == "blank" || current_filter.type == "notBlank") {
+                param_string = param_string + `${k}=${current_filter.type}&`
+            } else if (current_filter.type == "inRange") {
+                param_string = param_string + `${k}=${current_filter.type}_${current_filter.filter}_${current_filter.filterTo}&`
+            } else {
+                param_string = param_string + `${k}=${current_filter.type}_${current_filter.filter}`
+            }
+        } else if (current_filter.filterType == "set") {
             // TODO: cases for different numeric filters; the one for a range needs special handling in particular
-            param_string = param_string + `${k}=${current_filter.filter}&`
+            param_string = param_string + `${k}=${current_filter.values.join("_")}&`
         } else {
           continue
         }
@@ -53,8 +63,16 @@ export function queryParamsToFilters(params, numeric_filters, set_filters, text_
     var filter_info = {}
     for (const k of param_names) {
         if (numeric_filters.includes(k)) {
-            var number = Number(params[k])
-            filter_info[k] = {filterType: 'number', filter: number, type: 'equals'}
+            var field = params[k]
+            if (field == "blank" || field == "notBlank") {
+                filter_info[k] = {filterType: 'number', type: field}
+            } else if (field.startsWith("inRange_")) {
+                var values = field.split("_")
+                filter_info[k] = {filterType: 'number', type: 'inRange', filter: Number(values[1]), filterTo: Number(values[2])}
+            } else {
+                var values = field.split("_")
+                filter_info[k] = {filterType: 'number', type: values[0], filter: Number(values[1])}
+            }
         }
         else if (set_filters.includes(k)) {
             if (params[k] !== "") {
@@ -63,12 +81,18 @@ export function queryParamsToFilters(params, numeric_filters, set_filters, text_
             }
         } else if (text_filters.includes(k)) {
             var text = params[k]
-            filter_info[k] = {filter: text, filterType: 'text', type: 'contains'}
+            if (text == "blank" || text == "notBlank") {
+                filter_info[k] = {filterType: 'text', type: text}
+            } else {
+                var idx = text.indexOf("_")
+                filter_info[k] = {filter: text.slice(idx+1), filterType: 'text', type: text.slice(0,idx)}
+            }
         } else {
             // maybe code up a warning for this case
             continue
         }
     }
+    console.log(filter_info)
     return filter_info
 }
 
@@ -79,6 +103,27 @@ export function rescaleSpectrum(spectrum) {
         spectrum[i][1] = 100 * spectrum[i][1]/max_intensity
     }
     return spectrum
+}
+
+export function sortSubstancesByRecordCount(substance_list, record_counts) {
+    // Given a list of substances and a list of record counts per substance (with DTXSIDs as keys), sort the substances
+    // on total record count in descending order, breaking ties by substance name in normal lexicographical order.
+    substance_list.sort((a,b) => {
+        const a_counts = record_counts[a.dtxsid]
+        const a_total = a_counts ? Object.values(a_counts).reduce((a, b) => a+b, 0) : 0
+        const b_counts = record_counts[b.dtxsid]
+        const b_total = b_counts ? Object.values(b_counts).reduce((a, b) => a+b, 0) : 0
+        if (a_total > b_total) {
+            return -1
+        } else if (a_total < b_total) {
+          return 1
+        } else if (a.preferred_name < b.preferred_name) {
+          return -1
+        } else {
+          return 1
+        }
+    })
+    return substance_list
 }
 
 export function sourceAbbreviationTooltip(source_name) {

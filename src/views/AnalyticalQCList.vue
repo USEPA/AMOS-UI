@@ -92,6 +92,8 @@
               return m
             }
           }},
+          {field: 'lcms_amen_pos_true', headerName: 'ESI+', width: 80},
+          {field: 'lcms_amen_neg_true', headerName: 'ESI-', width: 80},
           {field: 'annotation', headerName: "Annotation", flex: 1, tooltipField: 'annotation'},
           {field: 'flags', headerName: "Substance Flags", flex: 1, tooltipField: 'flags', cellClass: {'text-wrap': 'wrap'}}
         ]

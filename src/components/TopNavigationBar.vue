@@ -28,11 +28,11 @@
         <b-dropdown-item to="/batch_search">Batch Search</b-dropdown-item>
         <b-dropdown-item to="/classyfire_search">ClassyFire Search</b-dropdown-item>
         <b-dropdown-item to="/mass_spectrum_search">Mass Spectrum Search</b-dropdown-item>
-        <b-dropdown-item to="/similar_method_search">Similar Method Search</b-dropdown-item>
+        <b-dropdown-item to="/similar_structure_search">Similar Structure Search</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;
       <b-nav-item-dropdown text="Other Pages" class="nav-dropdown">
-        <b-dropdown-item to="/analyte_visualization">Analyte Visualization</b-dropdown-item>
+        <b-dropdown-item to="/functional_class_visualization">Functional Class Visualization</b-dropdown-item>
         <b-dropdown-item to="/mass_spectrum_comparison">Mass Spectrum Comparison</b-dropdown-item>
       </b-nav-item-dropdown>
       &emsp;

@@ -72,25 +72,26 @@
     category="Open monographs collection"
     url="https://www.cfsre.org/nps-discovery/monographs"
     sourceID="CFSRE"
-    substances="94"
-    factSheets="83"
+    substances="95"
+    factSheets="84"
   />
   <DataSourceDetails
     sourceName="Centers for Disease Control and Prevention"
     category="Government methods collection"
     url="https://www.cdc.gov/index.htm"
     sourceID="CDC"
-    substances="2399"
-    factSheets="677"
+    substances="2707"
+    factSheets="699"
     methods="25"
+    spectra="804"
   />
   <DataSourceDetails
     sourceName="Czech Academy of Sciences"
     category="Open-access spectrum collection"
     url="https://chemrxiv.org/engage/chemrxiv/article-details/663ccc0a91aefa6ce19236c2"
     sourceID="Czech Academy of Sciences"
-    substances="6166"
-    spectra="404422"
+    substances="6271"
+    spectra="410227"
   />
   <DataSourceDetails
     sourceName="Drinking Water Treatability Database"
@@ -122,8 +123,8 @@
     category="United Nations fact sheet collection"
     url="https://www.fao.org/home/en"
     sourceID="FAO"
-    substances="279"
-    factSheets="1310"
+    substances="349"
+    factSheets="1395"
   />
   <DataSourceDetails
     sourceName="Global Natural Products Social Molecular Networking"
@@ -139,7 +140,7 @@
     url="https://hmdb.ca/"
     sourceID="HMDB"
     substances="3936"
-    spectra="45304"
+    spectra="45242"
   />
   <DataSourceDetails
     sourceName="Jozef Stefan Institute"
@@ -163,16 +164,16 @@
     category="Open-access spectral database"
     url="https://massbank.eu/MassBank/"
     sourceID="MassBank EU"
-    substances="14809"
-    spectra="113740"
+    substances="14914"
+    spectra="115792"
   />
   <DataSourceDetails
     sourceName="MassBank of North America"
     category="Open-access spectral database"
     url="https://mona.fiehnlab.ucdavis.edu"
     sourceID="MoNA"
-    substances="5536"
-    spectra="38455"
+    substances="5860"
+    spectra="40175"
   />
   <DataSourceDetails
     sourceName="National Environmental Methods Index"
@@ -278,8 +279,8 @@
     category="Government methods collection"
     url="https://www.epa.gov/"
     sourceID="EPA, APPRIL, EPA MS Labs, EPA-ECM, EPA-OW, USEPA"
-    substances="4247"
-    factSheets="19873"
+    substances="4304"
+    factSheets="19902"
     methods="1897"
     spectra="537"
   />

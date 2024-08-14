@@ -120,7 +120,7 @@
         disabled: {kingdom: false, superklass: true, klass: true, subklass: true},
         defaultColDef: {filter: 'agTextColumnFilter', floatingFilter: true, resizable: true},
         columnDefs: [
-          {field:'image', headerName:'Structure', checkboxSelection: true, floatingFilter: false, autoHeight: true, width: 120, wrapText: true, cellRenderer: (params) => {
+          {field:'image', headerName:'Structure', checkboxSelection: true, headerCheckboxSelection: true, floatingFilter: false, autoHeight: true, width: 120, wrapText: true, cellRenderer: (params) => {
             if (params.data.image_link) {
               var image = document.createElement('img');
               image.src = params.data.image_link
@@ -239,7 +239,6 @@
       sendToBatchSearch() {
         const dtxsid_list = this.gridApi.getSelectedRows().map(node => node.dtxsid)
         const target_href = `/batch_search?dtxsids=${dtxsid_list.join(";")}`
-        console.log(dtxsid_list)
         window.open(target_href)
       },
       classificationToURL() {
@@ -267,9 +266,9 @@
         this.gridApi.onFilterChanged()
 
         this.gridColumnApi.applyColumnState({state: [
-          {colId: "methods", sort: "asc", sortIndex: 0},
-          {colId: "fact_sheets", sort: "asc", sortIndex: 1},
-          {colId: "spectra", sort: "asc", sortIndex: 2}
+          {colId: "methods", sort: "desc", sortIndex: 0},
+          {colId: "fact_sheets", sort: "desc", sortIndex: 1},
+          {colId: "spectra", sort: "desc", sortIndex: 2}
         ]})
       },
       async getSuperklasses() {

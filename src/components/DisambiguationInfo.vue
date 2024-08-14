@@ -48,6 +48,11 @@
         image_link: ""
       }
     },
+    watch: {
+      substance_info() {
+        this.image_link = imageLinkForSubstance(this.substance_info.dtxsid, this.substance_info.image_in_comptox)
+      }
+    },
     async created() {
       this.image_link = imageLinkForSubstance(this.substance_info.dtxsid, this.substance_info.image_in_comptox)
     },

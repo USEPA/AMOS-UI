@@ -8,7 +8,7 @@
 <template>
   <div>
     <p>
-      This is a list of fact sheets available in the database.  Select a row in the table to view the fact sheet on the right side of the page.
+      This is a list of fact sheets available in the database.  Double-click a row in the table to view the fact sheet in a new window.
     </p>
     <div v-if="status.loading">Loading...</div>
     <p v-else>{{fact_sheet_info.length}} fact sheets in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed, covering {{substance_count}} {{filtered_record_count == 1 ? "substance" : "substances"}}.</p>

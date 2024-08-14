@@ -13,23 +13,24 @@
 
 <template>
   <p>The searched term "{{ synonym }}" is a synonym for multiple substances.  Click on a substance below to see its results in the database.</p>
-  <div class="substance-grid" v-for="s in substances">
+  <div class="substance-grid" v-for="s in substance_list">
     <DisambiguationInfo :substance_info="s" :record_info="record_counts[s.dtxsid]" @click="selectSynonym(s.dtxsid)" />
   </div>
 </template>
   
 <script>
-  import SubstanceTile from '@/components/SubstanceTile.vue'
+  import { sortSubstancesByRecordCount } from '@/assets/common_functions'
   import DisambiguationInfo from '@/components/DisambiguationInfo.vue'
 
   export default {
     data() {
       return {
+        substance_list: [],
         x: false,
       }
     },
-    created() {
-      1
+    updated() {
+      this.substance_list = sortSubstancesByRecordCount(this.substances, this.record_counts)
     },
     methods: {
       selectSynonym(dtxsid) {
@@ -37,7 +38,7 @@
       }
     },
     props: {substances: Object, synonym: String, record_counts: Object},
-    components: {SubstanceTile, DisambiguationInfo}
+    components: {DisambiguationInfo}
   }
 </script>
 
