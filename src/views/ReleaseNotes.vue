@@ -2,6 +2,20 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2024-08-14</summary>
+    <ul>
+      <li>Incorporated a major change to the functional class visualization (previously called the analyte visualization).</li>
+      <li>Incorporated fact sheets into the similar method search and renamed it to "similar structure search".</li>
+      <li>Added some sorting to the synonym and InChIKey disambiguation modals -- previously the order of results was not guaranteed, now they sort by decreasing number of records (ties are broken by EPA-preferred names.</li>
+      <li>Filters related to SpectraBase have been updated so that they now filter all externally linked spectra, now that we have additional sources of externally linked spectra.</li>
+      <li>Added fields for LC/MS amenability flags to the Analytical QC list.</li>
+      <li>Added a checkbox to the top of the table in the ClassyFire search to select all substances in the table.</li>
+      <li>Added a page for viewing NMR spectra, for if/when we add NMR spectra that need it.</li>
+      <li>Added a 404 page.</li>
+      <li>Changed some bits of text across multiple pages.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2024-07-24</summary>
     <ul>
       <li>Split the data filter on the ClassyFire search into three -- fact sheets, methods, and spectra -- and added a custom filter for selecting whether you want to view data with or without records of that type.</li>
