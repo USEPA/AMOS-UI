@@ -10,7 +10,7 @@
     <div class="nav-bar-left">
       <div style="text-align: start;">
         <router-link to="/" style="font-size: larger">AMOS</router-link>
-        <div style="font-size: smaller">Version: 2024-08-14</div>
+        <div style="font-size: smaller">Version: 2024-08-30</div>
       </div>
       &emsp;
       <input @keyup.enter="go()" type="text" v-model="searchTerm" name="search-term" title="General search input field">
@@ -18,31 +18,31 @@
     </div>
     <div class="nav-bar-right">
       &emsp;
-      <b-nav-item-dropdown text="Lists" class="nav-dropdown" style="background: #0e6993;">
-        <b-dropdown-item to="/analytical_qc_list">Analytical QC</b-dropdown-item>
-        <b-dropdown-item to="/fact_sheet_list">Fact Sheets</b-dropdown-item>
-        <b-dropdown-item to="/methods_list">Methods</b-dropdown-item>
-      </b-nav-item-dropdown>
+      <BNavItemDropdown text="Lists" class="nav-dropdown" style="background: #0e6993;">
+        <BDropdownItem to="/analytical_qc_list">Analytical QC</BDropdownItem>
+        <BDropdownItem to="/fact_sheet_list">Fact Sheets</BDropdownItem>
+        <BDropdownItem to="/methods_list">Methods</BDropdownItem>
+      </BNavItemDropdown>
       &emsp;
-      <b-nav-item-dropdown text="Additional Searches" class="nav-dropdown">
-        <b-dropdown-item to="/batch_search">Batch Search</b-dropdown-item>
-        <b-dropdown-item to="/classyfire_search">ClassyFire Search</b-dropdown-item>
-        <b-dropdown-item to="/mass_spectrum_search">Mass Spectrum Search</b-dropdown-item>
-        <b-dropdown-item to="/similar_structure_search">Similar Structure Search</b-dropdown-item>
-      </b-nav-item-dropdown>
+      <BNavItemDropdown text="Additional Searches" class="nav-dropdown">
+        <BDropdownItem to="/batch_search">Batch Search</BDropdownItem>
+        <BDropdownItem to="/classyfire_search">ClassyFire Search</BDropdownItem>
+        <BDropdownItem to="/mass_spectrum_search">Mass Spectrum Search</BDropdownItem>
+        <BDropdownItem to="/similar_structure_search">Similar Structure Search</BDropdownItem>
+      </BNavItemDropdown>
       &emsp;
-      <b-nav-item-dropdown text="Other Pages" class="nav-dropdown">
-        <b-dropdown-item to="/functional_class_visualization">Functional Class Visualization</b-dropdown-item>
-        <b-dropdown-item to="/mass_spectrum_comparison">Mass Spectrum Comparison</b-dropdown-item>
-      </b-nav-item-dropdown>
+      <BNavItemDropdown text="Other Pages" class="nav-dropdown">
+        <BDropdownItem to="/functional_class_visualization">Functional Class Visualization</BDropdownItem>
+        <BDropdownItem to="/mass_spectrum_comparison">Mass Spectrum Comparison</BDropdownItem>
+      </BNavItemDropdown>
       &emsp;
-      <b-nav-item-dropdown text="About" class="nav-dropdown">
-        <b-dropdown-item to="/about">About this App</b-dropdown-item>
-        <b-dropdown-item to="/contact">Contact Info</b-dropdown-item>
-        <b-dropdown-item to="/data_sources">Data Sources</b-dropdown-item>
-        <b-dropdown-item to="/related_applications">Related Applications</b-dropdown-item>
-        <b-dropdown-item to="/release_notes">Release Notes</b-dropdown-item>
-      </b-nav-item-dropdown>
+      <BNavItemDropdown text="About" class="nav-dropdown">
+        <BDropdownItem to="/about">About this App</BDropdownItem>
+        <BDropdownItem to="/contact">Contact Info</BDropdownItem>
+        <BDropdownItem to="/data_sources">Data Sources</BDropdownItem>
+        <BDropdownItem to="/related_applications">Related Applications</BDropdownItem>
+        <BDropdownItem to="/release_notes">Release Notes</BDropdownItem>
+      </BNavItemDropdown>
       &emsp;
       <button @click="store.showHeaderAndFooter = !store.showHeaderAndFooter">Toggle Header/Footer</button>
     </div>
@@ -50,6 +50,8 @@
 </template>
 
 <script>
+  import {BNavItemDropdown, BDropdownItem} from 'bootstrap-vue-next'
+
   import {store} from "@/assets/store.js"
 
   export default {
@@ -63,7 +65,8 @@
       return {
         store
       };
-    }
+    },
+    components: {BNavItemDropdown, BDropdownItem}
 }
 </script>
 

@@ -54,14 +54,9 @@
       <button @click="getSubstances">Get Substances</button>
     </div>
   </div>
-  <b-alert variant="warning" dismissible v-model="status_boxes.bad_query_params">{{ status_boxes.bad_params_message }}</b-alert>
-  <b-alert variant="warning" dismissible v-model="status_boxes.incomplete_query_params">An incomplete set of classification levels was passed in the URL.</b-alert>
+  <BAlert variant="warning" dismissible v-model="status_boxes.bad_query_params">{{ status_boxes.bad_params_message }}</BAlert>
+  <BAlert variant="warning" dismissible v-model="status_boxes.incomplete_query_params">An incomplete set of classification levels was passed in the URL.</BAlert>
   <br />
-  <!--
-  <button @click="resetSelection">Reset Selection</button>
-  <button @click="downloadSearchResults">Download Table</button>
-  <button @click="sendToBatchSearch">Send Selected Substances to Batch Search</button>
-  -->
   <div style="display: flex; flex-direction: row; justify-content: space-between">
     <div>
       <button @click="classificationToURL">Copy Classification to URL</button>
@@ -87,6 +82,7 @@
 
 <script>
   import axios from 'axios'
+  import { BAlert } from 'bootstrap-vue-next'
 
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
@@ -194,14 +190,6 @@
     async created() {
       const query_params = Object.keys(this.$route.query)
       fieldfiller: if (["kingdom", "superclass", "class", "subclass"].every(x => query_params.includes(x))) {
-        /* this.kingdom = this.$route.query.kingdom
-        this.superklass = this.$route.query.superclass
-        this.klass = this.$route.query.class
-        this.subklass = this.$route.query.subclass
-        this.disabled.superklass = false
-        this.disabled.klass = false
-        this.disabled.subklass = false
-        this.getSubstances() */
         this.kingdom = this.$route.query.kingdom
         if (!this.kingdoms.includes(this.$route.query.kingdom)) {
           this.status_boxes.bad_params_message = `Invalid kingdom '${this.$route.query.kingdom}'.`
@@ -326,7 +314,7 @@
         })
       }
     },
-    components: {AgGridVue, RecordCountFilter}
+    components: {AgGridVue, BAlert, RecordCountFilter}
   }
 </script>
 

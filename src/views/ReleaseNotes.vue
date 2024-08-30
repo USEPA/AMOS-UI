@@ -2,6 +2,14 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2024-08-30</summary>
+    <ul>
+      <li>Added some descriptive text and links to other search pages to the front page.</li>
+      <li>Fixed an issue with the InChIKey and synonym disambiguations in the similar structure search.</li>
+      <li>Added some source links and data source descriptions.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2024-08-14</summary>
     <ul>
       <li>Incorporated a major change to the functional class visualization (previously called the analyte visualization).</li>

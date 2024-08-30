@@ -78,12 +78,14 @@
       </div>
     </div>
   </div>
-  <b-alert variant="warning" dismissible v-model="status_boxes.show_empty_box_error">No substances were entered in the text box.</b-alert>
-  <b-alert variant="warning" dismissible v-model="status_boxes.no_records_found">No records were found for the searched substances.</b-alert>
+  <BAlert variant="warning" dismissible v-model="status_boxes.show_empty_box_error">No substances were entered in the text box.</BAlert>
+  <BAlert variant="warning" dismissible v-model="status_boxes.no_records_found">No records were found for the searched substances.</BAlert>
 </template>
 
 <script>
   import axios from 'axios'
+
+  import { BAlert } from 'bootstrap-vue-next'
 
   import { timestampForFile } from '@/assets/common_functions'
   import { BACKEND_LOCATION } from '@/assets/store'
@@ -160,7 +162,8 @@
         this.record_types = {"Fact Sheet": state, "Method": state, "Spectrum": state, "AnalyticalQCOnly": false}
         this.methodologies = {all: state, "GC/MS": state, "LC/MS": state, "NMR": state}
       }
-    }
+    },
+    components: {BAlert}
   }
 </script>
 

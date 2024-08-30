@@ -36,6 +36,14 @@
     spectra="36293"
   />
   <DataSourceDetails
+    sourceName="Australian National Industrial Chemicals Notification and Assessment Scheme"
+    category="Government fact sheet collection"
+    url="https://www.australianchamber.com.au/our-policies/work-health-safety/nicnas/"
+    sourceID="NICNAS"
+    substances="6570"
+    factSheets="3609"
+  />
+  <DataSourceDetails
     sourceName="Bruker"
     category="Vendor methods collection"
     url="https://www.bruker.com/"
@@ -76,14 +84,12 @@
     factSheets="84"
   />
   <DataSourceDetails
-    sourceName="Centers for Disease Control and Prevention"
-    category="Government methods collection"
-    url="https://www.cdc.gov/index.htm"
-    sourceID="CDC"
-    substances="2707"
-    factSheets="699"
-    methods="25"
-    spectra="804"
+    sourceName="Cosmetic Ingredient Review"
+    category="Open-access fact sheet collection"
+    url="https://www.cir-safety.org/"
+    sourceID="CIR"
+    substances="2963"
+    factSheets="535"
   />
   <DataSourceDetails
     sourceName="Czech Academy of Sciences"
@@ -102,13 +108,29 @@
     factSheets="72"
   />
   <DataSourceDetails
-    sourceName="Drug Enforcement Administration"
-    category="Government methods collection"
-    url="https://www.dea.gov"
-    sourceID="DEA"
-    substances="252"
-    factSheets="25"
-    methods="33"
+    sourceName="European Chemicals Agency"
+    category="International fact sheet collection"
+    url="https://echa.europa.eu/"
+    sourceID="ECHA"
+    substances="4943"
+    factSheets="3577"
+  />
+  <DataSourceDetails
+    sourceName="European Commission for Consumer Safety"
+    category="International fact sheet collection"
+    url="https://commission.europa.eu/business-economy-euro/doing-business-eu/eu-product-safety-and-labelling/product-safety/consumer-product-safety_en#:~:text=The%20Consumer%20Safety%20Network%20is,the%20main%20areas%20of%20discussion."
+    sourceID="ECCS"
+    substances="575"
+    factSheets="248"
+  />
+  <DataSourceDetails
+    sourceName="European Food Safety Authority"
+    category="International fact sheet collection"
+    url="https://www.efsa.europa.eu/en"
+    sourceID="EFSA"
+    substances="576"
+    factSheets="604"
+    methods="1"
   />
   <DataSourceDetails
     sourceName="European Union Reference Laboratories"
@@ -116,7 +138,7 @@
     url="https://www.eurl-pesticides.eu"
     sourceID="EURL"
     substances="722"
-    methods="56"
+    methods="55"
   />
   <DataSourceDetails
     sourceName="Food & Agricultural Organization of the United Nations"
@@ -125,6 +147,14 @@
     sourceID="FAO"
     substances="349"
     factSheets="1395"
+  />
+  <DataSourceDetails
+    sourceName="Food Contaminant and Residue Information System"
+    category="International fact sheet collection"
+    url="https://www.iaea.org/resources/databases/food-contaminant-and-residue-information-system"
+    sourceID="FCRIS"
+    substances="360"
+    methods="101"
   />
   <DataSourceDetails
     sourceName="Global Natural Products Social Molecular Networking"
@@ -141,6 +171,15 @@
     sourceID="HMDB"
     substances="3936"
     spectra="45242"
+  />
+  <DataSourceDetails
+    sourceName="The International Agency for Research on Cancer"
+    category="International fact sheet & method collection"
+    url="https://www.iarc.who.int/"
+    sourceID="IARC"
+    substances="2457"
+    factSheets="113"
+    methods="1"
   />
   <DataSourceDetails
     sourceName="Jozef Stefan Institute"
@@ -225,6 +264,30 @@
     factSheets="1626"
   />
   <DataSourceDetails
+    sourceName="NMRShiftDB"
+    category="NMR spectrum peak collection"
+    url="http://nmrshiftdb.nmr.uni-koeln.de/"
+    sourceID="NMRShiftDB"
+    substances="15020"
+    spectra="15125"
+  />
+  <DataSourceDetails
+    sourceName="National Toxicology Program"
+    category="Government fact sheet collection"
+    url="https://ntp.niehs.nih.gov/"
+    sourceID="NTP"
+    substances="707"
+    factSheets="571"
+  />
+  <DataSourceDetails
+    sourceName="Organisation for Economic Co-operation and Development"
+    category="International fact sheet collection"
+    url="https://hpvchemicals.oecd.org/"
+    sourceID="OECD"
+    substances="1764"
+    factSheets="1621"
+  />
+  <DataSourceDetails
     sourceName="Scientific Working Group for the Analysis of Seized Drugs"
     category="Open spectrum and monographs collection"
     url="https://www.swgdrug.org/"
@@ -247,15 +310,15 @@
     url="https://www.shimadzu.com"
     sourceID="Shimadzu"
     substances="5792"
-    methods="1113"
+    methods="1112"
   />
   <DataSourceDetails
     sourceName="SpectraBase"
     category="Spectrum database (spectra are not open, metadata is)"
     url="https://spectrabase.com/"
     sourceID="SpectraBase"
-    substances="149764"
-    spectra="590943"
+    substances="160442"
+    spectra="638634"
   />
   <DataSourceDetails
     sourceName="UC Davis Fiehn Lab"
@@ -264,6 +327,16 @@
     sourceID="UC Davis Fiehn Lab"
     substances="211"
     spectra="211"
+  />
+  <DataSourceDetails
+    sourceName="U.S. Centers for Disease Control and Prevention"
+    category="Government methods, fact sheets, and spectra"
+    url="https://www.cdc.gov/index.htm"
+    sourceID="CDC"
+    substances="2707"
+    factSheets="699"
+    methods="25"
+    spectra="804"
   />
   <DataSourceDetails
     sourceName="U.S. Department of Agriculture"
@@ -275,12 +348,29 @@
     methods="41"
   />
   <DataSourceDetails
+    sourceName="U.S. Department of Veterans Affairs"
+    category="Government monograph collection"
+    url="https://www.pbm.va.gov/"
+    sourceID="DVA"
+    substances="163"
+    factSheets="175"
+  />
+  <DataSourceDetails
+    sourceName="U.S. Drug Enforcement Administration"
+    category="Government methods collection"
+    url="https://www.dea.gov"
+    sourceID="DEA"
+    substances="252"
+    factSheets="25"
+    methods="33"
+  />
+  <DataSourceDetails
     sourceName="U.S. Environmental Protection Agency"
     category="Government methods collection"
     url="https://www.epa.gov/"
     sourceID="EPA, APPRIL, EPA MS Labs, EPA-ECM, EPA-OW, USEPA"
     substances="4304"
-    factSheets="19902"
+    factSheets="19903"
     methods="1897"
     spectra="537"
   />
@@ -315,6 +405,14 @@
     sourceID="Waters"
     substances="1907"
     methods="262"
+  />
+  <DataSourceDetails
+    sourceName="World Health Organization"
+    category="International fact sheet collection"
+    url="https://www.who.int"
+    sourceID="WHO"
+    substances="351"
+    factSheets="286"
   />
   <br />
 </template>

@@ -487,7 +487,7 @@
               var rect = document.getElementById('analyteClassSvg').getBoundingClientRect();
               div.html("<span style='font-size:2.2rem'>" + name + "</span><br/><br/><span style='font-size:1.5rem'>" + description + "</span>")
                 .style("left", (rect.left + 5) + "px")		
-                .style("top", (-(rect.bottom - rect.top) - 10) + "px")
+                .style("top", (-(rect.bottom - rect.top) - 120) + "px")
                 .style("line-height", "1.5rem")
             }
           })

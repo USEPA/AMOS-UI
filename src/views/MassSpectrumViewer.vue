@@ -24,7 +24,7 @@
         </ul>
         <button @click="show_table_modal = true">Show Points</button>
       </div>
-      <b-modal v-model="show_table_modal">
+      <BModal v-model="show_table_modal">
         <ag-grid-vue
           class="ag-theme-balham"
           style="height:600px; width:100%"
@@ -34,7 +34,7 @@
           :suppressCopyRowsToClipboard="true"
         ></ag-grid-vue>
         <button @click="copySpectrum()">Copy to Clipboard</button>
-      </b-modal>
+      </BModal>
     </div>
     <div class="half-page-column">
       <h3>Substance Info</h3>
@@ -50,6 +50,7 @@
 
 <script>
   import axios from 'axios';
+  import {BModal} from 'bootstrap-vue-next'
 
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
@@ -125,7 +126,7 @@
       const substance_response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${dtxsid}`)
       this.substance_info = substance_response.data.substances
     },
-    components: {AgGridVue, BasicSubstanceDisplay, MassSpectrumMetadata, SingleMassSpectrumPlot}
+    components: {AgGridVue, BasicSubstanceDisplay, BModal, MassSpectrumMetadata, SingleMassSpectrumPlot}
   }
 </script>
 

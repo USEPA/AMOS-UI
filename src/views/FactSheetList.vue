@@ -2,7 +2,8 @@
   This page displays a list of all fact sheets in the database, as well as being able to display the fact sheets
   themselves with their associated substances.
 
-  This page takes no URL route or query parameters.
+  This page takes no URL route parameters, but can take query parameters for the various filter filters associated
+  with the table.
 -->
 
 <template>
@@ -46,17 +47,18 @@
       :tooltipShowDelay="400"
       :suppressCopyRowsToClipboard="true"
     ></ag-grid-vue>
-    <b-modal size="xl" v-model="disambiguation.inchikey">
+    <BModal size="xl" v-model="disambiguation.inchikey">
       <InchikeyDisambiguation :searchedKey="substance_identifier" :substances="possible_substances" :record_counts="record_counts_by_dtxsid" @inchikeySelected="disambiguate" />
-    </b-modal>
-    <b-modal size="xl" v-model="disambiguation.synonym">
+    </BModal>
+    <BModal size="xl" v-model="disambiguation.synonym">
       <SynonymDisambiguation :synonym="substance_identifier" :substances="possible_substances" :record_counts="record_counts_by_dtxsid" @synonymSelected="disambiguate" />
-    </b-modal>
+    </BModal>
   </div>
 </template>
 
 <script>
   import axios from 'axios'
+  import { BModal } from 'bootstrap-vue-next'
   
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
@@ -187,7 +189,6 @@
           this.fact_sheets_with_substance = fact_sheet_response.data.internal_ids
           this.status.filter_by_substance = true
           this.gridApi.onFilterChanged()
-          console.log(fact_sheet_response)
         }
       },
       isExternalFilterPresent() {
@@ -271,6 +272,7 @@
 
     components: {
       AgGridVue,
+      BModal,
       HelpIcon,
       InchikeyDisambiguation,
       StoredPDFDisplay,

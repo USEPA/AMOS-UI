@@ -129,17 +129,18 @@
       <StoredPDFDisplay v-else-if="view_type == 'PDF'" :internalID="selected_row_data.internal_id" :recordType="selected_row_data.record_type" displayAdditionalInfo/>
       <p class="info-paragraph" v-else>This database does not contain anything for this record.  Click the hyperlink in the "Record Type" column to be directed to the source.</p>
     </div>
-    <b-modal size="xl" v-model="disambiguation.inchikey">
+    <BModal size="xl" v-model="disambiguation.inchikey">
       <InchikeyDisambiguation :searchedKey="$route.params.search_term" :substances="possible_substances" :record_counts="record_counts_by_dtxsid" @inchikeySelected="disambiguate" />
-    </b-modal>
-    <b-modal size="xl" v-model="disambiguation.synonym">
+    </BModal>
+    <BModal size="xl" v-model="disambiguation.synonym">
       <SynonymDisambiguation :synonym="$route.params.search_term" :substances="possible_substances" :record_counts="record_counts_by_dtxsid" @synonymSelected="disambiguate" />
-    </b-modal>
+    </BModal>
   </div>
 </template>
 
 <script>
   import axios from 'axios'
+  import { BModal } from 'bootstrap-vue-next'
 
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
@@ -223,13 +224,20 @@
           },
           {field: 'count', headerName: '#', width: 35, suppressSizeToFit: true, sortable: true, headerTooltip: "Number of substances in record."},
           {field: 'spectrum_rating', headerName: "Rating", width: 80, suppressSizeToFit: true, hide: true, filter: 'agTextColumnFilter'},
-          {field: 'description', headerName: 'Information', sortable: true, flex: 1, tooltipField: 'comment', filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params =>{
-            if (params.data.description === null) {
-              return "No description available."
-            } else {
-              return params.data.description
+          {field: 'description', headerName: 'Information', sortable: true, flex: 1, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params =>{
+              if (params.data.description === null) {
+                return "No description available."
+              } else {
+                return params.data.description
+              }
+            }, tooltipValueGetter: params => {
+              if (params.data.description === null) {
+                return "No description available."
+              } else {
+                return params.data.description
+              }
             }
-          }},
+          },
           {field: 'link', headerName: 'Link', hide: true}
         ]
       };
@@ -466,6 +474,7 @@
     },
     components: {
       AgGridVue,
+      BModal,
       ClassyFireDisplay,
       HelpIcon,
       InchikeyDisambiguation,

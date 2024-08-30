@@ -67,7 +67,7 @@
     </div>
   </div>
   <!-- Modal window that displays the spectrum in an AG Grid table.-->
-  <b-modal v-model="show_modal.table">
+  <BModal v-model="show_modal.table">
     <ag-grid-vue
       class="ag-theme-balham"
       style="height:600px; width:100%"
@@ -77,17 +77,18 @@
       :suppressCopyRowsToClipboard="true"
     ></ag-grid-vue>
     <button @click="copySpectrum()">Copy to Clipboard</button>
-  </b-modal>
+  </BModal>
 
   <!-- Modal window that displays the metadata associated with the spectrum, using the spectrum_metadata field from the database. -->
-  <b-modal v-if="row_data.spectrum_metadata" v-model="show_modal.metadata" ref="metadata_modal">
+  <BModal v-if="row_data.spectrum_metadata" v-model="show_modal.metadata" ref="metadata_modal">
     <MassSpectrumMetadata :spectrumMetadata=row_data.spectrum_metadata />
-  </b-modal>
-  <b-alert variant="warning" dismissible v-model="error_messages.invalidFormat">There are issues with the contents of the user spectrum -- please check to ensure it is correct.</b-alert>
+  </BModal>
+  <BAlert variant="warning" dismissible v-model="error_messages.invalidFormat">There are issues with the contents of the user spectrum -- please check to ensure it is correct.</BAlert>
 </template>
 
 <script>
   import axios from 'axios'
+  import { BAlert, BModal } from 'bootstrap-vue-next'
   import { validateSpectrumInput } from '@/assets/common_functions'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
 
@@ -188,7 +189,7 @@
         return selected_spectrum.map(function(x){return {"m/z":x[0], "intensity":x[1]}})
       }
     },
-    components: {AgGridVue, DualMassSpectrumPlot, MassSpectrumMetadata}
+    components: {AgGridVue, BAlert, BModal, DualMassSpectrumPlot, MassSpectrumMetadata}
   }
 
 </script>

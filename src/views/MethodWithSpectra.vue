@@ -31,9 +31,9 @@
       </div>
     </div>
     <div>
-      <b-modal scrollable size="lg" v-model="show_modal">
+      <BModal scrollable size="lg" v-model="show_modal">
         <MassSpectrumDisplay :internalID="spectrum_internal_id"/>
-      </b-modal>
+      </BModal>
     </div>
   </div>
 </template>
@@ -42,6 +42,7 @@
   import axios from 'axios'
   import '@/assets/style.css'
   import { BACKEND_LOCATION } from '@/assets/store'
+  import { BModal } from 'bootstrap-vue-next'
 
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
@@ -85,7 +86,7 @@
         this.show_modal = true
       }
     },
-    components: {AgGridVue, MassSpectrumDisplay, StoredPDFDisplay}
+    components: {AgGridVue, BModal, MassSpectrumDisplay, StoredPDFDisplay}
   }
 </script>
 

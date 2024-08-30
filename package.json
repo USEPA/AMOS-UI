@@ -15,7 +15,7 @@
     "ag-grid-vue3": "^28.2.1",
     "axios": "^0.27.2",
     "bootstrap": "^5.2.3",
-    "bootstrap-vue-3": "^0.4.13",
+    "bootstrap-vue-next": "^0.24.10",
     "d3": "^7.8.2",
     "vue": "^3.2.37",
     "vue-router": "^4.1.3",

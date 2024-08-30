@@ -30,7 +30,7 @@
     </div>
 
     <!-- Modal window that displays the spectrum in an AG Grid table.-->
-    <b-modal v-model="show_table_modal">
+    <BModal v-model="show_table_modal">
       <ag-grid-vue
         class="ag-theme-balham"
         style="height:600px; width:100%"
@@ -40,17 +40,18 @@
         :suppressCopyRowsToClipboard="true"
       ></ag-grid-vue>
       <button @click="copySpectrum()">Copy to Clipboard</button>
-    </b-modal>
+    </BModal>
 
     <!-- Modal window that displays the metadata associated with the spectrum, using the spectrum_metadata field from the database. -->
-    <b-modal v-if="spectrum_metadata" v-model="show_metadata_modal" ref="metadata_modal">
+    <BModal v-if="spectrum_metadata" v-model="show_metadata_modal" ref="metadata_modal">
       <MassSpectrumMetadata :spectrumMetadata=spectrum_metadata />
-    </b-modal>
+    </BModal>
   </div>
 </template>
 
 <script>
   import axios from 'axios';
+  import {BModal} from 'bootstrap-vue-next'
   
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
@@ -130,7 +131,7 @@
         document.body.removeChild(textarea)
       }
     },
-    components: {AgGridVue, MassSpectrumMetadata, SingleMassSpectrumPlot}
+    components: {AgGridVue, BModal, MassSpectrumMetadata, SingleMassSpectrumPlot}
   };
 </script>
 

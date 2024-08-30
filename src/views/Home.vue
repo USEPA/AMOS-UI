@@ -15,8 +15,8 @@
         bar above to access other functionality.  This application is easier to use on larger screens/windows.
       </p>
       <p>
-        For more information about this app, see the <router-link to="/about">about</router-link> page or
-        <a href="https://work.epa.gov/ccte/amos-analytical-methods-and-open-spectral-database-help">the manual</a>.
+        The search bar below (as well as the one in the navigation bar at the top) can be used to perform a general search of the database for all
+        records pertaining to a substance.
       </p>
       <div>
         <input @keyup.enter="go_big_bar()" id="big-search-bar" name="big-search-bar" placeholder="Search name, InChIKey, DTXSID, or CASRN..." size="60" v-model="bigBarSearchTerm">
@@ -33,8 +33,19 @@
       </div>
       <div>
         <input type="checkbox" id="substring-search" v-model="substring_search">
-        <label for="substring-search">Search by substring (name only)</label>
+        <label for="substring-search">Search by substring (name search only)</label>
       </div>
+      <br />
+      <p>
+        More precise and/or specific views of data are available on other pages.  This includes lists of the <router-link to="/fact_sheet_list">fact sheets</router-link> and the 
+        <router-link to="/methods_list">methods</router-link> available in the database, the ability to <router-link to="/classyfire_search">search for substances</router-link> 
+        belonging to a given ClassyFire classification, and a <router-link to="/similar_structure_search">structure similarity search</router-link> to find methods and fact sheets 
+        containing a searched substance or a structurally similar one.
+      </p>
+      <p>
+        For more information about this app, see the <router-link to="/about">about</router-link> page or
+        <a href="https://work.epa.gov/ccte/amos-analytical-methods-and-open-spectral-database-help">the manual</a>.
+      </p>
     </div>
   </div>
 </template>

@@ -99,16 +99,17 @@
       </div>
     </div>
   </div>
-  <b-modal size="xl" v-model="disambiguation.inchikey">
-    <InchikeyDisambiguation :searchedKey="$route.params.search_term" :substances="possible_substances" @inchikeySelected="disambiguate"/>
-  </b-modal>
-  <b-modal size="xl" v-model="disambiguation.synonym">
-    <SynonymDisambiguation :synonym="$route.params.search_term" :substances="possible_substances" @synonymSelected="disambiguate" />
-  </b-modal>
+  <BModal size="xl" v-model="disambiguation.inchikey">
+    <InchikeyDisambiguation :searchedKey="$route.params.search_term" :substances="possible_substances" :record_counts="record_counts_by_dtxsid" @inchikeySelected="disambiguate"/>
+  </BModal>
+  <BModal size="xl" v-model="disambiguation.synonym">
+    <SynonymDisambiguation :synonym="$route.params.search_term" :substances="possible_substances" :record_counts="record_counts_by_dtxsid" @synonymSelected="disambiguate" />
+  </BModal>
 </template>
 
 <script>
   import axios from 'axios'
+  import { BModal } from 'bootstrap-vue-next'
 
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
@@ -149,6 +150,7 @@
         right_side_viewer_mode: "N/A",
         substance_info: {searched_substance: {}, similar_substance: {}},
         highlighted_substances: [],
+        record_counts_by_dtxsid: {},
         min_similarity: 0.5,
         classyfire: {searched_substance: null, similar_substance: null},
         defaultColDef: {filter: true, floatingFilter: true},
@@ -228,6 +230,7 @@
     components: {
       AgGridVue,
       BasicSubstanceDisplay,
+      BModal,
       InchikeyDisambiguation,
       StoredPDFDisplay,
       SynonymDisambiguation
@@ -263,6 +266,9 @@
           this.searching = false
         } else if (response.data.ambiguity) {
           this.possible_substances = response.data.substances
+          const dtxsids = this.possible_substances.map(ps => ps.dtxsid)
+          this.record_counts_by_dtxsid = await axios.post(`${this.BACKEND_LOCATION}/record_counts_by_dtxsid/`, {dtxsids: dtxsids})
+          this.record_counts_by_dtxsid = this.record_counts_by_dtxsid.data
           if (response.data.ambiguity == "inchikey") {
             this.disambiguation.inchikey = true
           } else if (response.data.ambiguity == "synonym") {
