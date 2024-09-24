@@ -2,6 +2,17 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2024-09-24</summary>
+    <ul>
+      <li>The data sources page now shows information about data sources in a table, and some information has been fleshed out.</li>
+      <li>Modified the batch search's output to include AMOS internal links to records.  Field names in the output file have also been renamed to something a little more natural.</li>
+      <li>Added a record ID search option to the home page and navigation bar.</li>
+      <li>Modified the general search results to sort by substance counts when looking at fact sheets.  This shouldn't override other sorts that are in place when switching to looking at fact sheets.</li>
+      <li>Added substance counts to the fact sheet list.</li>
+      <li>Added internal links for PDFs to the displays of their metadata.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2024-08-30</summary>
     <ul>
       <li>Added some descriptive text and links to other search pages to the front page.</li>
