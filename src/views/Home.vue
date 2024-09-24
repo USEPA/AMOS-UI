@@ -18,9 +18,10 @@
         The search bar below (as well as the one in the navigation bar at the top) can be used to perform a general search of the database for all
         records pertaining to a substance.
       </p>
-      <div>
-        <input @keyup.enter="go_big_bar()" id="big-search-bar" name="big-search-bar" placeholder="Search name, InChIKey, DTXSID, or CASRN..." size="60" v-model="bigBarSearchTerm">
-        <button @click="go_big_bar()">Substance Search</button>
+      <div style="display: flex">
+        <input @keyup.enter="go_big_bar()" id="big-search-bar" name="big-search-bar" :placeholder="searchType == 'substances' ? 'Search name, InChIKey, DTXSID, or CASRN...' : 'Search record ID...'" size="60" v-model="bigBarSearchTerm">
+        <BFormSelect v-model="searchType" :options="searchTypeOptions" size="sm" style="width: auto; padding: 0 2em 0 0.5em;"/>  <!-- width needs to be set to fix height issues for some reason -->
+        <button @click="go_big_bar()">Search</button>
       </div>
       <div>
         <label><input type="radio" id="all-tab" v-model="initial_results_tab" value="all">All</label>
@@ -51,6 +52,8 @@
 </template>
 
 <script>
+  import {BFormSelect} from 'bootstrap-vue-next'
+
   export default {
     methods: {
       go_big_bar() {
@@ -58,19 +61,27 @@
         if (this.substring_search) {
           this.$router.push({path: `/substring_search/${search_term}`})
         }
-        else {
+        else if (this.searchType == "substances") {
           this.$router.push({
             path: `/search/${search_term}`,
             query: {initial_results_tab: this.initial_results_tab}
           })
+        } else {
+          this.$router.push(`/record_id_search/${encodeURI(search_term)}`)
         }
       }
     },
     data() {
       return {
         initial_results_tab: "all",
-        substring_search: false
+        substring_search: false,
+        searchType: "substances",
+        searchTypeOptions: [
+          {value: "substances", text: "Substance"},
+          {value: "ids", text: "Record ID"}
+        ]
       }
-    }
+    },
+    components: {BFormSelect}
   }
 </script>

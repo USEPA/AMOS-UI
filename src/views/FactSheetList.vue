@@ -86,7 +86,7 @@
         filtered_record_count: 0,
         full_table_filter: "",
         substance_identifier: "",
-        default_column_def: {resizable: true},
+        default_column_def: {resizable: true, sortable: true, filter: 'agTextColumnFilter', floatingFilter: true},
         substance_count: 0,
         disambiguation: {inchikey: false, synonym: false},
         status: {loading: true, substance_searching: false, filter_by_substance: false},
@@ -96,11 +96,11 @@
         NUMERIC_COLUMNS: [],
         TEXT_COLUMNS: ['analyte', 'document_type', 'fact_sheet_name', 'functional_classes', 'internal_id', 'source'],
         column_defs: [
-          {field: 'internal_id', headerName: 'Doc ID', sortable: true, sort: "asc", width: 80, comparator: (valA, valB, nodeA, nodeB, isDescending) => {
+          {field: 'internal_id', headerName: 'Doc ID', sort: "asc", width: 80, comparator: (valA, valB, nodeA, nodeB, isDescending) => {
             return Number.parseInt(valA.substring(3)) - Number.parseInt(valB.substring(3))
           }},
-          {field: 'fact_sheet_name', headerName: 'Fact Sheet Name', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, flex: 1.5, tooltipField: 'fact_sheet_name'},
-          {field: 'source', headerName: 'Source', sortable: true, filter: 'agTextColumnFilter', floatingFilter: true, width: 90, tooltipValueGetter: params => {
+          {field: 'fact_sheet_name', headerName: 'Fact Sheet Name', flex: 1.5, tooltipField: 'fact_sheet_name'},
+          {field: 'source', headerName: 'Source', width: 90, tooltipValueGetter: params => {
               return sourceAbbreviationTooltip(params.data.source)
             }, cellClass: params => {
               if (this.SOURCE_ABBREVIATION_MAPPING[params.data.source] && this.SOURCE_ABBREVIATION_MAPPING[params.data.source].full_name) {
@@ -108,8 +108,8 @@
               }
             }
           },
-          {field: 'document_type', headerName: 'Type', sortable: true, width: 90, filter: 'agTextColumnFilter', floatingFilter: true},
-          {field: 'analyte', headerName: 'Analyte', sortable: true, flex: 1, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
+          {field: 'document_type', headerName: 'Type', width: 90},
+          {field: 'analyte', headerName: 'Analyte', flex: 1, cellRenderer: params => {
             if (params.data.count == 1){
               const link = document.createElement("a");
               link.href = this.$router.resolve(`/search/${params.data.dtxsid}`).href;
@@ -123,10 +123,11 @@
               return params.data.analyte
             }
           }},
-          {field: 'functional_classes', headerName: 'Functional Classes', sortable: true, flex: 1.5, filter: 'agTextColumnFilter', floatingFilter: true},
-          {field: 'link', headerName: 'Link', sortable: true, width: 70, cellRenderer: params => {
+          {field: 'functional_classes', headerName: 'Functional Classes', flex: 1.5},
+          {field: 'link', headerName: 'Link', width: 70, filter: null, cellRenderer: params => {
             return `<a href='${params.data.link}' target='_blank'>Link</a>`
-          }}
+          }},
+          {field: "count", headerName: "# Substances", width: 90, filter: 'agNumberColumnFilter', headerTooltip: "Number of substances in fact sheet."}
         ]
       }
     },

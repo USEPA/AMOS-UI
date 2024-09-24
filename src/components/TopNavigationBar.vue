@@ -14,7 +14,13 @@
       </div>
       &emsp;
       <input @keyup.enter="go()" type="text" v-model="searchTerm" name="search-term" title="General search input field">
-      <button @click="go()">Substance Search</button>
+      <BFormSelect v-model="searchType" :options="searchTypeOptions" size="sm" style="width: auto; padding: 0 2em 0 0.5em;"/>  <!-- width needs to be set to fix height issues for some reason -->
+      <button @click="go()">Search</button>
+      <!-- <select id="search_type" name="search_type">
+        <option value="substances" selected>Substance</option>
+        <option value="ids">Record ID</option>
+      </select> -->
+      <!--style="padding: 0 0 0 0.25em;"-->
     </div>
     <div class="nav-bar-right">
       &emsp;
@@ -50,23 +56,33 @@
 </template>
 
 <script>
-  import {BNavItemDropdown, BDropdownItem} from 'bootstrap-vue-next'
+  import {BNavItemDropdown, BDropdownItem, BFormSelect} from 'bootstrap-vue-next'
 
   import {store} from "@/assets/store.js"
 
   export default {
+    data() {
+      return {
+        store,
+        searchTerm: "",
+        searchType: "substances",
+        searchTypeOptions: [
+          {value: "substances", text: "Substance"},
+          {value: "ids", text: "Record ID"}
+        ]
+      };
+    },
     methods: {
       go() {
         this.searchTerm = this.searchTerm.trim()
-        this.$router.push(`/search/${this.searchTerm}`)
+        if (this.searchType == "substances") {
+          this.$router.push(`/search/${this.searchTerm}`)
+        } else {
+          this.$router.push(`/record_id_search/${encodeURI(this.searchTerm)}`)
+        }
       }
     },
-    data() {
-      return {
-        store
-      };
-    },
-    components: {BNavItemDropdown, BDropdownItem}
+    components: {BNavItemDropdown, BDropdownItem, BFormSelect}
 }
 </script>
 
@@ -117,5 +133,10 @@
   .nav-dropdown a:hover{
     color: black;
     text-decoration: none
+  }
+
+  .search-type-selector {
+    background-color: #0e6993;
+    color: white;
   }
 </style>

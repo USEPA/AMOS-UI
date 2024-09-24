@@ -29,9 +29,9 @@
 </script>
 
 <style>
-#app {
-  margin: 0 auto;
-  padding: 1rem;
-  font-weight: normal;
-}
+  #app {
+    margin: 0 auto;
+    padding: 1rem;
+    font-weight: normal;
+  }
 </style>

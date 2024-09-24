@@ -26,6 +26,7 @@ const routes = [
   {path: "/classyfire_search", name: "ClassyFire Search", component: ()=>import('../views/ClassyFireClassificationSearch.vue')},
   {path: "/test_viz", name: "Test Viz", component: ()=>import('../views/TestViz.vue')},
   {path: "/release_notes", name: "Release Notes", component: ()=>import('../views/ReleaseNotes.vue')},
+  {path: "/record_id_search/:internal_id", name: "Record ID Search", component: ()=>import('../views/RecordIDSearch.vue')},
   {path: "/:catchAll(.*)", name: "404", component: ()=>import('../views/404.vue')}
 ]
 

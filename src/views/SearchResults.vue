@@ -222,7 +222,7 @@
               }
             }
           },
-          {field: 'count', headerName: '#', width: 35, suppressSizeToFit: true, sortable: true, headerTooltip: "Number of substances in record."},
+          {field: 'count', headerName: '# Substances', width: 90, suppressSizeToFit: true, sortable: true, filter: 'agNumberColumnFilter', floatingFilter: true, headerTooltip: "Number of substances in record."},
           {field: 'spectrum_rating', headerName: "Rating", width: 80, suppressSizeToFit: true, hide: true, filter: 'agTextColumnFilter'},
           {field: 'description', headerName: 'Information', sortable: true, flex: 1, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params =>{
               if (params.data.description === null) {
@@ -346,12 +346,15 @@
         if (tabName === "fact sheet"){
           this.gridColumnApi.setColumnsVisible(['count'], true)
           this.gridColumnApi.setColumnsVisible(['method_number', 'method_type', 'methodologies', 'record_type', 'spectrum_rating'], false)
+          this.gridColumnApi.applyColumnState({state: [{colId: 'count', sort: 'asc'}]})
         } else if (tabName === "spectrum") {
           this.gridColumnApi.setColumnsVisible(['methodologies', 'spectrum_rating'], true)
           this.gridColumnApi.setColumnsVisible(['count', 'method_number', 'method_type', 'record_type'], false)
+          this.gridColumnApi.applyColumnState({state: [{colId: 'count', sort: null}]})
         } else if (tabName === "method") {
           this.gridColumnApi.setColumnsVisible(['count', 'method_number', 'method_type', 'methodologies'], true)
           this.gridColumnApi.setColumnsVisible(['record_type', 'spectrum_rating'], false)
+          this.gridColumnApi.applyColumnState({state: [{colId: 'count', sort: null}]})
           if (this.record_type_counts.method == 0) {
             this.gridApi.value.showLoadingOverlay()
           }
@@ -359,6 +362,7 @@
           // "All" case
           this.gridColumnApi.setColumnsVisible(['count', 'methodologies', 'record_type'], true)
           this.gridColumnApi.setColumnsVisible(['method_number', 'method_type', 'spectrum_rating'], false)
+          this.gridColumnApi.applyColumnState({state: [{colId: 'count', sort: null}]})
         }
         this.gridApi.onFilterChanged()
         this.gridApi.sizeColumnsToFit()

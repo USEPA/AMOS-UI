@@ -15,6 +15,7 @@
       <p v-if="has_associated_spectra && displayAdditionalInfo">This method has spectra associated with it.  Click <router-link :to="`/method_with_spectra/method/${internalID}`">here</router-link> to view.</p>
       <ul v-if="metadata_rows" style="list-style-type: none;">
         <li v-for="r in Object.entries(metadata_rows)"><strong>{{r[0]}}:</strong> {{r[1]}}</li>
+        <li>AMOS Internal Link: <router-link :to="getDocumentHref(recordType)" target="_blank">Link</router-link></li>
       </ul>
     </div>
     <div class="tab-bar">
@@ -193,6 +194,15 @@
           console.log('Cannot copy: ' + err)
         }
         document.body.removeChild(textarea)
+      },
+      getDocumentHref(record_type) {
+        if (record_type == "Fact Sheet") {
+          return `/view_fact_sheet/${this.internalID}`
+        } else if (record_type == "Method") {
+          return `/view_method/${this.internalID}`
+        } else {
+          return `/view_spectrum_pdf/${this.internalID}`
+        }
       },
       onGridReady(params) {
         this.gridApi = params.api;

@@ -146,7 +146,7 @@
               }
             }
           },
-          {field: "count", headerName: "#", width: 60, floatingFilter: false, sortable: true, headerTooltip: "Number of substances in method."},
+          {field: "count", headerName: "# Substances", width: 90, filter: 'agNumberColumnFilter', sortable: true, headerTooltip: "Number of substances in method."},
           {field: "author", headerName: "Author(s)", hide: true},
           {field: "publisher", headerName: "Publisher", hide: true},
           {field: "link", headerName: "Link", hide: true}
