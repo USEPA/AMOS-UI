@@ -10,17 +10,12 @@
     <div class="nav-bar-left">
       <div style="text-align: start;">
         <router-link to="/" style="font-size: larger">AMOS</router-link>
-        <div style="font-size: smaller">Version: 2024-09-24</div>
+        <div style="font-size: smaller">Version: 2024-09-25</div>
       </div>
       &emsp;
       <input @keyup.enter="go()" type="text" v-model="searchTerm" name="search-term" title="General search input field">
       <BFormSelect v-model="searchType" :options="searchTypeOptions" size="sm" style="width: auto; padding: 0 2em 0 0.5em;"/>  <!-- width needs to be set to fix height issues for some reason -->
       <button @click="go()">Search</button>
-      <!-- <select id="search_type" name="search_type">
-        <option value="substances" selected>Substance</option>
-        <option value="ids">Record ID</option>
-      </select> -->
-      <!--style="padding: 0 0 0 0.25em;"-->
     </div>
     <div class="nav-bar-right">
       &emsp;

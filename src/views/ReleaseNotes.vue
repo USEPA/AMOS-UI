@@ -2,6 +2,17 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2024-09-25</summary>
+    <ul>
+      <li>Fixed an issue with the search mechanism in the analyte visualization which prevented it from working correctly.</li>
+      <li>Fixed an issue with viewing non-Analytical QC spectrum PDFs in the general search results.</li>
+      <li>Added tooltips to a couple fields in the fact sheet list.</li>
+      <li>Added sorting to the columns of the data sources table.</li>
+      <li>Bolded the label text for internal links for PDFs.</li>
+      <li>Updated some abbreviations and direct links to sources (not for individual records).</li>
+    </ul>
+  </details>
+  <details>
     <summary>2024-09-24</summary>
     <ul>
       <li>The data sources page now shows information about data sources in a table, and some information has been fleshed out.</li>
