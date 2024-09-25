@@ -38,9 +38,9 @@
       return {
         BACKEND_LOCATION,
         source_info: null,
-        defaultColumnDef: {floatingFilter: true},
+        defaultColumnDef: {floatingFilter: true, sortable: true},
         column_defs: [
-          {field: 'full_name', headerName: 'Source Name', flex: 1.5, wrapText: true, filter: 'agTextColumnFilter', cellRenderer: params => {
+          {field: 'full_name', headerName: 'Source Name', flex: 1.5, wrapText: true, sort: 'asc', filter: 'agTextColumnFilter', cellRenderer: params => {
             return "<a href='" + params.data.url + "' target='_blank'>" + params.data.full_name + "</a>"
           }},
           /*{field: 'source_ids', headerName: 'AMOS IDs', flex: 0.5},*/

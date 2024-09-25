@@ -15,7 +15,7 @@
       <p v-if="has_associated_spectra && displayAdditionalInfo">This method has spectra associated with it.  Click <router-link :to="`/method_with_spectra/method/${internalID}`">here</router-link> to view.</p>
       <ul v-if="metadata_rows" style="list-style-type: none;">
         <li v-for="r in Object.entries(metadata_rows)"><strong>{{r[0]}}:</strong> {{r[1]}}</li>
-        <li>AMOS Internal Link: <router-link :to="getDocumentHref(recordType)" target="_blank">Link</router-link></li>
+        <li><strong>AMOS Internal Link:</strong> <router-link :to="getDocumentHref(recordType)" target="_blank">Link</router-link></li>
       </ul>
     </div>
     <div class="tab-bar">

@@ -192,7 +192,7 @@
                 }
               } else if (name.toLowerCase().includes(search.toLowerCase())) {
                 doc.style.display = "grid";
-                docID_split = doc.id.split('_');
+                var docID_split = doc.id.split('_');
                 for (let d = 0; d < docID_split.length-1; d++) {
                   let newID = docID_split.slice(0,d+1).join('_') + '_classname'
                   var new_doc = document.getElementById(newID);

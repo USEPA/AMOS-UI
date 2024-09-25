@@ -109,7 +109,7 @@
             }
           },
           {field: 'document_type', headerName: 'Type', width: 90},
-          {field: 'analyte', headerName: 'Analyte', flex: 1, cellRenderer: params => {
+          {field: 'analyte', headerName: 'Analyte', flex: 1, tooltipField: 'analyte', cellRenderer: params => {
             if (params.data.count == 1){
               const link = document.createElement("a");
               link.href = this.$router.resolve(`/search/${params.data.dtxsid}`).href;
@@ -123,7 +123,7 @@
               return params.data.analyte
             }
           }},
-          {field: 'functional_classes', headerName: 'Functional Classes', flex: 1.5},
+          {field: 'functional_classes', headerName: 'Functional Classes', tooltipField: 'functional_classes', flex: 1.5},
           {field: 'link', headerName: 'Link', width: 70, filter: null, cellRenderer: params => {
             return `<a href='${params.data.link}' target='_blank'>Link</a>`
           }},
