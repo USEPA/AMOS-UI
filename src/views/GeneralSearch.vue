@@ -80,7 +80,7 @@
             <input type="checkbox" id="ms-ready" v-model="result_filters.ms_ready" @change="updateCheckboxFilters">
             <label for="ms-ready">Include MS-Ready methods</label>
             &nbsp;
-            <help-icon style="vertical-align:middle;" tooltipText="MS-Ready refers to a standardization of substances by collapsing isomers, salts, isotopes, etc., into a single form, identifiable by having the same first block of their InChIKey.  Selecting this will include methods from substances with the same MS-Ready form." />
+            <!-- <help-icon style="vertical-align:middle;" tooltipText="MS-Ready refers to a standardization of substances by collapsing isomers, salts, isotopes, etc., into a single form, identifiable by having the same first block of their InChIKey.  Selecting this will include methods from substances with the same MS-Ready form." /> -->
           </div>
           <div>
             <input type="checkbox" id="external_links" v-model="result_filters.external_links" @change="updateCheckboxFilters">

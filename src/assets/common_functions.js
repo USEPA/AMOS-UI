@@ -5,7 +5,7 @@ import { BACKEND_LOCATION, IMAGE_BY_DTXSID_API, SOURCE_ABBREVIATION_MAPPING } fr
 
 // Intended to check for valid inputs to spectrum fields, which would be a series of one or more lines where each line
 // is two numbers separated by a space.
-const SPECTRUM_REGEX = /^[0-9][0-9.]*\s[0-9][0-9.]*(\n[0-9][0-9.]*\s[0-9][0-9.]*)*$/
+const SPECTRUM_REGEX = /^[0-9][0-9.]*\s+[0-9][0-9.]*(\n[0-9][0-9.]*\s+[0-9][0-9.]*)*$/
 
 
 export function filtersToURL(base_url, filter_list) {
@@ -21,7 +21,7 @@ export function filtersToURL(base_url, filter_list) {
             if (current_filter.type == "blank" || current_filter.type == "notBlank") {
                 param_string = param_string + `${k}=${current_filter.type}&`
             } else {
-                param_string = param_string + `${k}=${current_filter.type}_${current_filter.filter}`
+                param_string = param_string + `${k}=${current_filter.type}_${current_filter.filter}&`
             }
         } else if (current_filter.filterType == "number") {
             if (current_filter.type == "blank" || current_filter.type == "notBlank") {
@@ -29,7 +29,7 @@ export function filtersToURL(base_url, filter_list) {
             } else if (current_filter.type == "inRange") {
                 param_string = param_string + `${k}=${current_filter.type}_${current_filter.filter}_${current_filter.filterTo}&`
             } else {
-                param_string = param_string + `${k}=${current_filter.type}_${current_filter.filter}`
+                param_string = param_string + `${k}=${current_filter.type}_${current_filter.filter}&`
             }
         } else if (current_filter.filterType == "set") {
             // TODO: cases for different numeric filters; the one for a range needs special handling in particular

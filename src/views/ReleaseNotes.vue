@@ -2,6 +2,15 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2024-10-08</summary>
+    <ul>
+      <li>Made some generalizations to whitespace matching in the separators between m/z and intensity values for the mass spectrum search -- previously it would only be considered valid if the values were separated by exactly one regular space.</li>
+      <li>Added a more thorough error message for incorrectly-formatted user spectra in the mass spectrum search.</li>
+      <li>Replaced the 'Limitation' column in the methods list with separate columns for the limits of quantitation and detection.</li>
+      <li>Fixed an issue with the InChIKey disambiguation where it might not display results if the first block of an InChIKey was matched but not the full InChIKey.</li>
+      <li>Fixed a bug with the generation of URLs generated to prepopulate table filters (used in the method and fact sheet searches, among others).</li>
+      <li>Disabled use of a help icon due to the tooltip display being broken for now.</li>
+    </ul>
     <summary>2024-09-25</summary>
     <ul>
       <li>Fixed an issue with the search mechanism in the analyte visualization which prevented it from working correctly.</li>

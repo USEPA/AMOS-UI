@@ -33,6 +33,16 @@
       <div v-if="status.searching">
         <p>Searching...</p>
       </div>
+      <div v-else-if="error_messages.invalidFormat">
+        <BAlert variant="danger" v-model="error_messages.invalidFormat">
+          There are issues with the contents of the user spectrum -- please check to ensure it is correct.  The spectrum should be in the following format:
+          <ul>
+            <li>There should be one peak per line.</li>
+            <li>Each peak should consist of an m/z value and an intensity, in that order, separated by spaces or tabs (no commas, semicolons, etc.).</li>
+            <li>No characters except for numbers, spaces, and periods should be present.</li>
+          </ul>
+        </BAlert>
+      </div>
       <div v-else-if="!status.any_search_complete">
         <p></p>
       </div>
@@ -83,7 +93,7 @@
   <BModal v-if="row_data.spectrum_metadata" v-model="show_modal.metadata" ref="metadata_modal">
     <MassSpectrumMetadata :spectrumMetadata=row_data.spectrum_metadata />
   </BModal>
-  <BAlert variant="warning" dismissible v-model="error_messages.invalidFormat">There are issues with the contents of the user spectrum -- please check to ensure it is correct.</BAlert>
+  <!-- <BAlert variant="warning" dismissible v-model="error_messages.invalidFormat">There are issues with the contents of the user spectrum -- please check to ensure it is correct.</BAlert> -->
 </template>
 
 <script>
@@ -146,6 +156,7 @@
         this.status.searching = true
         this.user_spectrum_string = this.user_spectrum_string.trim()
         if (validateSpectrumInput(this.user_spectrum_string) === false) {
+          this.status.searching = false
           this.error_messages.invalidFormat = true
           return;
         }
@@ -161,7 +172,7 @@
         } else {
           console.log("Unknown value for error_type.")
         }
-        this.user_spectrum_array = this.user_spectrum_string.split("\n").map(x => x.split(" ").map(y => Number(y)))
+        this.user_spectrum_array = this.user_spectrum_string.split("\n").map(x => x.trim().split(/\s+/).map(y => Number(y)))
         this.user_spectrum_array = rescaleSpectrum(this.user_spectrum_array)
         const response = await axios.post(
           `${this.BACKEND_LOCATION}/mass_spectrum_similarity_search/`,

@@ -8,7 +8,7 @@
 
 <template>
   <p>This page has a visualization of the classes of functional use classes in the database and the relationships between them.  Hover over one of the circles in the plot to see a description of the analyte class -- this will also highlight any parent or child classes that are in the plot as well.  You can also use the controls on the right to look for specific functional classes, either by going through the full list or using the search bar.</p>
-  <p>Double-clicking on a circle in the graph or an element in the dropdown list on the right will open the method list in a new tab with a filter on that classificiation; right-clicking will open a similar view of the fact sheets.  The visualization can be zoomed in or out.</p>
+  <p>Right-clicking on a circle in the graph or an element in the dropdown list on the right will open a menu with links to the method and fact sheet lists that are pre-filtered on the selected functional use.  The visualization can be zoomed in or out.</p>
   <div class="analyteClassContainer">
     <svg id="analyteClassSvg" width="100%" height="900"></svg>
     <div id="rightClickMenu">

@@ -17,7 +17,7 @@
       <label for="full-table-filter">Full Table Filter</label> &nbsp;
       <input type="text" v-model="full_table_filter" name="full-table-filter" @keyup="quickFilter(full_table_filter)">
       &nbsp;
-      <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." />
+      <!-- <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." /> -->
     </div>
     <div>
       <label for="full-table-filter">Substance Filter</label> &nbsp;

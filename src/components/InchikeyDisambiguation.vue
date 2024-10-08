@@ -52,8 +52,8 @@ import { sortSubstancesByRecordCount } from '@/assets/common_functions'
       if (jchem_inchikeys.includes(this.searchedKey) || indigo_inchikeys.includes(this.searchedKey)) {
         const match_index = this.substance_list.findIndex(s => s.jchem_inchikey==this.searchedKey || s.indigo_inchikey==this.searchedKey)
         this.exact_match = this.substance_list.splice(match_index, 1)[0]
-        this.non_exact_matches = this.substance_list
       }
+      this.non_exact_matches = this.substance_list
     },
     methods: {
       selectInchikey(dtxsid) {

@@ -16,7 +16,7 @@
         <label for="full-table-filter">Full Table Filter</label> &nbsp;
         <input type="text" v-model="full_table_filter" name="full-table-filter" @keyup="quickFilter(full_table_filter)">
         &nbsp;
-        <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." />
+        <!-- <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." /> -->
       </div>
       <div class="button-array">
         <button @click="saveFiltersAsURL">Copy filters to clipboard</button>
@@ -135,7 +135,9 @@
           },
           {field: "chemical_class", headerName: "Functional Classes", sortable: true, flex: 1, tooltipField: "chemical_class"},
           {field: "matrix", headerName: "Matrix", sortable: true, flex: 1, tooltipField: "matrix"},
-          {field: "limitation", headerName: "Limits", width: 100, tooltipField: "limitation"},
+          /* {field: "limitation", headerName: "Limits", width: 100, tooltipField: "limitation"}, */
+          {field: "limit_of_detection", headerName: "LOD", tooltipField: "limit_of_detection", width: 80},
+          {field: "limit_of_quantiation", headerName: "LOQ", tooltipField: "limit_of_quantiation", width: 80},
           {field: "document_type", headerName: "Type", width: 80, tooltipValueGetter: params => {
               if (this.METHOD_DOCUMENT_TYPES[params.data.document_type]) {
                 return this.METHOD_DOCUMENT_TYPES[params.data.document_type]
