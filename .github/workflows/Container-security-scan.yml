@@ -22,7 +22,7 @@ env:
 jobs:
   container-scan:
 
-    runs-on: th889
+    runs-on: th879
     environment: ${{ github.head_ref || github.ref_name }}
     permissions:
       contents: read
