@@ -2,6 +2,11 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2024-10-30</summary>
+    <ul>
+      <li>Added a viewer component and a page for viewing IR spectra; there are currently only a few hundred in the database (search for DTXSID101017069 for an example).</li>
+      <li>Added a page to perform partial identifier searches -- searches return a list of substances based on a name substring, the first block of an InChIKey, or an exact molecular formula.</li>
+    </ul>
     <summary>2024-10-08</summary>
     <ul>
       <li>Made some generalizations to whitespace matching in the separators between m/z and intensity values for the mass spectrum search -- previously it would only be considered valid if the values were separated by exactly one regular space.</li>

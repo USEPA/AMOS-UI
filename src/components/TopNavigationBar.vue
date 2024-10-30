@@ -10,7 +10,7 @@
     <div class="nav-bar-left">
       <div style="text-align: start;">
         <router-link to="/" style="font-size: larger">AMOS</router-link>
-        <div style="font-size: smaller">Version: 2024-10-08</div>
+        <div style="font-size: smaller">Version: 2024-10-30</div>
       </div>
       &emsp;
       <input @keyup.enter="go()" type="text" v-model="searchTerm" name="search-term" title="General search input field">
@@ -29,6 +29,7 @@
         <BDropdownItem to="/batch_search">Batch Search</BDropdownItem>
         <BDropdownItem to="/classyfire_search">ClassyFire Search</BDropdownItem>
         <BDropdownItem to="/mass_spectrum_search">Mass Spectrum Search</BDropdownItem>
+        <BDropdownItem to="/partial_identifier_search">Partial Identifier Search</BDropdownItem>
         <BDropdownItem to="/similar_structure_search">Similar Structure Search</BDropdownItem>
       </BNavItemDropdown>
       &emsp;
