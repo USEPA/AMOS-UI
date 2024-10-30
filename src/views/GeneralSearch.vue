@@ -124,8 +124,9 @@
     </div>
     <div class="half-page-column">
       <p class="info-paragraph" v-if="view_type == 'none'">Click on a row in the table to the left to display either a spectrum (if available) or a PDF file in this space.</p>
-      <MassSpectrumDisplay v-else-if="view_type == 'Mass Spectrum'" :internalID="selected_row_data.internal_id" displayAdditionalInfo/>
-      <NMRSpectrumDisplay v-else-if="view_type == 'NMR Spectrum'" :internalID="selected_row_data.internal_id"/>
+      <MassSpectrumDisplay v-else-if="view_type == 'Mass Spectrum'" :internalID="selected_row_data.internal_id" displayAdditionalInfo />
+      <NMRSpectrumDisplay v-else-if="view_type == 'NMR Spectrum'" :internalID="selected_row_data.internal_id" />
+      <IRSpectrumDisplay v-else-if="view_type == 'IR Spectrum'" :internalID="selected_row_data.internal_id" />
       <StoredPDFDisplay v-else-if="view_type == 'PDF'" :internalID="selected_row_data.internal_id" :recordType="selected_row_data.record_type" displayAdditionalInfo/>
       <p class="info-paragraph" v-else>This database does not contain anything for this record.  Click the hyperlink in the "Record Type" column to be directed to the source.</p>
     </div>
@@ -155,6 +156,7 @@
   import ClassyFireDisplay from '@/components/ClassyFireDisplay.vue'
   import HelpIcon from '@/components/HelpIcon.vue'
   import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
+  import IRSpectrumDisplay from '@/components/IRSpectrumDisplay.vue'
   import MassSpectrumDisplay from '@/components/MassSpectrumDisplay.vue'
   import NMRSpectrumDisplay from '@/components/NMRSpectrumDisplay.vue'
   import SimilarMethodRedirect from '@/components/SimilarMethodRedirect.vue'
@@ -354,7 +356,7 @@
         } else if (tabName === "method") {
           this.gridColumnApi.setColumnsVisible(['count', 'method_number', 'method_type', 'methodologies'], true)
           this.gridColumnApi.setColumnsVisible(['record_type', 'spectrum_rating'], false)
-          this.gridColumnApi.applyColumnState({state: [{colId: 'count', sort: null}]})
+          this.gridColumnApi.applyColumnState({state: [{colId: 'count', sort: 'asc'}]})
           if (this.record_type_counts.method == 0) {
             this.gridApi.value.showLoadingOverlay()
           }
@@ -482,6 +484,7 @@
       ClassyFireDisplay,
       HelpIcon,
       InchikeyDisambiguation,
+      IRSpectrumDisplay,
       MassSpectrumDisplay,
       NMRSpectrumDisplay,
       SimilarMethodRedirect,

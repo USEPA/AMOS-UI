@@ -39,7 +39,7 @@
         rowSelection="single"
         :suppressCopyRowsToClipboard="true"
       ></ag-grid-vue>
-      <button @click="copySpectrum()">Copy to Clipboard</button>
+      <button @click="copySpectrum">Copy to Clipboard</button>
     </BModal>
 
     <!-- Modal window that displays the metadata associated with the spectrum, using the spectrum_metadata field from the database. -->
@@ -114,7 +114,7 @@
         return spectrum.map(function(x){return {"m/z":x[0], "intensity":x[1]}})
       },
       copySpectrum() {
-        const spectrum_string = "m/z Intensity\n" + this.spectrum.map(x => `${x[0]} ${x[1]}`).join("\n");
+        var spectrum_string = "m/z Intensity\n" + this.spectrum.map(x => `${x[0]} ${x[1]}`).join("\n");
         // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
         // can't get that to work in this app, though, since it apparently requires a secured connection and the
         // deployed version of this app doesn't have that.  So I'm sticking to this technically-depricated solution that

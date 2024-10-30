@@ -106,7 +106,7 @@
     },
     async created() {
       const response = await axios.get(`${this.BACKEND_LOCATION}/substring_search/${this.$route.params.substring}`)
-      var match_info = response.data.info_list
+      var match_info = response.data.substances
       for (let i=0; i<match_info.length; i++) {
         match_info[i]["image_link"] = imageLinkForSubstance(match_info[i].dtxsid, match_info[i].image_in_comptox)
       }

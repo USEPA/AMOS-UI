@@ -21,12 +21,14 @@ const routes = [
   {path: "/view_mass_spectrum/:internal_id", name: "Mass Spectrum Viewer", component: ()=>import('../views/MassSpectrumViewer.vue')},
   {path: "/view_spectrum_pdf/:internal_id", name: "Spectrum PDF Viewer", component: ()=>import('../views/SpectrumPDFViewer.vue')},
   {path: "/view_nmr_spectrum/:internal_id", name: "NMR Spectrum Viewer", component: ()=>import('../views/NMRSpectrumViewer.vue')},
+  {path: "/view_ir_spectrum/:internal_id", name: "IR Spectrum Viewer", component: ()=>import('../views/IRSpectrumViewer.vue')},
   {path: "/analytical_qc_list", name: "Analytical QC List", component: ()=>import('../views/AnalyticalQCList.vue')},
   {path: "/related_applications", name: "Related Applications", component: ()=>import('../views/RelatedApplications.vue')},
   {path: "/classyfire_search", name: "ClassyFire Search", component: ()=>import('../views/ClassyFireClassificationSearch.vue')},
   {path: "/test_viz", name: "Test Viz", component: ()=>import('../views/TestViz.vue')},
   {path: "/release_notes", name: "Release Notes", component: ()=>import('../views/ReleaseNotes.vue')},
   {path: "/record_id_search/:internal_id", name: "Record ID Search", component: ()=>import('../views/RecordIDSearch.vue')},
+  {path: "/partial_identifier_search/", name: "Partial Identifier Search", component: ()=>import('../views/PartialIdentifierSearch.vue')},
   {path: "/:catchAll(.*)", name: "404", component: ()=>import('../views/404.vue')}
 ]
 

@@ -1,6 +1,6 @@
 <!--
-  This component is used to display a plot of an NMR spectrum stored directly in the database (as opposed to a PDF),
-  along with some supplemental information.
+  This component is used to display a plot of an infrared spectrum stored in the database, along with some supplemental
+  information.
 
   This component takes one prop:
   - internalID, a string corresponding to a unique ID in the database for a spectrum (with data in the database)
@@ -8,9 +8,9 @@
 
 <template>
   <div class="spectrum-display-container">
-    <p>Below is a plot of the selected NMR spectrum.  Use the mouse wheel to zoom in and out or double click to zoom in.  Hover over the plot with the mouse to see individual points; this may lag somewhat for larger spectra (64k points or so).  Intensities are scaled so that the maximum is 10.</p>
+    <p>Below is a plot of the selected IR spectrum.  Use the mouse wheel to zoom in and out or double click to zoom in.  Hover over the plot with the mouse to see individual points; this may lag somewhat for larger spectra (64k points or so).  Intensities are scaled so that the maximum is 100.</p>
     <div class="graph-container">
-      <h5>{{nucleus}} NMR Spectrum</h5>
+      <h5>{{nucleus}} IR Spectrum</h5>
       <svg width="600" height="400" id="plot"></svg>
       <button id="zoomReset">Reset Zoom</button>
     </div>
@@ -18,12 +18,10 @@
     <div class="info-container">
       <p style="font-weight: bold;">Information</p>
       <ul style="list-style-type: none;">
-        <li><strong>Nucleus:</strong> {{ nucleus }}</li>
-        <li><strong>Frequency:</strong> {{ frequency }} MHz</li>
-        <li><strong>Temperature:</strong> {{ temperature ? `${temperature} °C` : "Unknown" }}</li>
-        <li><strong>Solvent:</strong> {{ solvent ? solvent : "Unknown" }}</li>
+        <li><strong>IR Type:</strong> {{ ir_type }}</li>
+        <li><strong>Laser frequency:</strong> {{ frequency }} 1/cm</li>
       </ul>
-      <button @click="downloadNMRSpectrum">Download Spectrum</button>
+      <button @click="downloadIRSpectrum">Download Spectrum</button>
     </div>
   </div>
 </template>
@@ -41,59 +39,53 @@
     data() {
       return {
         spectrum: [],
-        frequency: 0,
-        nucleus: "",
-        temperature: null,
-        solvent: "",
-        x_units: "",
+        laser_frequency: 0,
+        ir_type: 0,
         BACKEND_LOCATION
       }
     },
     props: {internalID: String},
     watch: {
       async internalID(){
-        await this.getNMRSpectrum()
-        this.createNMRSpectrumPlot()
+        await this.getIRSpectrum()
+        this.createIRSpectrumPlot()
       }
     },
     async created() {
-      await this.getNMRSpectrum()
-      this.createNMRSpectrumPlot()
+      await this.getIRSpectrum()
+      this.createIRSpectrumPlot()
     },
     methods: {
-      async getNMRSpectrum() {
-        const path = `${this.BACKEND_LOCATION}/get_nmr_spectrum/${this.internalID}`
+      async getIRSpectrum() {
+        const path = `${this.BACKEND_LOCATION}/get_ir_spectrum/${this.internalID}`
         const response = await axios.get(path)
 
-        this.frequency = response.data.frequency
-        this.nucleus = response.data.nucleus
-        this.temperature = response.data.temperature
-        this.solvent = response.data.solvent
-        this.x_units = response.data.x_units
+        this.frequency = response.data.laser_frequency
+        this.ir_type = response.data.ir_type
 
-        // all spectra in database should have first_x as the most negative PPM and last_x as the most positive PPM
+        // all spectra in database should have first_x as the most negative wavenumber and last_x as the most positive wavenumber
         var intensities = response.data.intensities
         var first_x = response.data.first_x
         var last_x = response.data.last_x
         
         const num_points = intensities.length
         const step = (last_x - first_x)/(num_points-1)
-        var ppm = Array.from({length: num_points}, (_, i) => first_x + i*step)
-        var spectrum_array = d3.zip(ppm, intensities)
+        var wavenumbers = Array.from({length: num_points}, (_, i) => first_x + i*step)
+        var spectrum_array = d3.zip(wavenumbers, intensities)
         this.spectrum = spectrum_array.map(x => {
-          return {ppm: x[0], intensity: x[1]}
+          return {wavenumber: x[0], intensity: x[1]}
         })
       },
-      downloadNMRSpectrum() {
-        const spectrum_string = "PPM Intensity\n" + this.spectrum.map(x => `${x.ppm} ${x.intensity}`).join("\n")
+      downloadIRSpectrum() {
+        const spectrum_string = "Wavenumber Intensity\n" + this.spectrum.map(x => `${x.wavenumber} ${x.intensity}`).join("\n")
         var file = new Blob([spectrum_string], {type: "text/plain"})
         var a = document.createElement("a")
         a.setAttribute('download', true)
         a.href = window.URL.createObjectURL(file)
-        a.download = "nmr spectrum.txt"
+        a.download = "ir spectrum.txt"
         a.click()
       },
-      createNMRSpectrumPlot() {
+      createIRSpectrumPlot() {
         var svg = d3.select("#plot")
         var width = svg.attr("width")
         var height = svg.attr("height")
@@ -103,23 +95,23 @@
         svg.selectAll("*").remove();
 
         // construct the scales for the axes; we want the horizontal axis to go from most positive to most negative, so make sure that's set up correctly in the range
-        var ppm_scale = d3.scaleLinear().domain(d3.extent(this.spectrum, d => d["ppm"])).range([width-margin, margin])
-        let ppm_rescale = ppm_scale.copy()
+        var wavenumber_scale = d3.scaleLinear().domain(d3.extent(this.spectrum, d => d["wavenumber"])).range([width-margin, margin])
+        let wavenumber_rescale = wavenumber_scale.copy()
         var intensity_scale = d3.scaleLinear().domain(d3.extent(this.spectrum, d => d["intensity"])).range([height-margin, margin]).nice()
         
         // make the axes
-        var ppm_axis = d3.axisBottom(ppm_rescale)
-        var ppm_axis_g = svg.append("g").call(ppm_axis).attr("transform", `translate(0,${height-margin})`)
+        var wavenumber_axis = d3.axisBottom(wavenumber_rescale)
+        var wavenumber_axis_g = svg.append("g").call(wavenumber_axis).attr("transform", `translate(0,${height-margin})`)
         svg.append("g").call(d3.axisLeft(intensity_scale)).attr("transform", `translate(${margin},0)`)
 
         // make the axis labels
-        svg.append("text").attr("x", width/2).attr("y", height - margins.bottom/4).attr("text-anchor", "middle").attr("fill", "currentColor").text(this.x_units)
+        svg.append("text").attr("x", width/2).attr("y", height - margins.bottom/4).attr("text-anchor", "middle").attr("fill", "currentColor").text("Wavenumber (1/cm)")
         svg.append("text").attr("transform", "rotate(-90)").attr("x", -height/2).attr("y", margin/4).attr("text-anchor", "middle").attr("fill", "currentColor").text("Intensity")
         
         const clippingRect = svg.append("clipPath").attr("id", "clippy").append("rect").attr("width", width - 2*margin).attr("height", height - 2*margin).attr("transform", `translate(${margin}, ${margin})`).attr("fill", "none")
         
         // add the actual line to the plot
-        var linemaker = d3.line().x(d => ppm_rescale(d["ppm"])).y(d => intensity_scale(d["intensity"]))
+        var linemaker = d3.line().x(d => wavenumber_rescale(d["wavenumber"])).y(d => intensity_scale(d["intensity"]))
         var path = svg.append("path").attr("fill", "none").attr("stroke", "red").attr("d", linemaker(this.spectrum)).attr("clip-path", "url(#clippy)")
 
         // make a circle to add to the plot 
@@ -130,8 +122,8 @@
 
         const extent = [[margin, margin], [width-margin, height-margin]]
         const zoom = d3.zoom().scaleExtent([1,1000]).extent(extent).translateExtent(extent).on("zoom", function(event){
-          ppm_rescale = event.transform.rescaleX(ppm_scale)
-          ppm_axis_g.call(ppm_axis.scale(ppm_rescale))
+          wavenumber_rescale = event.transform.rescaleX(wavenumber_scale)
+          wavenumber_axis_g.call(wavenumber_axis.scale(wavenumber_rescale))
           path.attr("d", linemaker(spectrum))
         })
         svg.call(zoom)
@@ -145,10 +137,10 @@
           .on("mouseout", function() {focus.style("display", "none")})
           .on("mousemove", function(event) {
             var pt = d3.pointer(event, svg.node())
-            var cursor_x = ppm_rescale.invert(pt[0])
-            const x_index = d3.bisectCenter(spectrum.map(d => d["ppm"]), cursor_x)
-            focus.select("circle.y").attr("transform", `translate(${ppm_rescale(spectrum[x_index]["ppm"])}, ${intensity_scale(spectrum[x_index]["intensity"])})`)
-            focus.select("text.locationtext").text(`PPM: ${spectrum[x_index]["ppm"].toFixed(6)}; Intensity: ${spectrum[x_index]["intensity"].toFixed(3)}`)
+            var cursor_x = wavenumber_rescale.invert(pt[0])
+            const x_index = d3.bisectCenter(spectrum.map(d => d["wavenumber"]), cursor_x)
+            focus.select("circle.y").attr("transform", `translate(${wavenumber_rescale(spectrum[x_index]["wavenumber"])}, ${intensity_scale(spectrum[x_index]["intensity"])})`)
+            focus.select("text.locationtext").text(`Wavenumber: ${spectrum[x_index]["wavenumber"].toFixed(6)}; Intensity: ${spectrum[x_index]["intensity"].toFixed(3)}`)
           })
         
         d3.select("#zoomReset").on("click", function(){

@@ -135,7 +135,6 @@
           },
           {field: "chemical_class", headerName: "Functional Classes", sortable: true, flex: 1, tooltipField: "chemical_class"},
           {field: "matrix", headerName: "Matrix", sortable: true, flex: 1, tooltipField: "matrix"},
-          /* {field: "limitation", headerName: "Limits", width: 100, tooltipField: "limitation"}, */
           {field: "limit_of_detection", headerName: "LOD", tooltipField: "limit_of_detection", width: 80},
           {field: "limit_of_quantiation", headerName: "LOQ", tooltipField: "limit_of_quantiation", width: 80},
           {field: "document_type", headerName: "Type", width: 80, tooltipValueGetter: params => {

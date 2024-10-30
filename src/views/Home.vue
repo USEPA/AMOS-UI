@@ -59,7 +59,7 @@
       go_big_bar() {
         const search_term = this.bigBarSearchTerm.trim()
         if (this.substring_search) {
-          this.$router.push({path: `/substring_search/${search_term}`})
+          this.$router.push(`/partial_identifier_search?substring_search=${search_term}`)
         }
         else if (this.searchType == "substances") {
           this.$router.push({
