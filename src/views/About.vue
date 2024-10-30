@@ -24,12 +24,12 @@
     </ul>
     <p>The records in this application contain:</p>
     <ul v-if="summary_retrieved">
-      <li>Spectra in database: {{ (result_info["Spectrum"]["Mass Spectrum"] + result_info["Spectrum"]["NMR Spectrum"] + result_info["Spectrum"]["IR Spectrum"] + result_info["Spectrum"]["PDF"]).toLocaleString() }} spectra in database ({{result_info["Spectrum"]["PDF"].toLocaleString()}} of which are PDFs), covering {{result_info["Substances"]["Internal Spectrum"].toLocaleString()}} substances</li>
-      <!-- <ul>
-        <li>{{ result_info["Spectrum"]["Mass Spectrum"] }}</li>
-        <li>{{ result_info["Spectrum"]["NMR Spectrum"] }}</li>
-        <li>{{ result_info["Spectrum"]["IR Spectrum"] }}</li>
-      </ul> -->
+      <li>Spectra in database: {{ (result_info["Spectrum"]["Mass Spectrum"] + result_info["Spectrum"]["NMR Spectrum"] + result_info["Spectrum"]["IR Spectrum"]).toLocaleString() }} spectra in database ({{result_info["Spectrum"]["PDF"].toLocaleString()}} of which are PDFs), covering {{result_info["Substances"]["Internal Spectrum"].toLocaleString()}} substances</li>
+      <ul>
+        <li>{{ result_info["Spectrum"]["Mass Spectrum"].toLocaleString() }} mass spectra, either GC/MS or LC/MS</li>
+        <li>{{ result_info["Spectrum"]["NMR Spectrum"].toLocaleString() }} NMR spectra, all 1D</li>
+        <li>{{ result_info["Spectrum"]["IR Spectrum"].toLocaleString() }} IR spectra</li>
+      </ul>
       <li>Externally linked spectra: {{ result_info["Spectrum"]["External"].toLocaleString() }} external links, covering {{ result_info["Substances"]["External Spectrum"].toLocaleString()}} substances</li>
       <li>Fact Sheets: {{result_info["Fact Sheet"]["PDF"].toLocaleString()}} documents in database, covering {{ result_info["Substances"]["Internal Fact Sheet"].toLocaleString() }} substances</li>
       <li>Methods: {{result_info["Method"]["PDF"].toLocaleString()}} documents in database, covering {{result_info["Substances"]["Internal Method"].toLocaleString()}} substances</li>
