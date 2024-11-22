@@ -6,23 +6,25 @@
 -->
 
 <template>
-  <div v-if="spectrumMetadata.Chromatography && (Object.keys(spectrumMetadata.Chromatography).length > 0)">
-    <h5>Chromatography Info:</h5>
-    <ul style="list-style-type: none;" ref="metadata_modal">
-      <li v-for="c in Object.entries(spectrumMetadata.Chromatography)"><strong>{{c[0]}}:</strong> {{c[1]}}</li>
-    </ul>
+  <div id="spectrum_metadata">
+    <div v-if="spectrumMetadata.Chromatography && (Object.keys(spectrumMetadata.Chromatography).length > 0)">
+      <h5>Chromatography Info:</h5>
+      <ul style="list-style-type: none;" ref="metadata_modal">
+        <li v-for="c in Object.entries(spectrumMetadata.Chromatography)"><strong>{{c[0]}}:</strong> {{c[1]}}</li>
+      </ul>
+    </div>
+    <div v-if="spectrumMetadata.Spectrometry && (Object.keys(spectrumMetadata.Spectrometry).length > 0)">
+      <h5 >Spectrometry Info:</h5>
+      <ul style="list-style-type: none;">
+        <li v-for="s in Object.entries(spectrumMetadata.Spectrometry)"><strong>{{s[0]}}:</strong> {{s[1]}}</li>
+      </ul>
+    </div>
+    <span v-if="spectrumMetadata.Author"><strong>Author(s):</strong> {{spectrumMetadata.Author}}</span>
+    <br />
+    <span v-if="spectrumMetadata.Date"><strong>Date:</strong> {{spectrumMetadata.Date}}</span>
+    <br /><br />
+    <button @click="copyMetadata()">Copy to Clipboard</button>
   </div>
-  <div v-if="spectrumMetadata.Spectrometry && (Object.keys(spectrumMetadata.Spectrometry).length > 0)">
-    <h5 >Spectrometry Info:</h5>
-    <ul style="list-style-type: none;">
-      <li v-for="s in Object.entries(spectrumMetadata.Spectrometry)"><strong>{{s[0]}}:</strong> {{s[1]}}</li>
-    </ul>
-  </div>
-  <span v-if="spectrumMetadata.Author"><strong>Author(s):</strong> {{spectrumMetadata.Author}}</span>
-  <br />
-  <span v-if="spectrumMetadata.Date"><strong>Date:</strong> {{spectrumMetadata.Date}}</span>
-  <br /><br />
-  <button @click="copyMetadata()">Copy to Clipboard</button>
 </template>
 
 <script>
@@ -37,7 +39,7 @@
       copyMetadata() {
         const chromatography = Object.entries(this.spectrumMetadata.Chromatography).map(x => `- ${x[0]}: ${x[1]}`).join("\n")
         const spectrometry = Object.entries(this.spectrumMetadata.Spectrometry).map(x => `- ${x[0]}: ${x[1]}`).join("\n")
-        var data_string = `Chromatography:\n${chromatography}\n\nSpectrometry:\n${spectrometry}`
+        var data_string = `Chromatography:\n${chromatography}\nSpectrometry:\n${spectrometry}`
 
         var additional_info_string = ""
         if (this.spectrumMetadata.Author) {
@@ -55,14 +57,16 @@
         // I pulled out of CompTox's code, since it apparently works there.
         const textarea = document.createElement('textarea')
         textarea.value = data_string
-        document.body.appendChild(textarea)
+        //document.body.appendChild(textarea)
+        document.getElementById("spectrum_metadata").appendChild(textarea)
         textarea.select()
         try {
           document.execCommand('copy')
         } catch (err) {
           console.log('Cannot copy: ' + err)
         }
-        document.body.removeChild(textarea)
+        //document.body.removeChild(textarea)
+        document.getElementById("spectrum_metadata").removeChild(textarea)
       }
     }
   }

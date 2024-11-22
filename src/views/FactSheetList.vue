@@ -12,12 +12,12 @@
       This is a list of fact sheets available in the database.  Double-click a row in the table to view the fact sheet in a new window.
     </p>
     <div v-if="status.loading">Loading...</div>
-    <p v-else>{{fact_sheet_info.length}} fact sheets in total are present in the database; {{ filtered_record_count }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed, covering {{substance_count}} {{filtered_record_count == 1 ? "substance" : "substances"}}.</p>
+    <p v-else>{{fact_sheet_info.length.toLocaleString()}} fact sheets in total are present in the database; {{ filtered_record_count.toLocaleString() }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed, covering {{substance_count.toLocaleString()}} {{substance_count == 1 ? "substance" : "substances"}}.</p>
     <div style="padding-bottom: 10px;">
       <label for="full-table-filter">Full Table Filter</label> &nbsp;
       <input type="text" v-model="full_table_filter" name="full-table-filter" @keyup="quickFilter(full_table_filter)">
       &nbsp;
-      <!-- <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." /> -->
+      <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." />
     </div>
     <div>
       <label for="full-table-filter">Substance Filter</label> &nbsp;

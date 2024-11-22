@@ -4,8 +4,28 @@ import { BACKEND_LOCATION, IMAGE_BY_DTXSID_API, SOURCE_ABBREVIATION_MAPPING } fr
 
 
 // Intended to check for valid inputs to spectrum fields, which would be a series of one or more lines where each line
-// is two numbers separated by a space.
+// is two numbers separated by non-line-breaking space.
 const SPECTRUM_REGEX = /^[0-9][0-9.]*\s+[0-9][0-9.]*(\n[0-9][0-9.]*\s+[0-9][0-9.]*)*$/
+
+
+export function calculateMassRange(mass_target, error_range, error_type) {
+    // Calculates a mass range given a central value `mass_target`, a range `eror_range`, and
+    // whether the range is by Daltons ("da") or parts per million ("ppm").
+    if (error_type == "da"){
+        return [mass_target - error_range, mass_target + error_range]
+    } else if (error_type == "ppm") {
+        const mass_change = this.mass_target * this.mass_error / 1000000.0
+        return [mass_target - mass_change, mass_target + mass_change]
+    } else {
+        return [null, null]
+    }
+}
+
+
+export function constrainNumber(value, minimum, maximum) {
+    // Constrains a numeric value to be between the specified minimum and maximum.
+    return Math.min(Math.max(value, minimum), maximum)
+}
 
 
 export function filtersToURL(base_url, filter_list) {

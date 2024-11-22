@@ -32,7 +32,13 @@
       <p v-else-if="!found_substance">"{{ current_substance }}" was not recognized as a known substance.</p>
       <p v-else-if="dtxsid_counts.length == 0">The substance "{{ current_substance }}" was recognized, however no methods or fact sheets containing it or similar substances for it were found.</p>
       <div v-else>
-        <p>The tabbed area below has three tables -- one lists all the methods containing a substance similar to {{ current_substance }}, one lists all fact sheets containing a similar substance, and the third lists all similar substances found.  Clicking on a row will bring up the method or a comparison between the searched and selected substances, respectively.  Hover over a method or substance name to see the full name.  Methods and fact sheets in bold contain the searched substance.</p>
+        <div style="display: flex">
+          <p>The tabbed area below has three tables with information related to {{ current_substance }} (structure pictured right) and similar substances -- one lists all relevant methods, one lists all relevant fact sheets, and the third lists all similar substances found.  Clicking on a row will bring up the method or a comparison between the searched and selected substances, respectively.  Hover over a method or substance name to see the full name.  Methods and fact sheets in bold contain the searched substance.</p>
+          <div style="display: block; margin-left: auto; margin-right: auto; width:200px; height:200px;">
+            <img v-if="substance_info.searched_substance.image_link" style="width:200px; height:200px;" :src="substance_info.searched_substance.image_link" :alt="`Structure image for ${substance_info.searched_substance.dtxsid}`"/>  
+            <div v-else style="text-align: center; display: flex; align-items: center;">No structural representation was found for this substance.</div>
+          </div>
+        </div>
         <p>{{ dtxsid_counts.length }} distinct similar substances were found in  {{ Object.keys(ids_to_method_names).length }} methods and {{ Object.keys(ids_to_fact_sheet_names).length }} fact sheets.</p>
         <div class="tab-bar">
           <button :class="tab_viewer_mode == 'Methods' ? 'active': ''" @click="updateTab('Methods')">Methods</button>
@@ -285,6 +291,7 @@
           } else {
             this.classyfire.searched_substance = null
           }
+          
           this.updateHighlightedSubstances()
           this.current_substance = searched_substance.trim()  // should be whatever the user chooses
           this.found_substance = true

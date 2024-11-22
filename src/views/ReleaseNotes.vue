@@ -2,11 +2,25 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2024-11-22</summary>
+    <ul>
+      <li>Added a mass range search to the partial identifier search.</li>
+      <li>Fixed the "Copy to Clipboard" functionality in modal displays like the mass spectrum metadata.</li>
+      <li>Added buttons to the partial identifier search for copying searches to a URL, downloading information from the table, and sending a list of substances to the batch search.</li>
+      <li>Fixed double-clicking a row in the partial identifier search not searching the selected substance in a new tab.</li>
+      <li>Fixed and reenabled the help/tooltip icons on a few pages.</li>
+      <li>The first blocks of InChIKeys in substance information displays are now hyperlinked to the partial identifier search; clicking a link will open a search on that first block in a new tab.</li>
+      <li>Made a more explicit listing of AMOS's functionality on the home page.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2024-10-30</summary>
     <ul>
       <li>Added a viewer component and a page for viewing IR spectra; there are currently only a few hundred in the database (search for DTXSID101017069 for an example).</li>
       <li>Added a page to perform partial identifier searches -- searches return a list of substances based on a name substring, the first block of an InChIKey, or an exact molecular formula.</li>
     </ul>
+  </details>
+  <details>
     <summary>2024-10-08</summary>
     <ul>
       <li>Made some generalizations to whitespace matching in the separators between m/z and intensity values for the mass spectrum search -- previously it would only be considered valid if the values were separated by exactly one regular space.</li>
@@ -16,6 +30,8 @@
       <li>Fixed a bug with the generation of URLs generated to prepopulate table filters (used in the method and fact sheet searches, among others).</li>
       <li>Disabled use of a help icon due to the tooltip display being broken for now.</li>
     </ul>
+  </details>
+  <details>
     <summary>2024-09-25</summary>
     <ul>
       <li>Fixed an issue with the search mechanism in the analyte visualization which prevented it from working correctly.</li>

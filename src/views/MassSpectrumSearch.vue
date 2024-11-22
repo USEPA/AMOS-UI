@@ -6,9 +6,9 @@
       <div>
         <input type="text" v-model.number="mass_target" name="search-dtxsid"> Da ± &nbsp;<input type="text" v-model.number="mass_error" name="search-dtxsid">
         &nbsp;
-        <label><input type="radio" id="error_da" v-model="error_type" value="error_da">Da</label>
+        <label><input type="radio" id="error_da" v-model="error_type" value="da">Da</label>
         &nbsp;
-        <label><input type="radio" id="error_ppm" v-model="error_type" value="error_ppm">ppm</label>
+        <label><input type="radio" id="error_ppm" v-model="error_type" value="ppm">ppm</label>
         <p>NOTE: Please use the neutral mass of the substance when searching.</p>
       </div>
       <br />
@@ -109,7 +109,7 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { rescaleSpectrum } from '@/assets/common_functions'
+  import { calculateMassRange, rescaleSpectrum } from '@/assets/common_functions'
   import '@/assets/style.css'
   import DualMassSpectrumPlot from '@/components/DualMassSpectrumPlot.vue'
   import MassSpectrumMetadata from '@/components/MassSpectrumMetadata.vue'
@@ -119,7 +119,7 @@
       return {
         mass_target: 194,
         mass_error: 0.1,
-        error_type: "error_da",
+        error_type: "da",
         methodology: "LC/MS",
         results: [],
         unique_substances: 0,
@@ -160,18 +160,7 @@
           this.error_messages.invalidFormat = true
           return;
         }
-        var lower_mass_limit = 0
-        var upper_mass_limit = 0
-        if (this.error_type == "error_da"){
-          lower_mass_limit = this.mass_target - this.mass_error
-          upper_mass_limit = this.mass_target + this.mass_error
-        } else if (this.error_type == "error_ppm") {
-          const mass_change = this.mass_target * this.mass_error / 1000000.0
-          lower_mass_limit = this.mass_target - mass_change
-          upper_mass_limit = this.mass_target + mass_change
-        } else {
-          console.log("Unknown value for error_type.")
-        }
+        const [lower_mass_limit, upper_mass_limit] = calculateMassRange(this.mass_target, this.mass_error, this.error_type)
         this.user_spectrum_array = this.user_spectrum_string.split("\n").map(x => x.trim().split(/\s+/).map(y => Number(y)))
         this.user_spectrum_array = rescaleSpectrum(this.user_spectrum_array)
         const response = await axios.post(

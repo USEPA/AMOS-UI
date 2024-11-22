@@ -37,12 +37,16 @@
         <label for="substring-search">Search by substring (name search only)</label>
       </div>
       <br />
-      <p>
-        More precise and/or specific views of data are available on other pages.  This includes lists of the <router-link to="/fact_sheet_list">fact sheets</router-link> and the 
-        <router-link to="/methods_list">methods</router-link> available in the database, the ability to <router-link to="/classyfire_search">search for substances</router-link> 
-        belonging to a given ClassyFire classification, and a <router-link to="/similar_structure_search">structure similarity search</router-link> to find methods and fact sheets 
-        containing a searched substance or a structurally similar one.
-      </p>
+      <p>Several other searches and views of data exist, and can be accessed by the navigation bar at the top.  These include:</p>
+      <ul>
+        <li>Searching for substances belonging to <router-link to="/classyfire_search">a given ClassyFire classification</router-link>.</li>
+        <li>Searching for substances based on <router-link to="/partial_identifier_search">partial identifiers</router-link> like molecular formula, mass range, name substring, and the first block of the InChIKey.</li>
+        <li>Finding <router-link to="/mass_spectrum_search">mass spectra</router-link> similar to a user-submitted one.</li>
+        <li>Getting a <router-link to="/batch_search">listing of all records</router-link> for a set of substances.</li>
+        <li>Finding methods and fact sheets related to <router-link to="/similar_structure_search">a given substance or a structurally similar one</router-link>.</li>
+        <li>An interactive visualization for examining <router-link to="/functional_class_visualization">the functional use classes</router-link> of substances in methods and fact sheets.</li>
+        <li>Filterable detailed lists of all <router-link to="/fact_sheet_list">fact sheets</router-link> and <router-link to="/methods_list">methods</router-link> available in the database.</li>
+      </ul>
       <p>
         For more information about this app, see the <router-link to="/about">about</router-link> page or
         <a href="https://work.epa.gov/ccte/amos-analytical-methods-and-open-spectral-database-help">the manual</a>.

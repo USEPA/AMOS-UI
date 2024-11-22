@@ -112,7 +112,7 @@
             return link;
           }},
           {field: 'casrn', headerName: 'CASRN', width: 90, filter: 'agTextColumnFilter', floatingFilter: true},
-          {field: 'preferred_name', headerName:'Substance Name', flex: 1, filter: 'agTextColumnFilter', floatingFilter: true}
+          {field: 'preferred_name', headerName:'Substance Name', flex: 1, filter: 'agTextColumnFilter', floatingFilter: true, sortable: true}
         ]
       }
     },

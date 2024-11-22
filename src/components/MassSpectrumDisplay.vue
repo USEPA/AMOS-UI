@@ -30,7 +30,7 @@
     </div>
 
     <!-- Modal window that displays the spectrum in an AG Grid table.-->
-    <BModal v-model="show_table_modal">
+    <BModal id="spectrum_table" v-model="show_table_modal">
       <ag-grid-vue
         class="ag-theme-balham"
         style="height:600px; width:100%"
@@ -121,14 +121,16 @@
         // I pulled out of CompTox's code, since it apparently works there.
         const textarea = document.createElement('textarea')
         textarea.value = spectrum_string
-        document.body.appendChild(textarea)
+        //document.body.appendChild(textarea)
+        document.getElementById("spectrum_table").appendChild(textarea)
         textarea.select()
         try {
           document.execCommand('copy')
         } catch (err) {
           console.log('Cannot copy: ' + err)
         }
-        document.body.removeChild(textarea)
+        //document.body.removeChild(textarea)
+        document.getElementById("spectrum_table").removeChild(textarea)
       }
     },
     components: {AgGridVue, BModal, MassSpectrumMetadata, SingleMassSpectrumPlot}

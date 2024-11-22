@@ -21,7 +21,7 @@
           </tr>
           <tr>
             <td><button class="copy-button" title="Copy InChIKey" @click="copyToClipboard(substanceInfo.indigo_inchikey ? substanceInfo.indigo_inchikey : substanceInfo.jchem_inchikey)">⎘</button></td>
-            <td><strong>InChIKey:</strong> {{ substanceInfo.indigo_inchikey ? substanceInfo.indigo_inchikey : substanceInfo.jchem_inchikey}}</td>
+            <td><strong>InChIKey:</strong> <router-link :to="`/partial_identifier_search?inchikey_first_block_search=${displayed_inchikey.first_block}`" target="_blank">{{displayed_inchikey.first_block}}</router-link>{{displayed_inchikey.remainder}}</td>
           </tr>
           <tr>
             <td></td>
@@ -53,12 +53,18 @@
     data() {
       return {
         COMPTOX_PAGE_URL,
+        displayed_inchikey: {first_block: "", remainder: ""},
         image_link: ""
       }
     },
     watch: {
       substanceInfo() {
         this.image_link = imageLinkForSubstance(this.substanceInfo.dtxsid, this.substanceInfo.image_in_comptox)
+        const inchikey = this.substanceInfo.indigo_inchikey ? this.substanceInfo.indigo_inchikey : this.substanceInfo.jchem_inchikey
+        if (inchikey) {
+          this.displayed_inchikey.first_block = inchikey.slice(0,14)
+          this.displayed_inchikey.remainder = inchikey.slice(14)
+        }
       }
     },
     created() {

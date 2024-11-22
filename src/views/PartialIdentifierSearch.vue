@@ -1,16 +1,33 @@
 <template>
-  This page runs searches for substances based on non-unique identifiers for a substance.  Searches can be done on three identifiers:
+  This page runs searches for substances based on non-unique identifiers for a substance.  Searches can be done on four identifiers:
   <ul>
     <li>Substring of a substance name.  This will search for synonyms that contain the substring as well.</li>
     <li>First block of a substance's InChIKey.</li>
     <li>The exact molecular formula of a substance.</li>
+    <li>A range of (monoisotopic) molecular mass.</li>
   </ul>
   <div style="display: flex">
-    <input @keyup.enter="runPartialSearch(search_term, search_type)" id="big-search-bar" name="big-search-bar" placeholder="Search..." size="60" v-model="search_term">
+    <input v-if="search_type != 'mass_range_search'" @keyup.enter="runPartialSearch" id="big-search-bar" name="big-search-bar" placeholder="Search..." size="60" v-model="search_term">
+    <div v-else>
+      <input type="text" v-model.number="mass_target" name="search-dtxsid"> Da ± &nbsp;<input type="text" v-model.number="mass_error" name="search-dtxsid">
+      &nbsp;
+      <label><input type="radio" id="error_da" v-model="mass_error_type" value="da">Da</label>
+      &nbsp;
+      <label><input type="radio" id="error_ppm" v-model="mass_error_type" value="ppm">ppm</label>
+      &nbsp;
+    </div>
     <BFormSelect v-model="search_type" :options="search_type_options" size="sm" style="width: auto; padding: 0 2em 0 0.5em;"/>  <!-- width needs to be set to fix height issues for some reason -->
-    <button @click="runPartialSearch(search_term, search_type)">Search</button>
+    <button @click="runPartialSearch">Search</button>
   </div>
   <br />
+  <div style="display: flex; flex-direction: row; justify-content: space-between">
+    <div>
+      <button @click="searchToURL">Copy Search to URL</button>
+      <button @click="resetSearch">Reset Selection</button>
+      <button @click="downloadSearchResults">Download Table</button>
+    </div>
+    <button @click="sendToBatchSearch">Send Selected Substances to Batch Search</button>
+  </div>
   <p>{{ substances.length }} substances found; {{ filtered_record_count }} are currently displayed.</p>
   <ag-grid-vue
     class="ag-theme-balham"
@@ -20,6 +37,7 @@
     :rowData="substances"
     @grid-ready="onGridReady"
     @filter-changed="onFilterChanged"
+    @row-double-clicked="onDoubleClick"
     rowSelection="multiple"
     :suppressCopyRowsToClipboard="true"
   ></ag-grid-vue>
@@ -36,7 +54,7 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { imageLinkForSubstance } from '@/assets/common_functions'
+  import { calculateMassRange, constrainNumber, imageLinkForSubstance } from '@/assets/common_functions'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
   import RecordCountFilter from '@/components/RecordCountFilter.vue'
 
@@ -47,12 +65,16 @@
         COMPTOX_PAGE_URL,
         defaultColDef: {filter: 'agTextColumnFilter', floatingFilter: true, resizable: true},
         filtered_record_count: 0,
+        mass_error: null,
+        mass_error_type: "da",
+        mass_target: null,
         search_term: "",
         search_type: "substring_search",
         search_type_options: [
           {value: "substring_search", text: "Name Substring"},
           {value: "inchikey_first_block_search", text: "InChIKey First Block"},
-          {value: "formula_search", text: "Molecular Formula"}
+          {value: "formula_search", text: "Molecular Formula"},
+          {value: "mass_range_search", text: "Monoisotopic Mass Range"}
         ],
         substances: [],
         columnDefs: [{field:'image', headerName:'Structure', checkboxSelection: true, headerCheckboxSelection: true, floatingFilter: false, autoHeight: true, width: 120, wrapText: true, cellRenderer: (params) => {
@@ -73,7 +95,11 @@
             return "<a href='" + this.COMPTOX_PAGE_URL + params.data.dtxsid + "' target='_blank'>" + params.data.dtxsid + "</a>"
           }},
           {field: 'casrn', headerName: 'CASRN', width: 120},
-          {field: 'preferred_name', headerName: 'Preferred Name', sortable: true, sort: 'asc', flex: 1},
+          {field: 'preferred_name', headerName: 'Preferred Name', sortable: true, sort: 'asc', flex: 1, cellStyle: params => {
+            if (this.search_type == "substring_search" & !params.value.includes(this.search_term)) {
+              return {'font-style': 'italic'}
+            }
+          }},
           {field: 'synonyms', headerName: 'Synonym', flex: 1, wrapText: true, autoHeight: true, hide: true, cellStyle: {'white-space': 'pre-line'}, cellRenderer: params => {
             return params.data.synonyms.join("\n")
           }},
@@ -128,27 +154,83 @@
       const query_params = Object.keys(this.$route.query)
       const search_types = this.search_type_options.map(x => x.value)
       for (const param of query_params) {
-        console.log(param)
-        console.log(search_types)
         if (search_types.includes(param)) {
-          this.search_term = this.$route.query[param]
           this.search_type = param
-          this.runPartialSearch(this.$route.query[param], param)
+          if (param == "mass_range_search") {
+            const mass_search_params = this.$route.query[param].split("_")
+            this.mass_target = Number(mass_search_params[0])
+            this.mass_error = Number(mass_search_params[1])
+            this.mass_error_type =  mass_search_params[2]
+          } else {
+            this.search_term = this.$route.query[param]
+          }
+          this.runPartialSearch()
           break
         }
       }
     },
     methods: {
-      async runPartialSearch(search_term, search_type) {
-        const response = await axios.get(`${this.BACKEND_LOCATION}/${search_type}/${search_term}`)
+      async runPartialSearch() {
+        var response = null
+        if (this.search_type == "mass_range_search") {
+          if (this.mass_error_type == "da") {
+            this.mass_error = constrainNumber(this.mass_error, 0, 0.5)
+          } else {
+            this.mass_error = constrainNumber(this.mass_error, 0, 25)
+          }
+          const [lower_limit, upper_limit] = calculateMassRange(this.mass_target, this.mass_error, this.mass_error_type)
+          if (lower_limit === null) {
+            // add an error case later
+          }
+          console.log(lower_limit)
+          console.log(upper_limit)
+          response = await axios.post(`${this.BACKEND_LOCATION}/${this.search_type}/`, {upper_mass_limit: upper_limit, lower_mass_limit: lower_limit})
+        } else {
+          response = await axios.get(`${this.BACKEND_LOCATION}/${this.search_type}/${this.search_term}`)
+        }
         var substances = response.data.substances
         for (let i=0; i<substances.length; i++) {
           substances[i]["image_link"] = imageLinkForSubstance(substances[i].dtxsid, substances[i].image_in_comptox)
         }
         this.substances = substances
         
-        this.gridColumnApi.setColumnsVisible(['synonyms'], search_type == "substring_search")
+        this.gridColumnApi.setColumnsVisible(['synonyms'], this.search_type == "substring_search")
         this.gridApi.onFilterChanged()
+      },
+      searchToURL() {
+        var query_param = ""
+        if (this.search_type == "mass_range_search") {
+          query_param = `${this.mass_target}_${this.mass_error}_${this.mass_error_type}`
+        } else {
+          query_param = `${this.search_term}`
+        }
+        const url = `${window.location.origin}${this.$route.path}?${this.search_type}=${query_param}`
+
+        // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
+        // can't get that to work in this app, though, since it apparently requires a secured connection and the
+        // deployed version of this app doesn't have that.  So I'm sticking to this technically-depricated solution that
+        // I pulled out of CompTox's code, since it apparently works there.
+        const textarea = document.createElement('textarea')
+        textarea.value = url
+        document.body.appendChild(textarea)
+        textarea.select()
+        try {
+          document.execCommand('copy')
+        } catch (err) {
+          console.log('Cannot copy: ' + err)
+        }
+        document.body.removeChild(textarea)
+      },
+      resetSearch() {
+        this.search_term = ""
+        this.mass_target = null
+        this.mass_error = null
+      },
+      downloadSearchResults() {
+        this.gridApi.exportDataAsExcel({
+          fileName: `${this.search_type}.xlsx`,
+          columnKeys: ['dtxsid', 'casrn', 'preferred_name', 'monoisotopic_mass', 'molecular_formula']
+        })
       },
       onGridReady(params) {
         this.gridApi = params.api
@@ -163,6 +245,14 @@
       },
       onFilterChanged(params) {
         this.filtered_record_count = this.gridApi.getDisplayedRowCount()
+      },
+      sendToBatchSearch() {
+        const dtxsid_list = this.gridApi.getSelectedRows().map(node => node.dtxsid)
+        const target_href = `/batch_search?dtxsids=${dtxsid_list.join(";")}`
+        window.open(target_href)
+      },
+      onDoubleClick(event) {
+        window.open(`/search/${event.data.dtxsid}`)
       }
     },
     components: {AgGridVue, BFormSelect, RecordCountFilter}

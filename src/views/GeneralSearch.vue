@@ -40,7 +40,7 @@
                 </tr>
                 <tr>
                   <td><button class="copy-button" title="Copy InChIKey" @click="copyToClipboard(substance_info.indigo_inchikey ? substance_info.indigo_inchikey : substance_info.jchem_inchikey)">⎘</button></td>
-                  <td><strong>InChIKey:</strong> {{ substance_info.indigo_inchikey ? substance_info.indigo_inchikey : substance_info.jchem_inchikey}}</td>
+                  <td><strong>InChIKey:</strong> <router-link :to="`/partial_identifier_search?inchikey_first_block_search=${displayed_inchikey.first_block}`" target="_blank">{{displayed_inchikey.first_block}}</router-link>{{displayed_inchikey.remainder}}</td>
                 </tr>
                 <tr>
                   <td></td>
@@ -80,7 +80,7 @@
             <input type="checkbox" id="ms-ready" v-model="result_filters.ms_ready" @change="updateCheckboxFilters">
             <label for="ms-ready">Include MS-Ready methods</label>
             &nbsp;
-            <!-- <help-icon style="vertical-align:middle;" tooltipText="MS-Ready refers to a standardization of substances by collapsing isomers, salts, isotopes, etc., into a single form, identifiable by having the same first block of their InChIKey.  Selecting this will include methods from substances with the same MS-Ready form." /> -->
+            <help-icon style="vertical-align:middle;" tooltipText="MS-Ready refers to a standardization of substances by collapsing isomers, salts, isotopes, etc., into a single form, identifiable by having the same first block of their InChIKey.  Selecting this will include methods from substances with the same MS-Ready form." />
           </div>
           <div>
             <input type="checkbox" id="external_links" v-model="result_filters.external_links" @change="updateCheckboxFilters">
@@ -95,7 +95,7 @@
         <p v-if="no_substance_match">There is no substance in this database that matches the search term "{{$route.params.search_term}}" -- if something should be here, please check the search term for typos.</p>
         <div v-else-if="all_results.length==0">
           <p>The search term "{{$route.params.search_term}}" matches a substance in the database; however, no data records were found.</p>
-          <p>If you are looking for methods containing the searched substance, you can run a search for methods with similar structures <router-link :to="`/similar_method_search?search_term=${$route.params.search_term}`">here</router-link>.</p>
+          <p>If you are looking for methods containing the searched substance, you can run a search for methods with similar structures <router-link :to="`/similar_structure_search?search_term=${$route.params.search_term}`">here</router-link>.</p>
         </div>
         <div v-else>
           <div class="tab-bar">
@@ -190,6 +190,7 @@
         ms_ready_search_run: false,
         additional_sources: [],
         result_filters: {ms_ready: false, single_point_spectra: true, external_links: false},
+        displayed_inchikey: {first_block: "", remainder: ""},
         columnDefs: [
           {field: 'methodologies', headerName: 'Methodology', sortable: true, sort: 'asc', filter: 'agTextColumnFilter', floatingFilter: true, width: 140, suppressSizeToFit: true},
           {field: 'source', headerName: 'Source', sortable: true, width: 110, suppressSizeToFit: true, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
@@ -471,6 +472,12 @@
         this.record_type_counts = search_results.data.record_type_counts
         this.image_link = imageLinkForSubstance(this.substance_info.dtxsid, this.substance_info.image_in_comptox)
         this.still_searching = false
+
+        const inchikey = this.substance_info.indigo_inchikey ? this.substance_info.indigo_inchikey : this.substance_info.jchem_inchikey
+        if (inchikey) {
+          this.displayed_inchikey.first_block = inchikey.slice(0,14)
+          this.displayed_inchikey.remainder = inchikey.slice(14)
+        }
         
         // if no non-external links are available, then show the externally linked records by default
         if (!this.all_results.some(x => {return x.data_type})) {

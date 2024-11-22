@@ -26,8 +26,8 @@
     <ul v-if="summary_retrieved">
       <li>Spectra in database: {{ (result_info["Spectrum"]["Mass Spectrum"] + result_info["Spectrum"]["NMR Spectrum"] + result_info["Spectrum"]["IR Spectrum"]).toLocaleString() }} spectra in database ({{result_info["Spectrum"]["PDF"].toLocaleString()}} of which are PDFs), covering {{result_info["Substances"]["Internal Spectrum"].toLocaleString()}} substances</li>
       <ul>
-        <li>{{ result_info["Spectrum"]["Mass Spectrum"].toLocaleString() }} mass spectra, either GC/MS or LC/MS</li>
-        <li>{{ result_info["Spectrum"]["NMR Spectrum"].toLocaleString() }} NMR spectra, all 1D</li>
+        <li>{{ result_info["Spectrum"]["Mass Spectrum"].toLocaleString() }} mass spectra</li>
+        <li>{{ result_info["Spectrum"]["NMR Spectrum"].toLocaleString() }} NMR spectra</li>
         <li>{{ result_info["Spectrum"]["IR Spectrum"].toLocaleString() }} IR spectra</li>
       </ul>
       <li>Externally linked spectra: {{ result_info["Spectrum"]["External"].toLocaleString() }} external links, covering {{ result_info["Substances"]["External Spectrum"].toLocaleString()}} substances</li>
