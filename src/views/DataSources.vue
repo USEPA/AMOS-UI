@@ -56,7 +56,6 @@
     async created() {
       const response = await axios.get(`${this.BACKEND_LOCATION}/get_data_source_info/`)
       this.source_info = response.data
-      console.log(response.data)
     },
     components: {AgGridVue, DataSourceDetails}
   }

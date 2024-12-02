@@ -19,6 +19,7 @@
     <BFormSelect v-model="search_type" :options="search_type_options" size="sm" style="width: auto; padding: 0 2em 0 0.5em;"/>  <!-- width needs to be set to fix height issues for some reason -->
     <button @click="runPartialSearch">Search</button>
   </div>
+  <p v-if="search_type == 'mass_range_search'">Note: the size of the window in the mass range search is constrained to 0.5 Da or 25 ppm, as appropriate.  Input values larger than these will be coerced to the maximum values.</p>
   <br />
   <div style="display: flex; flex-direction: row; justify-content: space-between">
     <div>
@@ -182,8 +183,6 @@
           if (lower_limit === null) {
             // add an error case later
           }
-          console.log(lower_limit)
-          console.log(upper_limit)
           response = await axios.post(`${this.BACKEND_LOCATION}/${this.search_type}/`, {upper_mass_limit: upper_limit, lower_mass_limit: lower_limit})
         } else {
           response = await axios.get(`${this.BACKEND_LOCATION}/${this.search_type}/${this.search_term}`)
@@ -195,6 +194,17 @@
         this.substances = substances
         
         this.gridColumnApi.setColumnsVisible(['synonyms'], this.search_type == "substring_search")
+        if (this.search_type == "mass_range_search") {
+          this.gridColumnApi.applyColumnState({state: [
+            {colId: "spectra", sort: "desc", sortIndex: 0}
+          ]})
+      } else {
+          this.gridColumnApi.applyColumnState({state: [
+          {colId: "methods", sort: "desc", sortIndex: 0},
+          {colId: "fact_sheets", sort: "desc", sortIndex: 1},
+          {colId: "spectra", sort: "desc", sortIndex: 2}
+        ]})
+        }
         this.gridApi.onFilterChanged()
       },
       searchToURL() {
@@ -236,12 +246,6 @@
         this.gridApi = params.api
         this.gridColumnApi = params.columnApi
         this.gridApi.onFilterChanged()
-
-        this.gridColumnApi.applyColumnState({state: [
-          {colId: "methods", sort: "desc", sortIndex: 0},
-          {colId: "fact_sheets", sort: "desc", sortIndex: 1},
-          {colId: "spectra", sort: "desc", sortIndex: 2}
-        ]})
       },
       onFilterChanged(params) {
         this.filtered_record_count = this.gridApi.getDisplayedRowCount()

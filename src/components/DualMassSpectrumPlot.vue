@@ -18,6 +18,7 @@
     },
     props: {spectrum1: Array, spectrum2: Array, spectrum1_name: String, spectrum2_name: String},
     mounted() {
+      // this can't be used in created() since the svg element needs to be rendered before the plot can be created
       this.createDualMassSpectrumPlot()
     },
     watch: {
@@ -69,7 +70,7 @@
 
         // add per-point lines
         svg.append("g").selectAll("line").data(spectrum1).join("line").attr("x1", peak => mz_rescale(peak[0])).attr("x2", peak => mz_rescale(peak[0])).attr("y1", intensity_scale1(0)).attr("y2", peak => intensity_scale1(peak[1])).attr("class", "peak-line").attr("clip-path", "url(#clippy)")
-        svg.append("g").selectAll("line").data(spectrum2).join("line").attr("x1", peak => mz_rescale(peak[0])).attr("x2", peak => mz_rescale(peak[0])).attr("y1", intensity_scale2(0)).attr("y2", peak => intensity_scale2(peak[1])).attr("class", "peak-line").attr("clip-path", "url(#clippy)")
+        svg.append("g").selectAll("line").data(spectrum2).join("line").attr("x1", peak => mz_rescale(peak[0])).attr("x2", peak => mz_rescale(peak[0])).attr("y1", intensity_scale2(0)).attr("y2", peak => intensity_scale2(peak[1])).attr("class", "peak-line-secondary").attr("clip-path", "url(#clippy)")
         
         const extent = [[margins.left, margins.top], [width-margins.right, height-margins.bottom]]
         const zoom = d3.zoom().scaleExtent([1,100]).extent(extent).translateExtent(extent).on("zoom", function(event){
@@ -82,7 +83,7 @@
         // make circles to add to the plot to highlight points
         var focus = svg.append("g").style("display", "none")
         focus.append("circle").attr("id", "circle1").attr("class", "mouseover-highlight-circle").attr("r", 3)
-        focus.append("circle").attr("id", "circle2").attr("class", "mouseover-highlight-circle").attr("r", 3)
+        focus.append("circle").attr("id", "circle2").attr("class", "mouseover-highlight-circle-secondary").attr("r", 3)
         // add description text to the plot
         //focus.append("text").attr("class", "locationtext").attr("text-anchor", "end").attr("x", width).attr("y", margins.top/2)
         focus.append("text").attr("id", "text1").attr("text-anchor", "end").attr("x", width).attr("y", margins.top/2)
@@ -121,7 +122,7 @@
           })
          
         d3.select("#zoomReset").on("click", function(){
-          console.log("zoom reset clicked")
+          //console.log("zoom reset clicked")
           svg.call(zoom.transform, d3.zoomIdentity)
         })
       }

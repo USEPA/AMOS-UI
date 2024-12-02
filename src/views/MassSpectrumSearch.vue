@@ -160,6 +160,7 @@
           this.error_messages.invalidFormat = true
           return;
         }
+        
         const [lower_mass_limit, upper_mass_limit] = calculateMassRange(this.mass_target, this.mass_error, this.error_type)
         this.user_spectrum_array = this.user_spectrum_string.split("\n").map(x => x.trim().split(/\s+/).map(y => Number(y)))
         this.user_spectrum_array = rescaleSpectrum(this.user_spectrum_array)

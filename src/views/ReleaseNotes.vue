@@ -2,6 +2,18 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2024-12-02</summary>
+    <ul>
+      <li>Fixed an issue with calculating mass ranges using PPM in the mass spectrum and partial identifier searches.</li>
+      <li>Improved the handling of whitespace in MassSpectrumComparison's inputs -- it should now handle arbitrary non-line-breaking whitespace between the m/z and intensity values.</li>
+      <li>The coloring of the bottom spectrum on the mirrored mass spectrum plots has been changed to orange, to be more distinct from the top half of the plots.</li>
+      <li>Added a display for NMR spectrum metadata.</li>
+      <li>The partial identifier search now defaults to sorting by decreasing number of spectra if a mass range search is run, instead of the decreasing number of methods used by other searches.</li>
+      <li>Added a message to the partial identifier search about imposed mass range search limitations (0.5 Da or 25 ppm).</li>
+      <li>Added a column for the number of substances in a given record to the batch search.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2024-11-22</summary>
     <ul>
       <li>Added a mass range search to the partial identifier search.</li>

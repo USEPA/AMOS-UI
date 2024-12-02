@@ -30,7 +30,6 @@
       doesFilterPass(params) {
         // the this.params refers to the params for the component, not the argument for this function
         const field = this.params.colDef.field
-        console.log(params)
         if (this.sort_val == "Yes") {
           return params.data[field] > 0
         } else {

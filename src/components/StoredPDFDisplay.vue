@@ -133,7 +133,6 @@
         }
       },
       highlightedSubstances() {
-        console.log(this.highlightedSubstances)
         if (this.viewer_mode == "SubstanceTable") {
           this.gridApi.redrawRows()
         }

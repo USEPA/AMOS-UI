@@ -7,7 +7,7 @@
 
 <template>
   <div id="spectrum_metadata">
-    <h5>Spectrum Metadata:</h5>
+    <!-- <h5>Spectrum Metadata:</h5> -->
     <ul style="list-style-type: none;" ref="metadata_modal">
       <li v-for="c in Object.entries(spectrumMetadata)"><strong>{{c[0]}}:</strong> {{c[1]}}</li>
     </ul>

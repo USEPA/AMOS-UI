@@ -116,7 +116,6 @@
             :isExternalFilterPresent="isExternalFilterPresent"
             :doesExternalFilterPass="doesExternalFilterPass"
             :postSortRows="postSortRows"
-            :loadingOverlayComponent="SimilarMethodRedirect"
             :suppressCopyRowsToClipboard="true"
           ></ag-grid-vue>
         </div>
@@ -159,7 +158,6 @@
   import IRSpectrumDisplay from '@/components/IRSpectrumDisplay.vue'
   import MassSpectrumDisplay from '@/components/MassSpectrumDisplay.vue'
   import NMRSpectrumDisplay from '@/components/NMRSpectrumDisplay.vue'
-  import SimilarMethodRedirect from '@/components/SimilarMethodRedirect.vue'
   import StoredPDFDisplay from '@/components/StoredPDFDisplay.vue'
   import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
 
@@ -494,7 +492,6 @@
       IRSpectrumDisplay,
       MassSpectrumDisplay,
       NMRSpectrumDisplay,
-      SimilarMethodRedirect,
       StoredPDFDisplay,
       SynonymDisambiguation
     }

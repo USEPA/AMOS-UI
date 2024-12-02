@@ -7,14 +7,13 @@
 
 <template>
   <div>
-    <p><strong>NOTE: This page is effectively just a demo at the moment, as the full functionality has yet to be coded or established.</strong></p>
-    <p>This page allows you to load and visualize spectra.  To use it, copy the data you want to see into the text box.  It should be in the form of space-delimited values for m/z and intensity, with one peak per line.</p>
+    <p>This page visualizes and compares spectra.  Copy the spectra you want to visualize or compare into the text box(es), then use the buttons below to display them.  It should be in the form of space-delimited values for m/z and intensity, with one peak per line.</p>
     <div class="display-stuff">
       <div class="search-inputs">
         <div class="display-stuff">
           <div class="search-inputs">
             <p>Spectrum #1</p>
-            <textarea type="text" class="batch-search-input" rows="20" columns="35" v-model="spectrum_box_1"></textarea>
+            <textarea type="text" class="batch-search-input" rows="15" columns="35" v-model="spectrum_box_1"></textarea>
           </div>
           <div v-if="dtxsid_mode" class="search-inputs" style="padding-left: 100px">
             <p>Database Spectra</p>
@@ -31,7 +30,7 @@
           </div>
           <div v-else class="search-inputs" style="padding-left: 100px">
             <p>Spectrum #2</p>
-            <textarea type="text" class="batch-search-input" rows="20" columns="35" v-model="spectrum_box_2"></textarea>
+            <textarea type="text" class="batch-search-input" rows="15" columns="35" v-model="spectrum_box_2"></textarea>
           </div>
         </div>
         <div class="button-array">
@@ -43,7 +42,7 @@
       </div>
       <div class="info-container" style="padding-left: 100px">
         <div v-if="spectrum_display == 'single'">
-          <SingleMassSpectrumPlot :spectrum="spectrum1" />
+          <SingleMassSpectrumPlot :spectrum="spectrum1" :spectrum_name="plot_title"/>
           <br />
           <p><strong>Spectral Entropy:</strong> {{ spectral_entropy.toFixed(4) }}</p>
         </div>
@@ -54,11 +53,20 @@
         </div>
       </div>
     </div>
+    <BAlert variant="danger" v-model="error_messages.invalid_format">
+        There are issues with the contents of {{ error_messages.bad_spectrum_input_name }} -- please check to ensure it is correct.  The spectrum should be in the following format:
+        <ul>
+          <li>There should be one peak per line.</li>
+          <li>Each peak should consist of an m/z value and an intensity, in that order, separated by spaces or tabs (no commas, semicolons, etc.).</li>
+          <li>No characters except for numbers, spaces, and periods should be present.</li>
+        </ul>
+      </BAlert>
   </div>
 </template>
 
 <script>
   import axios from 'axios'
+  import { BAlert } from 'bootstrap-vue-next'
 
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
@@ -67,7 +75,7 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { rescaleSpectrum } from '@/assets/common_functions'
+  import { rescaleSpectrum, validateSpectrumInput } from '@/assets/common_functions'
   import { BACKEND_LOCATION } from '@/assets/store';
   import DualMassSpectrumPlot from '@/components/DualMassSpectrumPlot.vue'
   import SingleMassSpectrumPlot from '@/components/SingleMassSpectrumPlot.vue'
@@ -91,6 +99,7 @@
         database_spectra: [],
         substance_mapping: {},
         BACKEND_LOCATION,
+        error_messages: {invalid_format: false, bad_spectrum_input_name: ""},
         column_defs: [
           {field: "dtxsid", headerName: "DTXSID", width: 140},
           {field: "name", headerName: "Name", width: 140, cellRenderer: params => {return this.substance_mapping[params.data.dtxsid]}},
@@ -116,10 +125,15 @@
           this.display_database_spectrum()
         }
       },
-      async display_user_spectrum(box_contents) {
-        this.spectrum1 = box_contents.split("\n").map(x => x.split(" ").map(y => Number(y)))
+      async display_user_spectrum(box_contents, box_name) {
+        if (validateSpectrumInput(box_contents) === false) {
+          this.error_messages.invalid_format = true
+          this.error_messages.bad_spectrum_input_name = box_name
+          return;
+        }
+        this.spectrum1 = box_contents.split("\n").map(x => x.trim().split(/\s+/).map(y => Number(y)))
         this.spectrum1 = rescaleSpectrum(this.spectrum1)
-        this.plot_title = "User Spectrum"
+        this.plot_title = box_name
         this.spectral_entropy = await this.calculateSpectralEntropy(this.spectrum1)
         this.spectrum_display = "single"
       },
@@ -136,22 +150,33 @@
         }
       },
       async display_both_spectra() {
-          this.spectrum1 = this.spectrum_box_1.split("\n").map(x => x.split(" ").map(y => Number(y)))
-          this.spectrum1 = rescaleSpectrum(this.spectrum1)
-          this.plot_title = "Spectrum Comparison"
-          if (this.dtxsid_mode) {
-            this.spectrum2 = this.gridApi.getSelectedRows()[0].spectrum
-            this.spectrum2 = rescaleSpectrum(this.spectrum2)
-            this.spectrum1_name = "User Spectrum"
-            this.spectrum2_name = "Database Spectrum"
-          } else {
-            this.spectrum2 = this.spectrum_box_2.split("\n").map(x => x.split(" ").map(y => Number(y)))
-            this.spectrum2 = rescaleSpectrum(this.spectrum2)
-            this.spectrum1_name = "Spectrum #1"
-            this.spectrum2_name = "Spectrum #2"
-          }
-          this.entropy_similarity = await this.calculateEntropySimilarity(this.spectrum1, this.spectrum2)
-          this.spectrum_display = "dual"
+        if (validateSpectrumInput(this.spectrum_box_1) === false) {
+
+          this.error_messages.invalid_format = true
+          this.error_messages.bad_spectrum_input_name = "Spectrum #1"
+          return;
+        }
+        if (validateSpectrumInput(this.spectrum_box_2) === false) {
+          this.error_messages.invalid_format = true
+          this.error_messages.bad_spectrum_input_name = "Spectrum #1"
+          return;
+        }
+        this.spectrum1 = this.spectrum_box_1.split("\n").map(x => x.trim().split(/\s+/).map(y => Number(y)))
+        this.spectrum1 = rescaleSpectrum(this.spectrum1)
+        this.plot_title = "Spectrum Comparison"
+        if (this.dtxsid_mode) {
+          this.spectrum2 = this.gridApi.getSelectedRows()[0].spectrum
+          this.spectrum2 = rescaleSpectrum(this.spectrum2)
+          this.spectrum1_name = "User Spectrum"
+          this.spectrum2_name = "Database Spectrum"
+        } else {
+          this.spectrum2 = this.spectrum_box_2.split("\n").map(x => x.trim().split(/\s+/).map(y => Number(y)))
+          this.spectrum2 = rescaleSpectrum(this.spectrum2)
+          this.spectrum1_name = "Spectrum #1"
+          this.spectrum2_name = "Spectrum #2"
+        }
+        this.entropy_similarity = await this.calculateEntropySimilarity(this.spectrum1, this.spectrum2)
+        this.spectrum_display = "dual"
       },
       async calculateSpectralEntropy(spectrum) {
         // Calculates spectral entropy.
@@ -168,7 +193,7 @@
         this.gridApi = params.api
       }
     },
-    components: { AgGridVue, DualMassSpectrumPlot, SingleMassSpectrumPlot }
+    components: { AgGridVue, BAlert, DualMassSpectrumPlot, SingleMassSpectrumPlot }
   }
 </script>
 

@@ -220,7 +220,6 @@
         await this.getSubstances()
       } else if (query_params.length > 0) { 
         this.status_boxes.incomplete_query_params = true
-        console.log("Some query parameters are missing.")
       }
     },
     methods: {

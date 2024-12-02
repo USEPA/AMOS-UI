@@ -7,7 +7,7 @@
 
 <template>
   <div class="graph-container">
-    <h5>Mass Spectrum</h5>
+    <h5>{{ spectrum_name }}</h5>
     <svg width="600" height="400" id="msplot"></svg>
     <button id="zoomReset">Reset Zoom</button>
   </div>
@@ -23,8 +23,9 @@
         x: 1
       }
     },
-    props: {spectrum: Array},
+    props: {spectrum: Array, spectrum_name: {type: String, default: "Mass Spectrum"}},
     mounted() {
+      // this can't be used in created() since the svg element needs to be rendered before the plot can be created
       this.createSingleMassSpectrumPlot()
     },
     watch: {

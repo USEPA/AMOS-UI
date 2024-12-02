@@ -29,7 +29,17 @@
   stroke: #52B4FA;
 }
 
+.mouseover-highlight-circle-secondary {
+  fill: #AD4B05;
+  stroke: #AD4B05;
+}
+
 .peak-line {
   stroke: #52B4FA; 
+  stroke-width: 2
+}
+
+.peak-line-secondary {
+  stroke: #AD4B05; 
   stroke-width: 2
 }
