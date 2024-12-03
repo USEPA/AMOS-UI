@@ -14,7 +14,7 @@ export function calculateMassRange(mass_target, error_range, error_type) {
     if (error_type == "da"){
         return [mass_target - error_range, mass_target + error_range]
     } else if (error_type == "ppm") {
-        const mass_change = mass_target * mass_error / 1000000.0
+        const mass_change = mass_target * error_range / 1000000.0
         return [mass_target - mass_change, mass_target + mass_change]
     } else {
         return [null, null]
