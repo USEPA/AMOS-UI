@@ -8,7 +8,7 @@
 
 <template>
   <div>
-    <p>Below is a list of methods currently in the database.  Double-click on a row to display the method and its substances in another tab.  Cells in the table with a dashed underline have hovertext, usually for expanding out abbreviations in the cell content (it will take a second or two for the hovertext to appear).</p>
+    <p>Below is a list of methods currently in the database.  Double-click on a row to display the method and its substances in another tab.  Cells in the table with a dashed underline have hovertext.</p>
     <p v-if="status.loading">Loading...</p>
     <div v-else>
       <p>{{method_info.length.toLocaleString()}} methods in total are present in the database; {{ filtered_record_count.toLocaleString() }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed, covering {{substance_count.toLocaleString()}} {{substance_count == 1 ? "substance" : "substances"}}.</p>

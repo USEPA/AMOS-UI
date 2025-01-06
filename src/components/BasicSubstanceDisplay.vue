@@ -65,10 +65,16 @@
           this.displayed_inchikey.first_block = inchikey.slice(0,14)
           this.displayed_inchikey.remainder = inchikey.slice(14)
         }
+        console.log(inchikey)
       }
     },
     created() {
       this.image_link = imageLinkForSubstance(this.substanceInfo.dtxsid, this.substanceInfo.image_in_comptox)
+      const inchikey = this.substanceInfo.indigo_inchikey ? this.substanceInfo.indigo_inchikey : this.substanceInfo.jchem_inchikey
+        if (inchikey) {
+          this.displayed_inchikey.first_block = inchikey.slice(0,14)
+          this.displayed_inchikey.remainder = inchikey.slice(14)
+        }
     },
     methods: {
       copyToClipboard(text) {

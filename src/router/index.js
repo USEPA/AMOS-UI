@@ -16,7 +16,6 @@ const routes = [
   {path: "/view_fact_sheet/:internal_id", name: "Fact Sheet Viewer", component: ()=>import('../views/FactSheetViewer.vue')},
   {path: "/mass_spectrum_comparison", name: "Mass Spectrum Comparison", component: ()=>import('../views/MassSpectrumComparison.vue')},
   {path: "/mass_spectrum_search", name: "Mass Spectrum Search", component: ()=>import('../views/MassSpectrumSearch.vue')},
-  {path: "/substring_search/:substring", name: "Substring Search", component: ()=>import('../views/SubstringSearch.vue')},
   {path: "/functional_class_visualization", name: "Functional Class Visualization", component: ()=>import('../views/FunctionalClassVisualization.vue')},
   {path: "/view_mass_spectrum/:internal_id", name: "Mass Spectrum Viewer", component: ()=>import('../views/MassSpectrumViewer.vue')},
   {path: "/view_spectrum_pdf/:internal_id", name: "Spectrum PDF Viewer", component: ()=>import('../views/SpectrumPDFViewer.vue')},
@@ -29,6 +28,8 @@ const routes = [
   {path: "/release_notes", name: "Release Notes", component: ()=>import('../views/ReleaseNotes.vue')},
   {path: "/record_id_search/:internal_id", name: "Record ID Search", component: ()=>import('../views/RecordIDSearch.vue')},
   {path: "/partial_identifier_search/", name: "Partial Identifier Search", component: ()=>import('../views/PartialIdentifierSearch.vue')},
+  {path: "/nta_ms1_workflow/", name: "NTA MS1 Workflow", component: ()=>import('../views/MS1NTAJobSubmission.vue')},
+  {path: "/nta_ms2_workflow/", name: "NTA MS2 Workflow", component: ()=>import('../views/MS2NTAJobSubmission.vue')},
   {path: "/:catchAll(.*)", name: "404", component: ()=>import('../views/404.vue')}
 ]
 

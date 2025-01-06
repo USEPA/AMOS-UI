@@ -20,7 +20,7 @@
       <li>Viewing lists of fact sheets and methods in the database, along with displaying the documents themselves and the substances associated with them.</li>
       <li>Searching for all methods and fact sheets that cover a substance similar to one being searched.  This uses EPA calculations for the similarity between two substances and returns all methods and fact sheets containing at least one substance of sufficient similarity (similarity level is currently hardcoded on the Flask backend).  Searching can be done by DTXSID, CAS registry number, InChIKey, or name.</li>
       <li>Batch searching substances by DTXSID, and returning basic information for those records.</li>
-      <li>Comparing a user-submitted spectrum to other spectra in the database, given an analyical methodology (currently just GC/MS or LC/MS) and mass range.</li>
+      <li>Comparing a user-submitted spectrum to other spectra in the database, given an analytical methodology (currently just GC/MS or LC/MS) and mass range.</li>
     </ul>
     <p>The records in this application contain:</p>
     <ul v-if="summary_retrieved">

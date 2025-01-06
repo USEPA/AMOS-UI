@@ -2,6 +2,19 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2025-01-06</summary>
+    <ul>
+      <li>Counts of sources from external types of records (patents, literature, PubMed, etc.) have been incorporated into the partial identifier search, and are an option on the batch search.</li>
+      <li>Improved text on the partial identifier search to give clearer status information.</li>
+      <li>Added a control to the mass spectrum comparison page for filtering peaks below a threshold intensity.</li>
+      <li>Added a filter to the mass spectrum search to hide database spectra that are below a certain entropy similarity.</li>
+      <li>Added labels to better indicate what the top and bottom parts are of the mirrored spectrum plot used in the mass spectrum search and comparison pages.</li>
+      <li>Added some options for additional mass spectrum information to the batch search.</li>
+      <li>Fixed an issue where InChIKeys might not display when comparing substances in the similar structure search.</li>
+      <li>Added hovertext to the substance names on the substance grids in the PDF displays.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2024-12-02</summary>
     <ul>
       <li>Fixed an issue with calculating mass ranges using PPM in the mass spectrum and partial identifier searches.</li>

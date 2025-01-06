@@ -7,12 +7,12 @@
 
 <template>
   <div>
-    <p>This page visualizes and compares spectra.  Copy the spectra you want to visualize or compare into the text box(es), then use the buttons below to display them.  It should be in the form of space-delimited values for m/z and intensity, with one peak per line.</p>
+    <p>This page visualizes and compares spectra.  Copy the spectra you want to visualize or compare into the text box(es), then use the buttons below to display them.  It should be in the form of space-delimited values for m/z and intensity, with one peak per line.  Input spectra are automatically rescaled to a maximum intensity of 100.</p>
     <div class="display-stuff">
       <div class="search-inputs">
         <div class="display-stuff">
           <div class="search-inputs">
-            <p>Spectrum #1</p>
+            <h5>Spectrum #1</h5>
             <textarea type="text" class="batch-search-input" rows="15" columns="35" v-model="spectrum_box_1"></textarea>
           </div>
           <div v-if="dtxsid_mode" class="search-inputs" style="padding-left: 100px">
@@ -29,9 +29,14 @@
             ></ag-grid-vue>
           </div>
           <div v-else class="search-inputs" style="padding-left: 100px">
-            <p>Spectrum #2</p>
+            <h5>Spectrum #2</h5>
             <textarea type="text" class="batch-search-input" rows="15" columns="35" v-model="spectrum_box_2"></textarea>
           </div>
+        </div>
+        <br />
+        <div style="align-items: left; width: 90%">
+          <h5>Options</h5>
+          Min peak height for comparison <input type="number" min="0" max="100" v-model="peak_threshold">%
         </div>
         <div class="button-array">
           <button @click="display_user_spectrum(spectrum_box_1, 'Spectrum #1')">Display Spectrum #1</button>
@@ -92,6 +97,7 @@
         plot_title: "",
         spectral_entropy: 0,
         entropy_similarity: 0,
+        peak_threshold: 5,
         spectrum_display: null,
         entropy_display: null,
         dtxsid_mode: false,
@@ -175,7 +181,9 @@
           this.spectrum1_name = "Spectrum #1"
           this.spectrum2_name = "Spectrum #2"
         }
-        this.entropy_similarity = await this.calculateEntropySimilarity(this.spectrum1, this.spectrum2)
+        const filtered_spectrum1 = this.spectrum1.filter(x => x[1] >= this.peak_threshold)
+        const filtered_spectrum2 = this.spectrum2.filter(x => x[1] >= this.peak_threshold)
+        this.entropy_similarity = await this.calculateEntropySimilarity(filtered_spectrum1, filtered_spectrum2)
         this.spectrum_display = "dual"
       },
       async calculateSpectralEntropy(spectrum) {

@@ -60,6 +60,27 @@
           <br />
           <input type="checkbox" id="include-classyfire" v-model="include_classyfire">
           <label for="include-classyfire"><span class="has-hover-text" title="Includes the top four levels of ClassyFire classifications with the substance information.">Include ClassyFire</span></label>
+          <br />
+          <input type="checkbox" id="include-source-counts" v-model="include_source_counts">
+          <label for="include-source-counts"><span class="has-hover-text" title="Counts of the number of times a substance appears in sources not stored in AMOS.">Include source counts</span></label>
+        </div>
+        <div class="option-sets">
+          <strong>Record Info</strong>
+          <br />
+          <input type="checkbox" id="record-info-ms-all" v-model="record_info.ms.all">
+          <label for="record-info-ms-all"><span>All mass spectrum fields</span></label>
+          <br />
+          <input type="checkbox" id="record-info-ms-pos-neg" class="indented-checkbox" v-model="record_info.ms.rating" :disabled="record_info.ms.all">
+          <label for="record-info-ms-pos-neg"><span>"Clean"/"Noisy" rating</span></label>
+          <br />
+          <input type="checkbox" id="record-info-ms-ion-mode" class="indented-checkbox" v-model="record_info.ms.ionization_mode" :disabled="record_info.ms.all">
+          <label for="record-info-ms-ion-mode"><span>Ionization mode</span></label>
+          <br />
+          <input type="checkbox" id="record-info-ms-peak-count" class="indented-checkbox" v-model="record_info.ms.num_peaks" :disabled="record_info.ms.all">
+          <label for="record-info-ms-peak-count"><span>Peak count</span></label>
+          <br />
+          <input type="checkbox" id="record-info-ms-spectral-entropy" class="indented-checkbox" v-model="record_info.ms.spectral_entropy" :disabled="record_info.ms.all">
+          <label for="record-info-ms-spectral-entropy"><span>Spectral entropy</span></label>
         </div>
         <div class="option-sets">
           <strong>Other</strong>
@@ -98,6 +119,7 @@
         include_classyfire: true,
         include_external_links: true,
         include_analyticalqc: false,
+        include_source_counts: true,
         search_box: "",
         status_boxes: {
           show_empty_box_error: false,
@@ -105,6 +127,9 @@
         },
         record_types: {"Fact Sheet": true, "Method": true, "Spectrum": true, "AnalyticalQCOnly": false},
         methodologies: {all: true, "GC/MS": true, "LC/MS": true, "NMR": true},
+        record_info: {
+          ms: {all: false, ionization_mode: false, rating: false, spectral_entropy: false, num_peaks: false}
+        },
         BACKEND_LOCATION
       }
     },
@@ -122,11 +147,13 @@
         if(this.search_box != ""){
           const search_terms = this.search_box.split("\n")
           const parameters = {
+            additional_record_info: this.record_info,
             base_url: window.location.origin,
             dtxsids: search_terms,
             include_analyticalqc: this.include_analyticalqc,
             include_classyfire: this.include_classyfire,
             include_external_links: this.include_external_links,
+            include_source_counts: this.include_source_counts,
             methodologies: this.methodologies,
             record_types: this.record_types
           }
@@ -191,5 +218,9 @@
 
   .option-sets {
     margin-right: 50px
+  }
+
+  .indented-checkbox {
+    margin-left: 12px
   }
 </style>

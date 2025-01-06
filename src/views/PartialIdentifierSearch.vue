@@ -1,10 +1,12 @@
+
+
 <template>
-  This page runs searches for substances based on non-unique identifiers for a substance.  Searches can be done on four identifiers:
+  This page runs searches for substances based on identifiers that can potentially match more than one substance -- potentially many substances.  Searches can be done on four identifiers:
   <ul>
     <li>Substring of a substance name.  This will search for synonyms that contain the substring as well.</li>
     <li>First block of a substance's InChIKey.</li>
     <li>The exact molecular formula of a substance.</li>
-    <li>A range of (monoisotopic) molecular mass.</li>
+    <li>A range of (monoisotopic) molecular masses.</li>
   </ul>
   <div style="display: flex">
     <input v-if="search_type != 'mass_range_search'" @keyup.enter="runPartialSearch" id="big-search-bar" name="big-search-bar" placeholder="Search..." size="60" v-model="search_term">
@@ -29,7 +31,9 @@
     </div>
     <button @click="sendToBatchSearch">Send Selected Substances to Batch Search</button>
   </div>
-  <p>{{ substances.length }} substances found; {{ filtered_record_count }} are currently displayed.</p>
+  <p v-if="status.search_complete">{{ status.search_type }} search complete for {{ status.searched_term }}. {{ substances.length }} substances found; {{ filtered_record_count }} are currently displayed.</p>
+  <p v-else-if="status.searching">Searching...</p>
+  <p v-else>No search has been run.</p>
   <ag-grid-vue
     class="ag-theme-balham"
     style="height:600px; width:100%"
@@ -72,12 +76,13 @@
         search_term: "",
         search_type: "substring_search",
         search_type_options: [
-          {value: "substring_search", text: "Name Substring"},
-          {value: "inchikey_first_block_search", text: "InChIKey First Block"},
-          {value: "formula_search", text: "Molecular Formula"},
-          {value: "mass_range_search", text: "Monoisotopic Mass Range"}
+          {value: "substring_search", text: "Name substring"},
+          {value: "inchikey_first_block_search", text: "InChIKey first block"},
+          {value: "formula_search", text: "Molecular formula"},
+          {value: "mass_range_search", text: "Monoisotopic mass range"}
         ],
         substances: [],
+        status: {search_complete: false, searching: false, searched_term: "", search_type: ""},
         columnDefs: [{field:'image', headerName:'Structure', checkboxSelection: true, headerCheckboxSelection: true, floatingFilter: false, autoHeight: true, width: 120, wrapText: true, cellRenderer: (params) => {
             if (params.data.image_link) {
               var image = document.createElement('img');
@@ -97,7 +102,7 @@
           }},
           {field: 'casrn', headerName: 'CASRN', width: 120},
           {field: 'preferred_name', headerName: 'Preferred Name', sortable: true, sort: 'asc', flex: 1, cellStyle: params => {
-            if (this.search_type == "substring_search" & !params.value.includes(this.search_term)) {
+            if (this.search_type == "substring_search" & !params.value.toLowerCase().includes(this.search_term.toLowerCase())) {
               return {'font-style': 'italic'}
             }
           }},
@@ -147,7 +152,10 @@
             } else {
               return 0
             }
-          }}
+          }},
+          {field: 'source_count', headerName: 'Sources', width: 100, sortable: true},
+          {field: 'patent_count', headerName: 'Patents', width: 100, sortable: true},
+          {field: 'literature_count', headerName: 'Articles', width: 100, sortable: true}
         ]
       }
     },
@@ -172,6 +180,9 @@
     },
     methods: {
       async runPartialSearch() {
+        this.status.searching = true
+        this.status.search_complete = false
+
         var response = null
         if (this.search_type == "mass_range_search") {
           if (this.mass_error_type == "da") {
@@ -184,9 +195,13 @@
             // add an error case later
           }
           response = await axios.post(`${this.BACKEND_LOCATION}/${this.search_type}/`, {upper_mass_limit: upper_limit, lower_mass_limit: lower_limit})
+          this.status.searched_term = `${this.mass_target} Da +/- ${this.mass_error} ${this.mass_error_type=='da' ? 'Da' : 'ppm'}`
         } else {
           response = await axios.get(`${this.BACKEND_LOCATION}/${this.search_type}/${this.search_term}`)
+          this.status.searched_term = this.search_term
         }
+        this.status.search_type = this.search_type_options.find(x => x["value"]==this.search_type)["text"]
+
         var substances = response.data.substances
         for (let i=0; i<substances.length; i++) {
           substances[i]["image_link"] = imageLinkForSubstance(substances[i].dtxsid, substances[i].image_in_comptox)
@@ -206,6 +221,9 @@
         ]})
         }
         this.gridApi.onFilterChanged()
+
+        this.status.search_complete = true
+        this.status.searching = false
       },
       searchToURL() {
         var query_param = ""

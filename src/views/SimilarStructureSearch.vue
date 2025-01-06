@@ -92,7 +92,7 @@
       </div>
     </div>
     <StoredPDFDisplay style="width: 48vw;" v-if="right_side_viewer_mode == 'Methods'" :internalID="selected_row_data.internal_id" recordType="method" :highlightedSubstances="highlighted_substances"/>
-    <StoredPDFDisplay style="width: 48vw;" v-if="right_side_viewer_mode == 'Fact Sheets'" :internalID="selected_row_data.internal_id" recordType="fact sheet" :highlightedSubstances="highlighted_substances"/>
+    <StoredPDFDisplay style="width: 48vw;" v-else-if="right_side_viewer_mode == 'Fact Sheets'" :internalID="selected_row_data.internal_id" recordType="fact sheet" :highlightedSubstances="highlighted_substances"/>
     <div class="half-page-column" v-else-if="right_side_viewer_mode == 'Substances'">
       <h4>Searched Substance:</h4>
       <div style="display: flex; justify-content: center;">

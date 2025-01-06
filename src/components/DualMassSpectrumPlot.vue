@@ -62,6 +62,8 @@
         // make the axis labels
         svg.append("text").attr("x", width/2).attr("y", height - margins.bottom/4).attr("text-anchor", "middle").attr("fill", "currentColor").text("m/z")
         svg.append("text").attr("transform", "rotate(-90)").attr("x", -height/2).attr("y", margins.left/3).attr("text-anchor", "middle").attr("fill", "currentColor").text("Relative Intensity")
+        svg.append("text").attr("transform", "rotate(90)").attr("x", 1*height/2).attr("y", margins.left/3-width).attr("text-anchor", "end").attr("fill", "currentColor").text(spectrum1_name)
+        svg.append("text").attr("transform", "rotate(90)").attr("x", 1.1*height/2).attr("y", margins.left/3-width).attr("text-anchor", "start").attr("fill", "currentColor").text(spectrum2_name)
 
         // plots peaks as circles; may be useful for visual debugging
         //svg.append("g").selectAll("circle").data(this.spectrum).join("circle").attr("cx", d => mz_rescale(d[0])).attr("cy", d => intensity_scale(d[1])).attr("r", 3)

@@ -6,10 +6,10 @@
       <div>
         <input type="text" v-model.number="mass_target" name="search-dtxsid"> Da ± &nbsp;<input type="text" v-model.number="mass_error" name="search-dtxsid">
         &nbsp;
-        <label><input type="radio" id="error_da" v-model="error_type" value="da">Da</label>
+        <label><input type="radio" id="error_da" v-model="mass_error_type" value="da">Da</label>
         &nbsp;
-        <label><input type="radio" id="error_ppm" v-model="error_type" value="ppm">ppm</label>
-        <p>NOTE: Please use the neutral mass of the substance when searching.</p>
+        <label><input type="radio" id="error_ppm" v-model="mass_error_type" value="ppm">ppm</label>
+        <p>NOTE: The size of the window in the mass range search is constrained to 0.5 Da or 25 ppm, as appropriate.  Input values larger than these will be coerced to the maximum values.  Please use the neutral mass of the substance when searching.</p>
       </div>
       <br />
       <div>
@@ -22,9 +22,8 @@
       <br />
       <div>
         <h5>User Spectrum</h5>
-        Note: spectrum will be automatically rescaled to a maximum intensity of 100 in plots.
-        <br />
-        <textarea type="text" class="batch-search-input" style="width:250px;" rows="12" v-model="user_spectrum_string"></textarea>
+        Note: This spectrum will be automatically rescaled to a maximum intensity of 100 in plots.
+        <textarea type="text" class="batch-search-input" style="width:250px;" rows="15" v-model="user_spectrum_string"></textarea>
       </div>
       <br />
       <button @click="spectrum_search">Search</button>
@@ -47,7 +46,9 @@
         <p></p>
       </div>
       <div v-else-if="results.length > 0">
-        Search found {{ results.length }} spectra covering {{ unique_substances }} substances.
+        Minimum similarity to show: <input type="number" step="0.1" min="0.1" max="1" v-model="min_spectrum_similarity">
+        <br />
+        Search found {{ results.length }} spectra covering {{ unique_substances }} substances; {{ visible_info.spectra }} spectra covering {{ visible_info.substances }} are visible below.
         <ag-grid-vue
           class="ag-theme-balham"
           style="height:400px; width:100%"
@@ -57,7 +58,10 @@
           rowSelection="single"
           @row-selected="onRowSelected"
           @first-data-rendered="onGridReady"
+          @filter-changed="onFilterChanged"
           suppressAggFuncInHeader="true"
+          :isExternalFilterPresent="isExternalFilterPresent"
+          :doesExternalFilterPass="doesExternalFilterPass"
           :autoGroupColumnDef="autoGroupColumnDef"
           :suppressCopyRowsToClipboard="true"
         ></ag-grid-vue>
@@ -109,7 +113,7 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { calculateMassRange, rescaleSpectrum } from '@/assets/common_functions'
+  import { calculateMassRange, constrainNumber, rescaleSpectrum } from '@/assets/common_functions'
   import '@/assets/style.css'
   import DualMassSpectrumPlot from '@/components/DualMassSpectrumPlot.vue'
   import MassSpectrumMetadata from '@/components/MassSpectrumMetadata.vue'
@@ -119,10 +123,12 @@
       return {
         mass_target: 194,
         mass_error: 0.1,
-        error_type: "da",
+        mass_error_type: "da",
         methodology: "LC/MS",
+        min_spectrum_similarity: 0.1,
         results: [],
         unique_substances: 0,
+        visible_info: {spectra: 0, substances: 0},
         user_spectrum_string: "53.84601 0.040218\n59.7077 0.039517\n69.04531 0.269281\n71.112045 0.036707\n83.06077 0.233345\n110.071434 2.046293\n111.055466 0.068346\n123.04299 0.058855\n124.86625 0.049269\n132.70123 0.047547\n138.06598 34.97314\n151.09726 0.06952\n156.07649 0.046879\n180.06517 0.067487\n181.07085 0.058521\n195.08736 100",
         user_spectrum_array: [],
         show_plot: false,
@@ -151,6 +157,11 @@
         ]
       }
     },
+    watch: {
+      min_spectrum_similarity(new_val, old_val){
+        this.gridApi.onFilterChanged()
+      }
+    },
     methods: {
       async spectrum_search() {
         this.status.searching = true
@@ -160,8 +171,14 @@
           this.error_messages.invalidFormat = true
           return;
         }
+
+        if (this.mass_error_type == "da") {
+          this.mass_error = constrainNumber(this.mass_error, 0, 0.5)
+        } else {
+          this.mass_error = constrainNumber(this.mass_error, 0, 25)
+        }
         
-        const [lower_mass_limit, upper_mass_limit] = calculateMassRange(this.mass_target, this.mass_error, this.error_type)
+        const [lower_mass_limit, upper_mass_limit] = calculateMassRange(this.mass_target, this.mass_error, this.mass_error_type)
         this.user_spectrum_array = this.user_spectrum_string.split("\n").map(x => x.trim().split(/\s+/).map(y => Number(y)))
         this.user_spectrum_array = rescaleSpectrum(this.user_spectrum_array)
         const response = await axios.post(
@@ -176,6 +193,7 @@
       },
       onGridReady(params) {
         this.gridApi = params.api
+        this.gridApi.onFilterChanged()
       },
       onRowSelected(event) {
         if(event.event) {
@@ -185,6 +203,16 @@
         } else {
           this.show_plot = false
         }
+      },
+      onFilterChanged() {
+        this.visible_info.spectra = this.gridApi.getModel().rootNode.allChildrenCount
+        this.visible_info.substances = this.gridApi.getDisplayedRowCount()
+      },
+      isExternalFilterPresent() {
+        return true
+      }, 
+      doesExternalFilterPass(node) {
+        return node.data.similarity > this.min_spectrum_similarity
       },
       spectrumAsRows(selected_spectrum) {
         return selected_spectrum.map(function(x){return {"m/z":x[0], "intensity":x[1]}})

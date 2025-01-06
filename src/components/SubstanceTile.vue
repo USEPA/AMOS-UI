@@ -9,7 +9,7 @@
 
 <template>
   <div :class="highlight ? 'substance-tile substance-highlight' : 'substance-tile'">
-    <p style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;"><router-link :to="`/search/${substance_info.dtxsid}`" target="_blank"> {{substance_info.preferred_name}} </router-link> </p>
+    <p style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap;" :title="substance_info.preferred_name"><router-link :to="`/search/${substance_info.dtxsid}`" target="_blank"> {{substance_info.preferred_name}} </router-link> </p>
     <div style="display: block; margin-left: auto; margin-right: auto; width:150px; height:150px;">
       <img v-if="substance_info.image_link" style="width:150px; height:150px;" :src="substance_info.image_link" :alt="`Structure image for ${substance_info.dtxsid}`"/>  
       <div v-else style="text-align: center; display: flex; align-items: center;">No structural representation was found for this substance.</div>
