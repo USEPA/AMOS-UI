@@ -15,7 +15,7 @@
 
 <script>
   import * as d3 from "d3";
-  import '@/assets/mass_spectra.css'
+  import '@/assets/spectrum_plots.css'
 
   export default {
     data() {
@@ -23,13 +23,16 @@
         x: 1
       }
     },
-    props: {spectrum: Array, spectrum_name: {type: String, default: "Mass Spectrum"}},
+    props: {spectrum: Array, spectrum_name: {type: String, default: "Mass Spectrum"}, peak_threshold: {type: Number, default: 0}},
     mounted() {
       // this can't be used in created() since the svg element needs to be rendered before the plot can be created
       this.createSingleMassSpectrumPlot()
     },
     watch: {
       spectrum(){
+        this.createSingleMassSpectrumPlot()
+      },
+      peak_threshold(){
         this.createSingleMassSpectrumPlot()
       }
     },
@@ -41,13 +44,14 @@
         const margins = {right: 40, left: 40, top: 40, bottom: 40}
 
         const spectrum = this.spectrum
+        const peak_threshold = this.peak_threshold
 
         //clears the plot when new data is supplied to this component
         svg.selectAll("*").remove();
 
         // construct the scales for the axes
-        const ppm_domain = d3.extent(spectrum, d => d[0])
-        var mz_scale = d3.scaleLinear().domain([ppm_domain[0]-0.5, ppm_domain[1]+0.5]).range([margins.left, width-margins.right])
+        const mz_domain = d3.extent(spectrum, d => d[0])
+        var mz_scale = d3.scaleLinear().domain([mz_domain[0]-0.5, mz_domain[1]+0.5]).range([margins.left, width-margins.right])
         let mz_rescale = mz_scale.copy()
         var intensity_scale = d3.scaleLinear().domain([0,100]).range([height-margins.bottom, margins.top]).nice()
 
@@ -60,13 +64,16 @@
         svg.append("text").attr("x", width/2).attr("y", height - margins.bottom/4).attr("text-anchor", "middle").attr("fill", "currentColor").text("m/z")
         svg.append("text").attr("transform", "rotate(-90)").attr("x", -height/2).attr("y", margins.left/3).attr("text-anchor", "middle").attr("fill", "currentColor").text("Relative Intensity")
 
-        // plots peaks as circles; may be useful for visual debugging
-        //svg.append("g").selectAll("circle").data(this.spectrum).join("circle").attr("cx", d => mz_rescale(d[0])).attr("cy", d => intensity_scale(d[1])).attr("r", 3)
-        
         const clippingRect = svg.append("clipPath").attr("id", "clippy").append("rect").attr("width", width - margins.left - margins.right).attr("height", height - margins.top - margins.bottom).attr("transform", `translate(${margins.left}, ${margins.top})`).attr("fill", "none")
 
         // add per-point lines
-        svg.append("g").selectAll("line").data(spectrum).join("line").attr("x1", peak => mz_rescale(peak[0])).attr("x2", peak => mz_rescale(peak[0])).attr("y1", intensity_scale(0)).attr("y2", peak => intensity_scale(peak[1])).attr("class", "peak-line").attr("clip-path", "url(#clippy)")
+        svg.append("g").selectAll("line").data(spectrum).join("line")
+          .attr("x1", peak => mz_rescale(peak[0])).attr("x2", peak => mz_rescale(peak[0]))
+          .attr("y1", intensity_scale(0)).attr("y2", peak => intensity_scale(peak[1]))
+          .attr("class", (peak) => {
+            return peak[1] >= peak_threshold ? "ms-peak-line" : "ms-peak-line-below-threshold"
+          })
+          .attr("clip-path", "url(#clippy)")
 
         const extent = [[margins.left, margins.top], [width-margins.right, height-margins.bottom]]
         const zoom = d3.zoom().scaleExtent([1,100]).extent(extent).translateExtent(extent).on("zoom", function(event){
@@ -78,7 +85,7 @@
 
         // make a circle to add to the plot 
         var focus = svg.append("g").style("display", "none")
-        focus.append("circle").attr("class", "mouseover-highlight-circle").attr("r", 3)
+        focus.append("circle").attr("id", "highlight").attr("r", 3)
         // add description text to the plot
         focus.append("text").attr("class", "locationtext").attr("text-anchor", "end").attr("x", width).attr("y", margins.top/2)
 
@@ -90,7 +97,9 @@
             var pt = d3.pointer(event, svg.node())
             var cursor_x = mz_rescale.invert(pt[0])
             const x_index = d3.bisectCenter(spectrum.map(d => d[0]), cursor_x)
-            focus.select("circle.mouseover-highlight-circle").attr("transform", `translate(${mz_rescale(spectrum[x_index][0])}, ${intensity_scale(spectrum[x_index][1])})`)
+            focus.select("#highlight")
+              .attr("class", () => spectrum[x_index][1] >= peak_threshold ? "mouseover-highlight-circle" : "mouseover-highlight-circle-below-threshold")
+              .attr("transform", `translate(${mz_rescale(spectrum[x_index][0])}, ${intensity_scale(spectrum[x_index][1])})`)
             focus.select("text.locationtext").text(`m/z: ${spectrum[x_index][0].toFixed(4)}; Intensity: ${spectrum[x_index][1].toFixed(3)}`)
           })
         

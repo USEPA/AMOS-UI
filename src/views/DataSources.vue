@@ -46,10 +46,18 @@
           /*{field: 'source_ids', headerName: 'AMOS IDs', flex: 0.5},*/
           {field: 'category', headerName: 'Category', filter: 'agSetColumnFilter', flex: 1},
           {field: 'description', headerName: 'Description', flex: 1.5, wrapText: true, filter: 'agTextColumnFilter', autoHeight: true},
-          {field: 'substances', headerName: '# Substances', width: 120, filter: 'agNumberColumnFilter'},
-          {field: 'fact_sheets', headerName: '# Fact Sheets', width: 120, filter: 'agNumberColumnFilter'},
-          {field: 'methods', headerName: '# Methods', width: 100, filter: 'agNumberColumnFilter'},
-          {field: 'spectra', headerName: '# Spectra', width: 100, filter: 'agNumberColumnFilter'},
+          {field: 'substances', headerName: '# Substances', width: 120, filter: 'agNumberColumnFilter', cellRenderer: params => {
+            return params.data.substances.toLocaleString()
+          }},
+          {field: 'fact_sheets', headerName: '# Fact Sheets', width: 120, filter: 'agNumberColumnFilter', cellRenderer: params => {
+            return params.data.fact_sheets.toLocaleString()
+          }},
+          {field: 'methods', headerName: '# Methods', width: 100, filter: 'agNumberColumnFilter', cellRenderer: params => {
+            return params.data.methods.toLocaleString()
+          }},
+          {field: 'spectra', headerName: '# Spectra', width: 100, filter: 'agNumberColumnFilter', cellRenderer: params => {
+            return params.data.spectra.toLocaleString()
+          }},
         ]
       }
     },

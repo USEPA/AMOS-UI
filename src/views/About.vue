@@ -24,17 +24,17 @@
     </ul>
     <p>The records in this application contain:</p>
     <ul v-if="summary_retrieved">
-      <li>Spectra in database: {{ (result_info["Spectrum"]["Mass Spectrum"] + result_info["Spectrum"]["NMR Spectrum"] + result_info["Spectrum"]["IR Spectrum"]).toLocaleString() }} spectra in database ({{result_info["Spectrum"]["PDF"].toLocaleString()}} of which are PDFs), covering {{result_info["Substances"]["Internal Spectrum"].toLocaleString()}} substances</li>
+      <li>Spectra in database: {{ internal_spectra["Total"].toLocaleString() }} spectra total, {{ internal_spectra["PDF"].toLocaleString() }} of which are stored as PDFs, covering {{ substances["Internal Spectrum"].toLocaleString() }} substances.  Among those that are not PDFs, there are:</li>
       <ul>
-        <li>{{ result_info["Spectrum"]["Mass Spectrum"].toLocaleString() }} mass spectra</li>
-        <li>{{ result_info["Spectrum"]["NMR Spectrum"].toLocaleString() }} NMR spectra</li>
-        <li>{{ result_info["Spectrum"]["IR Spectrum"].toLocaleString() }} IR spectra</li>
+        <li>{{ internal_spectra["Mass"]["Total"].toLocaleString() }} mass spectra -- {{ breakdowns["Mass"] }} </li>
+        <li>{{ internal_spectra["NMR"]["Total"].toLocaleString() }} NMR spectra -- {{ breakdowns["NMR"] }} </li>
+        <li>{{ internal_spectra["IR"]["Total"].toLocaleString() }} IR spectra -- {{ breakdowns["IR"] }} </li>
       </ul>
-      <li>Externally linked spectra: {{ result_info["Spectrum"]["External"].toLocaleString() }} external links, covering {{ result_info["Substances"]["External Spectrum"].toLocaleString()}} substances</li>
-      <li>Fact Sheets: {{result_info["Fact Sheet"]["PDF"].toLocaleString()}} documents in database, covering {{ result_info["Substances"]["Internal Fact Sheet"].toLocaleString() }} substances</li>
-      <li>Methods: {{result_info["Method"]["PDF"].toLocaleString()}} documents in database, covering {{result_info["Substances"]["Internal Method"].toLocaleString()}} substances</li>
-      <li>Unique sources: {{result_info["Sources"]["Total"].toLocaleString()}}</li>
-      <li>Substances appearing in at least one record: {{result_info["Substances"]["Total"].toLocaleString()}}</li>
+      <li>Externally linked spectra: {{ external_spectra_count.toLocaleString() }} links for spectra of various kinds, covering {{ substances["External Spectrum"].toLocaleString() }} substances.</li>
+      <li>Fact Sheets: {{ fact_sheet_count.toLocaleString() }} documents, covering {{ substances["Internal Fact Sheet"].toLocaleString() }} substances.</li>
+      <li>Methods: {{ method_count.toLocaleString() }} documents, covering {{ substances["Internal Method"].toLocaleString() }} substances.</li>
+      <li>Unique sources: {{ source_count.toLocaleString() }}</li>
+      <li>Substances appearing in at least one record: {{ substances["Total"].toLocaleString() }}</li>
     </ul>
   </div>
 </template>
@@ -49,21 +49,62 @@
       return {
         contents_search_done: false,
         summary_retrieved: false,
+        external_spectra_count: 0,
+        fact_sheet_count: 0,
+        internal_spectra: {},
+        method_count: 0,
         source_count: 0,
-        substances_appearing: 0,
-        result_types: {},
+        substances: {},
+        breakdowns: {},
         BACKEND_LOCATION
       }
     },
     methods: {
       async getDatabaseStats(){
         const response = await axios.get(`${this.BACKEND_LOCATION}/database_summary/`)
-        this.result_info = response.data
+        const result_info = response.data
         this.summary_retrieved = true
+        return result_info
       }
     },
     async created() {
-      await this.getDatabaseStats()
+      const result_info = await this.getDatabaseStats()
+      this.external_spectra_count = result_info["External Spectrum"]["Total"]
+      this.fact_sheet_count = result_info["Fact Sheet"]["Total"]
+      this.internal_spectra = result_info["Internal Spectrum"]
+      this.method_count = result_info["Method"]["Total"]
+      this.source_count = result_info["Sources"]["Total"]
+      this.substances = result_info["Substances"]
+
+      // MS breakdown
+      const ms_types = Object.keys(this.internal_spectra["Mass"])
+      var ms_breakdown = ""
+      for (let k of ms_types) {
+        if (!(["other", "Total"].includes(k))) {
+          ms_breakdown += `${this.internal_spectra["Mass"][k].toLocaleString()} ${k}; `
+        }
+      }
+      this.breakdowns["Mass"] = ms_breakdown + `${this.internal_spectra["Mass"]["other"].toLocaleString()} other`
+
+      // NMR breakdown
+      const nmr_types = Object.keys(this.internal_spectra["NMR"])
+      var nmr_breakdown = ""
+      for (let k of nmr_types) {
+        if (!(["Total"].includes(k))) {
+          nmr_breakdown += `${this.internal_spectra["NMR"][k].toLocaleString()} ${k}; `
+        }
+      }
+      this.breakdowns["NMR"] = nmr_breakdown.substring(0, nmr_breakdown.length-2)
+
+      // IR breakdown
+      const ir_types = Object.keys(this.internal_spectra["IR"])
+      var ir_breakdown = ""
+      for (let k of ir_types) {
+        if (!(["Total"].includes(k))) {
+          ir_breakdown += `${this.internal_spectra["IR"][k].toLocaleString()} ${k}; `
+        }
+      }
+      this.breakdowns["IR"] = ir_breakdown.substring(0, ir_breakdown.length-2)
     }
   }
 </script>

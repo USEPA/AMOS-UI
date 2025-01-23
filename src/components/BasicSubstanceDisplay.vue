@@ -65,7 +65,6 @@
           this.displayed_inchikey.first_block = inchikey.slice(0,14)
           this.displayed_inchikey.remainder = inchikey.slice(14)
         }
-        console.log(inchikey)
       }
     },
     created() {

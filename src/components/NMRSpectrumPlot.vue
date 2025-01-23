@@ -19,6 +19,7 @@
   import * as d3 from "d3";
 
   import '@/assets/style.css'
+  import '@/assets/spectrum_plots.css'
 
   export default {
     data() {
@@ -42,25 +43,25 @@
         var width = svg.attr("width")
         var height = svg.attr("height")
         const margins = {right: 40, left: 40, top: 40, bottom: 40}
-        const margin = 40
 
         svg.selectAll("*").remove();
 
-        // construct the scales for the axes; we want the horizontal axis to go from most positive to most negative, so make sure that's set up correctly in the range
-        var ppm_scale = d3.scaleLinear().domain(d3.extent(this.spectrum, d => d["ppm"])).range([width-margin, margin])
+        // construct the scales for the axes; we want the horizontal axis to go from most positive on the left to most
+        // negative on the right, so make sure that's set up correctly in the range
+        var ppm_scale = d3.scaleLinear().domain(d3.extent(this.spectrum, d => d["ppm"])).range([width-margins.right, margins.left])
         let ppm_rescale = ppm_scale.copy()
-        var intensity_scale = d3.scaleLinear().domain(d3.extent(this.spectrum, d => d["intensity"])).range([height-margin, margin]).nice()
+        var intensity_scale = d3.scaleLinear().domain(d3.extent(this.spectrum, d => d["intensity"])).range([height-margins.bottom, margins.top]).nice()
         
         // make the axes
         var ppm_axis = d3.axisBottom(ppm_rescale)
-        var ppm_axis_g = svg.append("g").call(ppm_axis).attr("transform", `translate(0,${height-margin})`)
-        svg.append("g").call(d3.axisLeft(intensity_scale)).attr("transform", `translate(${margin},0)`)
+        var ppm_axis_g = svg.append("g").call(ppm_axis).attr("transform", `translate(0,${height-margins.bottom})`)
+        svg.append("g").call(d3.axisLeft(intensity_scale)).attr("transform", `translate(${margins.top},0)`)
 
         // make the axis labels
         svg.append("text").attr("x", width/2).attr("y", height - margins.bottom/4).attr("text-anchor", "middle").attr("fill", "currentColor").text("PPM")
-        svg.append("text").attr("transform", "rotate(-90)").attr("x", -height/2).attr("y", margin/4).attr("text-anchor", "middle").attr("fill", "currentColor").text("Intensity")
+        svg.append("text").attr("transform", "rotate(-90)").attr("x", -height/2).attr("y", margins.left/4).attr("text-anchor", "middle").attr("fill", "currentColor").text("Intensity")
         
-        const clippingRect = svg.append("clipPath").attr("id", "clippy").append("rect").attr("width", width - 2*margin).attr("height", height - 2*margin).attr("transform", `translate(${margin}, ${margin})`).attr("fill", "none")
+        const clippingRect = svg.append("clipPath").attr("id", "clippy").append("rect").attr("width", width - margins.left - margins.right).attr("height", height - margins.top - margins.bottom).attr("transform", `translate(${margins.left}, ${margins.top})`).attr("fill", "none")
         
         // add the actual line to the plot
         var linemaker = d3.line().x(d => ppm_rescale(d["ppm"])).y(d => intensity_scale(d["intensity"]))
@@ -72,7 +73,7 @@
 
         var spectrum = this.spectrum
 
-        const extent = [[margin, margin], [width-margin, height-margin]]
+        const extent = [[margins.left, margins.top], [width-margins.right, height-margins.bottom]]
         const zoom = d3.zoom().scaleExtent([1,1000]).extent(extent).translateExtent(extent).on("zoom", function(event){
           ppm_rescale = event.transform.rescaleX(ppm_scale)
           ppm_axis_g.call(ppm_axis.scale(ppm_rescale))
@@ -81,10 +82,10 @@
         svg.call(zoom)
 
         // add description text to the plot
-        focus.append("text").attr("class", "locationtext").attr("text-anchor", "end").attr("x", width).attr("y", margin/2)
+        focus.append("text").attr("class", "locationtext").attr("text-anchor", "end").attr("x", width).attr("y", margins.top/2)
 
         // the rect is the selection area for the cursor, while the rest of this block is implementing the mouseover functionality
-        svg.append("rect").attr("width", width - 2*margin).attr("height", height - 2*margin).attr("transform", `translate(${margin}, ${margin})`).style("fill", "none").style("pointer-events", "all")
+        svg.append("rect").attr("width", width - margins.left - margins.right).attr("height", height - margins.top - margins.bottom).attr("transform", `translate(${margins.left}, ${margins.top})`).style("fill", "none").style("pointer-events", "all")
           .on("mouseover", function() {focus.style("display", null)})
           .on("mouseout", function() {focus.style("display", "none")})
           .on("mousemove", function(event) {
@@ -104,25 +105,3 @@
   }
   
 </script>
-
-<style>
-  .spectrum-display-container {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    height: 100%
-  }
-
-  .graph-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .info-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 18px
-  }
-</style>

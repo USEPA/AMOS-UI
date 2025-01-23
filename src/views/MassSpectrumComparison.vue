@@ -9,7 +9,7 @@
   <div>
     <p>This page visualizes and compares spectra.  Copy the spectra you want to visualize or compare into the text box(es), then use the buttons below to display them.  It should be in the form of space-delimited values for m/z and intensity, with one peak per line.  Input spectra are automatically rescaled to a maximum intensity of 100.</p>
     <div class="display-stuff">
-      <div class="search-inputs">
+      <div class="search-inputs" style="width: 44vw;">
         <div class="display-stuff">
           <div class="search-inputs">
             <h5>Spectrum #1</h5>
@@ -37,6 +37,16 @@
         <div style="align-items: left; width: 90%">
           <h5>Options</h5>
           Min peak height for comparison <input type="number" min="0" max="100" v-model="peak_threshold">%
+          <br />
+          <div style="padding-top: 10px;">
+            Window for peak similarity <input type="number" min="0" max="25" v-model="similarity.window">
+            &nbsp;
+            <label><input type="radio" id="error_da" v-model="similarity.type" value="da">Da</label>
+            &nbsp;
+            <label><input type="radio" id="error_ppm" v-model="similarity.type" value="ppm">ppm</label>
+            <br />
+            NOTE: The size of the window in the mass range search is constrained to 0.5 Da or 25 ppm, as appropriate.  Input values larger than these will be coerced to the maximum values.
+          </div>
         </div>
         <div class="button-array">
           <button @click="display_user_spectrum(spectrum_box_1, 'Spectrum #1')">Display Spectrum #1</button>
@@ -45,20 +55,20 @@
           <button @click="display_both_spectra()">Display Both</button>
         </div>
       </div>
-      <div class="info-container" style="padding-left: 100px">
+      <div class="info-container" style="padding-left: 100px; width: 44vw">
         <div v-if="spectrum_display == 'single'">
-          <SingleMassSpectrumPlot :spectrum="spectrum1" :spectrum_name="plot_title"/>
+          <SingleMassSpectrumPlot :spectrum="spectrum1" :spectrum_name="plot_title" :peak_threshold="peak_threshold"/>
           <br />
           <p><strong>Spectral Entropy:</strong> {{ spectral_entropy.toFixed(4) }}</p>
         </div>
         <div v-else-if="spectrum_display == 'dual'">
-          <DualMassSpectrumPlot :spectrum1="spectrum1" :spectrum2="spectrum2" :spectrum1_name="spectrum1_name" :spectrum2_name="spectrum2_name"/>
+          <DualMassSpectrumPlot :spectrum1="spectrum1" :spectrum2="spectrum2" :spectrum1_name="spectrum1_name" :spectrum2_name="spectrum2_name" :peak_threshold="peak_threshold" :window_size="similarity.window" :window_type="similarity.type"/>
           <br />
           <p><strong>Entropy Similarity:</strong> {{ entropy_similarity.toFixed(4) }}</p>
         </div>
       </div>
     </div>
-    <BAlert variant="danger" v-model="error_messages.invalid_format">
+    <BAlert variant="danger" v-model="error_messages.invalid_format" dismissible>
         There are issues with the contents of {{ error_messages.bad_spectrum_input_name }} -- please check to ensure it is correct.  The spectrum should be in the following format:
         <ul>
           <li>There should be one peak per line.</li>
@@ -80,7 +90,7 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { rescaleSpectrum, validateSpectrumInput } from '@/assets/common_functions'
+  import { constrainNumber, rescaleSpectrum, validateSpectrumInput } from '@/assets/common_functions'
   import { BACKEND_LOCATION } from '@/assets/store';
   import DualMassSpectrumPlot from '@/components/DualMassSpectrumPlot.vue'
   import SingleMassSpectrumPlot from '@/components/SingleMassSpectrumPlot.vue'
@@ -105,6 +115,7 @@
         database_spectra: [],
         substance_mapping: {},
         BACKEND_LOCATION,
+        similarity: {window: 0.05, type: "da"},
         error_messages: {invalid_format: false, bad_spectrum_input_name: ""},
         column_defs: [
           {field: "dtxsid", headerName: "DTXSID", width: 140},
@@ -194,7 +205,12 @@
         return response.data.entropy
       },
       async calculateEntropySimilarity(spectrum_1, spectrum_2) {
-        const response = await axios.post(`${this.BACKEND_LOCATION}/entropy_similarity/`, {spectrum_1: spectrum_1, spectrum_2: spectrum_2})
+        if (this.similarity.type == "da") {
+          this.similarity.window = constrainNumber(this.similarity.window, 0, 0.5)
+        } else {
+          this.similarity.window = constrainNumber(this.similarity.window, 0, 25)
+        }
+        const response = await axios.post(`${this.BACKEND_LOCATION}/entropy_similarity/`, {spectrum_1: spectrum_1, spectrum_2: spectrum_2, window: this.similarity.window, type: this.similarity.type})
         return response.data.similarity
       },
       onGridReady(params) {

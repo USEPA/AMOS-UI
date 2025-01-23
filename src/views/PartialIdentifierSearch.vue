@@ -1,15 +1,18 @@
 
 
 <template>
-  This page runs searches for substances based on identifiers that can potentially match more than one substance -- potentially many substances.  Searches can be done on four identifiers:
+  This page runs searches for substances based on identifiers that can match more than one substance -- potentially many substances.  Searches can be done on four identifiers:
   <ul>
-    <li>Substring of a substance name.  This will search for synonyms that contain the substring as well.</li>
-    <li>First block of a substance's InChIKey.</li>
-    <li>The exact molecular formula of a substance.</li>
+    <li>Substring of a substance name.  This will search for recognized synonyms that contain the substring as well.</li>
+    <li>The first block of a substance's InChIKey.</li>
+    <li>
+      The exact molecular formula of a substance in <a href="https://en.wikipedia.org/wiki/Chemical_formula#Hill_system">Hill form</a>.
+      <help-icon style="vertical-align:middle;" tooltipText="Hill form lists the number of carbon atoms, then the number of hydrogen atoms, then counts of all other atoms in alphabetical order, with single-letter abbreviations coming before two-letter ones that start with the same letter (e.g., 'B' before 'Be').  If no carbon is present, all atoms (including hydrogen) are listed alphabetically.  For example, C2H5Br, BrClH2Si, and H2O4S are in Hill form." />
+    </li>
     <li>A range of (monoisotopic) molecular masses.</li>
   </ul>
   <div style="display: flex">
-    <input v-if="search_type != 'mass_range_search'" @keyup.enter="runPartialSearch" id="big-search-bar" name="big-search-bar" placeholder="Search..." size="60" v-model="search_term">
+    <input v-if="search_type != 'mass_range_search'" @keyup.enter="runPartialSearch" placeholder="Search..." size="60" v-model="search_term">
     <div v-else>
       <input type="text" v-model.number="mass_target" name="search-dtxsid"> Da ± &nbsp;<input type="text" v-model.number="mass_error" name="search-dtxsid">
       &nbsp;
@@ -61,6 +64,7 @@
 
   import { calculateMassRange, constrainNumber, imageLinkForSubstance } from '@/assets/common_functions'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
+  import HelpIcon from '@/components/HelpIcon.vue'
   import RecordCountFilter from '@/components/RecordCountFilter.vue'
 
   export default {
@@ -70,8 +74,8 @@
         COMPTOX_PAGE_URL,
         defaultColDef: {filter: 'agTextColumnFilter', floatingFilter: true, resizable: true},
         filtered_record_count: 0,
-        mass_error: null,
-        mass_error_type: "da",
+        mass_error: 5,
+        mass_error_type: "ppm",
         mass_target: null,
         search_term: "",
         search_type: "substring_search",
@@ -160,6 +164,7 @@
       }
     },
     async created()  {
+      // if there are query parameters in the URL, run the appropriate search; otherwise, nothing needs to be done
       const query_params = Object.keys(this.$route.query)
       const search_types = this.search_type_options.map(x => x.value)
       for (const param of query_params) {
@@ -277,7 +282,7 @@
         window.open(`/search/${event.data.dtxsid}`)
       }
     },
-    components: {AgGridVue, BFormSelect, RecordCountFilter}
+    components: {AgGridVue, BFormSelect, HelpIcon, RecordCountFilter}
   }
 </script>
 

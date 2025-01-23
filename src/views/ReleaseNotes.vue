@@ -2,6 +2,16 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2025-01-23</summary>
+    <ul>
+      <li>Functionality has been added for submitting non-targeted analysis (NTA) jobs under the header of "ITERPRET NTA".  This is still under construction, but the current job page is functional.</li>
+      <li>Mass spectrum plots on the mass spectrum comparison page will grey out peaks that are below a specified threshold; these will also be ignored in entropy calculations.</li>
+      <li>Control of the similarity window used in the similar entropy calculations has been added to the mass spectrum comparison and search pages.  Mirrored spectrum plots on these pages will highlight similar peaks on these pages as well.</li>
+      <li>More detailed breakdowns of the spectra in AMOS's database have been added to the about page.</li>
+      <li>Counts of external sources have been added to the partial identifier search (now renamed "Formula, Mass, & Partial Identifier Search" in the navigation bar).</li>
+    </ul>
+  </details>
+  <details>
     <summary>2025-01-06</summary>
     <ul>
       <li>Counts of sources from external types of records (patents, literature, PubMed, etc.) have been incorporated into the partial identifier search, and are an option on the batch search.</li>

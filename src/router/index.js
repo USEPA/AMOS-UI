@@ -28,8 +28,10 @@ const routes = [
   {path: "/release_notes", name: "Release Notes", component: ()=>import('../views/ReleaseNotes.vue')},
   {path: "/record_id_search/:internal_id", name: "Record ID Search", component: ()=>import('../views/RecordIDSearch.vue')},
   {path: "/partial_identifier_search/", name: "Partial Identifier Search", component: ()=>import('../views/PartialIdentifierSearch.vue')},
-  {path: "/nta_ms1_workflow/", name: "NTA MS1 Workflow", component: ()=>import('../views/MS1NTAJobSubmission.vue')},
+  {path: "/ms1_nta/submit/", name: "NTA MS1 Job Submission", component: ()=>import('../views/MS1NTAJobSubmission.vue')},
+  {path: "/ms1_nta/results/:job_id", name: "NTA MS1 Job Results", component: ()=>import('../views/MS1NTAResults.vue')},
   {path: "/nta_ms2_workflow/", name: "NTA MS2 Workflow", component: ()=>import('../views/MS2NTAJobSubmission.vue')},
+  {path: "/nta_home/", name: "NTA Home", component: ()=>import('../views/NTAHome.vue')},
   {path: "/:catchAll(.*)", name: "404", component: ()=>import('../views/404.vue')}
 ]
 

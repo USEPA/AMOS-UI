@@ -1,5 +1,14 @@
+<!--
+  This page is an adaptation/copy of the job submission page from the NTA WebApp, designed to allow the submission of
+  jobs to the NTA application's backend.
+
+  As of this writing, the code is currently hitting some enpoints for the original NTA web application as a pseudo-API;
+  a more proper API is expected to follow in the future.
+
+  There are no URL or query parameters associated with this page.
+-->
+
 <template>
-  <button @click="fileContentCheck">FileContentCheck</button>
   <table class="nostripe input_table">
     <thead><tr>
       <th scope="col">Input</th><th scope="col">Value</th>
@@ -15,11 +24,11 @@
       </tr>
       <tr>
         <th>Positive mode file (csv):</th>
-        <td><input type="file" id="pos_mode_file" accept=".csv" @change="loadFile($event, 'positive_mode')"></td>
+        <td><input type="file" id="pos_mode_file" accept=".csv" @change="loadFile($event, 'positive_mode')" :disabled="run_test_files=='yes'"></td>
       </tr>
       <tr>
         <th>Negative mode file (csv):</th>
-        <td><input type="file" id="neg_mode_file" accept=".csv" @change="loadFile($event, 'negative_mode')"></td>
+        <td><input type="file" id="neg_mode_file" accept=".csv" @change="loadFile($event, 'negative_mode')" :disabled="run_test_files=='yes'"></td>
       </tr>
       <tr>
         <th>Positive mode adducts:</th>
@@ -80,15 +89,15 @@
       </tr>
       <tr>
         <th>Run sequence positive mode file (csv; optional):</th>
-        <td><input type="file" id="run_sequence_pos_file" accept=".csv" @change="loadFile($event, 'run_sequence_positive')"></td>
+        <td><input type="file" id="run_sequence_pos_file" accept=".csv" @change="loadFile($event, 'run_sequence_positive')" :disabled="run_test_files=='yes'"></td>
       </tr>
       <tr>
         <th>Run sequence negative mode file (csv; optional):</th>
-        <td><input type="file" id="run_sequence_neg_file" accept=".csv" @change="loadFile($event, 'run_sequence_negative')"></td>
+        <td><input type="file" id="run_sequence_neg_file" accept=".csv" @change="loadFile($event, 'run_sequence_negative')" :disabled="run_test_files=='yes'"></td>
       </tr>
       <tr>
         <th>Tracer file (csv; optional):</th>
-        <td><input type="file" id="tracer_file" accept=".csv" @change="loadFile($event, 'tracer')"></td>
+        <td><input type="file" id="tracer_file" accept=".csv" @change="loadFile($event, 'tracer')" :disabled="run_test_files=='yes'"></td>
       </tr>
       <tr>
         <th>Tracer mass accuracy units:</th>
@@ -152,10 +161,6 @@
         <th>Search DSSTox by:</th>
         <td><BFormSelect v-model="search_mode" :options="search_mode_options" size="sm" style="width: auto;"/></td>
       </tr>
-      <!-- <tr>
-        <th>Save top result only?</th>
-        <td><BFormSelect v-model="top_result_only" :options="yes_no_options" size="sm" style="width: auto;"/></td>
-      </tr> -->
     </tbody>
   </table>
   <div class="input-nav">
@@ -173,35 +178,34 @@
   export default {
     data() {
       return {
+        mass_unit_options: ["Da", "ppm"],
+        mrl_std_multiplier_options: ['3', '5', '10'],
+        search_mode_options: ['mass', 'formula'],
+        tracer_plot_yaxis_options: ['linear', 'log'],
+        yes_no_options: ['no', 'yes'],
         parent_ion_mass_accuracy: 5,
         min_replicate_hits: 66,
-        min_replicate_hits_in_blanks: 66,
-        project_name: "Example NTA",
+        min_replicate_hits_in_blanks: 60, //66,
+        project_name: "gsj_test_browser", // "Example NTA",
         run_test_files: "no",
         mass_accuracy_units: "ppm",
         tracer_mass_accuracy_units: "ppm",
-        mass_unit_options: ["Da", "ppm"],
         tracer_plot_yaxis: "log",
-        tracer_plot_yaxis_options: ['linear', 'log'],
         tracer_plot_trendline: "yes",
         mrl_std_multiplier: "3",
-        mrl_std_multiplier_options: ['3', '5', '10'],
-        search_dsstox: "yes",
+        search_dsstox: "no", // "yes",
         search_hcd: "no",
-        /* top_result_only: "no", */
         search_mode: "mass",
-        search_mode_options: ['mass', 'formula'],
-        yes_no_options: ['no', 'yes'],
         file_contents: {positive_mode: null, negative_mode: null, run_sequence_positive: null, run_sequence_negative: null, tracer: null},
         pos_adducts: ["Na", "K", "NH4"],
-        neg_adducts: ["Cl", "HCO2", "CH3CO2", "FA"],
+        neg_adducts: ["Cl", "Br", "HCO2", "CH3CO2", "CF3CO2"], //["Cl", "HCO2", "CH3CO2", "FA"],
         neutral_losses: ["H2O", "CO2"],
         mass_accuracy: 10,
         retention_time_accuracy: 0.05,
-        tracer_mass_accuracy: 5,
+        tracer_mass_accuracy: 10, //5,
         tracer_retention_time_accuracy: 0.1,
-        max_replicate_cv: 0.8,
-        minimum_retention_time: 0.0,
+        max_replicate_cv: 0.5, //0.8,
+        minimum_retention_time: 0.5, //0.0,
       }
     },
     methods: {
@@ -213,38 +217,58 @@
         })
         reader.readAsText(file)
       },
-      fileContentCheck() {
-        console.log(this.pos_adducts)
-        console.log(this.neg_adducts)
-        console.log(this.neutral_losses)
-      },
       async submitJob() {
-        const input_parameters = {
-          project_name: this.project_name, test_files: this.run_test_files, mass_accuracy_units: this.mass_accuracy_units,
-          mass_accuracy: this.mass_accuracy, rt_accuracy: this.retention_time_accuracy,
-          mass_accuracy_units_tr: this.tracer_mass_accuracy_units, mass_accuracy_tr: this.tracer_mass_accuracy,
-          rt_accuracy_tr: this.tracer_retention_time_accuracy, tracer_plot_yaxis_format: this.tracer_plot_yaxis,
-          tracer_plot_trendline: this.tracer_plot_trendline, min_replicate_hits: this.min_replicate_hits,
-          min_replicate_hits_blanks: this.min_replicate_hits_in_blanks, max_replicate_cv: this.max_replicate_cv,
-          mrl_std_multiplier: this.mrl_std_multiplier, parent_ion_mass_accuracy: this.parent_ion_mass_accuracy,
-          minimum_rt: this.minimum_retention_time, search_dsstox: this.search_dsstox, search_hcd: this.search_hcd,
-          search_mode: this.search_mode, pos_adducts: this.pos_adducts, neg_adducts: this.neg_adducts, neutral_losses: this.neutral_losses,
-          pos_input: this.file_contents.positive_mode, neg_input: this.file_contents.negative_mode, tracer_file: this.file_contents.tracer,
-          run_sequence_pos_file: this.file_contents.run_sequence_positive, run_sequence_neg_file: this.file_contents.run_sequence_negative
+        const payload_old = {
+          project_name: "gsj_test_browser",
+          datetime: this.getDateTime(),
+          test_files: "no",
+          pos_input: document.getElementById("pos_mode_file").files[0],
+          neg_input: document.getElementById("neg_mode_file").files[0],
+          pos_adducts: ["Na", "K", "NH4"],
+          neg_adducts: ["Cl", "Br", "HCO2", "CH3CO2", "CF3CO2"],
+          neutral_losses: ["H2O", "CO2"],
+          mass_accuracy_units: "ppm",
+          mass_accuracy: 10,
+          rt_accuracy: 0.05,
+          run_sequence_pos_file: document.getElementById("run_sequence_pos_file").files[0],
+          run_sequence_neg_file: document.getElementById("run_sequence_neg_file").files[0],
+          tracer_input: document.getElementById("tracer_file").files[0],
+          mass_accuracy_units_tr: "ppm",
+          mass_accuracy_tr: 10,
+          rt_accuracy_tr: 0.5,
+          tracer_plot_yaxis_format: "log",
+          tracer_plot_trendline: "yes",
+          min_replicate_hits: 66,
+          min_replicate_hits_blanks: 60,
+          max_replicate_cv: 0.5,
+          mrl_std_multiplier: 3,
+          parent_ion_mass_accuracy: 5,
+          minimum_rt: 0.5,
+          search_dsstox: "no",
+          search_hcd: "no",
+          search_mode: "mass"
         }
-        const job_id = this.generateJobID()
-        //const response = axios.post("https://qed-prod.edap-cluster.com/nta/ms1/input/", input_parameters)
-        const response = axios.post("https://qed-dev.edap-cluster.com/nta/ms1/external/input/", input_parameters)
-        // const response = axios.get("https://qed-dev.edap-cluster.com/nta/ms1/status/OKXQE3OM")
-        console.log(response)
+        const response = await axios.postForm("https://qed-dev.edap-cluster.com/nta/ms1/external/input/", payload_old)
+
+        const job_id_regex = /Job ID: ([A-Za-z0-9]*)/
+        const match = response.data.match(job_id_regex)
+        const job_id = match[1]
+
+        this.$router.push(`/ms1_nta/results/${job_id}`)
+        
       },
-      generateJobID(id_length=8) {
-        const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-        let job_id = ''
-        while (job_id.length < id_length) {
-          job_id += characters.charAt(Math.floor(Math.random()*characters.length))
-        }
-        return job_id
+      getDateTime() {
+        var now     = new Date(); 
+        var year    = now.getFullYear();
+        var month   = now.getMonth()+1; 
+        var day     = now.getDate();
+        var hour    = now.getHours();
+        var minute  = now.getMinutes();
+        var second  = now.getSeconds(); 
+        
+        const ymd = `${year}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`
+        const hms = `${hour.toString().padStart(2, "0")}-${minute.toString().padStart(2, "0")}-${second.toString().padStart(2, "0")}`
+        return ymd + " " + hms;
       },
       resetSettings() {
         this.parent_ion_mass_accuracy = 5
@@ -272,7 +296,7 @@
         this.max_replicate_cv = 0.8
         this.minimum_retention_time = 0.0
 
-        // NOTE: unsure whether this is the best way to do this, but it's the only straightforward one, I could find,
+        // NOTE: unsure whether this is the best way to do this, but it's the only straightforward one I could find,
         // and it's not triggering any other issues that I can see.
         document.getElementById('pos_mode_file').value = null
         document.getElementById('neg_mode_file').value = null

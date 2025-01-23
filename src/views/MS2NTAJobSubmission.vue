@@ -87,14 +87,11 @@
         const files_list = event.target.files
         this.file_contents[sign] = []
         this.file_names[sign] = []
-        console.log(files_list)
         for (const file of files_list) {
           let reader = new FileReader()
           reader.addEventListener("load", (event) => {
             this.file_names[sign].push(file.name)
             this.file_contents[sign].push(reader.result)
-            console.log(this.file_names[sign])
-            console.log(this.file_contents[sign])
           })
           reader.readAsText(file)
         }
@@ -103,8 +100,6 @@
         const file_index = this.file_names[sign].indexOf(file_name)
         this.file_names[sign].splice(file_index, 1)
         this.file_contents[sign].splice(file_index, 1)
-        console.log(this.file_names[sign])
-        console.log(this.file_contents[sign])
       },
       submitJob() {
         1

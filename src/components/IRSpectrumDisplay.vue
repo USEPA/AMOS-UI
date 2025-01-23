@@ -32,6 +32,7 @@
 
   import * as d3 from "d3";
 
+  import '@/assets/spectrum_plots.css'
   import '@/assets/style.css'
   import { BACKEND_LOCATION } from '@/assets/store';
 
@@ -94,21 +95,21 @@
 
         svg.selectAll("*").remove();
 
-        // construct the scales for the axes; we want the horizontal axis to go from most positive to most negative, so make sure that's set up correctly in the range
-        var wavenumber_scale = d3.scaleLinear().domain(d3.extent(this.spectrum, d => d["wavenumber"])).range([width-margin, margin])
+        // construct the scales for the axes; we want the horizontal axis to go from most positive on the left to most negative on the right, so make sure that's set up correctly in the range
+        var wavenumber_scale = d3.scaleLinear().domain(d3.extent(this.spectrum, d => d["wavenumber"])).range([width-margins.right, margins.left])
         let wavenumber_rescale = wavenumber_scale.copy()
-        var intensity_scale = d3.scaleLinear().domain(d3.extent(this.spectrum, d => d["intensity"])).range([height-margin, margin]).nice()
+        var intensity_scale = d3.scaleLinear().domain(d3.extent(this.spectrum, d => d["intensity"])).range([height-margins.bottom, margins.top]).nice()
         
         // make the axes
         var wavenumber_axis = d3.axisBottom(wavenumber_rescale)
-        var wavenumber_axis_g = svg.append("g").call(wavenumber_axis).attr("transform", `translate(0,${height-margin})`)
-        svg.append("g").call(d3.axisLeft(intensity_scale)).attr("transform", `translate(${margin},0)`)
+        var wavenumber_axis_g = svg.append("g").call(wavenumber_axis).attr("transform", `translate(0,${height-margins.bottom})`)
+        svg.append("g").call(d3.axisLeft(intensity_scale)).attr("transform", `translate(${margins.top},0)`)
 
         // make the axis labels
         svg.append("text").attr("x", width/2).attr("y", height - margins.bottom/4).attr("text-anchor", "middle").attr("fill", "currentColor").text("Wavenumber (1/cm)")
         svg.append("text").attr("transform", "rotate(-90)").attr("x", -height/2).attr("y", margin/4).attr("text-anchor", "middle").attr("fill", "currentColor").text("Intensity")
         
-        const clippingRect = svg.append("clipPath").attr("id", "clippy").append("rect").attr("width", width - 2*margin).attr("height", height - 2*margin).attr("transform", `translate(${margin}, ${margin})`).attr("fill", "none")
+        const clippingRect = svg.append("clipPath").attr("id", "clippy").append("rect").attr("width", width - margins.left - margins.right).attr("height", height - margins.top - margins.bottom).attr("transform", `translate(${margins.left}, ${margins.top})`).attr("fill", "none")
         
         // add the actual line to the plot
         var linemaker = d3.line().x(d => wavenumber_rescale(d["wavenumber"])).y(d => intensity_scale(d["intensity"]))
@@ -120,7 +121,7 @@
 
         var spectrum = this.spectrum
 
-        const extent = [[margin, margin], [width-margin, height-margin]]
+        const extent = [[margins.left, margins.top], [width-margins.right, height-margins.bottom]]
         const zoom = d3.zoom().scaleExtent([1,1000]).extent(extent).translateExtent(extent).on("zoom", function(event){
           wavenumber_rescale = event.transform.rescaleX(wavenumber_scale)
           wavenumber_axis_g.call(wavenumber_axis.scale(wavenumber_rescale))
@@ -132,7 +133,7 @@
         focus.append("text").attr("class", "locationtext").attr("text-anchor", "end").attr("x", width).attr("y", margin/2)
 
         // the rect is the selection area for the cursor, while the rest of this block is implementing the mouseover functionality
-        svg.append("rect").attr("width", width - 2*margin).attr("height", height - 2*margin).attr("transform", `translate(${margin}, ${margin})`).style("fill", "none").style("pointer-events", "all")
+        svg.append("rect").attr("width", width - margins.left - margins.right).attr("height", height - margins.top - margins.bottom).attr("transform", `translate(${margins.left}, ${margins.top})`).style("fill", "none").style("pointer-events", "all")
           .on("mouseover", function() {focus.style("display", null)})
           .on("mouseout", function() {focus.style("display", "none")})
           .on("mousemove", function(event) {
@@ -152,25 +153,3 @@
   }
   
 </script>
-
-<style>
-  .spectrum-display-container {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    height: 100%
-  }
-
-  .graph-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .info-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    font-size: 18px
-  }
-</style>

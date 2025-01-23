@@ -1,6 +1,6 @@
 <!--
   This component is used to organize links that go to various pages on the app.  It also contains a search bar for the
-  general record search.
+  general search.
 
   This component takes no props.
 -->
@@ -10,7 +10,7 @@
     <div class="nav-bar-left">
       <div style="text-align: start;">
         <router-link to="/" style="font-size: larger">AMOS</router-link>
-        <div style="font-size: smaller">Version: 2025-01-06</div>
+        <div style="font-size: smaller">Version: 2025-01-23</div>
       </div>
       &emsp;
       <input @keyup.enter="go()" type="text" v-model="searchTerm" name="search-term" title="General search input field">
@@ -19,7 +19,7 @@
     </div>
     <div class="nav-bar-right">
       &emsp;
-      <BNavItemDropdown text="Lists" class="nav-dropdown" style="background: #0e6993;">
+      <BNavItemDropdown text="Lists" class="nav-dropdown">
         <BDropdownItem to="/analytical_qc_list">Analytical QC</BDropdownItem>
         <BDropdownItem to="/fact_sheet_list">Fact Sheets</BDropdownItem>
         <BDropdownItem to="/methods_list">Methods</BDropdownItem>
@@ -28,9 +28,14 @@
       <BNavItemDropdown text="Additional Searches" class="nav-dropdown">
         <BDropdownItem to="/batch_search">Batch Search</BDropdownItem>
         <BDropdownItem to="/classyfire_search">ClassyFire Search</BDropdownItem>
+        <BDropdownItem to="/partial_identifier_search">Formula, Mass, & Partial Identifier Search</BDropdownItem>
         <BDropdownItem to="/mass_spectrum_search">Mass Spectrum Search</BDropdownItem>
-        <BDropdownItem to="/partial_identifier_search">Partial Identifier Search</BDropdownItem>
         <BDropdownItem to="/similar_structure_search">Similar Structure Search</BDropdownItem>
+      </BNavItemDropdown>
+      &emsp;
+      <BNavItemDropdown text="INTERPRET NTA" class="nav-dropdown">
+        <BDropdownItem to="/nta_home">NTA Home</BDropdownItem>
+        <BDropdownItem to="/ms1_nta/submit">MS1 Job Submission</BDropdownItem>
       </BNavItemDropdown>
       &emsp;
       <BNavItemDropdown text="Other Pages" class="nav-dropdown">

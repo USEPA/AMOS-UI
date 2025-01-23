@@ -4,12 +4,21 @@
     <div class="half-page-column">
       <h5>Mass Information</h5>
       <div>
-        <input type="text" v-model.number="mass_target" name="search-dtxsid"> Da ± &nbsp;<input type="text" v-model.number="mass_error" name="search-dtxsid">
+        Target Mass
+        <input type="text" v-model.number="mass_target"> Da ± &nbsp;<input type="text" v-model.number="mass_error">
         &nbsp;
         <label><input type="radio" id="error_da" v-model="mass_error_type" value="da">Da</label>
         &nbsp;
         <label><input type="radio" id="error_ppm" v-model="mass_error_type" value="ppm">ppm</label>
-        <p>NOTE: The size of the window in the mass range search is constrained to 0.5 Da or 25 ppm, as appropriate.  Input values larger than these will be coerced to the maximum values.  Please use the neutral mass of the substance when searching.</p>
+        <br />
+        <div style="padding-top: 10px; padding-bottom: 10px;">
+          Window for peak similarity <input type="number" min="0" max="25" v-model="similarity.window">
+          &nbsp;
+          <label><input type="radio" id="error_da" v-model="similarity.type" value="da">Da</label>
+          &nbsp;
+          <label><input type="radio" id="error_ppm" v-model="similarity.type" value="ppm">ppm</label>
+        </div>
+        <p>NOTE: The target mass and entropy similarity window ranges are constrained to 0.5 Da or 25 ppm, as appropriate.  Input values larger than these will be coerced to the maximum values.  Please use the neutral mass of the substance when searching.</p>
       </div>
       <br />
       <div>
@@ -48,7 +57,7 @@
       <div v-else-if="results.length > 0">
         Minimum similarity to show: <input type="number" step="0.1" min="0.1" max="1" v-model="min_spectrum_similarity">
         <br />
-        Search found {{ results.length }} spectra covering {{ unique_substances }} substances; {{ visible_info.spectra }} spectra covering {{ visible_info.substances }} are visible below.
+        Search found {{ results.length }} spectra covering {{ unique_substances }} substances; {{ visible_info.spectra }} spectra covering {{ visible_info.substances }} substances are visible below.
         <ag-grid-vue
           class="ag-theme-balham"
           style="height:400px; width:100%"
@@ -67,7 +76,7 @@
         ></ag-grid-vue>
         <br />
         <div v-if="any_row_selected" style="display: flex; flex-direction: column; align-items: center">
-          <DualMassSpectrumPlot style="display: flex;" :spectrum1="user_spectrum_array" :spectrum2="row_data.spectrum" spectrum1_name="User Spectrum" :spectrum2_name="row_data.dtxsid"/>
+          <DualMassSpectrumPlot style="display: flex;" :spectrum1="user_spectrum_array" :spectrum2="row_data.spectrum" spectrum1_name="User Spectrum" :spectrum2_name="row_data.dtxsid" :window_size="similarity.window" :window_type="similarity.type"/>
           <br />
           <p><strong>Source</strong>: <a :href="row_data.link" target="_blank">{{ row_data.source }}</a></p>
           <br />
@@ -122,8 +131,8 @@
     data() {
       return {
         mass_target: 194,
-        mass_error: 0.1,
-        mass_error_type: "da",
+        mass_error: 5,
+        mass_error_type: "ppm",
         methodology: "LC/MS",
         min_spectrum_similarity: 0.1,
         results: [],
@@ -140,6 +149,7 @@
         any_row_selected: false,
         row_data: {spectrum: [], spectrum_metadata: {}, dtxsid: "", source: "", link: ""},
         status: {searching: false, any_search_complete: false},
+        similarity: {window: 0.05, type: "da"},
         columnDefs: [
           {field: 'dtxsid', hide: true, headerName: "Substance", width: 300, rowGroup: true, cellRenderer: params => {
             return "<a href='" + this.$router.resolve(`/search/${params.value}`).href + "' target='_blank'>" + params.value + "</a> (" + this.substance_mapping[params.value] + ")"
@@ -183,7 +193,7 @@
         this.user_spectrum_array = rescaleSpectrum(this.user_spectrum_array)
         const response = await axios.post(
           `${this.BACKEND_LOCATION}/mass_spectrum_similarity_search/`,
-          {upper_mass_limit: upper_mass_limit, lower_mass_limit: lower_mass_limit, methodology: this.methodology, spectrum: this.user_spectrum_array}
+          {upper_mass_limit: upper_mass_limit, lower_mass_limit: lower_mass_limit, methodology: this.methodology, spectrum: this.user_spectrum_array, window: this.similarity.window, type: this.similarity.type}
         )
         this.results = response.data.results
         this.unique_substances = response.data.unique_substances
