@@ -40,10 +40,8 @@
 
 <script>
   import axios from 'axios'
-  import '@/assets/style.css'
-  import { BACKEND_LOCATION } from '@/assets/store'
   import { BModal } from 'bootstrap-vue-next'
-
+  
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
@@ -51,8 +49,10 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
   
+  import { BACKEND_LOCATION } from '@/assets/store.js'
   import MassSpectrumDisplay from '@/components/MassSpectrumDisplay.vue'
   import StoredPDFDisplay from '@/components/StoredPDFDisplay.vue'
+  import '@/styles/main.css'
 
   export default {
     data(){

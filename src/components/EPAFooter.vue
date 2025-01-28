@@ -131,5 +131,5 @@ export default {
 }
 </script>
 
-<style scoped src="@/assets/oneepastyle.css">
+<style scoped src="@/styles/oneepastyle.css">
 </style>

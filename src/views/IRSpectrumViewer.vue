@@ -19,10 +19,10 @@
 <script>
   import axios from 'axios';
 
-  import { BACKEND_LOCATION } from '@/assets/store'
-  import '@/assets/style.css'
+  import { BACKEND_LOCATION } from '@/assets/store.js'
   import BasicSubstanceDisplay from '@/components/BasicSubstanceDisplay.vue'
   import IRSpectrumDisplay from '@/components/IRSpectrumDisplay.vue'
+  import '@/styles/main.css'
 
   export default {
     data() {

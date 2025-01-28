@@ -2,9 +2,19 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2025-01-27</summary>
+    <ul>
+      <!--NTA--> <li>Added a field for NA values to MS1NTAJobSubmission along with some basic validation.</li>
+      <!--NTA--> <li>Updated some of the adduct options and default values on MS1NTAJobSubmission.</li>
+      <li>Re-enlarged some the mass spectrum input fields for the search and comparison pages.</li>
+      <li>The select/deselect all buttons on the batch search now act on the mass spectrum metadata options and source count option.</li>
+      <li>Fixed a minor issue with the About page.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2025-01-23</summary>
     <ul>
-      <li>Functionality has been added for submitting non-targeted analysis (NTA) jobs under the header of "ITERPRET NTA".  This is still under construction, but the current job page is functional.</li>
+      <!--NTA--> <li>Functionality has been added for submitting non-targeted analysis (NTA) jobs under the header of "INTERPRET NTA".  This is still under construction, but the current job page is functional.</li>
       <li>Mass spectrum plots on the mass spectrum comparison page will grey out peaks that are below a specified threshold; these will also be ignored in entropy calculations.</li>
       <li>Control of the similarity window used in the similar entropy calculations has been added to the mass spectrum comparison and search pages.  Mirrored spectrum plots on these pages will highlight similar peaks on these pages as well.</li>
       <li>More detailed breakdowns of the spectra in AMOS's database have been added to the about page.</li>

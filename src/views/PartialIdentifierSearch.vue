@@ -62,8 +62,8 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { calculateMassRange, constrainNumber, imageLinkForSubstance } from '@/assets/common_functions'
-  import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
+  import { calculateMassRange, constrainNumber, imageLinkForSubstance } from '@/assets/common_functions.js'
+  import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store.js'
   import HelpIcon from '@/components/HelpIcon.vue'
   import RecordCountFilter from '@/components/RecordCountFilter.vue'
 

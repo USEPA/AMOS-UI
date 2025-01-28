@@ -25,7 +25,7 @@
 
 <script>
   import axios from 'axios'
-  import { BACKEND_LOCATION } from '@/assets/store'
+  import { BACKEND_LOCATION } from '@/assets/store.js'
 
   export default {
     data() {

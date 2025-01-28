@@ -32,9 +32,9 @@
 
   import * as d3 from "d3";
 
-  import '@/assets/spectrum_plots.css'
-  import '@/assets/style.css'
-  import { BACKEND_LOCATION } from '@/assets/store';
+  import '@/styles/spectrum_plots.css'
+  import '@/styles/main.css'
+  import { BACKEND_LOCATION } from '@/assets/store.js';
 
   export default {
     data() {

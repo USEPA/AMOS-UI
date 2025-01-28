@@ -13,7 +13,7 @@
         <div class="display-stuff">
           <div class="search-inputs">
             <h5>Spectrum #1</h5>
-            <textarea type="text" class="batch-search-input" rows="15" columns="35" v-model="spectrum_box_1"></textarea>
+            <textarea type="text" class="batch-search-input" rows="20" columns="35" v-model="spectrum_box_1"></textarea>
           </div>
           <div v-if="dtxsid_mode" class="search-inputs" style="padding-left: 100px">
             <p>Database Spectra</p>
@@ -30,7 +30,7 @@
           </div>
           <div v-else class="search-inputs" style="padding-left: 100px">
             <h5>Spectrum #2</h5>
-            <textarea type="text" class="batch-search-input" rows="15" columns="35" v-model="spectrum_box_2"></textarea>
+            <textarea type="text" class="batch-search-input" rows="20" columns="35" v-model="spectrum_box_2"></textarea>
           </div>
         </div>
         <br />
@@ -90,8 +90,8 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { constrainNumber, rescaleSpectrum, validateSpectrumInput } from '@/assets/common_functions'
-  import { BACKEND_LOCATION } from '@/assets/store';
+  import { constrainNumber, rescaleSpectrum, validateSpectrumInput } from '@/assets/common_functions.js'
+  import { BACKEND_LOCATION } from '@/assets/store.js';
   import DualMassSpectrumPlot from '@/components/DualMassSpectrumPlot.vue'
   import SingleMassSpectrumPlot from '@/components/SingleMassSpectrumPlot.vue'
 

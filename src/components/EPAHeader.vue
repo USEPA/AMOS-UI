@@ -135,7 +135,7 @@ export default {
 }
 </script>
 
-<style scoped src="@/assets/oneepastyle.css">
+<style scoped src="@/styles/oneepastyle.css">
 .container-fluid {
   padding-left: 0px !important;
   padding-right: 0px !important;

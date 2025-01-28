@@ -19,10 +19,9 @@
 </template>
 
 <script>
-  import { imageLinkForSubstance } from '@/assets/common_functions'
-  import { COMPTOX_PAGE_URL } from '@/assets/store'
-
-  import '@/assets/style.css'
+  import { imageLinkForSubstance } from '@/assets/common_functions.js'
+  import { COMPTOX_PAGE_URL } from '@/assets/store.js'
+  import '@/styles/main.css'
 
   export default {
     data() {

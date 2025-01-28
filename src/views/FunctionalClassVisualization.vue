@@ -21,7 +21,7 @@
 
 <script>
   import * as d3 from "d3";
-  import '@/assets/analyte_class.css'
+  import '@/styles/functional_class_viz.css'
 
   export default {
     mounted() {

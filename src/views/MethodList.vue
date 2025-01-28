@@ -57,10 +57,10 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { filtersToURL, queryParamsToFilters, sourceAbbreviationTooltip, timestampForFile } from '@/assets/common_functions'
-  import { BACKEND_LOCATION, ANALYTE_MAPPING, METHOD_DOCUMENT_TYPES, METHODOLOGY_MAPPING, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
-  import '@/assets/style.css'
+  import { filtersToURL, queryParamsToFilters, sourceAbbreviationTooltip, timestampForFile } from '@/assets/common_functions.js'
+  import { BACKEND_LOCATION, ANALYTE_MAPPING, METHOD_DOCUMENT_TYPES, METHODOLOGY_MAPPING, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store.js'
   import HelpIcon from '@/components/HelpIcon.vue'
+  import '@/styles/main.css'
 
   export default {
     data() {

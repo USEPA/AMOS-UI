@@ -59,11 +59,11 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { BACKEND_LOCATION } from '@/assets/store'
-  import '@/assets/style.css'
+  import { BACKEND_LOCATION } from '@/assets/store.js'
   import BasicSubstanceDisplay from '@/components/BasicSubstanceDisplay.vue'
   import MassSpectrumMetadata from '@/components/MassSpectrumMetadata.vue'
   import SingleMassSpectrumPlot from '@/components/SingleMassSpectrumPlot.vue'
+  import '@/styles/main.css'
 
   export default {
     data() {

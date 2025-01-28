@@ -108,9 +108,9 @@
 
   import { BAlert } from 'bootstrap-vue-next'
 
-  import { timestampForFile } from '@/assets/common_functions'
-  import { BACKEND_LOCATION } from '@/assets/store'
-  import '@/assets/style.css'
+  import { timestampForFile } from '@/assets/common_functions.js'
+  import { BACKEND_LOCATION } from '@/assets/store.js'
+  import '@/styles/main.css'
 
   export default {
     data() {
@@ -186,6 +186,8 @@
         this.include_classyfire = state
         this.include_external_links = state
         this.include_analyticalqc = state
+        this.include_source_counts = state
+        this.record_info.ms = {all: state, ionization_mode: state, rating: state, spectral_entropy: state, num_peaks: state}
         this.record_types = {"Fact Sheet": state, "Method": state, "Spectrum": state, "AnalyticalQCOnly": false}
         this.methodologies = {all: state, "GC/MS": state, "LC/MS": state, "NMR": state}
       }

@@ -32,7 +32,7 @@
       <div>
         <h5>User Spectrum</h5>
         <p>Note: This spectrum will be automatically rescaled to a maximum intensity of 100 in plots.</p>
-        <textarea type="text" class="batch-search-input" style="width:250px;" rows="15" v-model="user_spectrum_string"></textarea>
+        <textarea type="text" class="batch-search-input" style="width:250px;" rows="20" v-model="user_spectrum_string"></textarea>
       </div>
       <br />
       <button @click="spectrum_search">Search</button>
@@ -106,26 +106,24 @@
   <BModal v-if="row_data.spectrum_metadata" v-model="show_modal.metadata" ref="metadata_modal">
     <MassSpectrumMetadata :spectrumMetadata=row_data.spectrum_metadata />
   </BModal>
-  <!-- <BAlert variant="warning" dismissible v-model="error_messages.invalidFormat">There are issues with the contents of the user spectrum -- please check to ensure it is correct.</BAlert> -->
 </template>
 
 <script>
   import axios from 'axios'
   import { BAlert, BModal } from 'bootstrap-vue-next'
-  import { validateSpectrumInput } from '@/assets/common_functions'
-  import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store'
-
+  
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
   import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
-
-  import { calculateMassRange, constrainNumber, rescaleSpectrum } from '@/assets/common_functions'
-  import '@/assets/style.css'
+  
+  import { calculateMassRange, constrainNumber, rescaleSpectrum, validateSpectrumInput } from '@/assets/common_functions.js'
+  import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store.js'
   import DualMassSpectrumPlot from '@/components/DualMassSpectrumPlot.vue'
   import MassSpectrumMetadata from '@/components/MassSpectrumMetadata.vue'
+  import '@/styles/main.css'
 
   export default{
     data() {

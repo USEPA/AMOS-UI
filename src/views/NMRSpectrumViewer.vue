@@ -36,12 +36,12 @@
   import axios from 'axios';
   import * as d3 from "d3";
 
-  import { BACKEND_LOCATION } from '@/assets/store'
-  import '@/assets/style.css'
+  import { BACKEND_LOCATION } from '@/assets/store.js'
   import BasicSubstanceDisplay from '@/components/BasicSubstanceDisplay.vue'
   import NMRSpectrumDisplay from '@/components/NMRSpectrumDisplay.vue'
   import NMRSpectrumMetadata from '@/components/NMRSpectrumMetadata.vue'
   import NMRSpectrumPlot from '@/components/NMRSpectrumPlot.vue'
+  import '@/styles/main.css'
 
   export default {
     data() {

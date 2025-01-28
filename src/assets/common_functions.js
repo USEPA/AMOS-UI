@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { BACKEND_LOCATION, IMAGE_BY_DTXSID_API, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store'
+import { BACKEND_LOCATION, IMAGE_BY_DTXSID_API, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store.js'
 
 
 // Intended to check for valid inputs to spectrum fields, which would be a series of one or more lines where each line

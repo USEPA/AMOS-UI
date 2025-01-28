@@ -19,7 +19,7 @@
 </template>
   
 <script>
-  import { sortSubstancesByRecordCount } from '@/assets/common_functions'
+  import { sortSubstancesByRecordCount } from '@/assets/common_functions.js'
   import DisambiguationInfo from '@/components/DisambiguationInfo.vue'
 
   export default {

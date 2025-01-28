@@ -23,12 +23,25 @@
         <td><BFormSelect v-model="run_test_files" :options="yes_no_options" size="sm" style="width: auto;"/></td>
       </tr>
       <tr>
-        <th>Positive mode file (csv):</th>
+        <th>
+          Positive mode file (csv):
+          <div style="color: darkred;" v-if="errors.no_input_file"><br />Error: If not running test files, a positive mode file, a negative mode file, or both must be submitted.</div>
+        </th>
         <td><input type="file" id="pos_mode_file" accept=".csv" @change="loadFile($event, 'positive_mode')" :disabled="run_test_files=='yes'"></td>
       </tr>
       <tr>
-        <th>Negative mode file (csv):</th>
+        <th>
+          Negative mode file (csv):
+          <div style="color: darkred;" v-if="errors.no_input_file"><br />Error: If not running test files, a positive mode file, a negative mode file, or both must be submitted.</div>
+        </th>
         <td><input type="file" id="neg_mode_file" accept=".csv" @change="loadFile($event, 'negative_mode')" :disabled="run_test_files=='yes'"></td>
+      </tr>
+      <tr>
+        <th>
+          Input matrix non-detect value:
+          <div style="color: darkred;" v-if="errors.na_value_size"><br />Error: field must contain 1 to 10 characters.</div>
+        </th>
+        <td><input type="text" minlength="1" maxlength="10" v-model="na_value"></td>
       </tr>
       <tr>
         <th>Positive mode adducts:</th>
@@ -49,7 +62,6 @@
             <div><label for="neg_adduct_2"><input type="checkbox" v-model="neg_adducts" value="HCO2" id="neg_adduct_2">[M+HCO<sub>2</sub>]-</label></div>
             <div><label for="neg_adduct_3"><input type="checkbox" v-model="neg_adducts" value="CH3CO2" id="neg_adduct_3">[M+CH<sub>3</sub>CO<sub>2</sub>]-</label></div>
             <div><label for="neg_adduct_4"><input type="checkbox" v-model="neg_adducts" value="CF3CO2" id="neg_adduct_4">[M+CF<sub>3</sub>CO<sub>2</sub>]-</label></div>
-            <div><label for="neg_adduct_5"><input type="checkbox" v-model="neg_adducts" value="FA" id="neg_adduct_5">[M+FA]-</label></div>
           </div>
         </td>
       </tr>
@@ -67,11 +79,11 @@
             <div><label for="neutral_loss_7"><input type="checkbox" v-model="neutral_losses" value="CO" id="neutral_loss_7">[M-CO]</label></div>
             <div><label for="neutral_loss_8"><input type="checkbox" v-model="neutral_losses" value="CO2" id="neutral_loss_8">[M-CO<sub>2</sub>]</label></div>
             <div><label for="neutral_loss_9"><input type="checkbox" v-model="neutral_losses" value="C2H4" id="neutral_loss_9">[M-C<sub>2</sub>H<sub>4</sub>]</label></div>
-            <div><label for="neutral_loss_10"><input type="checkbox" v-model="neutral_losses" value="HFA" id="neutral_loss_10">[M+HFA]</label></div>
-            <div><label for="neutral_loss_11"><input type="checkbox" v-model="neutral_losses" value="HAc" id="neutral_loss_11">[M+HAc]</label></div>
-            <div><label for="neutral_loss_12"><input type="checkbox" v-model="neutral_losses" value="MeOH" id="neutral_loss_12">[M+MeOH]</label></div>
-            <div><label for="neutral_loss_13"><input type="checkbox" v-model="neutral_losses" value="ACN" id="neutral_loss_13">[M+ACN]</label></div>
-            <div><label for="neutral_loss_14"><input type="checkbox" v-model="neutral_losses" value="IsoProp" id="neutral_loss_14">[M+IsoProp]</label></div>
+            <div><label for="neutral_loss_10"><input type="checkbox" v-model="neutral_losses" value="CH2O2" id="neutral_loss_10">[M+CH<sub>2</sub>O<sub>2</sub>]</label></div>
+            <div><label for="neutral_loss_11"><input type="checkbox" v-model="neutral_losses" value="CH3COOH" id="neutral_loss_11">[M+CH<sub>3</sub>COOH]</label></div>
+            <div><label for="neutral_loss_12"><input type="checkbox" v-model="neutral_losses" value="CH3OH" id="neutral_loss_12">[M+CH<sub>3</sub>OH]</label></div>
+            <div><label for="neutral_loss_13"><input type="checkbox" v-model="neutral_losses" value="CH3CN" id="neutral_loss_13">[M+CH<sub>3</sub>CN]</label></div>
+            <div><label for="neutral_loss_14"><input type="checkbox" v-model="neutral_losses" value="(CH3)2CHOH" id="neutral_loss_14">[M+(CH<sub>3</sub>)<sub>2</sub>CHOH]</label></div>
           </div>
         </td>
       </tr>
@@ -159,21 +171,24 @@
       </tr>
       <tr>
         <th>Search DSSTox by:</th>
-        <td><BFormSelect v-model="search_mode" :options="search_mode_options" size="sm" style="width: auto;"/></td>
+        <td><BFormSelect v-model="dsstox_search_mode" :options="search_mode_options" size="sm" style="width: auto;"/></td>
       </tr>
     </tbody>
   </table>
-  <div class="input-nav">
+  <div style="padding: 10px;">
     <button @click="resetSettings">Reset Settings</button>
     <button @click="submitJob">Submit</button>
   </div>
+  <BAlert variant="danger" v-model="errors.any">
+    There are errors with your submission.  Please check above; fields with errors will have red error messages with them.
+  </BAlert>
 </template>
 
 
 <script>
   import axios from 'axios'
 
-  import { BFormSelect } from 'bootstrap-vue-next'
+  import { BAlert, BFormSelect } from 'bootstrap-vue-next'
 
   export default {
     data() {
@@ -185,27 +200,29 @@
         yes_no_options: ['no', 'yes'],
         parent_ion_mass_accuracy: 5,
         min_replicate_hits: 66,
-        min_replicate_hits_in_blanks: 60, //66,
-        project_name: "gsj_test_browser", // "Example NTA",
+        min_replicate_hits_in_blanks: 66,
+        project_name: "Example NTA",
         run_test_files: "no",
         mass_accuracy_units: "ppm",
         tracer_mass_accuracy_units: "ppm",
         tracer_plot_yaxis: "log",
         tracer_plot_trendline: "yes",
         mrl_std_multiplier: "3",
-        search_dsstox: "no", // "yes",
+        search_dsstox: "yes",
         search_hcd: "no",
-        search_mode: "mass",
+        dsstox_search_mode: "mass",
         file_contents: {positive_mode: null, negative_mode: null, run_sequence_positive: null, run_sequence_negative: null, tracer: null},
         pos_adducts: ["Na", "K", "NH4"],
-        neg_adducts: ["Cl", "Br", "HCO2", "CH3CO2", "CF3CO2"], //["Cl", "HCO2", "CH3CO2", "FA"],
+        neg_adducts: ["Cl", "Br", "HCO2", "CH3CO2", "CF3CO2"],
         neutral_losses: ["H2O", "CO2"],
         mass_accuracy: 10,
         retention_time_accuracy: 0.05,
-        tracer_mass_accuracy: 10, //5,
+        tracer_mass_accuracy: 5,
         tracer_retention_time_accuracy: 0.1,
-        max_replicate_cv: 0.5, //0.8,
-        minimum_retention_time: 0.5, //0.0,
+        max_replicate_cv: 0.8,
+        minimum_retention_time: 0.0,
+        na_value: "0",
+        errors: {any: false, na_value_size: false, no_input_file: false}
       }
     },
     methods: {
@@ -217,39 +234,51 @@
         })
         reader.readAsText(file)
       },
+      validateFields() {
+        // TODO: Update this to set the fields to false in one sweep
+        this.errors = {any: false, na_value_size: false, no_input_file: false}
+        if (this.na_value.length == 0) {
+          this.errors.any = true
+          this.errors.na_value_size = true
+        }
+      },
       async submitJob() {
-        const payload_old = {
-          project_name: "gsj_test_browser",
+        this.validateFields()
+        if (this.errors.any == true) {
+          return
+        }
+        const payload = {
+          project_name: this.project_name,
           datetime: this.getDateTime(),
-          test_files: "no",
+          test_files: this.run_test_files,
           pos_input: document.getElementById("pos_mode_file").files[0],
           neg_input: document.getElementById("neg_mode_file").files[0],
-          pos_adducts: ["Na", "K", "NH4"],
-          neg_adducts: ["Cl", "Br", "HCO2", "CH3CO2", "CF3CO2"],
-          neutral_losses: ["H2O", "CO2"],
-          mass_accuracy_units: "ppm",
-          mass_accuracy: 10,
-          rt_accuracy: 0.05,
+          pos_adducts: this.pos_adducts,
+          neg_adducts: this.neg_adducts,
+          neutral_losses: this.neutral_losses,
+          mass_accuracy_units: this.mass_accuracy_units,
+          mass_accuracy: this.mass_accuracy,
+          rt_accuracy: this.retention_time_accuracy,
           run_sequence_pos_file: document.getElementById("run_sequence_pos_file").files[0],
           run_sequence_neg_file: document.getElementById("run_sequence_neg_file").files[0],
           tracer_input: document.getElementById("tracer_file").files[0],
-          mass_accuracy_units_tr: "ppm",
-          mass_accuracy_tr: 10,
-          rt_accuracy_tr: 0.5,
-          tracer_plot_yaxis_format: "log",
-          tracer_plot_trendline: "yes",
-          min_replicate_hits: 66,
-          min_replicate_hits_blanks: 60,
-          max_replicate_cv: 0.5,
-          mrl_std_multiplier: 3,
-          parent_ion_mass_accuracy: 5,
-          minimum_rt: 0.5,
-          search_dsstox: "no",
-          search_hcd: "no",
-          search_mode: "mass"
+          mass_accuracy_units_tr: this.tracer_mass_accuracy_units,
+          mass_accuracy_tr: this.tracer_mass_accuracy,
+          rt_accuracy_tr: this.tracer_retention_time_accuracy,
+          tracer_plot_yaxis_format: this.tracer_plot_yaxis,
+          tracer_plot_trendline: this.tracer_plot_trendline,
+          min_replicate_hits: this.min_replicate_hits,
+          min_replicate_hits_blanks: this.min_replicate_hits_in_blanks,
+          max_replicate_cv: this.max_replicate_cv,
+          mrl_std_multiplier: this.mrl_std_multiplier,
+          parent_ion_mass_accuracy: this.parent_ion_mass_accuracy,
+          minimum_rt: this.minimum_retention_time,
+          search_dsstox: this.search_dsstox,
+          search_hcd: this.search_hcd,
+          search_mode: this.dsstox_search_mode,
+          na_val: this.na_value
         }
-        const response = await axios.postForm("https://qed-dev.edap-cluster.com/nta/ms1/external/input/", payload_old)
-
+        const response = await axios.postForm("https://qed-dev.edap-cluster.com/nta/ms1/external/input/", payload)
         const job_id_regex = /Job ID: ([A-Za-z0-9]*)/
         const match = response.data.match(job_id_regex)
         const job_id = match[1]
@@ -305,7 +334,7 @@
         document.getElementById('tracer_file').value = null
       }
     },
-    components: { BFormSelect }
+    components: { BAlert, BFormSelect }
   }
 </script>
 

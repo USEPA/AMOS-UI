@@ -42,7 +42,7 @@
 <script>
   import axios from 'axios'
 
-  import { BACKEND_LOCATION } from '@/assets/store'
+  import { BACKEND_LOCATION } from '@/assets/store.js'
 
   export default {
     data() {
@@ -59,16 +59,10 @@
         BACKEND_LOCATION
       }
     },
-    methods: {
-      async getDatabaseStats(){
-        const response = await axios.get(`${this.BACKEND_LOCATION}/database_summary/`)
-        const result_info = response.data
-        this.summary_retrieved = true
-        return result_info
-      }
-    },
     async created() {
-      const result_info = await this.getDatabaseStats()
+      const response = await axios.get(`${this.BACKEND_LOCATION}/database_summary/`)
+      const result_info = response.data
+      
       this.external_spectra_count = result_info["External Spectrum"]["Total"]
       this.fact_sheet_count = result_info["Fact Sheet"]["Total"]
       this.internal_spectra = result_info["Internal Spectrum"]
@@ -105,6 +99,8 @@
         }
       }
       this.breakdowns["IR"] = ir_breakdown.substring(0, ir_breakdown.length-2)
+
+      this.summary_retrieved = true
     }
   }
 </script>

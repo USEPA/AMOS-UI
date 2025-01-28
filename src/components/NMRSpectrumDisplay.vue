@@ -37,8 +37,8 @@
 
   import * as d3 from "d3";
 
-  import '@/assets/style.css'
-  import { BACKEND_LOCATION } from '@/assets/store';
+  import '@/styles/main.css'
+  import { BACKEND_LOCATION } from '@/assets/store.js';
   import NMRSpectrumMetadata from '@/components/NMRSpectrumMetadata.vue'
   import NMRSpectrumPlot from '@/components/NMRSpectrumPlot.vue';
 

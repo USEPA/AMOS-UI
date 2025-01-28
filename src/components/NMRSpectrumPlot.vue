@@ -18,8 +18,8 @@
 <script>
   import * as d3 from "d3";
 
-  import '@/assets/style.css'
-  import '@/assets/spectrum_plots.css'
+  import '@/styles/main.css'
+  import '@/styles/spectrum_plots.css'
 
   export default {
     data() {

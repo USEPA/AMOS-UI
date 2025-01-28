@@ -43,10 +43,10 @@
 
 <script>
 
-  import { imageLinkForSubstance } from '@/assets/common_functions'
-  import '@/assets/style.css'
-  import { COMPTOX_PAGE_URL } from '@/assets/store'
+  import { imageLinkForSubstance } from '@/assets/common_functions.js'
+  import { COMPTOX_PAGE_URL } from '@/assets/store.js'
   import ClassyFireDisplay from '@/components/ClassyFireDisplay.vue'
+  import '@/styles/main.css'
 
   export default {
     props: {substanceInfo: Object, classification: Object},
