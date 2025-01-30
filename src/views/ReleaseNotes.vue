@@ -2,6 +2,13 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2025-01-30</summary>
+    <ul>
+      <!--NTA--><li>Updated the default value of the NA field for the MS1 NTA job submission.</li>
+      <li>Added functional use classes to the substance displays in the general and similar structure searches.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2025-01-27</summary>
     <ul>
       <!--NTA--> <li>Added a field for NA values to MS1NTAJobSubmission along with some basic validation.</li>
