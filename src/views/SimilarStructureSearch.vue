@@ -96,12 +96,12 @@
     <div class="half-page-column" v-else-if="right_side_viewer_mode == 'Substances'">
       <h4>Searched Substance:</h4>
       <div style="display: flex; justify-content: center;">
-        <BasicSubstanceDisplay style="justify-content: left; width: 90%" :substanceInfo="substance_info.searched_substance" :classification="classyfire.searched_substance" />
+        <BasicSubstanceDisplay style="justify-content: left; width: 90%" :substanceInfo="substance_info.searched_substance" :classification="classyfire.searched_substance" :functionalUses="functional_uses.searched_substance" />
       </div>
       <br />
       <h4>Selected Substance From Table:</h4>
       <div style="display: flex; justify-content: center;">
-        <BasicSubstanceDisplay style="justify-content: left; width: 90%" :substanceInfo="substance_info.similar_substance" :classification="classyfire.similar_substance"/>
+        <BasicSubstanceDisplay style="justify-content: left; width: 90%" :substanceInfo="substance_info.similar_substance" :classification="classyfire.similar_substance" :functionalUses="functional_uses.similar_substance"/>
       </div>
     </div>
   </div>
@@ -159,6 +159,7 @@
         record_counts_by_dtxsid: {},
         min_similarity: 0.5,
         classyfire: {searched_substance: null, similar_substance: null},
+        functional_uses: {searched_substance: null, similar_substance: null},
         defaultColDef: {filter: true, floatingFilter: true},
         method_column_defs: [
           {field: "internal_id", rowGroup: true, hide: true, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
@@ -204,9 +205,6 @@
             }
           }
         },
-        /* methodsGroupColumnDef: {filter: 'agTextColumnFilter', filterValueGetter: (params) => {
-          return this.ids_to_method_names[params.data.internal_id]
-        }}, */
         methodsGroupColumnDef: {headerName: 'Method Name (# substances)', filter: 'agTextColumnFilter', width: 210, sortable: true,
           filterValueGetter: (params) => {return this.ids_to_method_names[params.data.internal_id]},
           comparator: (valueA, valueB, nodeA, nodeB, isDescending) => {
@@ -291,6 +289,13 @@
           } else {
             this.classyfire.searched_substance = null
           }
+
+          const functional_use_response = await axios.get(`${this.BACKEND_LOCATION}/functional_uses_for_dtxsid/${response.data.substances.dtxsid}`)
+          if (functional_use_response.data.functional_classes !== null) {
+            this.functional_uses.searched_substance = functional_use_response.data.functional_classes.join(", ")
+          } else {
+            this.functional_uses.searched_substance = null
+          }
           
           this.updateHighlightedSubstances()
           this.current_substance = searched_substance.trim()  // should be whatever the user chooses
@@ -341,12 +346,21 @@
           const substance_response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${event.data.dtxsid}`)
           this.substance_info.similar_substance = substance_response.data.substances
           this.substance_info.similar_substance.image_link = imageLinkForSubstance(substance_response.data.substances.dtxsid, substance_response.data.substances.image_in_comptox)
+
           const classyfire_response = await axios.get(`${this.BACKEND_LOCATION}/get_classification_for_dtxsid/${substance_response.data.substances.dtxsid}`)
           if ((classyfire_response.status == 200) & (classyfire_response.data.kingdom !== null)) {
             this.classyfire.similar_substance = classyfire_response.data
           } else {
             this.classyfire.similar_substance = null
           }
+
+          const functional_use_response = await axios.get(`${this.BACKEND_LOCATION}/functional_uses_for_dtxsid/${substance_response.data.substances.dtxsid}`)
+          if (functional_use_response.data.functional_classes !== null) {
+            this.functional_uses.similar_substance = functional_use_response.data.functional_classes.join(", ")
+          } else {
+            this.functional_uses.similar_substance = null
+          }
+
           this.right_side_viewer_mode = "Substances"
         }
       },

@@ -221,7 +221,7 @@
         tracer_retention_time_accuracy: 0.1,
         max_replicate_cv: 0.8,
         minimum_retention_time: 0.0,
-        na_value: "0",
+        na_value: "1",
         errors: {any: false, na_value_size: false, no_input_file: false}
       }
     },

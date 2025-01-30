@@ -1,5 +1,3 @@
-import axios from 'axios'
-
 import { BACKEND_LOCATION, IMAGE_BY_DTXSID_API, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store.js'
 
 

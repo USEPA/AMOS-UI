@@ -65,6 +65,15 @@
                     </details>
                   </td>
                 </tr>
+                <tr v-if="functional_uses">
+                  <td></td>
+                  <td>
+                    <details>
+                      <summary><strong>Functional Uses</strong></summary>
+                      <div style="max-width: 400px;">{{ functional_uses }}</div>
+                    </details>
+                  </td>
+                </tr>
               </table>
             </div>
           </div>
@@ -184,6 +193,7 @@
         result_table_view_mode: "all",
         result_count: 0,
         classification: null,
+        functional_uses: null,
         record_type_counts: {method: 0, "fact sheet": 0, spectrum: 0},
         ms_ready_search_run: false,
         additional_sources: [],
@@ -462,6 +472,12 @@
         const classyfire = await axios.get(`${this.BACKEND_LOCATION}/get_classification_for_dtxsid/${response.data.substances.dtxsid}`)
         if ((classyfire.status == 200) & (classyfire.data.kingdom !== null)) {
           this.classification = classyfire.data
+        }
+        const functional_use_response = await axios.get(`${this.BACKEND_LOCATION}/functional_uses_for_dtxsid/${response.data.substances.dtxsid}`)
+        if (functional_use_response.data.functional_classes !== null) {
+          this.functional_uses = functional_use_response.data.functional_classes.join(", ")
+        } else {
+          this.functional_uses = null
         }
         this.additional_sources = additional_source_results.data
         this.all_results = search_results.data.records

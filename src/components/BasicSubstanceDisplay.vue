@@ -35,6 +35,15 @@
             <td></td>
             <td><ClassyFireDisplay :kingdom="classification.kingdom" :superklass="classification.superklass" :klass="classification.klass" :subklass="classification.subklass" /></td>
           </tr>
+          <tr>
+            <td></td>
+            <td>
+              <details>
+                <summary><strong>Functional Uses</strong></summary>
+                <div style="max-width: 400px;">{{ functionalUses }}</div>
+              </details>
+            </td>
+          </tr>
         </table>
       </ul>
     </div>
@@ -49,7 +58,7 @@
   import '@/styles/main.css'
 
   export default {
-    props: {substanceInfo: Object, classification: Object},
+    props: {substanceInfo: Object, classification: Object, functionalUses: String},
     data() {
       return {
         COMPTOX_PAGE_URL,

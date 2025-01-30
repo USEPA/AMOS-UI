@@ -51,7 +51,7 @@
       var response = await axios.get(status_url)
       while ((response.data.status == "Processing") || (response.data.status == "Not found")){
         console.log("Checking...")
-        await timerFunc(2000)
+        await timerFunc(5000)
         response = await axios.get(status_url)
       }
       
