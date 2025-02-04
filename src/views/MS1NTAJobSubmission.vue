@@ -37,10 +37,7 @@
         <td><input type="file" id="neg_mode_file" accept=".csv" @change="loadFile($event, 'negative_mode')" :disabled="run_test_files=='yes'"></td>
       </tr>
       <tr>
-        <th>
-          Input matrix non-detect value:
-          <div style="color: darkred;" v-if="errors.na_value_size"><br />Error: field must contain 1 to 10 characters.</div>
-        </th>
+        <th>Input matrix non-detect value: <br /> (Up to 10 characters)</th>
         <td><input type="text" minlength="1" maxlength="10" v-model="na_value"></td>
       </tr>
       <tr>
@@ -187,6 +184,7 @@
 
 <script>
   import axios from 'axios'
+  import { toRaw } from 'vue'
 
   import { BAlert, BFormSelect } from 'bootstrap-vue-next'
 
@@ -221,8 +219,8 @@
         tracer_retention_time_accuracy: 0.1,
         max_replicate_cv: 0.8,
         minimum_retention_time: 0.0,
-        na_value: "1",
-        errors: {any: false, na_value_size: false, no_input_file: false}
+        na_value: "",
+        errors: {any: false, no_input_file: false}
       }
     },
     methods: {
@@ -243,19 +241,20 @@
         }
       },
       async submitJob() {
-        this.validateFields()
+        /* this.validateFields()
         if (this.errors.any == true) {
           return
-        }
+        } */
         const payload = {
           project_name: this.project_name,
           datetime: this.getDateTime(),
           test_files: this.run_test_files,
           pos_input: document.getElementById("pos_mode_file").files[0],
           neg_input: document.getElementById("neg_mode_file").files[0],
-          pos_adducts: this.pos_adducts,
-          neg_adducts: this.neg_adducts,
-          neutral_losses: this.neutral_losses,
+          pos_adducts: toRaw(this.pos_adducts),
+          neg_adducts: toRaw(this.neg_adducts),
+          neutral_losses: toRaw(this.neutral_losses),
+          whaargarbl: 6,
           mass_accuracy_units: this.mass_accuracy_units,
           mass_accuracy: this.mass_accuracy,
           rt_accuracy: this.retention_time_accuracy,
@@ -278,6 +277,47 @@
           search_mode: this.dsstox_search_mode,
           na_val: this.na_value
         }
+
+        /* var payload = new FormData()
+        payload.append("project_name", this.project_name)
+        payload.append("datetime", this.getDateTime())
+        payload.append("test_files", this.run_test_files)
+        payload.append("pos_input", document.getElementById("pos_mode_file").files[0])
+        payload.append("neg_input", document.getElementById("neg_mode_file").files[0])
+        payload.append("whaargarbl", "test")
+        payload.append("mass_accuracy_units", this.mass_accuracy_units)
+        payload.append("mass_accuracy", this.mass_accuracy)
+        payload.append("rt_accuracy", this.retention_time_accuracy)
+        payload.append("run_sequence_pos_file", document.getElementById("run_sequence_pos_file").files[0])
+        payload.append("run_sequence_neg_file", document.getElementById("run_sequence_neg_file").files[0])
+        payload.append("tracer_input", document.getElementById("tracer_file").files[0])
+        payload.append("mass_accuracy_units_tr", this.tracer_mass_accuracy_units)
+        payload.append("mass_accuracy_tr", this.tracer_mass_accuracy)
+        payload.append("rt_accuracy_tr", this.tracer_retention_time_accuracy)
+        payload.append("tracer_plot_yaxis_format", this.tracer_plot_yaxis)
+        payload.append("tracer_plot_trendline", this.tracer_plot_trendline)
+        payload.append("min_replicate_hits", this.min_replicate_hits)
+        payload.append("min_replicate_hits_blanks", this.min_replicate_hits_in_blanks)
+        payload.append("max_replicate_cv", this.max_replicate_cv)
+        payload.append("mrl_std_multiplier", this.mrl_std_multiplier)
+        payload.append("parent_ion_mass_accuracy", this.parent_ion_mass_accuracy)
+        payload.append("minimum_rt", this.minimum_retention_time)
+        payload.append("search_dsstox", this.search_dsstox)
+        payload.append("search_hcd", this.search_hcd)
+        payload.append("search_mode", this.dsstox_search_mode)
+        payload.append("na_val", this.na_value)
+
+        for (let a of toRaw(this.pos_adducts)) {
+          payload.append("pos_adducts[]", a)
+        }
+        for (let a of toRaw(this.neg_adducts)) {
+          payload.append("neg_adducts[]", a)
+        }
+        for (let a of toRaw(this.neutral_losses)) {
+          payload.append("neutral_losses[]", a)
+        } */
+
+        //const response = await axios.post("http://127.0.0.1:5000/dummy_post/", payload)
         const response = await axios.postForm("https://qed-dev.edap-cluster.com/nta/ms1/external/input/", payload)
         const job_id_regex = /Job ID: ([A-Za-z0-9]*)/
         const match = response.data.match(job_id_regex)
@@ -324,6 +364,7 @@
         this.tracer_retention_time_accuracy = 0.1
         this.max_replicate_cv = 0.8
         this.minimum_retention_time = 0.0
+        this.na_value = ""
 
         // NOTE: unsure whether this is the best way to do this, but it's the only straightforward one I could find,
         // and it's not triggering any other issues that I can see.

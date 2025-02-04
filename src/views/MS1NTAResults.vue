@@ -11,23 +11,38 @@
 <template>
   <h4>Status of job {{ $route.params.job_id }}</h4>
   <p>To access these results later, you can copy <router-link :to="`/ms1_nta/results/${$route.params.job_id}`" target="_blank">this link</router-link> to navigate back to this page.</p>
-  <div v-if="status == 'Not found'">
+  <div v-if="status.job == 'Not found'">
     Job is either in progress or job ID does not exist.  If you were redirected to this page from the submission form, please wait, as running the job can take a while.
   </div>
-  <div v-else-if="status == 'Processing'">
+  <div v-else-if="status.job == 'Processing'">
     Job is in progress.
   </div>
-  <div v-else-if="status == 'Completed'">
+  <div v-else-if="status.job == 'Completed'">
     <p>Job completed successfully.</p>
     <p>Job start time: {{ job_start_time }}</p>
-    <p>Use the button below to download the results.  Result files are stored in a zip file that may be several megabytes in size; downloading the file may take a moment.</p>
-    <button @click="downloadResults($route.params.job_id)">Download Results</button>
+    <p>Use the buttons below to download the results or to load the results into the browser for use with visualizations.  Result files are stored in a zip file that may be several megabytes in size; downloading the file may take a moment.</p>
+    <div>
+      <button @click="loadResultsFile($route.params.job_id)">Load Results</button>
+      <button @click="downloadResults($route.params.job_id)">Download Results File (ZIP)</button>
+    </div>
   </div>
   <div v-else>
     <p>Job did not complete successfully.</p>
     <p>Job start time: {{ job_start_time }}</p>
-    <p>Status: {{ status }}</p>
+    <p>Status: {{ status.job }}</p>
     <p>Additional information: {{ error_info }}</p>
+  </div>
+  <div v-if="status.retrieving_file">
+    Results file is being retrieved -- files may be large, so this may take a moment...
+  </div>
+  <div v-if="status.file_retrieved">
+    <div>
+      <p>Select visualization to view:</p>
+      <label><input type="radio" v-model="current_visualization" value="cv" @click="loadCVScatterplot">CV Scatterplot</label>
+    </div>
+    <div v-if="current_visualization=='cv'">
+      <img :src="scatterplot_image_blob" />
+    </div>
   </div>
 </template>
 
@@ -39,9 +54,12 @@
     data() {
       return {
         job_start_time: "",
-        status: "Not found",
         error_info: "",
-        excel_blob: null
+        scatterplot_image_blob: null,
+        zip_blob: null,
+        excel_blob: null,
+        current_visualization: "none",
+        status: {job: "Not found", retrieving_file: false, file_retrieved: false}
       }
     },
     async created() {
@@ -56,17 +74,24 @@
       }
       
       this.job_start_time = response.data.start_time
-      this.status = response.data.status
+      this.status.job = response.data.status
       this.error_info = response.data.error_info
     },
     methods: {
-      async downloadResults(job_id) {
+      async loadResultsFile(job_id) {
+        this.status.retrieving_file = true
         const res = await axios.get("https://qed-dev.edap-cluster.com/nta/ms1/results/toxpi/" + job_id, {responseType: "blob"})
-        
-        let blob = new Blob([res.data], {type: res.headers['content-type']})
+        this.zip_blob = res.data
+        this.status.file_retrieved = true
+        this.status.retrieving_file = false
+      },
+      async downloadResults(job_id) {
+        if (!this.status.file_retrieved) {
+          await this.loadResultsFile(job_id)
+        }
         let link = document.createElement('a')
-        link.href = window.URL.createObjectURL(blob)
-        link.download = `${this.$route.params.job_id}.zip`
+        link.href = window.URL.createObjectURL(this.zip_blob)
+        link.download = `${job_id}.zip`
         link.click()
 
         // extract the Excel workbook that holds the results
@@ -79,6 +104,14 @@
         link2.href = window.URL.createObjectURL(this.excel_blob)
         link2.download = "excel_text.xlsx"
         link2.click() */
+      },
+      async loadCVScatterplot() {
+        const zip = new JSZip()
+        const zip_content = await zip.loadAsync(this.zip_blob)
+        const scatterplot_filename = zip_content.file(/cv_scatterplot/)[0].name
+        const scatterplot_blob = await zip_content.file(scatterplot_filename).async("blob")
+        const urlCreator = window.URL || window.webkitURL
+        this.scatterplot_image_blob = urlCreator.createObjectURL(scatterplot_blob)
       }
     }
   }
