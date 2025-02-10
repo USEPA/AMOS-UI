@@ -24,6 +24,7 @@
     <div>
       <button @click="loadResultsFile($route.params.job_id)">Load Results</button>
       <button @click="downloadResults($route.params.job_id)">Download Results File (ZIP)</button>
+      <!-- <button @click="combineSheets()">Test Operation</button>  -->
     </div>
   </div>
   <div v-else>
@@ -38,10 +39,15 @@
   <div v-if="status.file_retrieved">
     <div>
       <p>Select visualization to view:</p>
-      <label><input type="radio" v-model="current_visualization" value="cv" @click="loadCVScatterplot">CV Scatterplot</label>
+      <label style="padding: 5px;"><input type="radio" v-model="current_visualization" value="cv" @click="loadCVScatterplot">CV Scatterplot</label>
+      <label style="padding: 5px;"><input type="radio" v-model="current_visualization" value="decision_tree" @click="combineSheets">Decision Tree</label>
     </div>
     <div v-if="current_visualization=='cv'">
       <img :src="scatterplot_image_blob" />
+    </div>
+    <div v-else-if="current_visualization=='decision_tree'">
+      <p v-if="status.loading_viz">Loading...</p>
+      <DecisionTree v-else :parametersCSVString="csv_strings.parameters" :resultsCSVString="csv_strings.results" />
     </div>
   </div>
 </template>
@@ -49,6 +55,9 @@
 <script>
   import axios from 'axios'
   import * as JSZip from 'jszip'
+  import * as XLSX from 'xlsx'
+
+  import DecisionTree from '@/components/DecisionTree.vue'
 
   export default {
     data() {
@@ -59,7 +68,8 @@
         zip_blob: null,
         excel_blob: null,
         current_visualization: "none",
-        status: {job: "Not found", retrieving_file: false, file_retrieved: false}
+        status: {job: "Not found", retrieving_file: false, file_retrieved: false, loading_viz: false},
+        csv_strings: {parameters: "", results: ""}
       }
     },
     async created() {
@@ -93,26 +103,44 @@
         link.href = window.URL.createObjectURL(this.zip_blob)
         link.download = `${job_id}.zip`
         link.click()
-
-        // extract the Excel workbook that holds the results
-        /* const zip = new JSZip()
-        const zip_content = await zip.loadAsync(blob)
-        const xlsx_filename = zip_content.file(/xlsx/)[0].name
-        this.excel_blob = await zip_content.file(xlsx_filename).async("blob")
-
-        let link2 = document.createElement('a')
-        link2.href = window.URL.createObjectURL(this.excel_blob)
-        link2.download = "excel_text.xlsx"
-        link2.click() */
       },
-      async loadCVScatterplot() {
+      async extractFileFromWorkbook(file_regex, file_type="blob") {
         const zip = new JSZip()
         const zip_content = await zip.loadAsync(this.zip_blob)
-        const scatterplot_filename = zip_content.file(/cv_scatterplot/)[0].name
-        const scatterplot_blob = await zip_content.file(scatterplot_filename).async("blob")
+        const target_filename = zip_content.file(file_regex)[0].name
+        const target_file = await zip_content.file(target_filename).async(file_type)
+        return target_file
+      },
+      async loadCVScatterplot() {
+        const scatterplot_blob = await this.extractFileFromWorkbook(/cv_scatterplot/)
         const urlCreator = window.URL || window.webkitURL
         this.scatterplot_image_blob = urlCreator.createObjectURL(scatterplot_blob)
+      },
+      async combineSheets() {
+        this.status.loading_viz = true
+        const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
+        const workbook = XLSX.read(excel_array)
+
+        const worksheet_names = workbook.SheetNames
+        let target_worksheet = null
+        if (!worksheet_names.includes("All Detection Statistics (Pos)")) {
+          target_worksheet = workbook.Sheets["All Detection Statistics (Neg)"]
+        } else if (!worksheet_names.includes("All Detection Statistics (Neg)")) {
+          target_worksheet = workbook.Sheets["All Detection Statistics (Pos)"]
+        } else {
+          const positive_rows = XLSX.utils.sheet_to_json(workbook.Sheets["All Detection Statistics (Pos)"])
+          const negative_rows = XLSX.utils.sheet_to_json(workbook.Sheets["All Detection Statistics (Neg)"])
+
+          const all_rows = positive_rows.concat(negative_rows)
+          target_worksheet = XLSX.utils.json_to_sheet(all_rows)
+        }
+
+        this.csv_strings.parameters = XLSX.utils.sheet_to_csv(workbook.Sheets["Analysis Parameters"])
+        this.csv_strings.results = XLSX.utils.sheet_to_csv(target_worksheet)
+
+        this.status.loading_viz = false
       }
-    }
+    },
+    components: { DecisionTree }
   }
 </script>

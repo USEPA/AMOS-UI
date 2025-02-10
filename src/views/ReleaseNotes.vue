@@ -2,6 +2,15 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2025-02-10</summary>
+    <ul>
+      <!-- NTA --> <li>Two visualizations have been added to the results page for the NTA MS1 results -- a CV scatterplot (extracted from the zipped results file) and a tree view of the filtering of occurrences and features in the data.</li>
+      <!-- NTA --> <li>Modified the NA field for the NTA MS1 job submission -- it is no longer a required field.</li>
+      <!-- NTA --> <li>Added a bunch of tooltips for the inputs on the MS1 job submission page.</li>
+      <li>Added an option to the partial identifier search to filter/show multicomponent substances.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2025-01-30</summary>
     <ul>
       <!--NTA--><li>Updated the default value of the NA field for the MS1 NTA job submission.</li>

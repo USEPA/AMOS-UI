@@ -26,6 +26,9 @@
   </div>
   <p v-if="search_type == 'mass_range_search'">Note: the size of the window in the mass range search is constrained to 0.5 Da or 25 ppm, as appropriate.  Input values larger than these will be coerced to the maximum values.</p>
   <br />
+  <input type="checkbox" id="multicomponent-substance-toggle" v-model="show_multicomponent_substances" @change="updateTableFilters">
+  <label for="multicomponent-substance-toggle">Show multicomponent substances</label>
+  <br />
   <div style="display: flex; flex-direction: row; justify-content: space-between">
     <div>
       <button @click="searchToURL">Copy Search to URL</button>
@@ -46,6 +49,8 @@
     @grid-ready="onGridReady"
     @filter-changed="onFilterChanged"
     @row-double-clicked="onDoubleClick"
+    :isExternalFilterPresent="isExternalFilterPresent"
+    :doesExternalFilterPass="doesExternalFilterPass"
     rowSelection="multiple"
     :suppressCopyRowsToClipboard="true"
   ></ag-grid-vue>
@@ -79,6 +84,7 @@
         mass_target: null,
         search_term: "",
         search_type: "substring_search",
+        show_multicomponent_substances: false,
         search_type_options: [
           {value: "substring_search", text: "Name substring"},
           {value: "inchikey_first_block_search", text: "InChIKey first block"},
@@ -229,6 +235,8 @@
 
         this.status.search_complete = true
         this.status.searching = false
+
+        console.log(this.substances)
       },
       searchToURL() {
         var query_param = ""
@@ -280,6 +288,21 @@
       },
       onDoubleClick(event) {
         window.open(`/search/${event.data.dtxsid}`)
+      },
+      isExternalFilterPresent() {
+        return true
+      },
+      doesExternalFilterPass(node) {
+        if (!this.show_multicomponent_substances) {
+          if ((node.data.smiles !== null) && node.data.smiles.includes(".")) {
+            return false
+          }
+        }
+        return true
+      },
+      updateTableFilters() {
+        this.gridApi.onFilterChanged()
+        this.updateRecordCounts()
       }
     },
     components: {AgGridVue, BFormSelect, HelpIcon, RecordCountFilter}

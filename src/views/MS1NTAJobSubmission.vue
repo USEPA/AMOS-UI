@@ -9,13 +9,16 @@
 -->
 
 <template>
-  <table class="nostripe input_table">
+  <table class="nostripe job-submission-input-table">
     <thead><tr>
       <th scope="col">Input</th><th scope="col">Value</th>
     </tr></thead>
     <tbody>
       <tr>
-        <th>Project name:</th>
+        <th>
+          Project name:
+          <HelpIcon tooltipText="Enter a unique name for each new NTA job run." />
+        </th>
         <td><textarea cols="30" rows="1" v-model="project_name"></textarea></td>
       </tr>
       <tr>
@@ -25,6 +28,7 @@
       <tr>
         <th>
           Positive mode file (csv):
+          <HelpIcon tooltipText="Input file containing positive mode data where rows are features and columns are samples.  File type must be .csv." />
           <div style="color: darkred;" v-if="errors.no_input_file"><br />Error: If not running test files, a positive mode file, a negative mode file, or both must be submitted.</div>
         </th>
         <td><input type="file" id="pos_mode_file" accept=".csv" @change="loadFile($event, 'positive_mode')" :disabled="run_test_files=='yes'"></td>
@@ -32,16 +36,22 @@
       <tr>
         <th>
           Negative mode file (csv):
+          <HelpIcon tooltipText="Input file containing negative mode data where rows are features and columns are samples.  File type must be .csv." />
           <div style="color: darkred;" v-if="errors.no_input_file"><br />Error: If not running test files, a positive mode file, a negative mode file, or both must be submitted.</div>
         </th>
         <td><input type="file" id="neg_mode_file" accept=".csv" @change="loadFile($event, 'negative_mode')" :disabled="run_test_files=='yes'"></td>
       </tr>
       <tr>
-        <th>Input matrix non-detect value: <br /> (Up to 10 characters)</th>
+        <th>
+          Input matrix non-detect value: <HelpIcon tooltipText="A number or character(s) representing NaNs in the input data." />
+          <br /> (Up to 10 characters)</th>
         <td><input type="text" minlength="1" maxlength="10" v-model="na_value"></td>
       </tr>
       <tr>
-        <th>Positive mode adducts:</th>
+        <th>
+          Positive mode adducts:
+          <HelpIcon tooltipText="Chemical adducts to be investigated as linkages between chemical features in the positive mode dataset." />
+        </th>
         <td>
           <div id="id_pos_adducts" class="two">
             <div><label for="pos_adduct_0"><input type="checkbox" v-model="pos_adducts" value="Na" id="pos_adduct_0">[M+Na]+</label></div>
@@ -51,7 +61,10 @@
         </td>
       </tr>
       <tr>
-        <th>Negative mode adducts:</th>
+        <th>
+          Negative mode adducts:
+          <HelpIcon tooltipText="Chemical adducts to be investigated as linkages between chemical features in the negative mode dataset." />
+        </th>
         <td>
           <div id="id_neg_adducts" class="two">
             <div><label for="neg_adduct_0"><input type="checkbox" v-model="neg_adducts" value="Cl" id="neg_adduct_0">[M+Cl]-</label></div>
@@ -63,7 +76,10 @@
         </td>
       </tr>
       <tr>
-        <th>Neutral losses (both modes):</th>
+        <th>
+          Neutral losses (both modes):
+          <HelpIcon tooltipText="Chemical adducts to be investigated as linkages between chemical features in the datasets for both modes." />
+        </th>
         <td>
           <div id="id_neutral_losses" class="two">
             <div><label for="neutral_loss_0"><input type="checkbox" v-model="neutral_losses" value="H2O" id="neutral_loss_0">[M-H<sub>2</sub>O]</label></div>
@@ -85,89 +101,148 @@
         </td>
       </tr>
       <tr>
-        <th>Adduct / duplicate mass accuracy units:</th>
+        <th>
+          Adduct / duplicate mass accuracy units:
+          <HelpIcon tooltipText="Units of mass tolerance for adduct and duplicate feature identification." />
+        </th>
         <td><BFormSelect v-model="mass_accuracy_units" :options="mass_unit_options" size="sm" style="width: auto;"/></td>
       </tr>
       <tr>
-        <th>Adduct / duplicate mass accuracy:</th>
+        <th>
+          Adduct / duplicate mass accuracy:
+          <HelpIcon tooltipText="The window of masses at which a feature can be considered an adduct or duplicate of another feature.  Numeric." />
+        </th>
         <td><input type="number" step="any" v-model="mass_accuracy"></td>
       </tr>
       <tr>
-        <th>Adduct / duplicate retention time accuracy (mins):</th>
+        <th>
+          Adduct / duplicate retention time accuracy (mins):
+          <HelpIcon tooltipText="The window of retention times at which a feature can be considered an adduct or duplicate of another feature.  Numeric." />
+        </th>
         <td><input type="number" step="0.01" v-model="retention_time_accuracy"></td>
       </tr>
       <tr>
-        <th>Run sequence positive mode file (csv; optional):</th>
+        <th>
+          Run sequence positive mode file (csv; optional):
+          <HelpIcon tooltipText="Run sequence data for the positive mode." />
+        </th>
         <td><input type="file" id="run_sequence_pos_file" accept=".csv" @change="loadFile($event, 'run_sequence_positive')" :disabled="run_test_files=='yes'"></td>
       </tr>
       <tr>
-        <th>Run sequence negative mode file (csv; optional):</th>
+        <th>
+          Run sequence negative mode file (csv; optional):
+          <HelpIcon tooltipText="Run sequence data for the negative mode." />
+        </th>
         <td><input type="file" id="run_sequence_neg_file" accept=".csv" @change="loadFile($event, 'run_sequence_negative')" :disabled="run_test_files=='yes'"></td>
       </tr>
       <tr>
-        <th>Tracer file (csv; optional):</th>
+        <th>
+          Tracer file (csv; optional):
+          <HelpIcon tooltipText="Information on chemical features added to the study samples in known quantities." />
+        </th>
         <td><input type="file" id="tracer_file" accept=".csv" @change="loadFile($event, 'tracer')" :disabled="run_test_files=='yes'"></td>
       </tr>
       <tr>
-        <th>Tracer mass accuracy units:</th>
+        <th>
+          Tracer mass accuracy units:
+          <HelpIcon tooltipText="Units of mass tolerance for tracer feature identification." />
+        </th>
         <td><BFormSelect v-model="tracer_mass_accuracy_units" :options="mass_unit_options" size="sm" style="width: auto;"/></td>
       </tr>
       <tr>
-        <th>Tracer mass accuracy:</th>
+        <th>
+          Tracer mass accuracy:
+          <HelpIcon tooltipText="The window of masses at which a feature can be considered a tracer feature from the tracer input file.  Numeric." />
+        </th>
         <td><input type="number" step="any" v-model="tracer_mass_accuracy"></td>
       </tr>
       <tr>
-        <th>Tracer retention time accuracy (mins):</th>
+        <th>
+          Tracer retention time accuracy (mins):
+          <HelpIcon tooltipText="The window of retention times at which a feature can be considered a trace feature from the tracer input file.  Numeric." />
+        </th>
         <td><input type="number" step="0.1" v-model="tracer_retention_time_accuracy"></td>
       </tr>
       <tr>
-        <th>Tracer plot y-axis scaling:</th>
+        <th>
+          Tracer plot y-axis scaling:
+          <HelpIcon tooltipText="Preferred y-axis format to display on the tracer run sequence plot(s)." />
+        </th>
         <td><BFormSelect v-model="tracer_plot_yaxis" :options="tracer_plot_yaxis_options" size="sm" style="width: auto;"/></td>
       </tr>
       <tr>
-        <th>Tracer plot trendlines shown:</th>
+        <th>
+          Tracer plot trendlines shown:
+        </th>
         <td><BFormSelect v-model="tracer_plot_trendline" :options="yes_no_options" size="sm" style="width: auto;"/></td>
       </tr>
       <tr>
-        <th>Min replicate hits (%):</th>
+        <th>
+          Min replicate hits (%):
+          <HelpIcon tooltipText="Percentage of replicates that a feature must be observed across a set of sample replicates to be kept." />
+        </th>
         <td><div style="display: flex; align-items: center;">
           <input type="range" max="100" min="1" class="slider-bar" v-model="min_replicate_hits">&nbsp;{{ min_replicate_hits }}
         </div></td>
       </tr>
       <tr>
-        <th>Min replicate hits in blanks (%):</th>
+        <th>
+          Min replicate hits in blanks (%):
+          <HelpIcon tooltipText="Percentage of replicates that a feature must be observed across a set of blank replicates to be used for blank-specific calculations (i.e., blank subtraction, minimum reporting limit generation)." />
+        </th>
         <td><div style="display: flex; align-items: center;">
           <input type="range" max="100" min="1" class="slider-bar" v-model="min_replicate_hits_in_blanks">&nbsp;{{ min_replicate_hits_in_blanks }}
         </div></td>
       </tr>
       <tr>
-        <th>Max replicate CV:</th>
+        <th>
+          Max replicate CV:
+          <HelpIcon tooltipText="Numeric value for the maximum acceptable CV. Any occurrences greater than this maximal acceptable CV are subject to removal or flagging in the output data." />
+        </th>
         <td><input type="number" step="0.1" v-model="max_replicate_cv"></td>
       </tr>
       <tr>
-        <th>MRL standard deviation multiplier:</th>
+        <th>
+          MRL standard deviation multiplier:
+          <HelpIcon tooltipText="The minimum reporting limit (MRL) for each chemical feature is calculated as: <br /> x<sub>b</sub>&#177;(σ*y) <br /> where x<sub>b</sub> is the mean abundance of the chemical feature in the blanks, σ is the standard deviation of the chemical feature in the blanks, and y is the selected multiplier." :html="true" />
+        </th>
         <td><BFormSelect v-model="mrl_std_multiplier" :options="mrl_std_multiplier_options" size="sm" style="width: auto;"/></td>
       </tr>
       <tr>
-        <th>Parent ion mass accuracy (ppm):</th>
+        <th>
+          Parent ion mass accuracy (ppm):
+          <HelpIcon tooltipText="The mass tolerance in ppm of the parent ions (i.e., features) that will be searched against DSSTox.  Numeric." />
+        </th>
         <td><div style="display: flex; align-items: center;">
           <input type="range" max="10" min="1" class="slider-bar" v-model="parent_ion_mass_accuracy">&nbsp;{{ parent_ion_mass_accuracy }}
         </div></td>
       </tr>
       <tr>
-        <th>Discard features below this retention time (mins):</th>
+        <th>
+          Discard features below this retention time (mins):
+          <HelpIcon tooltipText="Remove all features below the given retention time.  This limits the features of interest and is directly related to the void volume/time of the analytical method used to acquire sample data.  Numeric." />
+        </th>
         <td><input type="number" step="0.1"  id="id_minimum_rt" v-model="minimum_retention_time"></td>
       </tr>
       <tr>
-        <th>Search DSSTox for possible structures:</th>
+        <th>
+          Search DSSTox for possible structures:
+          <HelpIcon tooltipText="Whether to compare masses of features that pass QA/QC filtering to those in DSSTox to identify candidate chemicals." />
+        </th>
         <td><BFormSelect v-model="search_dsstox" :options="yes_no_options" size="sm" style="width: auto;"/></td>
       </tr>
       <tr>
-        <th>Search Cheminformatics Hazard Module for toxicity data:</th>
+        <th>
+          Search Cheminformatics Hazard Module for toxicity data:
+          <HelpIcon tooltipText="Whether candidate chemicals from DSSTox should have Hazard Information pulled down from the Cheminformatics Hazard module." />
+        </th>
         <td><BFormSelect v-model="search_hcd" :options="yes_no_options" size="sm" style="width: auto;"/></td>
       </tr>
       <tr>
-        <th>Search DSSTox by:</th>
+        <th>
+          Search DSSTox by:
+          <HelpIcon tooltipText="How to search for candidates in DSSTox.  When mass is selected, the masses of features that pass QA/QC are used. When formula is selected, the molecular formula for features that pass QA/QC are used. " />
+        </th>
         <td><BFormSelect v-model="dsstox_search_mode" :options="search_mode_options" size="sm" style="width: auto;"/></td>
       </tr>
     </tbody>
@@ -184,9 +259,10 @@
 
 <script>
   import axios from 'axios'
+  import { BAlert, BFormSelect } from 'bootstrap-vue-next'
   import { toRaw } from 'vue'
 
-  import { BAlert, BFormSelect } from 'bootstrap-vue-next'
+  import HelpIcon from '@/components/HelpIcon.vue'
 
   export default {
     data() {
@@ -375,25 +451,25 @@
         document.getElementById('tracer_file').value = null
       }
     },
-    components: { BAlert, BFormSelect }
+    components: { BAlert, BFormSelect, HelpIcon }
   }
 </script>
 
 
 <style>
-  .input_table {
+  .job-submission-input-table {
     border: 1px solid black;
     border-collapse: collapse;
   }
 
-  .input_table th {
+  .job-submission-input-table th {
     background-color: #f1f1f1;
     padding: 10px;
     border: 1px solid black;
     border-collapse: collapse;
   }
 
-  .input_table td {
+  .job-submission-input-table td {
     padding: 10px;
     border: 1px solid black;
     border-collapse: collapse;
