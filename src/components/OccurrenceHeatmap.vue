@@ -30,7 +30,7 @@
       }
     },
     mounted() {
-      this.loadHeatmap()
+      this.createOccurrenceHeatmap()
     },
     props: {workbook: Object},
     methods: {
@@ -509,7 +509,7 @@
         }
       },
 
-      loadHeatmap() {
+      /* loadHeatmap() {
         fetch('http://127.0.0.1:5173/src/data/Example_nta_NTA_WebApp_results.xlsx')
         .then(response => response.arrayBuffer()) // read file as array buffer
         .then(data => {
@@ -518,7 +518,7 @@
           // call the main function that cleans data and draws heatmap
           this.createOccurrenceHeatmap(workbook);
         });
-      }
+      } */
     }
   }
 </script>
