@@ -691,6 +691,7 @@ export function mousemoveCellEvent(
   redX,
   greenCheck
 ) {
+  
   // first handle on-hover tooltips, get mouse position
   const rect = renderer.domElement.getBoundingClientRect();
   mousePos.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
@@ -718,8 +719,8 @@ export function mousemoveCellEvent(
     // display info box
     if (cellData) {
       tooltip.innerHTML = `<div style="background-color: white; color: black; padding: 5px; border-radius: 3px; border: solid 1px white; margin-bottom: 0px"><b>Feature ID</b>: ${cellData.featureId}\n<b>Sample Name</b>: ${cellData.sampleName}\n<b>Decision</b>: <span style="color: ${cellData.color === 'grey' ? 'rgb(100,100,100)' : cellData.color}; background-color: ${cellData.color === 'white' ? 'black' : 'none'}; padding: ${cellData.color === 'white' ? '1px 8px' : '1px'}; border-radius: 3px; margin-top: 4px;">${cellData["decision"]}</span></div>\n${cellData.passSampleReplicate === true ? greenCheck : redX}<b>Replicate Percentage</b>: ${cellData["repPercentValue"]}%\n${cellData.passCV ? greenCheck : redX}<b>CV</b>: ${cellData["cvValue"]}\n${(cellData.mdlQuotient === 'NA' || !cellData.passMRL) ? redX : greenCheck}<b>Sample Mean / MRL</b>: ${cellData["mdlQuotient"]}`;
-      tooltip.style.left = `${event.offsetX + 20}px`;
-      tooltip.style.top = `${event.offsetY + 25}px`;
+      tooltip.style.left = `${event.pageX - 100}px`;
+      tooltip.style.top = `${event.pageY + 25}px`;
       tooltip.style.display = 'block';
     } else {
       tooltip.style.display = 'none';

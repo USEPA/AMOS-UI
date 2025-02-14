@@ -156,7 +156,6 @@
         this.status.loading_viz = true
         const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
         this.excel_workbook = XLSX.read(excel_array)
-        console.log(this.excel_workbook)
         this.current_visualization = "occurrence_heatmap"
         this.status.loading_viz = false
       }
