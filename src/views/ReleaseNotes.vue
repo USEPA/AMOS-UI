@@ -2,6 +2,15 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2025-02-14</summary>
+    <ul>
+      <!-- NTA --> <li>A heatmap visualizing occurrence information has been added to the NTA MS1 results page.</li>
+      <li>For the functional use class visualization, hovering over a use class in the list on the right will now more clearly highlight it on the graph.</li>
+      <li>Some minor CSS clashes related to the functional use class visualization have been fixed.</li>
+      <li>The table download on the partial identifier search will now correctly download all visible columns (except for the substance images).</li>
+    </ul>
+  </details>
+  <details>
     <summary>2025-02-10</summary>
     <ul>
       <!-- NTA --> <li>Two visualizations have been added to the results page for the NTA MS1 results -- a CV scatterplot (extracted from the zipped results file) and a tree view of the filtering of occurrences and features in the data.</li>

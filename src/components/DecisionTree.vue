@@ -112,9 +112,6 @@
     },
     props: {parametersCSVString: String, resultsCSVString: String},
     mounted() {
-      var csv_path = 'http://127.0.0.1:5173/src/data/Jon_WW2DW_statistics_sheet.csv'
-      var init_parameters_path = 'http://127.0.0.1:5173/src/data/Analysis Parameters.csv'
-      var jobid = window.location.pathname.split("/").pop();
       var showingOccurrence = true;
       var showingIcicle = false;
       

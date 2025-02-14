@@ -1,5 +1,18 @@
 <template>
-  <canvas id="heatmap" style="top: 80px; margin-top: 60px;"></canvas>
+  <p>Primary interactions:</p>
+  <ul>
+    <li>Hover over the heatmap to see individual data points.</li>
+    <li>Click and drag across a region of the plot to zoom in.  Use Ctrl-Space to toggle between the zoomed-out view and the last zoomed-in level.</li>
+    <li>Hover over the title text to see aggregate statistics of the data.  Click it to more clearly shows failures in the heatmap.</li>
+    <li>Hover over the labels along the vertical axis to get per-feature summaries.</li>
+    <li>Use the sliders below the plot to adjust various thresholds.  The heatmap will automatically update after adjustments.</li>
+  </ul>
+  <p>Caution: This visualization is GPU-intensive, and may lag on some devices.</p>
+  <div id="heatmapContainer">
+    <canvas id="heatmap"></canvas>
+    <!-- Need to have this dummy element for the canvas-adding function to lock onto, otherwise the page elements end up changing order and getting screwed up on the page. -->
+    <div id="dummyChild"></div>
+  </div>
 </template>
 
 <script>
@@ -19,8 +32,9 @@
     mounted() {
       this.loadHeatmap()
     },
+    props: {workbook: Object},
     methods: {
-      createOccurrenceHeatmap(dataXlsxPath, data=null, minSample=null, minBlank=null, maxCv=null, mrlMult=null) {
+      createOccurrenceHeatmap(data=null, minSample=null, minBlank=null, maxCv=null, mrlMult=null) {
         // needed to get event listeners working since they're defined a couple levels down in this function
         // but the make recursive calls to createOccurrenceHeatmap
         let createOccurrenceHeatmap = this.createOccurrenceHeatmap
@@ -33,7 +47,7 @@
             minReplicateBlankHitPercent,
             maxReplicateCvValue,
             MrlMult
-          ] = dataUtils.getOccurrenceAndParameterData(dataXlsxPath);
+          ] = dataUtils.getOccurrenceAndParameterData(this.workbook);
         } else {
           var minReplicateHitsPercent = minSample;
           var minReplicateBlankHitPercent = minBlank;
@@ -137,7 +151,7 @@
             cellWidth,
             apparentCellWidth
           };
-
+          
           // setup the renderers, cameras, orbitControls and scene
           let [
             canvas, 
@@ -148,7 +162,7 @@
             orbitControls, 
             scene
           ] = heatmapUtils.setTheScene("heatmap", dimsObject);
-
+          
           // set renderer bg color
           renderer.setClearColor(0xffffff, 1)
 
@@ -171,7 +185,7 @@
             zoomBoxMaterial,
             blackMaterial  
           ] = heatmapUtils.getMaterials();
-
+          
           // create instanced mesh objects, to prevent creating a new mesh for each cell of the heatmap
           let redMesh = heatmapUtils.createInstancedMesh(cellGeometry, redMaterial, redCount);
           let greyMesh = heatmapUtils.createInstancedMesh(cellGeometry, greyMaterial, greyCount);
@@ -186,30 +200,29 @@
           heatmapGroup.add(whiteMesh);
 
           scene.add(heatmapGroup);
-
+          
           // find cell positions and colors, get red cell instances for animation later
           const redCellInstances = heatmapUtils.setCellColorAndPos(cvDataFlat, dimsObject, greyMesh, redMesh, whiteMesh);
 
           // add a transparent mesh to house the graph title/labels/partitions
           const graphMesh = new THREE.Mesh(graphGeometry, clearMaterial);
           scene.add(graphMesh);
-
+          
           // add title, x-axis label, y-axis labels, horizontal and vertical partition lines
           heatmapUtils.addTitle(canvas, thresholdData, dimsObject, graphMesh);
           heatmapUtils.addXAxisLabel(canvas, dimsObject, graphMesh);
           heatmapUtils.addYAxisLabelsAndHorzLines(canvas, sampleGroups, dimsObject, horzLineGeo, blackMaterial, graphMesh, scene);
           let vertLineObjects = heatmapUtils.getVertLines(dimsObject, nFeatures, vertLineGeo, blackMaterial);
-
           // set up rendering loop
           animate();
-
+          
           // build on-hover tooltips for cells, y-axis labels and title
           const titleTooltip = heatmapUtils.buildTitleTooltip();
           const yAxisTooltip = heatmapUtils.buildYAxisTooltip();    
           const tooltip = heatmapUtils.buildTooltip();
           
           // add event listeners for title (show tooltip on-hover; highlight red cells on click)
-          const heatmapTitleDiv = document.querySelector(".title");
+          const heatmapTitleDiv = document.querySelector(".heatmap-title");
           
           heatmapTitleDiv.addEventListener('mouseenter', (e) => {
             heatmapUtils.mouseenterTitleEvent(e, samplePassCounts, titleTooltip, heatmapTitleDiv, dimsObject);
@@ -223,7 +236,7 @@
           heatmapTitleDiv.addEventListener('click', (e) => {
             redCellZoomed = heatmapUtils.clickTitleEvent(e, redCellInstances, redMesh, redCellZoomed);
           });
-
+          
           // add event listeners for y-axis labels
           const yAxisLabelDivs = document.querySelectorAll(".yAxisLabel");
           yAxisLabelDivs.forEach(label => {
@@ -237,7 +250,7 @@
             });
 
           });
-
+          
           // now add event listeners for the cells. First set some needed variables
           var greenCheck = "&#x2705;";
           var redX = "&#x274c";
@@ -250,7 +263,7 @@
             y: orbitControls.target.y,
             z: 0
           };
-
+          
           const raycaster = new THREE.Raycaster(); // for detecting on-hovers for heatmap cells
           const mousePos = new THREE.Vector2(); // keep track of the mouse position
           
@@ -367,7 +380,7 @@
             renderer.render(scene, camera);
             labelRenderer.render(scene, camera);
           }
-
+          
           function createControls() {
             const controls = document.createElement('div');
             controls.id = "controls";
@@ -446,15 +459,16 @@
                 const maxReplicateCvValue = parseFloat(document.getElementById("cvThreshold").value);
                 const mrlMult = parseFloat(document.getElementById("mdlMultiplier").value);
 
-                const children = Array.from(document.body.children);
+                // const children = Array.from(document.body.children);
+                const children = Array.from(document.getElementById("heatmapContainer").children)
 
                 children.forEach(child => {
-                  if (child.id !== "loadDataBtn" && child.id !== "controls" && child.tagName.toLowerCase() !== "script") {
+                  if (child.id !== "dummyChild" && child.id !== "controls") {
                     child.remove();
                   }
                 });
 
-                createOccurrenceHeatmap(dataXlsxPath, data, minReplicateHitsPercent, minReplicateBlankHitPercent, maxReplicateCvValue, mrlMult);
+                createOccurrenceHeatmap(data, minReplicateHitsPercent, minReplicateBlankHitPercent, maxReplicateCvValue, mrlMult);
               });
               inputBox.addEventListener('keydown', (event) => {
                 if (event.key === "Enter") {
@@ -463,15 +477,16 @@
                   const maxReplicateCvValue = parseFloat(document.getElementById("cvThreshold").value);
                   const mrlMult = parseFloat(document.getElementById("mdlMultiplier").value);
 
-                  const children = Array.from(document.body.children);
+                  // const children = Array.from(document.body.children);
+                  const children = Array.from(document.getElementById("heatmapContainer").children)
 
                   children.forEach(child => {
-                    if (child.id !== "loadDataBtn" && child.id !== "controls" && child.tagName.toLowerCase() !== "script") {
+                    if (child.id !== "dummyChild" && child.id !== "controls") {
                       child.remove();
                     }
                   });
 
-                  createOccurrenceHeatmap(dataXlsxPath, data, minReplicateHitsPercent, minReplicateBlankHitPercent, maxReplicateCvValue, mrlMult);
+                  createOccurrenceHeatmap(data, minReplicateHitsPercent, minReplicateBlankHitPercent, maxReplicateCvValue, mrlMult);
                 }
               });
 
@@ -481,7 +496,8 @@
               controls.appendChild(sliderContainer);
             });
 
-            document.body.appendChild(controls);
+            //document.body.appendChild(controls);
+            document.getElementById("heatmapContainer").insertBefore(controls, null);
             controls.style.left = (window.innerWidth / 2) - (controls.offsetWidth / 2) + "px";
           }
 
@@ -489,11 +505,12 @@
           if (sliderCheck === null) {
             createControls();
           }
+          
         }
       },
 
       loadHeatmap() {
-        fetch('src/data/Example_nta_NTA_WebApp_results.xlsx')
+        fetch('http://127.0.0.1:5173/src/data/Example_nta_NTA_WebApp_results.xlsx')
         .then(response => response.arrayBuffer()) // read file as array buffer
         .then(data => {
           const workbook = XLSX.read(data, { type: 'array' });
@@ -501,7 +518,7 @@
           // call the main function that cleans data and draws heatmap
           this.createOccurrenceHeatmap(workbook);
         });
-        }
+      }
     }
   }
 </script>
@@ -511,10 +528,11 @@
     margin: auto;
     margin-top: 0px;
   }
-  .tooltip {
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+  .heatmap-tooltip {
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    z-index: 1080;
   }
-  .yAxisLabel, .title {
+  .yAxisLabel, .heatmap-title {
     background-color: white;
     color: black;
     padding: 3px;
@@ -522,8 +540,8 @@
     transition: color 0.3s ease, background-color 0.3s ease;
     cursor: pointer;
   }
-  .title {
-    padding: 4px 6px;
+  .heatmap-title {
+    padding: 0px 4px;
     text-align: center;
   }
   #heatmapTitle {
@@ -532,5 +550,9 @@
   span.subTitle {
     font-size: 20px;
     pointer-events: none;
+  }
+  #heatmap {
+    top: 80px;
+    margin-top: 60px
   }
 </style>

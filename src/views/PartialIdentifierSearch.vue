@@ -235,8 +235,6 @@
 
         this.status.search_complete = true
         this.status.searching = false
-
-        console.log(this.substances)
       },
       searchToURL() {
         var query_param = ""
@@ -268,9 +266,11 @@
         this.mass_error = null
       },
       downloadSearchResults() {
+        let visible_columns = this.gridColumnApi.getAllDisplayedColumns().map(x => x.colId)
+
         this.gridApi.exportDataAsExcel({
           fileName: `${this.search_type}.xlsx`,
-          columnKeys: ['dtxsid', 'casrn', 'preferred_name', 'monoisotopic_mass', 'molecular_formula']
+          columnKeys: visible_columns.filter(c => c !== "image")
         })
       },
       onGridReady(params) {

@@ -39,15 +39,21 @@
   <div v-if="status.file_retrieved">
     <div>
       <p>Select visualization to view:</p>
-      <label style="padding: 5px;"><input type="radio" v-model="current_visualization" value="cv" @click="loadCVScatterplot">CV Scatterplot</label>
-      <label style="padding: 5px;"><input type="radio" v-model="current_visualization" value="decision_tree" @click="combineSheets">Decision Tree</label>
+      <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="cv_scatterplot" @click="loadCVScatterplot">CV Scatterplot</label>
+      <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="decision_tree" @click="loadDecisionTree">Decision Tree</label>
+      <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="occurrence_heatmap" @click="loadOccurrenceHeatmap">Occurrence Heatmap</label>
     </div>
-    <div v-if="current_visualization=='cv'">
-      <img :src="scatterplot_image_blob" />
+    <div v-if="current_visualization=='cv_scatterplot'">
+      <p v-if="status.loading_viz">Loading...</p>
+      <img v-else :src="scatterplot_image_blob" />
     </div>
     <div v-else-if="current_visualization=='decision_tree'">
       <p v-if="status.loading_viz">Loading...</p>
       <DecisionTree v-else :parametersCSVString="csv_strings.parameters" :resultsCSVString="csv_strings.results" />
+    </div>
+    <div v-else-if="current_visualization=='occurrence_heatmap'">
+      <p v-if="status.loading_viz">Loading...</p>
+      <OccurrenceHeatmap :workbook="excel_workbook" />
     </div>
   </div>
 </template>
@@ -58,6 +64,7 @@
   import * as XLSX from 'xlsx'
 
   import DecisionTree from '@/components/DecisionTree.vue'
+  import OccurrenceHeatmap from '@/components/OccurrenceHeatmap.vue'
 
   export default {
     data() {
@@ -66,10 +73,11 @@
         error_info: "",
         scatterplot_image_blob: null,
         zip_blob: null,
-        excel_blob: null,
+        selected_visualization: "none",
         current_visualization: "none",
         status: {job: "Not found", retrieving_file: false, file_retrieved: false, loading_viz: false},
-        csv_strings: {parameters: "", results: ""}
+        csv_strings: {parameters: "", results: ""},
+        excel_workbook: null
       }
     },
     async created() {
@@ -112,12 +120,16 @@
         return target_file
       },
       async loadCVScatterplot() {
+        this.status.loading_viz = true
+        this.current_visualization = "cv_scatterplot"
         const scatterplot_blob = await this.extractFileFromWorkbook(/cv_scatterplot/)
         const urlCreator = window.URL || window.webkitURL
         this.scatterplot_image_blob = urlCreator.createObjectURL(scatterplot_blob)
+        this.status.loading_viz = false
       },
-      async combineSheets() {
+      async loadDecisionTree() {
         this.status.loading_viz = true
+        this.current_visualization = "decision_tree"
         const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
         const workbook = XLSX.read(excel_array)
 
@@ -139,8 +151,16 @@
         this.csv_strings.results = XLSX.utils.sheet_to_csv(target_worksheet)
 
         this.status.loading_viz = false
+      },
+      async loadOccurrenceHeatmap() {
+        this.status.loading_viz = true
+        const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
+        this.excel_workbook = XLSX.read(excel_array)
+        console.log(this.excel_workbook)
+        this.current_visualization = "occurrence_heatmap"
+        this.status.loading_viz = false
       }
     },
-    components: { DecisionTree }
+    components: { DecisionTree, OccurrenceHeatmap }
   }
 </script>

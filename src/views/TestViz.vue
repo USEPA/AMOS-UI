@@ -1,6 +1,6 @@
 <template>
-  Hi.
-  <OccurrenceHeatmap />
+  Zooming is by Ctrl+Space.
+  <!-- <OccurrenceHeatmap /> -->
 </template>
 
 

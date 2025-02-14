@@ -61,17 +61,16 @@ export function setTheScene(canvasId, dimsObject) {
   if (canvas === null) {
     canvas = document.createElement("canvas");
     canvas.id = canvasId;
-    document.body.insertBefore(canvas, document.getElementById("loadDataBtn"));
   }
-  const renderer = new THREE.WebGLRenderer({ antialias: true, canvas, precision: 'highp' });
+  const renderer = new THREE.WebGLRenderer({ antialias: true, canvas: canvas, precision: 'highp' });
   renderer.setSize(dimsObject.actualWidth, dimsObject.actualHeight);
-  document.body.appendChild(renderer.domElement);
+  document.getElementById("heatmapContainer").insertBefore(canvas, document.getElementById("dummyChild"));
 
   // setup CSS2DRenderer (for axis labels)
   const labelRenderer = new CSS2DRenderer();
   labelRenderer.setSize(dimsObject.actualWidth, dimsObject.actualHeight);
-  document.body.appendChild(labelRenderer.domElement);
-
+  //document.body.appendChild(labelRenderer.domElement);
+  document.getElementById("heatmapContainer").appendChild(labelRenderer.domElement);
   // setup camera
   const left = -dimsObject.actualWidth / 2;
   const right = dimsObject.actualWidth / 2;
@@ -90,7 +89,7 @@ export function setTheScene(canvasId, dimsObject) {
     near,
     far
   };
-
+  
   // setup orbit controls for zooming / panning
   const orbitControls = new OrbitControls(camera, renderer.domElement);
   orbitControls.enableZoom = false;
@@ -99,10 +98,10 @@ export function setTheScene(canvasId, dimsObject) {
   orbitControls.screenSpacePanning = true;
   orbitControls.keyPanSpeed = 10;
   orbitControls.update();
-
+  
   // set the scene
   const scene = new THREE.Scene();
-
+  
   return [canvas, renderer, labelRenderer, camera, cameraDefaults, orbitControls, scene];
 }
 
@@ -230,7 +229,7 @@ export function addTitle(canvas, thresholdData, dimsObject, graphMesh) {
   // create and style div
   const titleDiv = document.createElement("div");
   titleDiv.style.whiteSpace = "pre";
-  titleDiv.className = "title";
+  titleDiv.className = "heatmap-title";
   titleDiv.style.color = "black";
   titleDiv.style.fontSize = "30px";
   titleDiv.style.backgroundColor = 'transparent';
@@ -243,7 +242,7 @@ export function addTitle(canvas, thresholdData, dimsObject, graphMesh) {
   titleDiv.innerHTML += `<span class="subTitle">Blank Rep. Threshold: ${thresholdData.minReplicateBlankHitPercent}%&emsp; `;
   titleDiv.innerHTML += `<span class="subTitle">CV Threshold ${thresholdData.maxReplicateCvValue}&emsp; `;
   titleDiv.innerHTML += `<span class="subTitle">MRL Multiplier: ${thresholdData.MrlMult}</span>`;
-
+  
   // set the position
   const canvRect = canvas.getBoundingClientRect();
 
@@ -251,11 +250,11 @@ export function addTitle(canvas, thresholdData, dimsObject, graphMesh) {
   titleX += (dimsObject.width / 2); // center to the actual graph
 
   let titleY = dimsObject.actualHeight; // value of 0 sets top to be `height` below graph?? shift up by this amount
-  titleY += (dimsObject.height / 2) + dimsObject.paddingHeight*0.8; // shift to top of graph, account for padding
+  titleY += (dimsObject.height / 2) + dimsObject.paddingHeight*0.9; // shift to top of graph, account for padding
 
   const titleLabel = new CSS2DObject(titleDiv);
   titleLabel.position.set(titleX, titleY, 0);
-
+  
   // add to mesh
   graphMesh.add(titleLabel);
   titleLabel.layers.set(0);
@@ -348,7 +347,7 @@ export function addYAxisLabelsAndHorzLines(canvas, sampleGroups, dimsObject, hor
     labelX += -(labelWidth / 2) - 16; // right-align labels and add padding
     
     let labelY = (dimsObject.actualHeight / 2) + dimsObject.paddingHeight; // shift up
-    labelY += dimsObject.cellHeight * (sampleGroups.length - index + 1) - (labelHeight / 2); // center to correct row
+    labelY += dimsObject.cellHeight * (sampleGroups.length - index + 1)  - (labelHeight / 4); // center to correct row
     
     const labelLabel = new CSS2DObject(labelDiv);
     labelLabel.position.set(labelX, labelY, 0);
@@ -429,10 +428,11 @@ export function buildTitleTooltip() {
   titleTooltip.style.pointerEvents = 'none';
   titleTooltip.style.display = 'none';
   titleTooltip.style.whiteSpace = "pre";
-  titleTooltip.className = "tooltip";
+  titleTooltip.className = "heatmap-tooltip";
   titleTooltip.id = "heatmapTitle";
 
-  document.body.appendChild(titleTooltip);
+  //document.body.appendChild(titleTooltip);
+  document.getElementById("heatmapContainer").insertBefore(titleTooltip, null);
 
   return titleTooltip;
 }
@@ -454,9 +454,10 @@ export function buildYAxisTooltip() {
   yAxisTooltip.style.pointerEvents = 'none';
   yAxisTooltip.style.display = 'none';
   yAxisTooltip.style.whiteSpace = "pre";
-  yAxisTooltip.className = "tooltip";
+  yAxisTooltip.className = "heatmap-tooltip";
   
-  document.body.appendChild(yAxisTooltip);
+  //document.body.appendChild(yAxisTooltip);
+  document.getElementById("heatmapContainer").insertBefore(yAxisTooltip, null);
 
   return yAxisTooltip;
 }
@@ -478,10 +479,11 @@ export function buildTooltip() {
   tooltip.style.pointerEvents = 'none';
   tooltip.style.display = 'none';
   tooltip.style.whiteSpace = "pre";
-  tooltip.className = "tooltip";
+  tooltip.className = "heatmap-tooltip";
   tooltip.style.width = "250px";
 
-  document.body.appendChild(tooltip);
+  //document.body.appendChild(tooltip);
+  document.getElementById("heatmapContainer").insertBefore(tooltip, null);
 
   return tooltip;
 }

@@ -34,6 +34,8 @@
         var width = +svg.attr("width"),
           height = +svg.attr("height");
         
+        svg.attr("class", "functional_class_viz")
+        
         // add zooming/panning
         let zoom = d3.zoom()
           .on('zoom', function(e) {
@@ -263,58 +265,65 @@
           add_children(selector)
         }
 
-        d3.selectAll('li')
+        d3.selectAll('li.functional_class')
           .on("mouseover", function(d) {
             if (this === d.target) {
               d3.select(this)
-                .transition()
+                .transition("hover-li")
                   .duration(300)
                   .style("color", "rgb(255, 219, 39)");
             } else {
               d3.select(this)
-                .transition()
+                .transition("hover-li")
                   .duration(300)
                   .style("color", "rgb(255, 150, 150)");
             }
             var myId = this.id.split("_").slice(-2,-1) + "_node";
             if (this === d.target) {
               d3.select(`.${myId}`)
-                .transition()
+                .transition("hover-li")
                   .duration(300)
                   .style("stroke-width", "4px")
-                  .style("stroke", "yellow")
-                .transition()
-                  .duration(300)
-                  .attr("r", (d) => 80)
-                .transition()
-                  .duration(300)
+                  .style("stroke", "black")
+                  .style("fill", "yellow")
+                .transition("hover-li")
+                  .duration(600)
+                  .attr("r", (d) => 110)
+                .transition("hover-li")
+                  .duration(600)
                   .attr("r", (d) => d.r)
+                .on("end", function repeat() {
+                  d3.select(`.${myId}`).transition("hover-li")
+                    .duration(600)
+                    .attr("r", () => 110)
+                  .transition("hover-li")
+                    .duration(600)
+                    .attr("r", (d) => d.r)
+                  .on("end", repeat);
+                });
             } else {
               d3.select(`.${myId}`)
-                .transition()
+                .transition("hover-li")
                   .duration(300)
                   .style("stroke-width", "4px")
                   .style("stroke", "red")
-                .transition()
-                  .duration(300)
-                  .attr("r", (d) => 80)
-                .transition()
-                  .duration(300)
                   .attr("r", (d) => d.r)
+                  .style("fill", "black");
             }
           })
           .on("mouseout", function(d) {
             d3.select(this)
-              .transition()
+              .transition("hover-li")
                 .duration(300)
                 .style("color", "white");
             var myId = this.id.split("_").slice(-2,-1) + "_node";
             d3.select(`.${myId}`)
-              .transition()
+              .transition("hover-li")
                 .duration(300)
                 .style("stroke-width", "1.5px")
                 .attr("r", (d) => d.r)
-                .style("stroke", "aqua")
+                .style("fill", "black")
+                .style("stroke", "aqua");
           })
           .on("click", function(d) {
             if (this === d.target) {
@@ -324,11 +333,11 @@
                   if (doc.style.display === 'none') {
                     doc.style.display = 'grid';
                     d3.select("#"+id)
-                      .transition().duration(200)
+                      .transition("click-li").duration(200)
                         .style("font-size", '1.3rem')
                   } else {
                     d3.select("#"+id)
-                      .transition().duration(200)
+                      .transition("click-li").duration(200)
                         .style("font-size", '0rem')
                         .on("end", function() {
                           this.style.display = 'none';
@@ -417,7 +426,7 @@
               var class_name = dat.id;
               var name = dat.name;
               d3.select('.' + class_name.replace(/\s/g, "") + "_node")
-                .transition()
+                .transition("hover-node")
                 .duration(300)
                 .style("stroke-width", "4px")
                 .style("stroke", "yellow");
@@ -426,23 +435,23 @@
                 for (let i in dat.parents) {
                   var p = dat.parents[i]
                   d3.selectAll(`.${p.replace(/\s/g, "")}_node`)
-                    .transition()
+                    .transition("hover-node")
                     .duration(300)
                     .style("stroke-width", "4px")
                     .style("stroke", "red");
                   
                   var myId = `#arrow_${class_name.replace(/\s/g, "")}_${p.replace(/\s/g, "")}`;
                   d3.selectAll(myId)
-                    .transition()
+                    .transition("hover-node")
                       .duration(400)
                       .attr("markerWidth", 20)
                       .attr("markerHeight", 20)
                       .style("fill", "rgb(200, 130, 130)")
-                    .transition()
+                    .transition("hover-node")
                       .duration(200)
                       .attr("markerHeight", 20)
                       .attr("markerHeight", 20)
-                    .transition()
+                    .transition("hover-node")
                       .duration(300)
                       .attr("markerHeight", 16)
                       .attr("markerHeight", 16);
@@ -455,23 +464,23 @@
                 for (let i in dat.children) {
                   var c = dat.children[i]
                   d3.selectAll(`.${c.replace(/\s/g, "")}_node`)
-                    .transition()
+                    .transition("hover-node")
                     .duration(300)
                     .style("stroke-width", "4px")
                     .style("stroke", "lime")
 
                   var myId = `#arrow_${c.replace(/\s/g, "")}_${class_name.replace(/\s/g, "")}`;
                   d3.selectAll(myId)
-                    .transition()
+                    .transition("hover-node")
                       .duration(400)
                       .attr("markerWidth", 20)
                       .attr("markerHeight", 20)
                       .style("fill", "rgb(167, 206, 169)")
-                    .transition()
+                    .transition("hover-node")
                       .duration(200)
                       .attr("markerHeight", 20)
                       .attr("markerHeight", 20)
-                    .transition()
+                    .transition("hover-node")
                       .duration(300)
                       .attr("markerHeight", 16)
                       .attr("markerHeight", 16);
@@ -480,7 +489,7 @@
                 var children = "None";
               };
               var description = dat.description;
-              div.transition()
+              div.transition("hover-node")
                 .duration(200)
                 .style("opacity", 1)
               // div.html("<span style='font-size:1.8rem'>" + class_name + "</span><br/>" + description + "<br/><br/><b>Parents:</b> " + parents + "<br/><b>Children:</b> " + children)
@@ -493,15 +502,15 @@
           })
           .on("mouseout", function(e, d) {
             d3.selectAll('circle')
-              .transition()
+              .transition("hover-node")
               .duration(300)
               .style("stroke-width", "1.5px")
               .style("stroke", 'aqua')
-            div.transition()
+            div.transition("hover-node")
               .duration(300)
               .style("opacity", 0)
             d3.selectAll(".arrow")
-              .transition()
+              .transition("hover-node")
                 .duration(250)
                 .attr("markerHeight", 12)
                 .attr("markerWidth", 12)
@@ -547,7 +556,7 @@
         node
           .attr('cx', () => randomNumber(-3200, 6500))
           .attr('cy', () => randomNumber(-3400, 2200))
-          .transition()
+          .transition("opening-scene")
             .duration(3000)
             .attr("cx", (d) => d.x)
             .attr("cy", (d) => d.y)
@@ -559,7 +568,7 @@
             return `M ${d.source.x} ${d.source.y} L ${midX} ${midY} L ${d.target.x} ${d.target.y}`
           })
           .style('opacity', 0)
-          .transition()
+          .transition("opening-scene")
             .delay(3000)
             .duration(500)
             .style("opacity", 1)
