@@ -14,11 +14,7 @@
   <div style="display: flex">
     <input v-if="search_type != 'mass_range_search'" @keyup.enter="runPartialSearch" placeholder="Search..." size="60" v-model="search_term">
     <div v-else>
-      <input type="text" v-model.number="mass_target" name="search-dtxsid"> Da ± &nbsp;<input type="text" v-model.number="mass_error" name="search-dtxsid">
-      &nbsp;
-      <label><input type="radio" id="error_da" v-model="mass_error_type" value="da">Da</label>
-      &nbsp;
-      <label><input type="radio" id="error_ppm" v-model="mass_error_type" value="ppm">ppm</label>
+      <MassRangeInput ref="massInput"/>
       &nbsp;
     </div>
     <BFormSelect v-model="search_type" :options="search_type_options" size="sm" style="width: auto; padding: 0 2em 0 0.5em;"/>  <!-- width needs to be set to fix height issues for some reason -->
@@ -58,7 +54,7 @@
 
 <script>
   import axios from 'axios'
-  import {BFormSelect} from 'bootstrap-vue-next'
+  import { BFormSelect } from 'bootstrap-vue-next'
 
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
@@ -67,14 +63,18 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
-  import { calculateMassRange, constrainNumber, imageLinkForSubstance } from '@/assets/common_functions.js'
+  import { imageLinkForSubstance } from '@/assets/common_functions.js'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store.js'
   import HelpIcon from '@/components/HelpIcon.vue'
+  import MassRangeInput from '@/components/MassRangeInput.vue'
+  import MassTableFilter from '@/components/MassTableFilter.vue'
   import RecordCountFilter from '@/components/RecordCountFilter.vue'
 
   export default {
     data() {
       return {
+        querySearch: false,
+        mass_search_override: null,
         BACKEND_LOCATION,
         COMPTOX_PAGE_URL,
         defaultColDef: {filter: 'agTextColumnFilter', floatingFilter: true, resizable: true},
@@ -119,7 +119,7 @@
           {field: 'synonyms', headerName: 'Synonym', flex: 1, wrapText: true, autoHeight: true, hide: true, cellStyle: {'white-space': 'pre-line'}, cellRenderer: params => {
             return params.data.synonyms.join("\n")
           }},
-          {field: 'monoisotopic_mass', headerName: 'Monoisotopic Mass', width: 150, filter: 'agNumberColumnFilter'},
+          {field: 'monoisotopic_mass', headerName: 'Monoisotopic Mass', width: 150, sortable: true, filter: MassTableFilter},
           {field: 'molecular_formula', headerName: 'Formula', width: 120},
           {field: 'spectra', headerName: "Spectra", width: 110, sortable: true, filter: RecordCountFilter, filterParams: {record_name: "spectra"}, cellRenderer: params => {
             if (params.data.spectra > 0) {
@@ -169,24 +169,37 @@
         ]
       }
     },
-    async created()  {
-      // if there are query parameters in the URL, run the appropriate search; otherwise, nothing needs to be done
+    created() {
+      // if there are any query parameters in the URL, set up the appropriate search
       const query_params = Object.keys(this.$route.query)
       const search_types = this.search_type_options.map(x => x.value)
       for (const param of query_params) {
         if (search_types.includes(param)) {
+          this.querySearch = true
           this.search_type = param
           if (param == "mass_range_search") {
             const mass_search_params = this.$route.query[param].split("_")
-            this.mass_target = Number(mass_search_params[0])
-            this.mass_error = Number(mass_search_params[1])
-            this.mass_error_type =  mass_search_params[2]
+            this.mass_search_override = {
+              mass_target: Number(mass_search_params[0]),
+              mass_error: Number(mass_search_params[1]),
+              mass_error_type: mass_search_params[2]
+            }
           } else {
             this.search_term = this.$route.query[param]
           }
-          this.runPartialSearch()
           break
         }
+      }
+    },
+    async mounted() {
+      // if there are query parameters in the URL, run the search; the mass range search requires some special handling
+      if (this.querySearch) {
+        if (this.search_type == "mass_range_search") {
+          this.$refs.massInput.$data.mass_target = this.mass_search_override.mass_target
+          this.$refs.massInput.$data.mass_error = this.mass_search_override.mass_error
+          this.$refs.massInput.$data.mass_error_type = this.mass_search_override.mass_error_type
+        }
+        await this.runPartialSearch()
       }
     },
     methods: {
@@ -196,17 +209,12 @@
 
         var response = null
         if (this.search_type == "mass_range_search") {
-          if (this.mass_error_type == "da") {
-            this.mass_error = constrainNumber(this.mass_error, 0, 0.5)
-          } else {
-            this.mass_error = constrainNumber(this.mass_error, 0, 25)
-          }
-          const [lower_limit, upper_limit] = calculateMassRange(this.mass_target, this.mass_error, this.mass_error_type)
+          const [lower_limit, upper_limit] = this.$refs.massInput.calculateRange()
           if (lower_limit === null) {
             // add an error case later
           }
           response = await axios.post(`${this.BACKEND_LOCATION}/${this.search_type}/`, {upper_mass_limit: upper_limit, lower_mass_limit: lower_limit})
-          this.status.searched_term = `${this.mass_target} Da +/- ${this.mass_error} ${this.mass_error_type=='da' ? 'Da' : 'ppm'}`
+          this.status.searched_term = `${this.$refs.massInput.$data.mass_target} Da +/- ${this.$refs.massInput.$data.mass_error} ${this.$refs.massInput.$data.mass_error_type=='da' ? 'Da' : 'ppm'}`
         } else {
           response = await axios.get(`${this.BACKEND_LOCATION}/${this.search_type}/${this.search_term}`)
           this.status.searched_term = this.search_term
@@ -232,14 +240,13 @@
         ]})
         }
         this.gridApi.onFilterChanged()
-
         this.status.search_complete = true
         this.status.searching = false
       },
       searchToURL() {
         var query_param = ""
         if (this.search_type == "mass_range_search") {
-          query_param = `${this.mass_target}_${this.mass_error}_${this.mass_error_type}`
+          query_param = `${this.$refs.massInput.$data.mass_target}_${this.$refs.massInput.$data.mass_error}_${this.$refs.massInput.$data.mass_error_type}`
         } else {
           query_param = `${this.search_term}`
         }
@@ -305,7 +312,7 @@
         this.updateRecordCounts()
       }
     },
-    components: {AgGridVue, BFormSelect, HelpIcon, RecordCountFilter}
+    components: {AgGridVue, BFormSelect, HelpIcon, MassRangeInput, MassTableFilter, RecordCountFilter}
   }
 </script>
 

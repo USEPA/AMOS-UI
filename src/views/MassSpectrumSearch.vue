@@ -5,12 +5,7 @@
       <h5>Mass Information</h5>
       <div>
         Target Mass
-        <input type="text" v-model.number="mass_target"> Da ± &nbsp;<input type="text" v-model.number="mass_error">
-        &nbsp;
-        <label><input type="radio" id="error_da" v-model="mass_error_type" value="da">Da</label>
-        &nbsp;
-        <label><input type="radio" id="error_ppm" v-model="mass_error_type" value="ppm">ppm</label>
-        <br />
+        <MassRangeInput ref="massInput" />
         <div style="padding-top: 10px; padding-bottom: 10px;">
           Window for peak similarity <input type="number" min="0" max="25" v-model="similarity.window">
           &nbsp;
@@ -119,18 +114,16 @@
   import { LicenseManager } from 'ag-grid-enterprise'
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
   
-  import { calculateMassRange, constrainNumber, rescaleSpectrum, validateSpectrumInput } from '@/assets/common_functions.js'
+  import { rescaleSpectrum, validateSpectrumInput } from '@/assets/common_functions.js'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store.js'
   import DualMassSpectrumPlot from '@/components/DualMassSpectrumPlot.vue'
+  import MassRangeInput from '@/components/MassRangeInput.vue'
   import MassSpectrumMetadata from '@/components/MassSpectrumMetadata.vue'
   import '@/styles/main.css'
 
   export default{
     data() {
       return {
-        mass_target: 194,
-        mass_error: 5,
-        mass_error_type: "ppm",
         methodology: "LC/MS",
         min_spectrum_similarity: 0.1,
         results: [],
@@ -180,13 +173,7 @@
           return;
         }
 
-        if (this.mass_error_type == "da") {
-          this.mass_error = constrainNumber(this.mass_error, 0, 0.5)
-        } else {
-          this.mass_error = constrainNumber(this.mass_error, 0, 25)
-        }
-        
-        const [lower_mass_limit, upper_mass_limit] = calculateMassRange(this.mass_target, this.mass_error, this.mass_error_type)
+        const [lower_mass_limit, upper_mass_limit] = this.$refs.massInput.calculateRange()
         this.user_spectrum_array = this.user_spectrum_string.split("\n").map(x => x.trim().split(/\s+/).map(y => Number(y)))
         this.user_spectrum_array = rescaleSpectrum(this.user_spectrum_array)
         const response = await axios.post(
@@ -226,7 +213,16 @@
         return selected_spectrum.map(function(x){return {"m/z":x[0], "intensity":x[1]}})
       }
     },
-    components: {AgGridVue, BAlert, BModal, DualMassSpectrumPlot, MassSpectrumMetadata}
+    async mounted() {
+      // Dunno why the wait is needed here and not in the partial identifier search...
+      const timerFunc = (t) => new Promise(resolve => setTimeout(resolve, t))
+
+      this.$refs.massInput.$data.mass_target = 194.1
+      this.$refs.massInput.$data.mass_error_type = "da"
+      await timerFunc(50)
+      this.$refs.massInput.$data.mass_error = 0.1
+    },
+    components: {AgGridVue, BAlert, BModal, DualMassSpectrumPlot, MassRangeInput, MassSpectrumMetadata}
   }
 
 </script>

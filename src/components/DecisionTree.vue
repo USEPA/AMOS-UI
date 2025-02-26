@@ -102,7 +102,7 @@
 <script>
   import * as d3 from "d3";
 
-  import '@/styles/decisionTree-styles.css'
+  import '@/styles/decision_tree.css'
 
   export default {
     data() {

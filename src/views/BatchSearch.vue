@@ -63,6 +63,9 @@
           <br />
           <input type="checkbox" id="include-source-counts" v-model="include_source_counts">
           <label for="include-source-counts"><span class="has-hover-text" title="Counts of the number of times a substance appears in sources not stored in AMOS.">Include source counts</span></label>
+          <br />
+          <input type="checkbox" id="include-functional-uses" v-model="include_functional_uses">
+          <label for="include-functional-uses"><span class="has-hover-text" title="A list of the common uses for a substance.  Only exists for some substances.">Include functional use classes</span></label>
         </div>
         <div class="option-sets">
           <strong>Record Info</strong>
@@ -88,8 +91,8 @@
           <input type="checkbox" id="include-external-links" v-model="include_external_links" checked>
           <label for="include-external-links"><span class="has-hover-text" title="For some sources, AMOS only contains external links to data instead of the actual data.  These other sources may require logins or other information to access their data.">Include externally linked records</span></label>
           <br />
-          <!-- <input type="checkbox" id="include-analyticalqc" v-model="include_analyticalqc">
-          <label for="include-analyticalqc"><span class="has-hover-text" title="Some additional, project-specific information exists for records from Analytical QC.">Include additional Analytical QC info</span></label> -->
+          <input type="checkbox" id="always-download-file" v-model="always_download_file">
+          <label for="always-download-file"><span class="has-hover-text" title="If no records are found, a file will normally not download.  This option downloads the file and supplementary information regardless.  Doesn't work with the 'Analytical QC Only' option.">Always download file</span></label>
         </div>
       </div>
       <br />
@@ -118,8 +121,9 @@
         batch_search_params: {},
         include_classyfire: true,
         include_external_links: true,
-        include_analyticalqc: false,
         include_source_counts: true,
+        include_functional_uses: true,
+        always_download_file: false,
         search_box: "",
         status_boxes: {
           show_empty_box_error: false,
@@ -150,12 +154,13 @@
             additional_record_info: this.record_info,
             base_url: window.location.origin,
             dtxsids: search_terms,
-            include_analyticalqc: this.include_analyticalqc,
             include_classyfire: this.include_classyfire,
             include_external_links: this.include_external_links,
             include_source_counts: this.include_source_counts,
+            include_functional_uses: this.include_functional_uses,
             methodologies: this.methodologies,
-            record_types: this.record_types
+            record_types: this.record_types,
+            always_download_file: this.always_download_file
           }
           var endpoint = ""
           var filename = ""
@@ -185,7 +190,6 @@
       mass_select(state) {
         this.include_classyfire = state
         this.include_external_links = state
-        this.include_analyticalqc = state
         this.include_source_counts = state
         this.record_info.ms = {all: state, ionization_mode: state, rating: state, spectral_entropy: state, num_peaks: state}
         this.record_types = {"Fact Sheet": state, "Method": state, "Spectrum": state, "AnalyticalQCOnly": false}
@@ -215,11 +219,11 @@
     align-items: center;
   }
   .batch-search-options {
-    margin-left: 100px
+    margin-left: 80px
   }
 
   .option-sets {
-    margin-right: 50px
+    margin-right: 40px
   }
 
   .indented-checkbox {

@@ -6,8 +6,15 @@
 -->
 
 <template>
-  This page is meant to give descriptions of the more commonly appearing data sources combined in this application, in terms of what the source is, how many records are in the database, and how many substances those records cover.  Sources with only a few records are not listed here.
-  <br /><br />
+  This page gives descriptions of the data sources that have large amounts of data stored in this application, including how many records from each source are in the database, and how many substances those records cover.  Sources with relatively few records are not listed here.
+  <br /> <br />
+  <div>
+    <label for="full-table-filter">Full Table Filter</label> &nbsp;
+    <input type="text" v-model="full_table_filter" name="full-table-filter" @keyup="quickFilter(full_table_filter)">
+    &nbsp;
+    <HelpIcon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." />
+  </div>
+  <br />
   <ag-grid-vue
     class="ag-theme-balham"
     style="height:550px; width:100%"
@@ -16,6 +23,7 @@
     :rowData="source_info"
     rowSelection="single"
     :suppressCopyRowsToClipboard="true"
+    @grid-ready="onGridReady"
   ></ag-grid-vue>
 </template>
 
@@ -31,6 +39,7 @@
   
   import { BACKEND_LOCATION } from '@/assets/store.js'
   import DataSourceDetails from '@/components/DataSourceDetails.vue'
+  import HelpIcon from '@/components/HelpIcon.vue'
 
   export default {
     data() {
@@ -38,6 +47,7 @@
         BACKEND_LOCATION,
         source_info: null,
         defaultColumnDef: {floatingFilter: true, sortable: true},
+        full_table_filter: "",
         column_defs: [
           {field: 'full_name', headerName: 'Source Name', flex: 1.5, wrapText: true, sort: 'asc', filter: 'agTextColumnFilter', cellRenderer: params => {
             return "<a href='" + params.data.url + "' target='_blank'>" + params.data.full_name + "</a>"
@@ -64,7 +74,16 @@
       const response = await axios.get(`${this.BACKEND_LOCATION}/get_data_source_info/`)
       this.source_info = response.data
     },
-    components: {AgGridVue, DataSourceDetails}
+    methods: {
+      onGridReady(params) {
+        this.gridApi = params.api;
+        this.gridColumnApi = params.columnApi;
+      },
+      quickFilter(input) {
+        this.gridApi.setQuickFilter(input)
+      },
+    },
+    components: {AgGridVue, DataSourceDetails, HelpIcon}
   }
 </script>
 

@@ -77,7 +77,7 @@
         substance_count: 0,
         status: {loading: true},
         NUMERIC_COLUMNS: ["year_published"],
-        TEXT_COLUMNS: ["analyte", "author", "chemical_class", "document_type", "limitation", "matrix", "method_name", "method_number", "methodologies", "publisher", "source"],
+        TEXT_COLUMNS: ["analyte", "author", "functional_classes", "document_type", "limitation", "matrix", "method_name", "method_number", "methodologies", "publisher", "source"],
         column_defs: [
           {field: "method_number", headerName: "Method #", width: 100},
           {field: "method_name", headerName: "Name", tooltipField: 'method_name', sortable: true, flex: 2.5, cellClass: 'fake-link'},
@@ -133,7 +133,7 @@
               }
             }
           },
-          {field: "chemical_class", headerName: "Functional Classes", sortable: true, flex: 1, tooltipField: "chemical_class"},
+          {field: "functional_classes", headerName: "Functional Classes", sortable: true, flex: 1, tooltipField: "functional_classes"},
           {field: "matrix", headerName: "Matrix", sortable: true, flex: 1, tooltipField: "matrix"},
           {field: "limit_of_detection", headerName: "LOD", tooltipField: "limit_of_detection", width: 80},
           {field: "limit_of_quantiation", headerName: "LOQ", tooltipField: "limit_of_quantiation", width: 80},

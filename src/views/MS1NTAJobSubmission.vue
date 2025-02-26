@@ -18,11 +18,15 @@
         <th>
           Project name:
           <HelpIcon tooltipText="Enter a unique name for each new NTA job run." />
+          <div style="color: darkred;" v-if="errors.no_project_name"><br />Error: This field is required.</div>
         </th>
         <td><textarea cols="30" rows="1" v-model="project_name"></textarea></td>
       </tr>
       <tr>
-        <th>Run test files only (debugging):</th>
+        <th>
+          Run test files only (debugging):
+          <div style="color: darkred;" v-if="errors.no_input_file"><br />Error: If not running test files, a positive mode file, a negative mode file, or both must be submitted.</div>
+        </th>
         <td><BFormSelect v-model="run_test_files" :options="yes_no_options" size="sm" style="width: auto;"/></td>
       </tr>
       <tr>
@@ -77,7 +81,7 @@
       </tr>
       <tr>
         <th>
-          Neutral losses (both modes):
+          Neutral losses & solvent modifiers (both modes):
           <HelpIcon tooltipText="Chemical adducts to be investigated as linkages between chemical features in the datasets for both modes." />
         </th>
         <td>
@@ -229,14 +233,18 @@
           Search DSSTox for possible structures:
           <HelpIcon tooltipText="Whether to compare masses of features that pass QA/QC filtering to those in DSSTox to identify candidate chemicals." />
         </th>
-        <td><BFormSelect v-model="search_dsstox" :options="yes_no_options" size="sm" style="width: auto;"/></td>
+        <td>
+          <div style="display: flex; align-items: center;">
+            <BFormSelect v-model="search_dsstox" :options="yes_no_options" size="sm" style="width: auto;" :disabled="search_hcd=='yes'"/><div v-if="search_hcd=='yes'">&nbsp; Required for Cheminformatics Hazard Module data.</div>
+          </div>
+        </td>
       </tr>
       <tr>
         <th>
           Search Cheminformatics Hazard Module for toxicity data:
           <HelpIcon tooltipText="Whether candidate chemicals from DSSTox should have Hazard Information pulled down from the Cheminformatics Hazard module." />
         </th>
-        <td><BFormSelect v-model="search_hcd" :options="yes_no_options" size="sm" style="width: auto;"/></td>
+        <td><BFormSelect v-model="search_hcd" :options="yes_no_options" size="sm" style="width: auto;" @change="hcd_dsstox"/></td>
       </tr>
       <tr>
         <th>
@@ -296,10 +304,16 @@
         max_replicate_cv: 0.8,
         minimum_retention_time: 0.0,
         na_value: "",
-        errors: {any: false, no_input_file: false}
+        errors: {any: false, no_input_file: false, no_project_name: false}
       }
     },
     methods: {
+      hcd_dsstox() {
+        console.log(this.search_hcd)
+        if (this.search_hcd == 'yes') {
+          this.search_dsstox = 'yes'
+        }
+      },
       loadFile(event, file_input) {
         const file = event.target.files[0]
         let reader = new FileReader()
@@ -309,18 +323,31 @@
         reader.readAsText(file)
       },
       validateFields() {
-        // TODO: Update this to set the fields to false in one sweep
-        this.errors = {any: false, na_value_size: false, no_input_file: false}
-        if (this.na_value.length == 0) {
-          this.errors.any = true
-          this.errors.na_value_size = true
+        for (let key of Object.keys(this.errors)) {
+          this.errors[key] = false
         }
+        
+        // check project name is not empty
+        if (this.project_name.length == 0) {
+          this.errors.any = true
+          this.errors.no_project_name = true
+        }
+
+        // check that there's at least one file submitted or the test files are being run
+        const num_positive_files = document.getElementById("pos_mode_file").files.length
+        const num_negative_files = document.getElementById("neg_mode_file").files.length
+        if (num_positive_files==0 && num_negative_files==0 && this.run_test_files=="no") {
+          this.errors.any = true
+          this.errors.no_input_file = true
+        }
+        
       },
       async submitJob() {
-        /* this.validateFields()
+        this.validateFields()
         if (this.errors.any == true) {
           return
-        } */
+        }
+
         const payload = {
           project_name: this.project_name,
           datetime: this.getDateTime(),

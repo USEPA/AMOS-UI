@@ -353,7 +353,7 @@
                 posY = e.clientY;
               var myId = this.id.split("_")[this.id.split('_').length-2]
               var methods_url = filterById(graph.nodes, myId).url
-              var fact_sheets_url = methods_url.replace('methods_list', 'fact_sheet_list').replace("chemical_class", 'functional_classes')
+              var fact_sheets_url = methods_url.replace('methods_list', 'fact_sheet_list')
               menu(posX, posY, methods_url, fact_sheets_url);
             }
             e.preventDefault();
@@ -520,7 +520,7 @@
             var posX = e.clientX,
               posY = e.clientY;
             var methods_url = filterById(graph.nodes, this.id).url;
-            var fact_sheets_url = methods_url.replace('methods_list', 'fact_sheet_list').replace("chemical_class", 'functional_classes')
+            var fact_sheets_url = methods_url.replace('methods_list', 'fact_sheet_list')
             menu(posX, posY, methods_url, fact_sheets_url);
             e.preventDefault();
           })
