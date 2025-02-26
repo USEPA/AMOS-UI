@@ -2,6 +2,16 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2025-02-26</summary>
+    <ul>
+      <li>Added a full-table filter to the data sources list.</li>
+      <!-- NTA --> <li>Added error messages to the NTA job submission page for when the project name field is blank and when test files are not run and no positive or negative mode files have been uploaded.</li>
+      <!-- NTA --> <li>Modified the NTA job submission page to force the "Search DSSTox" option to be true when searching the Hazard Dashboard.</li>
+      <li>Added a custom filter for the monoisotopic mass to the partial identifier search's results table.</li>
+      <li>Added options to the batch search always download a file (normally it won't if no records are found) and including functional use classes.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2025-02-14</summary>
     <ul>
       <!-- NTA --> <li>A heatmap visualizing occurrence information has been added to the NTA MS1 results page.</li>
