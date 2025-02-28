@@ -2,6 +2,14 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2025-02-28</summary>
+    <ul>
+      <li>Added a run sequence visualization to the NTA MS1 results.</li>
+      <li>For the batch search, the "Always Download File" option is now true by default, the "Include Functional Uses" button now correctly updates with the "Select All"/"Deselect All" buttons, and the message for when no records are found and no file is downloaded has been expanded.</li>
+      <li>The PDF display in the similar structure search has an option to show only the similar substances in the grid and table views of substances.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2025-02-26</summary>
     <ul>
       <li>Added a full-table filter to the data sources list.</li>
