@@ -1,11 +1,10 @@
 <template>
-  Zooming is by Ctrl+Space.
-  <!-- <OccurrenceHeatmap /> -->
+  Hi.
 </template>
 
 
 <script>
-  import OccurrenceHeatmap from '@/components/OccurrenceHeatmap.vue'
+  import RunSequencePlot from '@/components/RunSequencePlot.vue'
 
   export default {
     data() {
@@ -13,7 +12,7 @@
         x: 1
       }
     },
-    components: { OccurrenceHeatmap },
+    components: { RunSequencePlot },
     created() {
       1
     }

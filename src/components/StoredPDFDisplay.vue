@@ -29,10 +29,11 @@
     <div v-else-if="viewer_mode == 'SubstanceGrid'">
       <button @click="downloadSubstanceGridInfo">Download Substance Info</button>
       <button @click="copySubstancesToClipboard">Copy DTXSID List</button>
+      &nbsp;
+      <label v-if="highlightedSubstances.length > 0"><input type="checkbox" v-model="show_only_similar_substances">Show only similar substances</label>
       <div class="substance-grid">
         <div v-for="cl in substance_list">
-          <SubstanceTile v-if="highlightedSubstances.includes(cl.dtxsid)" :substance_info="cl" highlight/>
-          <SubstanceTile v-else :substance_info="cl"/>
+          <SubstanceTile v-if="!show_only_similar_substances || (show_only_similar_substances && highlightedSubstances.includes(cl.dtxsid))" :substance_info="cl" :highlight="highlightedSubstances.includes(cl.dtxsid)"/>
         </div>
       </div>
     </div>
@@ -40,6 +41,8 @@
     <div v-else-if="viewer_mode == 'SubstanceTable'">
       <button @click="downloadSubstanceTableInfo">Download Substance Info</button>
       <button @click="copySubstancesToClipboard">Copy DTXSID List</button>
+      &nbsp;
+      <label v-if="highlightedSubstances.length > 0"><input type="checkbox" v-model="show_only_similar_substances" @change="updateTableFilters">Show only similar substances</label>
       <ag-grid-vue
         class="ag-theme-balham"
         style="height:550px; width:100%"
@@ -49,6 +52,8 @@
         @grid-ready="onGridReady"
         :rowClassRules="rowClassRules"
         :suppressCopyRowsToClipboard="true"
+        :isExternalFilterPresent="isExternalFilterPresent"
+        :doesExternalFilterPass="doesExternalFilterPass"
       ></ag-grid-vue>
     </div>
     <p v-else>Illegal value for 'viewer_mode' selected.  Current value is {{viewer_mode}}.</p>
@@ -83,6 +88,7 @@
         has_associated_spectra: false,
         BACKEND_LOCATION,
         COMPTOX_PAGE_URL,
+        show_only_similar_substances: false,
         column_defs: [
           {field:'image', headerName:'Structure', autoHeight: true, width: 100, wrapText: true, cellRenderer: (params) => {
             if (params.data.image_link) {
@@ -204,6 +210,17 @@
       onGridReady(params) {
         this.gridApi = params.api;
         this.gridColumnApi = params.columnApi;
+      },
+      isExternalFilterPresent() {
+        return this.show_only_similar_substances
+      },
+      doesExternalFilterPass(node) {
+        console.log("he")
+        return this.highlightedSubstances.includes(node.data.dtxsid)
+      },
+      updateTableFilters() {
+        this.gridApi.onFilterChanged()
+        this.updateRecordCounts()
       }
     },
     components: { AgGridVue, SubstanceTile }

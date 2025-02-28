@@ -20,7 +20,7 @@
   <div v-else-if="status.job == 'Completed'">
     <p>Job completed successfully.</p>
     <p>Job start time: {{ job_start_time }}</p>
-    <p>Use the buttons below to download the results or to load the results into the browser for use with visualizations.  Result files are stored in a zip file that may be several megabytes in size; downloading the file may take a moment.</p>
+    <p>Use the buttons below to download the results or to load the results into the browser for use with visualizations.  Result files are stored in a zip file that may be tens of megabytes in size; downloading the file may take a moment.</p>
     <div>
       <button @click="loadResultsFile($route.params.job_id)">Load Results</button>
       <button @click="downloadResults($route.params.job_id)">Download Results File (ZIP)</button>
@@ -42,6 +42,7 @@
       <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="cv_scatterplot" @click="loadCVScatterplot">CV Scatterplot</label>
       <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="decision_tree" @click="loadDecisionTree">Decision Tree</label>
       <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="occurrence_heatmap" @click="loadOccurrenceHeatmap">Occurrence Heatmap</label>
+      <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="run_sequence_plots" @click="loadRunSequencePlots" :disabled="!has_run_sequence">Run Sequence Plot</label>
     </div>
     <div v-if="current_visualization=='cv_scatterplot'">
       <p v-if="status.loading_viz">Loading...</p>
@@ -53,7 +54,11 @@
     </div>
     <div v-else-if="current_visualization=='occurrence_heatmap'">
       <p v-if="status.loading_viz">Loading...</p>
-      <OccurrenceHeatmap :workbook="excel_workbook" />
+      <OccurrenceHeatmap v-else :workbook="excel_workbook" />
+    </div>
+    <div v-else-if="current_visualization=='run_sequence_plots'">
+      <p v-if="status.loading_viz">Loading...</p>
+      <RunSequencePlot v-else :workbook="excel_workbook" />
     </div>
   </div>
 </template>
@@ -65,6 +70,7 @@
 
   import DecisionTree from '@/components/DecisionTree.vue'
   import OccurrenceHeatmap from '@/components/OccurrenceHeatmap.vue'
+  import RunSequencePlot from '@/components/RunSequencePlot.vue'
 
   export default {
     data() {
@@ -77,7 +83,8 @@
         current_visualization: "none",
         status: {job: "Not found", retrieving_file: false, file_retrieved: false, loading_viz: false},
         csv_strings: {parameters: "", results: ""},
-        excel_workbook: null
+        excel_workbook: null,
+        has_run_sequence: false
       }
     },
     async created() {
@@ -100,6 +107,13 @@
         this.status.retrieving_file = true
         const res = await axios.get("https://qed-dev.edap-cluster.com/nta/ms1/results/toxpi/" + job_id, {responseType: "blob"})
         this.zip_blob = res.data
+
+        const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
+        const workbook = XLSX.read(excel_array)
+        if (workbook.SheetNames.includes("Run Sequence (pos)") || workbook.SheetNames.includes("Run Sequence (neg)")) {
+          this.has_run_sequence = true
+        }
+
         this.status.file_retrieved = true
         this.status.retrieving_file = false
       },
@@ -154,12 +168,19 @@
       },
       async loadOccurrenceHeatmap() {
         this.status.loading_viz = true
+        this.current_visualization = "occurrence_heatmap"
         const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
         this.excel_workbook = XLSX.read(excel_array)
-        this.current_visualization = "occurrence_heatmap"
+        this.status.loading_viz = false
+      },
+      async loadRunSequencePlots() {
+        this.status.loading_viz = true
+        this.current_visualization = "run_sequence_plots"
+        const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
+        this.excel_workbook = XLSX.read(excel_array)
         this.status.loading_viz = false
       }
     },
-    components: { DecisionTree, OccurrenceHeatmap }
+    components: { DecisionTree, OccurrenceHeatmap, RunSequencePlot }
   }
 </script>

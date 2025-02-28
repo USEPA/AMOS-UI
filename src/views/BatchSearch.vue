@@ -103,7 +103,7 @@
     </div>
   </div>
   <BAlert variant="warning" dismissible v-model="status_boxes.show_empty_box_error">No substances were entered in the text box.</BAlert>
-  <BAlert variant="warning" dismissible v-model="status_boxes.no_records_found">No records were found for the searched substances.</BAlert>
+  <BAlert variant="warning" dismissible v-model="status_boxes.no_records_found">No records were found in the database for the searched substances.  If you want supplemental information about the substances regardless, check the "Always Download File" option.</BAlert>
 </template>
 
 <script>
@@ -123,7 +123,7 @@
         include_external_links: true,
         include_source_counts: true,
         include_functional_uses: true,
-        always_download_file: false,
+        always_download_file: true,
         search_box: "",
         status_boxes: {
           show_empty_box_error: false,
@@ -191,6 +191,7 @@
         this.include_classyfire = state
         this.include_external_links = state
         this.include_source_counts = state
+        this.include_functional_uses = state
         this.record_info.ms = {all: state, ionization_mode: state, rating: state, spectral_entropy: state, num_peaks: state}
         this.record_types = {"Fact Sheet": state, "Method": state, "Spectrum": state, "AnalyticalQCOnly": false}
         this.methodologies = {all: state, "GC/MS": state, "LC/MS": state, "NMR": state}
