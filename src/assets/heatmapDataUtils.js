@@ -188,7 +188,7 @@ export function parseHeaders(dataArr) {
   }
   // sort by the countD value
   newHeaders.sort((a, b) => a[1] - b[1])
-
+  
   // group data by countD value
   const groups = newHeaders.reduce((acc, item) => {
     const key = item[1];
@@ -198,10 +198,10 @@ export function parseHeaders(dataArr) {
     acc[key].push(item);
     return acc;
   }, {});
-
+  
   // transform groups into desired format
   const new_headers_list = Object.values(groups).map(group => group.map(item => item[0]));
-
+  
   return new_headers_list;
 }
 
@@ -216,7 +216,7 @@ export function getUniqueSampleHeaders(dataArr) {
 
   // get all headers grouped together by similarity
   let allHeaders = parseHeaders(dataArr);
-
+  
   // clean headers to only have the header names
   const non_samples = ["MRL"];
   let samHeaders = [];
@@ -225,7 +225,7 @@ export function getUniqueSampleHeaders(dataArr) {
       samHeaders.push(sublist[0].slice(0, sublist[0].length-1));
     }
   }
-
+  
   // isolate the sample groups from the stats columns
   const prefixes = [
     "Mean ", 
@@ -347,7 +347,7 @@ export function getRepCvMeanHeaders(sampleGroups) {
 }
 
 /**
- * Returns an updated dataArr with MDL values set.
+ * Returns an updated dataArr with MRL values set.
  * 
  * @param {object[]} dataArr The data array whose elements are objects that represent rows.
  * @param {string} blankMeanHeader The header for blank mean value.
@@ -355,28 +355,28 @@ export function getRepCvMeanHeaders(sampleGroups) {
  * @param {string} blankRepPerHeader The header for blank replicate percent.
  * @param {number} MrlMul The MRL multiplier. 
  * @param {number} minReplicateBlankHitPercent The minimum replicate blank hit percent.
- * @returns {object[]} dataArr after filling in the MDL keys.
+ * @returns {object[]} dataArr after filling in the MRL keys.
  */
-export function calcMDL(dataArr, blankMeanHeader, blankStdHeader, blankRepPerHeader, MrlMult, minReplicateBlankHitPercent) {
+export function calcMRL(dataArr, blankMeanHeader, blankStdHeader, blankRepPerHeader, MrlMult, minReplicateBlankHitPercent) {
   
-  // calculate MDLs
+  // calculate MRLs
   dataArr.forEach(row => {
-    row["MDL"] = row[blankMeanHeader] + MrlMult * row[blankStdHeader];
+    row["MRL"] = row[blankMeanHeader] + MrlMult * row[blankStdHeader];
   });
   dataArr.forEach(row => {
-    if (row["MDL"] === null || row["MDL"] === "") {
+    if (row["MRL"] === null || row["MRL"] === "") {
       if (row[blankMeanHeader] === null || row[blankMeanHeader] === "") {
-        row["MDL"] = 0;
+        row["MRL"] = 0;
       } else {
-        row["MDL"] = null;
+        row["MRL"] = null;
       }
     }
   });
 
-  // If blank replicate percentage column fails, zero out MDL
+  // If blank replicate percentage column fails, zero out MRL
   dataArr.forEach(row => {
     if (row[blankRepPerHeader] < minReplicateBlankHitPercent) {
-      row["MDL"] = 0;
+      row["MRL"] = 0;
     }
   });
 
@@ -414,12 +414,12 @@ export function getCvSubset(dataArr, cvColHeaders) {
  * maximizes performance at the cost of readability. It would be more readable if we were to iterate over the data
  * multiple times (similar to how the python code is written), but it is more efficient to handle as many tasks as
  * possible within a single iteration of the data. Here, we iterate through 3 times. The first iteration sets failed
- * n_abun and MDL samples to null. The second iteration checks if we pass the CV threshold, if so it adds to a 
- * "belowCount" key for sorting on features with the most detects, AND goes ahead and sets the -1 (failed replicat/MDL),
+ * n_abun and MRL samples to null. The second iteration checks if we pass the CV threshold, if so it adds to a 
+ * "belowCount" key for sorting on features with the most detects, AND goes ahead and sets the -1 (failed replicat/MRL),
  * 0 (pass all) and 1 (failed cv). The third iteration, is to remove the "belowCount" key.
  * 
  * @param {object[]} cvData The cvData structure containing the CV values for each row.
- * @param {object[]} data The full data structure imported from the webapp output, containing all columns & MDL values.
+ * @param {object[]} data The full data structure imported from the webapp output, containing all columns & MRL values.
  * @param {number} minReplicateBlankHitPercent The min replicate blank percent parameter.
  * @param {number} minReplicateHitsPercent The min replicate blank percent parameter.
  * @param {number} maxReplicateCvValue The max CV value parameter.
@@ -428,7 +428,7 @@ export function getCvSubset(dataArr, cvColHeaders) {
  * @param {string[]} meanColHeaders A list of mean column names.
  * @param {string} blankRepPerHeader The header name used for blank replicate percentage.
  * @returns {object[]} The transformed cvData data structure after sorting by # of passed samples,
- * and setting the CV to -1 for failing replicate/MDL, 0 for passing all, and 1 for failing CV.
+ * and setting the CV to -1 for failing replicate/MRL, 0 for passing all, and 1 for failing CV.
  */
 export function cleanCvDataAndGetDiscretizedData(
   cvData, 
@@ -441,14 +441,14 @@ export function cleanCvDataAndGetDiscretizedData(
   meanColHeaders,
   blankRepPerHeader
 ) {
-  // first filter on n_abun and MDL cutoffs
+  // first filter on n_abun and MRL cutoffs
   for (let i = 0; i < cvColHeaders.length; i++) {
     let x = cvColHeaders[i];
     let y = repColHeaders[i];
     let z = meanColHeaders[i];
     const sampleName = x.slice(3, x.length);
 
-    // replace cvData values with null for n_abun and MDL cutoffs
+    // replace cvData values with null for n_abun and MRL cutoffs
     for (let rowIndex = 0; rowIndex < data.length; rowIndex++) {
       data[rowIndex][`passSampleReplicate${sampleName}`] = true;
       data[rowIndex][`passCV${sampleName}`] = true;
@@ -464,8 +464,8 @@ export function cleanCvDataAndGetDiscretizedData(
         data[rowIndex][`passSampleReplicate${sampleName}`] = false;
         continue;
       }
-      // added condition for a meanValue of "" to fail the MDL
-      if (data[rowIndex][z] < data[rowIndex]["MDL"]) {
+      // added condition for a meanValue of "" to fail the MRL
+      if (data[rowIndex][z] < data[rowIndex]["MRL"]) {
         cvData[rowIndex][x] = null;
         data[rowIndex][`passMRL${sampleName}`] = false;
       }
@@ -485,7 +485,7 @@ export function cleanCvDataAndGetDiscretizedData(
           data[rowIndex][`passCV${colHeader.slice(3, colHeader.length)}`] = false;
         }
       } else {
-        cvData[rowIndex][colHeader] = -1; // failed replicate or MDL
+        cvData[rowIndex][colHeader] = -1; // failed replicate or MRL
       }
     }
   }
@@ -507,7 +507,7 @@ export function cleanCvDataAndGetDiscretizedData(
  * 
  * @param {object[]} cvDataDiscrete The discretized cv data - e.g., the returned value from 
  * cleanCvDataAndGetDiscretizedData().
- * @param {object[]} data The full data structure imported from the webapp output, containing all columns & MDL values.
+ * @param {object[]} data The full data structure imported from the webapp output, containing all columns & MRL values.
  * @returns {object[]} An array of object containing the feature index, sample index and value (-1, 0, 1) for 
  * each sample to be plotted on the heatmap.
  */
@@ -516,15 +516,18 @@ export function getFlattenedCvData(cvDataDiscrete, data, sampleGroups) {
   cvDataDiscrete.forEach((feature, featureIndex) => {
     const featureID = feature["FeatureID"];
     const featureData = data.find(obj => obj["Feature ID"] === featureID);
+    //console.log(featureID)
+    //console.log(featureData)
     Object.entries(feature).forEach(([sample, value], k) => {
       // skip over featureID keys
       if (!sample.endsWith("tureID")) {
+        //console.log(sample)
         const sampleIndex = sampleGroups.indexOf(sample.slice(3, sample.length));
-        const mdl = Number(featureData["MDL"].toFixed(1));
+        const mrl = Number(featureData["MRL"].toFixed(1));
         const repPercentage = featureData[`Detection Percentage ${sample.slice(3, sample.length)}`];
         const repCount = featureData[`Detection Count ${sample.slice(3, sample.length)}`];
         const meanValue = featureData[`Mean ${sample.slice(3, sample.length)}`];
-        let mrlQuotient = featureData[`MDL`] !== 0 ? meanValue / featureData[`MDL`] : '&#8734;';
+        let mrlQuotient = featureData[`MRL`] !== 0 ? meanValue / featureData[`MRL`] : '&#8734;';
         if (Number.isNaN(mrlQuotient)) {
           mrlQuotient = 0;
         }
@@ -536,6 +539,7 @@ export function getFlattenedCvData(cvDataDiscrete, data, sampleGroups) {
           cv = 'NA';
           mrlQuotient = "NA";
         } else {
+          /* ERROR IS HERE */
           cv = Number(cv.toFixed(3));
         }
 
@@ -556,8 +560,8 @@ export function getFlattenedCvData(cvDataDiscrete, data, sampleGroups) {
           "repDetectionValue": repCount,
           "repPercentValue": repPercentage,
           "cvValue": cv,
-          "mdlQuotient": (mrlQuotient === 0 || typeof mrlQuotient === "string") ? mrlQuotient : mrlQuotient.toFixed(3),
-          "mdl": mdl,
+          "mrlQuotient": (mrlQuotient === 0 || typeof mrlQuotient === "string") ? mrlQuotient : mrlQuotient.toFixed(3),
+          "mrl": mrl,
           "decision": passFail,
           "passSampleReplicate": featureData[`passSampleReplicate${sample.slice(3, sample.length)}`],
           "passCV": cv === "NA" ? false : featureData[`passCV${sample.slice(3, sample.length)}`],

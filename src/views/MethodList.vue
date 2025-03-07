@@ -9,7 +9,11 @@
 <template>
   <div>
     <p>Below is a list of methods currently in the database.  Double-click on a row to display the method and its substances in another tab.  Cells in the table with a dashed underline have hovertext.</p>
-    <p v-if="status.loading">Loading...</p>
+    <div v-if="status.loading">
+      <p>Loading methods...{{ method_info.length.toLocaleString() }} of {{ status.full_count.toLocaleString() }} retrieved.</p>
+      <BProgress :value="method_info.length" :max="status.full_count" style="margin: 10px;"/>
+      <br />
+    </div>
     <div v-else>
       <p>{{method_info.length.toLocaleString()}} methods in total are present in the database; {{ filtered_record_count.toLocaleString() }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed, covering {{substance_count.toLocaleString()}} {{substance_count == 1 ? "substance" : "substances"}}.</p>
       <div>
@@ -24,20 +28,20 @@
         <button @click="downloadSubstancesInMethods" :disabled="filtered_record_count==0">Download Substances</button>
         <button @click="resetFilters">Reset Filters</button>
       </div>
-      <ag-grid-vue
-        class="ag-theme-balham"
-        style="height:600px; width:100%"
-        :defaultColDef="default_column_def"
-        :columnDefs="column_defs"
-        :rowData="method_info"
-        @grid-ready="onGridReady"
-        rowSelection="single"
-        @row-double-clicked="onDoubleClick"
-        @filter-changed="onFilterChanged"
-        :tooltipShowDelay="500"
-        :suppressCopyRowsToClipboard="true"
-      ></ag-grid-vue>
     </div>
+    <ag-grid-vue
+      class="ag-theme-balham"
+      style="height:600px; width:100%"
+      :defaultColDef="default_column_def"
+      :columnDefs="column_defs"
+      :rowData="method_info"
+      @grid-ready="onGridReady"
+      rowSelection="single"
+      @row-double-clicked="onDoubleClick"
+      @filter-changed="onFilterChanged"
+      :tooltipShowDelay="500"
+      :suppressCopyRowsToClipboard="true"
+    ></ag-grid-vue>
     <br />
     <p>Some usage notes:</p>
     <ul>
@@ -49,6 +53,7 @@
 
 <script>
   import axios from 'axios'
+  import { BProgress } from 'bootstrap-vue-next'
 
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
@@ -70,12 +75,12 @@
         SOURCE_ABBREVIATION_MAPPING,
         METHODOLOGY_MAPPING,
         METHOD_DOCUMENT_TYPES,
-        method_info: null,    //starting this as null instead of an empty array means the loading overlay will trigger
+        method_info: [],
         default_column_def: {resizable: true, filter: 'agTextColumnFilter', floatingFilter: true, filterParams: {maxNumConditions: 1}},
         full_table_filter: "",
         filtered_record_count: 0,
         substance_count: 0,
-        status: {loading: true},
+        status: {loading: true, loaded_count: 0, full_count: 0},
         NUMERIC_COLUMNS: ["year_published"],
         TEXT_COLUMNS: ["analyte", "author", "functional_classes", "document_type", "limitation", "matrix", "method_name", "method_number", "methodologies", "publisher", "source"],
         column_defs: [
@@ -155,10 +160,25 @@
       }
     },
     async created() {
-      const path = `${this.BACKEND_LOCATION}/method_list`
+      /* const path = `${this.BACKEND_LOCATION}/method_list`
       const response = await axios.get(path)
       this.method_info = response.data.results
+      this.status.loading = false */
+
+      const count_response = await axios.get(`${this.BACKEND_LOCATION}/record_type_count/methods`)
+      const method_count = count_response.data.record_count
+      this.status.full_count = method_count
+
+      const BATCH_SIZE = 1000
+      const num_pages = Math.ceil(method_count / BATCH_SIZE)
+
+      for (let i = 0; i < num_pages; i++) {
+        const batch_response = await axios.get(`${this.BACKEND_LOCATION}/method_pagination/${BATCH_SIZE}/${i*BATCH_SIZE}`)
+        const batch_results = batch_response.data.results
+        this.method_info = this.method_info.concat(batch_results)
+      }
       this.status.loading = false
+      this.gridApi.onFilterChanged();
     },
     methods: {
       onDoubleClick(event) {
@@ -234,11 +254,13 @@
       },
     },
     components: {
-      AgGridVue, HelpIcon
+      AgGridVue, BProgress, HelpIcon
     }
   }
 </script>
 
 <style>
-
+  /* .progress-bar {
+    background-color: #0e6993;
+  } */
 </style>

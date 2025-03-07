@@ -11,7 +11,10 @@
     <p>
       This is a list of fact sheets available in the database.  Double-click a row in the table to view the fact sheet in a new window.
     </p>
-    <div v-if="status.loading">Loading...</div>
+    <div v-if="status.loading">
+      <p>Loading fact sheets...{{ fact_sheet_info.length.toLocaleString() }} of {{ status.full_count.toLocaleString() }} retrieved.</p>
+      <BProgress :value="fact_sheet_info.length" :max="status.full_count" style="margin: 10px;"/>
+    </div>
     <p v-else>{{fact_sheet_info.length.toLocaleString()}} fact sheets in total are present in the database; {{ filtered_record_count.toLocaleString() }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed, covering {{substance_count.toLocaleString()}} {{substance_count == 1 ? "substance" : "substances"}}.</p>
     <div style="padding-bottom: 10px;">
       <label for="full-table-filter">Full Table Filter</label> &nbsp;
@@ -58,7 +61,7 @@
 
 <script>
   import axios from 'axios'
-  import { BModal } from 'bootstrap-vue-next'
+  import { BModal, BProgress } from 'bootstrap-vue-next'
   
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
@@ -70,7 +73,6 @@
   import { filtersToURL, queryParamsToFilters, sourceAbbreviationTooltip, timestampForFile } from '@/assets/common_functions.js'
   import { BACKEND_LOCATION, SOURCE_ABBREVIATION_MAPPING } from '@/assets/store.js'
   import InchikeyDisambiguation from '@/components/InchikeyDisambiguation.vue'
-  import StoredPDFDisplay from '@/components/StoredPDFDisplay.vue'
   import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
   import HelpIcon from '@/components/HelpIcon.vue'
   import '@/styles/main.css'
@@ -80,7 +82,7 @@
       return {
         SOURCE_ABBREVIATION_MAPPING,
         selected_row_data: {},
-        fact_sheet_info: null,
+        fact_sheet_info: [],
         any_fact_sheet_selected: false,  // used to avoid having a box with an error pop up if nothing's been selected yet,
         BACKEND_LOCATION,
         filtered_record_count: 0,
@@ -89,7 +91,7 @@
         default_column_def: {resizable: true, sortable: true, filter: 'agTextColumnFilter', floatingFilter: true},
         substance_count: 0,
         disambiguation: {inchikey: false, synonym: false},
-        status: {loading: true, substance_searching: false, filter_by_substance: false},
+        status: {loading: true, substance_searching: false, filter_by_substance: false, full_count: 0},
         fact_sheets_with_substance: [],
         possible_substances: [],
         record_counts_by_dtxsid: {},
@@ -133,10 +135,25 @@
     },
 
     async created() {
-      const path = `${this.BACKEND_LOCATION}/fact_sheet_list`
+      /* const path = `${this.BACKEND_LOCATION}/fact_sheet_list`
       const response = await axios.get(path)
       this.fact_sheet_info = response.data.results
+      this.status.loading = false */
+
+      const count_response = await axios.get(`${this.BACKEND_LOCATION}/record_type_count/fact_sheets`)
+      const fact_sheet_count = count_response.data.record_count
+      this.status.full_count = fact_sheet_count
+
+      const BATCH_SIZE = 1000
+      const num_pages = Math.ceil(fact_sheet_count / BATCH_SIZE)
+
+      for (let i = 0; i < num_pages; i++) {
+        const batch_response = await axios.get(`${this.BACKEND_LOCATION}/fact_sheet_pagination/${BATCH_SIZE}/${i*BATCH_SIZE}`)
+        const batch_results = batch_response.data.results
+        this.fact_sheet_info = this.fact_sheet_info.concat(batch_results)
+      }
       this.status.loading = false
+      this.gridApi.onFilterChanged();
     },
 
     methods: {
@@ -274,9 +291,9 @@
     components: {
       AgGridVue,
       BModal,
+      BProgress,
       HelpIcon,
       InchikeyDisambiguation,
-      StoredPDFDisplay,
       SynonymDisambiguation
     }
   }
