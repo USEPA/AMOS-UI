@@ -42,6 +42,7 @@ pipeline {
 
         stage('Dockerize') {
             steps {
+                sh "env"
                 sh "docker buildx use mybuilder"
                 sh "docker buildx build --platform linux/amd64 --tag ${DOCKER_REGISTRY}/epa/${IMAGE_NAME}:${IMAGE_TAG} --push ."
             }
