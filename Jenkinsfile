@@ -31,14 +31,6 @@ pipeline {
             }
         }
 
-        stage('Build') {
-            steps {
-                nodejs(nodeJSInstallationName: 'nodejs-22') {
-                    sh 'npm install && rm -rf .env.local && npm run build-dev'
-                }
-            }
-        }
-
         stage('Dependencies check') {
             steps {
                 catchError(message: 'Dependency check failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
