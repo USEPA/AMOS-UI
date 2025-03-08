@@ -33,10 +33,12 @@
         <BDropdownItem to="/similar_structure_search">Similar Structure Search</BDropdownItem>
       </BNavItemDropdown>
       &emsp;
-      <BNavItemDropdown text="INTERPRET NTA" class="nav-dropdown">
-        <BDropdownItem to="/nta_home">NTA Home</BDropdownItem>
-        <BDropdownItem to="/ms1_nta/submit">MS1 Job Submission</BDropdownItem>
-      </BNavItemDropdown>
+      <template v-if="store.showInterpretNTA">
+        <BNavItemDropdown text="INTERPRET NTA" class="nav-dropdown">
+          <BDropdownItem to="/nta_home">NTA Home</BDropdownItem>
+          <BDropdownItem to="/ms1_nta/submit">MS1 Job Submission</BDropdownItem>
+        </BNavItemDropdown>
+      </template>
       &emsp;
       <BNavItemDropdown text="Other Pages" class="nav-dropdown">
         <BDropdownItem to="/functional_class_visualization">Functional Class Visualization</BDropdownItem>

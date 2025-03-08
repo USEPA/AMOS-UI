@@ -322,4 +322,5 @@ export const METHOD_DOCUMENT_TYPES = {
 
 export const store = reactive({
     showHeaderAndFooter: false,
+	showInterpretNTA: false,
 })
