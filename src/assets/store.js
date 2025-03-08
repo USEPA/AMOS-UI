@@ -5,6 +5,8 @@ export const BACKEND_LOCATION = import.meta.env.VITE_FLASK_BACKEND_LOCATION
 export const COMPTOX_PAGE_URL = import.meta.env.VITE_COMPTOX_PAGE_URL
 export const IMAGE_BY_DTXSID_API = import.meta.env.VITE_IMAGE_BY_DTXSID_API
 
+console.log({BACKEND_LOCATION, COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API})
+
 export const ANALYTE_MAPPING = {
     SVOCs: "Semi-volatile organic compounds",
     VOCs: "Volatile organic compounds",
