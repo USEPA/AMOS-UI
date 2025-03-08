@@ -58,8 +58,8 @@ pipeline {
 
         stage('Check') {
             steps {
-                sh "sleep 20"
-                sh "curl https://amos.sciencedataexperts.com/"
+                sh "sleep 5"
+                // sh "curl https://amos.sciencedataexperts.com/"
             }
         }
     }
