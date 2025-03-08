@@ -9,23 +9,25 @@
   <div class="nav-bar">
     <div class="nav-bar-left">
       <div style="text-align: start;">
-        <router-link to="/" style="font-size: larger">AMOS</router-link>
+        <router-link style="font-size: larger" to="/">AMOS</router-link>
         <div style="font-size: smaller">Version: 2025-02-28</div>
       </div>
       &emsp;
-      <input @keyup.enter="go()" type="text" v-model="searchTerm" name="search-term" title="General search input field">
-      <BFormSelect v-model="searchType" :options="searchTypeOptions" size="sm" style="width: auto; padding: 0 2em 0 0.5em;"/>  <!-- width needs to be set to fix height issues for some reason -->
+      <input v-model="searchTerm" name="search-term" title="General search input field" type="text" @keyup.enter="go()">
+      <BFormSelect v-model="searchType" :options="searchTypeOptions" size="sm"
+                   style="width: auto; padding: 0 2em 0 0.5em;"/>
+      <!-- width needs to be set to fix height issues for some reason -->
       <button @click="go()">Search</button>
     </div>
     <div class="nav-bar-right">
       &emsp;
-      <BNavItemDropdown text="Lists" class="nav-dropdown">
+      <BNavItemDropdown class="nav-dropdown" text="Lists">
         <BDropdownItem to="/analytical_qc_list">Analytical QC</BDropdownItem>
         <BDropdownItem to="/fact_sheet_list">Fact Sheets</BDropdownItem>
         <BDropdownItem to="/methods_list">Methods</BDropdownItem>
       </BNavItemDropdown>
       &emsp;
-      <BNavItemDropdown text="Additional Searches" class="nav-dropdown">
+      <BNavItemDropdown class="nav-dropdown" text="Additional Searches">
         <BDropdownItem to="/batch_search">Batch Search</BDropdownItem>
         <BDropdownItem to="/classyfire_search">ClassyFire Search</BDropdownItem>
         <BDropdownItem to="/partial_identifier_search">Formula, Mass, & Partial Identifier Search</BDropdownItem>
@@ -33,23 +35,21 @@
         <BDropdownItem to="/similar_structure_search">Similar Structure Search</BDropdownItem>
       </BNavItemDropdown>
       &emsp;
-      <template v-if="store.showInterpretNTA">
-        <BNavItemDropdown text="INTERPRET NTA" class="nav-dropdown">
-          <BDropdownItem to="/nta_home">NTA Home</BDropdownItem>
-          <BDropdownItem to="/ms1_nta/submit">MS1 Job Submission</BDropdownItem>
-        </BNavItemDropdown>
-      </template>
+      <BNavItemDropdown v-if="store.showInterpretNTA" class="nav-dropdown" text="INTERPRET NTA">
+        <BDropdownItem to="/nta_home">NTA Home</BDropdownItem>
+        <BDropdownItem to="/ms1_nta/submit">MS1 Job Submission</BDropdownItem>
+      </BNavItemDropdown>
       &emsp;
-      <BNavItemDropdown text="Other Pages" class="nav-dropdown">
+      <BNavItemDropdown class="nav-dropdown" text="Other Pages">
         <BDropdownItem to="/functional_class_visualization">Functional Class Visualization</BDropdownItem>
         <BDropdownItem to="/mass_spectrum_comparison">Mass Spectrum Comparison</BDropdownItem>
       </BNavItemDropdown>
       &emsp;
-      <BNavItemDropdown text="About" class="nav-dropdown">
+      <BNavItemDropdown class="nav-dropdown" text="About">
         <BDropdownItem to="/about">About this App</BDropdownItem>
         <BDropdownItem to="/contact">Contact Info</BDropdownItem>
         <BDropdownItem to="/data_sources">Data Sources</BDropdownItem>
-        <BDropdownItem to="/related_applications">Related Applications</BDropdownItem>
+        <BDropdownItem v-if="store.showInterpretNTA" to="/related_applications">Related Applications</BDropdownItem>
         <BDropdownItem to="/release_notes">Release Notes</BDropdownItem>
       </BNavItemDropdown>
       &emsp;
@@ -59,86 +59,86 @@
 </template>
 
 <script>
-  import {BNavItemDropdown, BDropdownItem, BFormSelect} from 'bootstrap-vue-next'
+import {BDropdownItem, BFormSelect, BNavItemDropdown} from 'bootstrap-vue-next'
 
-  import {store} from "@/assets/store.js"
+import {store} from "@/assets/store.js"
 
-  export default {
-    data() {
-      return {
-        store,
-        searchTerm: "",
-        searchType: "substances",
-        searchTypeOptions: [
-          {value: "substances", text: "Substance"},
-          {value: "ids", text: "Record ID"}
-        ]
-      };
-    },
-    methods: {
-      go() {
-        this.searchTerm = this.searchTerm.trim()
-        if (this.searchType == "substances") {
-          this.$router.push(`/search/${this.searchTerm}`)
-        } else {
-          this.$router.push(`/record_id_search/${encodeURI(this.searchTerm)}`)
-        }
+export default {
+  data() {
+    return {
+      store,
+      searchTerm: "",
+      searchType: "substances",
+      searchTypeOptions: [
+        {value: "substances", text: "Substance"},
+        {value: "ids", text: "Record ID"}
+      ]
+    };
+  },
+  methods: {
+    go() {
+      this.searchTerm = this.searchTerm.trim()
+      if (this.searchType === "substances") {
+        this.$router.push(`/search/${this.searchTerm}`)
+      } else {
+        this.$router.push(`/record_id_search/${encodeURI(this.searchTerm)}`)
       }
-    },
-    components: {BNavItemDropdown, BDropdownItem, BFormSelect}
+    }
+  },
+  components: {BNavItemDropdown, BDropdownItem, BFormSelect}
 }
 </script>
 
 <style>
-  .nav-bar {
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-    background: #0e6993;
-    color: white;
-    line-height: 1;
-    text-align: center;
-    margin-bottom: 10px;
-  }
+.nav-bar {
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+  background: #0e6993;
+  color: white;
+  line-height: 1;
+  text-align: center;
+  margin-bottom: 10px;
+}
 
-  .nav-bar-left {
-    display: flex;
-    align-items: center;
-  }
+.nav-bar-left {
+  display: flex;
+  align-items: center;
+}
 
-  .nav-bar-right {
-    display: flex;
-    align-items: center;
-  }
+.nav-bar-right {
+  display: flex;
+  align-items: center;
+}
 
-  .nav-bar a{
-    color: white;
-    text-decoration: none;
-  }
+.nav-bar a {
+  color: white;
+  text-decoration: none;
+}
 
-  .nav-bar a:hover{
-    color: white;
-    text-decoration: underline;
-  }
+.nav-bar a:hover {
+  color: white;
+  text-decoration: underline;
+}
 
-  .nav-dropdown {
-    background: #0e6993;
-    display: flex;
-    float: left;
-    color: white;
-  }
+.nav-dropdown {
+  background: #0e6993;
+  display: flex;
+  float: left;
+  color: white;
+}
 
-  .nav-dropdown a{
-    color: black;
-  }
+.nav-dropdown a {
+  color: black;
+}
 
-  .nav-dropdown a:hover{
-    color: black;
-    text-decoration: none
-  }
+.nav-dropdown a:hover {
+  color: black;
+  text-decoration: none
+}
 
-  .search-type-selector {
-    background-color: #0e6993;
-    color: white;
-  }
+.search-type-selector {
+  background-color: #0e6993;
+  color: white;
+}
 </style>
