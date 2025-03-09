@@ -49,7 +49,7 @@
       </ul>
       <p>
         For more information about this app, see the <router-link to="/about">about</router-link> page or
-        <a href="https://work.epa.gov/ccte/amos-analytical-methods-and-open-spectral-database-help">the manual</a>.
+        <a :href="manualUrl">the manual</a>.
       </p>
     </div>
   </div>
@@ -57,6 +57,7 @@
 
 <script>
   import {BFormSelect} from 'bootstrap-vue-next'
+  import {store} from "@/assets/store.js";
 
   export default {
     methods: {
@@ -83,8 +84,16 @@
         searchTypeOptions: [
           {value: "substances", text: "Substance"},
           {value: "ids", text: "Record ID"}
-        ]
+        ],
+        store: store,
       }
+    },
+    computed: {
+      manualUrl() {
+        return store.showInterpretNTA ?
+            "https://work.epa.gov/ccte/amos-analytical-methods-and-open-spectral-database-help" :
+            "https://www.epa.gov/comptox-tools/amos-analytical-methods-and-open-spectral-database-help"
+      },
     },
     components: {BFormSelect}
   }
