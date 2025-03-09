@@ -32,6 +32,7 @@ const routes = [
   {path: "/ms1_nta/results/:job_id", name: "NTA MS1 Job Results", component: ()=>import('../views/MS1NTAResults.vue')},
   {path: "/nta_ms2_workflow/", name: "NTA MS2 Workflow", component: ()=>import('../views/MS2NTAJobSubmission.vue')},
   {path: "/nta_home/", name: "NTA Home", component: ()=>import('../views/NTAHome.vue')},
+  {path: "/soil_ternary_plot/", name: "Soil Ternary Plot", component: ()=>import('../views/SoilTernaryPlot.vue')},
   {path: "/:catchAll(.*)", name: "404", component: ()=>import('../views/404.vue')}
 ]
 

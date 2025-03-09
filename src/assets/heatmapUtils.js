@@ -69,8 +69,8 @@ export function setTheScene(canvasId, dimsObject) {
   // setup CSS2DRenderer (for axis labels)
   const labelRenderer = new CSS2DRenderer();
   labelRenderer.setSize(dimsObject.actualWidth, dimsObject.actualHeight);
-  //document.body.appendChild(labelRenderer.domElement);
   document.getElementById("heatmapContainer").appendChild(labelRenderer.domElement);
+  
   // setup camera
   const left = -dimsObject.actualWidth / 2;
   const right = dimsObject.actualWidth / 2;
@@ -505,8 +505,11 @@ export function mouseenterTitleEvent(e, samplePassCounts, titleTooltip, heatmapT
     titleTooltip.innerHTML = `<div style="background-color: white; color: black; padding: 5px; border-radius: 3px; border: solid 1px white;"><b>Features</b>: ${data["nFeatures"].toLocaleString()}\n<b>Samples</b>: ${data["nSamples"].toLocaleString()}\n<b>Occurrences</b>: ${data["nOccurrences"].toLocaleString()}</div>\n<b>Pass</b>: ${data["nPass"].toLocaleString()}\n<b>Fail</b>: <span style="color: rgb(255, 160, 160)">${data["nFail"].toLocaleString()}</span>\n<b>Non-Detect</b>: <span style="color: rgb(200,200,200)">${data["nNonDetect"].toLocaleString()}</span>`;
 
     // set position to just right of the title, same height that mouse enters
+    const heatmapElement = document.getElementById("heatmap");
+    const heatmapRect = heatmapElement.getBoundingClientRect();
+    const heatmapTop = heatmapRect.top + window.scrollY - 14;
     titleTooltip.style.left = dimsObject.paddingWidth + (dimsObject.width / 2) + heatmapTitleDiv.offsetWidth*0.55 + "px";
-    titleTooltip.style.top = e.pageY + "px";
+    titleTooltip.style.top = heatmapTop + "px";
     titleTooltip.style.display = "block";
     heatmapTitleDiv.style.color = "white";
     heatmapTitleDiv.style.backgroundColor = "black";
@@ -718,9 +721,13 @@ export function mousemoveCellEvent(
 
     // display info box
     if (cellData) {
-      tooltip.innerHTML = `<div style="background-color: white; color: black; padding: 5px; border-radius: 3px; border: solid 1px white; margin-bottom: 0px"><b>Feature ID</b>: ${cellData.featureId}\n<b>Sample Name</b>: ${cellData.sampleName}\n<b>Decision</b>: <span style="color: ${cellData.color === 'grey' ? 'rgb(100,100,100)' : cellData.color}; background-color: ${cellData.color === 'white' ? 'black' : 'none'}; padding: ${cellData.color === 'white' ? '1px 8px' : '1px'}; border-radius: 3px; margin-top: 4px;">${cellData["decision"]}</span></div>\n${cellData.passSampleReplicate === true ? greenCheck : redX}<b>Replicate Percentage</b>: ${cellData["repPercentValue"]}%\n${cellData.passCV ? greenCheck : redX}<b>CV</b>: ${cellData["cvValue"]}\n${(cellData.mdlQuotient === 'NA' || !cellData.passMRL) ? redX : greenCheck}<b>Sample Mean / MRL</b>: ${cellData["mdlQuotient"]}`;
-      tooltip.style.left = `${event.pageX - 100}px`;
-      tooltip.style.top = `${event.pageY + 25}px`;
+      const heatmapElement = document.getElementById("heatmap");
+      const heatmapRect = heatmapElement.getBoundingClientRect();
+      const heatmapTop = heatmapRect.top + window.scrollY + 80;
+      const heatmapLeft = heatmapRect.left + heatmapRect.width + window.scrollX + 5;
+      tooltip.innerHTML = `<div style="background-color: white; color: black; padding: 5px; border-radius: 3px; border: solid 1px white; margin-bottom: 0px"><b>Feature ID</b>: ${cellData.featureId}\n<b>Sample Name</b>: ${cellData.sampleName}\n<b>Decision</b>: <span style="color: ${cellData.color === 'grey' ? 'rgb(100,100,100)' : cellData.color}; background-color: ${cellData.color === 'white' ? 'black' : 'none'}; padding: ${cellData.color === 'white' ? '1px 8px' : '1px'}; border-radius: 3px; margin-top: 4px;">${cellData["decision"]}</span></div>\n${cellData.passSampleReplicate === true ? greenCheck : redX}<b>Replicate Percentage</b>: ${cellData["repPercentValue"]}%\n${cellData.passCV ? greenCheck : redX}<b>CV</b>: ${cellData["cvValue"]}\n${(cellData.mrlQuotient === 'NA' || !cellData.passMRL) ? redX : greenCheck}<b>Sample Mean / MRL</b>: ${cellData["mrlQuotient"]}`;
+      tooltip.style.left = heatmapLeft + "px";
+      tooltip.style.top = heatmapTop + "px";
       tooltip.style.display = 'block';
     } else {
       tooltip.style.display = 'none';

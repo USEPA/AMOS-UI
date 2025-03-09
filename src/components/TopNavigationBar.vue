@@ -9,8 +9,8 @@
   <div class="nav-bar">
     <div class="nav-bar-left">
       <div style="text-align: start;">
-        <router-link style="font-size: larger" to="/">AMOS</router-link>
-        <div style="font-size: smaller">Version: 2025-02-28</div>
+        <router-link to="/" style="font-size: larger">AMOS</router-link>
+        <div style="font-size: smaller">Version: 2025-03-07</div>
       </div>
       &emsp;
       <input v-model="searchTerm" name="search-term" title="General search input field" type="text" @keyup.enter="go()">
@@ -43,6 +43,7 @@
       <BNavItemDropdown class="nav-dropdown" text="Other Pages">
         <BDropdownItem to="/functional_class_visualization">Functional Class Visualization</BDropdownItem>
         <BDropdownItem to="/mass_spectrum_comparison">Mass Spectrum Comparison</BDropdownItem>
+        <BDropdownItem to="/soil_ternary_plot">Soil Ternary Plot</BDropdownItem>
       </BNavItemDropdown>
       &emsp;
       <BNavItemDropdown class="nav-dropdown" text="About">

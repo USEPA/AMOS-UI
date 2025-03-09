@@ -40,15 +40,14 @@
         let createOccurrenceHeatmap = this.createOccurrenceHeatmap
         
         // read in and parse data from files
-        if (minSample === null) {
-          var [
-            data,
-            minReplicateHitsPercent,
-            minReplicateBlankHitPercent,
-            maxReplicateCvValue,
-            MrlMult
-          ] = dataUtils.getOccurrenceAndParameterData(this.workbook);
-        } else {
+        var [
+          data,
+          minReplicateHitsPercent,
+          minReplicateBlankHitPercent,
+          maxReplicateCvValue,
+          MrlMult
+        ] = dataUtils.getOccurrenceAndParameterData(this.workbook);
+        if (minSample !== null) {
           var minReplicateHitsPercent = minSample;
           var minReplicateBlankHitPercent = minBlank;
           var maxReplicateCvValue = maxCv;
@@ -60,10 +59,10 @@
           maxReplicateCvValue,
           MrlMult
         };
-
+        
         // get unique sample headers
         const sampleGroups = dataUtils.getUniqueSampleHeaders(data);
-
+        
         // find the blank sample names
         const [
           blankMeanHeader, 
@@ -78,8 +77,8 @@
           meanColHeaders
         ] = dataUtils.getRepCvMeanHeaders(sampleGroups);
 
-        // Calculate the MDL
-        data = dataUtils.calcMDL(
+        // Calculate the MRL
+        data = dataUtils.calcMRL(
           data, 
           blankMeanHeader, 
           blankStdHeader, 
@@ -87,11 +86,11 @@
           MrlMult, 
           minReplicateBlankHitPercent
         );
-
+        
         // get subset of data for CV columns
         let cvData = dataUtils.getCvSubset(data, cvColHeaders);
-
-        // replace cvValues with null if don't pass n_abun / MDL cutoffs
+        
+        // replace cvValues with null if don't pass n_abun / MRL cutoffs
         let cvDataDiscrete = dataUtils.cleanCvDataAndGetDiscretizedData(
           cvData, data,
           minReplicateBlankHitPercent, minReplicateHitsPercent, maxReplicateCvValue,
@@ -104,7 +103,7 @@
           cvDataFlat, 
           data
         ] = dataUtils.getFlattenedCvData(cvDataDiscrete, data, sampleGroups);
-
+        
         // get counts (n_samples, n_features, n_passes for each sample)
         const nFeatures = cvDataDiscrete.length;
         const samplePassCounts = dataUtils.getSamplePassCounts(cvDataFlat, nFeatures);
@@ -382,6 +381,7 @@
           }
           
           function createControls() {
+            const canvasRect = canvas.getBoundingClientRect();
             const controls = document.createElement('div');
             controls.id = "controls";
             controls.style.padding = "10px";
@@ -390,13 +390,15 @@
             controls.style.display = "block";
             controls.style.position = "absolute";
             controls.style.marginTop = "0px";
-            controls.style.top = canvas.getBoundingClientRect().top + height + paddingHeight*2 + 5 + "px";
+            controls.style.top = canvasRect.top + height + window.scrollY - paddingHeight*1.65 - 10 + "px";
+            controls.style.left = canvasRect.left + canvasRect.width + window.scrollX + 10 + "px"; 
+            controls.style.width = "325px";
             
             const sliders = [
               {id: 'replicateSampleThreshold', label: "Sample Replicate Threshold", min: 0, max: 100, step: 0.1, value: minReplicateHitsPercent},
               {id: 'replicateBlankThreshold', label: "Blank Replicate Threshold", min: 0, max: 100, step: 0.1, value: minReplicateBlankHitPercent},
               {id: 'cvThreshold', label: "CV Threshold", min: 0, max: 3, step: 0.01, value: maxReplicateCvValue},
-              {id: 'mdlMultiplier', label: "MDL Multiplier", min: 0, max: 10, step: 1, value: MrlMult}
+              {id: 'mrlMultiplier', label: "MRL Multiplier", min: 0, max: 10, step: 1, value: MrlMult}
             ];
 
             sliders.forEach(slider => {
@@ -428,12 +430,12 @@
               inputBox.style.marginLeft = "10px";
               inputBox.style.borderRadius = "3px";
 
-              if (inputBox.id === "mdlMultiplierBox") {
+              if (inputBox.id === "mrlMultiplierBox") {
                 inputBox.readOnly = true;
               }
 
               input.addEventListener('input', () => {
-                if (input.id === "mdlMultiplier") {
+                if (input.id === "mrlMultiplier") {
                   if (input.value < 4) {
                     input.value = 3;
                   } else if (input.value < 7.5) {
@@ -457,7 +459,7 @@
                 const minReplicateHitsPercent = parseFloat(document.getElementById("replicateSampleThreshold").value);
                 const minReplicateBlankHitPercent = parseFloat(document.getElementById("replicateBlankThreshold").value);
                 const maxReplicateCvValue = parseFloat(document.getElementById("cvThreshold").value);
-                const mrlMult = parseFloat(document.getElementById("mdlMultiplier").value);
+                const mrlMult = parseFloat(document.getElementById("mrlMultiplier").value);
 
                 // const children = Array.from(document.body.children);
                 const children = Array.from(document.getElementById("heatmapContainer").children)
@@ -475,7 +477,7 @@
                   const minReplicateHitsPercent = parseFloat(document.getElementById("replicateSampleThreshold").value);
                   const minReplicateBlankHitPercent = parseFloat(document.getElementById("replicateBlankThreshold").value);
                   const maxReplicateCvValue = parseFloat(document.getElementById("cvThreshold").value);
-                  const mrlMult = parseFloat(document.getElementById("mdlMultiplier").value);
+                  const mrlMult = parseFloat(document.getElementById("mrlMultiplier").value);
 
                   // const children = Array.from(document.body.children);
                   const children = Array.from(document.getElementById("heatmapContainer").children)
@@ -498,7 +500,6 @@
 
             //document.body.appendChild(controls);
             document.getElementById("heatmapContainer").insertBefore(controls, null);
-            controls.style.left = (window.innerWidth / 2) - (controls.offsetWidth / 2) + "px";
           }
 
           const sliderCheck = document.getElementById("replicateSampleThreshold");
@@ -540,7 +541,7 @@
     font-size: 20px;
     pointer-events: none;
   }
-  #heatmap {
+  #heatmapContainer {
     top: 80px;
     margin-top: 60px
   }

@@ -253,6 +253,14 @@
         </th>
         <td><BFormSelect v-model="dsstox_search_mode" :options="search_mode_options" size="sm" style="width: auto;"/></td>
       </tr>
+      <tr>
+        <th>
+          Run qNTA:
+        </th>
+        <td><div style="display: flex; align-items: center;">
+          <BFormSelect v-model="do_qnta" :options="yes_no_options" size="sm" style="width: auto;" disabled/> &nbsp; (Temporarily disabled)
+        </div></td>
+      </tr>
     </tbody>
   </table>
   <div style="padding: 10px;">
@@ -304,7 +312,8 @@
         max_replicate_cv: 0.8,
         minimum_retention_time: 0.0,
         na_value: "",
-        errors: {any: false, no_input_file: false, no_project_name: false}
+        errors: {any: false, no_input_file: false, no_project_name: false},
+        do_qnta: "no"
       }
     },
     methods: {
@@ -357,7 +366,6 @@
           pos_adducts: toRaw(this.pos_adducts),
           neg_adducts: toRaw(this.neg_adducts),
           neutral_losses: toRaw(this.neutral_losses),
-          whaargarbl: 6,
           mass_accuracy_units: this.mass_accuracy_units,
           mass_accuracy: this.mass_accuracy,
           rt_accuracy: this.retention_time_accuracy,
@@ -378,49 +386,10 @@
           search_dsstox: this.search_dsstox,
           search_hcd: this.search_hcd,
           search_mode: this.dsstox_search_mode,
-          na_val: this.na_value
+          na_val: this.na_value,
+          do_qnta: this.do_qnta
         }
-
-        /* var payload = new FormData()
-        payload.append("project_name", this.project_name)
-        payload.append("datetime", this.getDateTime())
-        payload.append("test_files", this.run_test_files)
-        payload.append("pos_input", document.getElementById("pos_mode_file").files[0])
-        payload.append("neg_input", document.getElementById("neg_mode_file").files[0])
-        payload.append("whaargarbl", "test")
-        payload.append("mass_accuracy_units", this.mass_accuracy_units)
-        payload.append("mass_accuracy", this.mass_accuracy)
-        payload.append("rt_accuracy", this.retention_time_accuracy)
-        payload.append("run_sequence_pos_file", document.getElementById("run_sequence_pos_file").files[0])
-        payload.append("run_sequence_neg_file", document.getElementById("run_sequence_neg_file").files[0])
-        payload.append("tracer_input", document.getElementById("tracer_file").files[0])
-        payload.append("mass_accuracy_units_tr", this.tracer_mass_accuracy_units)
-        payload.append("mass_accuracy_tr", this.tracer_mass_accuracy)
-        payload.append("rt_accuracy_tr", this.tracer_retention_time_accuracy)
-        payload.append("tracer_plot_yaxis_format", this.tracer_plot_yaxis)
-        payload.append("tracer_plot_trendline", this.tracer_plot_trendline)
-        payload.append("min_replicate_hits", this.min_replicate_hits)
-        payload.append("min_replicate_hits_blanks", this.min_replicate_hits_in_blanks)
-        payload.append("max_replicate_cv", this.max_replicate_cv)
-        payload.append("mrl_std_multiplier", this.mrl_std_multiplier)
-        payload.append("parent_ion_mass_accuracy", this.parent_ion_mass_accuracy)
-        payload.append("minimum_rt", this.minimum_retention_time)
-        payload.append("search_dsstox", this.search_dsstox)
-        payload.append("search_hcd", this.search_hcd)
-        payload.append("search_mode", this.dsstox_search_mode)
-        payload.append("na_val", this.na_value)
-
-        for (let a of toRaw(this.pos_adducts)) {
-          payload.append("pos_adducts[]", a)
-        }
-        for (let a of toRaw(this.neg_adducts)) {
-          payload.append("neg_adducts[]", a)
-        }
-        for (let a of toRaw(this.neutral_losses)) {
-          payload.append("neutral_losses[]", a)
-        } */
-
-        //const response = await axios.post("http://127.0.0.1:5000/dummy_post/", payload)
+        
         const response = await axios.postForm("https://qed-dev.edap-cluster.com/nta/ms1/external/input/", payload)
         const job_id_regex = /Job ID: ([A-Za-z0-9]*)/
         const match = response.data.match(job_id_regex)

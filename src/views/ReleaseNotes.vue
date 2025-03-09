@@ -2,6 +2,15 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2025-03-07</summary>
+    <ul>
+      <!-- NTA --> <li>A control for running qNTA has been added to the MS1 job submission page, due to a change on the NTA engine that now requires the existence of that parameter.  The control is currently disabled, however, with a fixed value of "no".</li>
+      <li>The method and fact sheet lists now load blocks of 1000 documents at a time; progress bars and some additional text have been added to show progress.</li>
+      <!-- NTA --> <li>Some modifications have been made to element positions on the occurrence heatmap in the NTA MS1 results.</li>
+      <li>A ternary soil plot visualization has been added, which links back to the method list.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2025-02-28</summary>
     <ul>
       <li>Added a run sequence visualization to the NTA MS1 results.</li>
