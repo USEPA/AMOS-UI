@@ -22,10 +22,16 @@
 <script>
   import * as d3 from "d3";
   import '@/styles/functional_class_viz.css'
+  import {store} from "@/assets/store.js";
 
   export default {
+    data() {
+      return {
+        store,
+      }
+    },
     mounted() {
-      d3.json("json_with_positions.json") 
+      d3.json(this.store.showInterpretNTA ? "json_with_positions.json" : "json_with_positions-sde.json")
         .then(function(graph) {
 
         var svg = d3.select('#analyteClassSvg');
