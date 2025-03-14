@@ -49,7 +49,7 @@
       </ul>
       <p>
         For more information about this app, see the <router-link to="/about">about</router-link> page or
-        <a :href="manualUrl">the manual</a>.
+        <a :href="manualUrl" target="manual">the manual</a>.
       </p>
     </div>
   </div>

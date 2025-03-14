@@ -11,7 +11,7 @@
       available experimental analytical chemistry data from several sources, most of which are focused on mass spectra.
       This app was written using Vue 3 and Bootstrap on the front end, with a Flask-based Python API accessing a
       PostgreSQL database behind the scenes. A manual with details about the functioning of various pages is available
-      <a :href="manualUrl">here</a>.</p>
+      <a :href="manualUrl" target="manual">here</a>.</p>
     <p>The database contains a mixture of data types that can be divided into three categories.</p>
     <ul>
       <li><b>Spectra</b> of various types. These are primarily mass spectra, with smaller amounts of NMR and IR spectra.
