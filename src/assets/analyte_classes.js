@@ -1,7 +1,7 @@
 // function for generating visualization
 function generateAnalyteClassVis() {
 
-  d3.json("./analyte_hierarchy.json") 
+  d3.json(this.store.showInterpretNTA ? "analyte_hierarchy.json" : "analyte_hierarchy-sde.json")
     .then(function(graph) {
 
     var svg = d3.select('#analyteClassSvg'),
