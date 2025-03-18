@@ -7,9 +7,7 @@ pipeline {
         VUE_APP_VERSION = 'DEV'
         VUE_APP_BUILD_DATE = "${BUILD_TIMESTAMP}"
 
-        VITE_FLASK_BACKEND_LOCATION = "http://amos-server:5000"
-        VITE_COMPTOX_PAGE_URL = "https://ccte-res-ncd.epa.gov/dashboard/dsstoxdb/results?search="
-        VITE_IMAGE_BY_DTXSID_API = "https://comptox.epa.gov/dashboard-api/ccdapp1/chemical-files/image/by-dtxsid/"
+        BACKEND_LOCATION = "http://amos-server:5000"
 
         IMAGE_NAME = 'amos-ui'
         IMAGE_TAG = 'latest'
@@ -42,9 +40,8 @@ pipeline {
 
         stage('Dockerize') {
             steps {
-                sh "env"
                 sh "docker buildx use mybuilder"
-                sh "docker buildx build --platform linux/amd64 --tag ${DOCKER_REGISTRY}/epa/${IMAGE_NAME}:${IMAGE_TAG} --push ."
+                sh "docker buildx build --platform linux/amd64 --tag ${DOCKER_REGISTRY}/epa/${IMAGE_NAME}:${IMAGE_TAG} --push --build-arg BACKEND_LOCATION=${BACKEND_LOCATION} ."
             }
         }
 

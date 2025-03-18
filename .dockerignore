@@ -1,0 +1,12 @@
+.git/
+.github/
+.idea/
+node_modules/
+
+.dockerignore
+.env
+.gitignore
+
+Jenkinsfile
+
+package-lock.json
