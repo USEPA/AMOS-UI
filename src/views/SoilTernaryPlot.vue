@@ -11,7 +11,7 @@
 
 <script>
   import * as d3 from "d3";
-  import {store} from "../assets/store.js"
+  import {FRONTEND_LOCATION, store} from "../assets/store.js"
 
   export default {
     data() {
@@ -22,9 +22,7 @@
     },
     computed: {
       amosUrl() {
-        return this.store.showInterpretNTA ?
-            "https://ccte-cced-amos.epa.gov" :
-            "https://amos.sciencedataexperts.com";
+        return FRONTEND_LOCATION;
       },
     },
     mounted() {

@@ -1,6 +1,7 @@
 import { reactive } from 'vue'
 
 export const APP_MODE = import.meta.env.MODE
+export const FRONTEND_LOCATION = import.meta.env.VITE_FRONTEND_LOCATION
 export const BACKEND_LOCATION = import.meta.env.VITE_FLASK_BACKEND_LOCATION
 export const COMPTOX_PAGE_URL = import.meta.env.VITE_COMPTOX_PAGE_URL
 export const IMAGE_BY_DTXSID_API = import.meta.env.VITE_IMAGE_BY_DTXSID_API
