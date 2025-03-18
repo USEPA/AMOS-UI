@@ -7,7 +7,7 @@ pipeline {
         VUE_APP_VERSION = 'DEV'
         VUE_APP_BUILD_DATE = "${BUILD_TIMESTAMP}"
 
-        BACKEND_LOCATION = "http://amos-server:5000"
+        BACKEND_LOCATION = "https://amos.sciencedataexperts.com/api"
 
         IMAGE_NAME = 'amos-ui'
         IMAGE_TAG = 'latest'
