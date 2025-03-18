@@ -11,12 +11,24 @@
 
 <script>
   import * as d3 from "d3";
+  import {store} from "../assets/store.js"
 
   export default {
     data() {
-      return { x: 1 }
+      return {
+        x: 1,
+        store,
+      }
+    },
+    computed: {
+      amosUrl() {
+        return this.store.showInterpretNTA ?
+            "https://ccte-cced-amos.epa.gov" :
+            "https://amos.sciencedataexperts.com";
+      },
     },
     mounted() {
+      const amosUrl = this.amosUrl;
       function createSoilTernaryPlot() {
         // setup grid for plot and tooltip
         const ternaryContainer = d3.select("#soil-ternary-container")
@@ -283,7 +295,7 @@
             tooltip.html("<b>Soil Type:</b> Clay<br><br><b>Clay Content:</b> 40-100%<br><b>Silt Content:</b> 0-40%<br><b>Sand Content:</b> 0-45%")
           })
           .on("click", () => {
-            const url = "https://ccte-cced-amos.epa.gov/methods_list?matrix=contains_clay";
+            const url = `${amosUrl}/methods_list?matrix=contains_clay`;
             window.open(url, "_blank");
           });
 
@@ -325,7 +337,7 @@
             tooltip.html("<b>Soil Type:</b> Silty Clay<br><br><b>Clay Content:</b> 40-60%<br><b>Silt Content:</b> 40-60%<br><b>Sand Content:</b> 0-20%")
           })
           .on("click", () => {
-            const url = "https://ccte-cced-amos.epa.gov/methods_list?matrix=contains_silty clay";
+            const url = `${amosUrl}/methods_list?matrix=contains_silty clay`;
             window.open(url, "_blank");
           });
 
@@ -375,7 +387,7 @@
             tooltip.html("<b>Soil Type:</b> Silty Clay Loam<br><br><b>Clay Content:</b> 27.5-40%<br><b>Silt Content:</b> 40-72.5%<br><b>Sand Content:</b> 0-20%")
           })
           .on("click", () => {
-            const url = "https://ccte-cced-amos.epa.gov/methods_list?matrix=contains_silty clay loam";
+            const url = `${amosUrl}/methods_list?matrix=contains_silty clay loam`;
             window.open(url, "_blank");
           });
 
@@ -427,7 +439,7 @@
             tooltip.html("<b>Soil Type:</b> Silt Loam<br><br><b>Clay Content:</b> 12.5-27.5%<br><b>Silt Content:</b> 50-87.5%<br><b>Sand Content:</b> 0-50%");
           })
           .on("click", () => {
-            const url = "https://ccte-cced-amos.epa.gov/methods_list?matrix=silt loam";
+            const url = `${amosUrl}/methods_list?matrix=silt loam`;
             window.open(url, "_blank");
           });
 
@@ -477,7 +489,7 @@
               tooltip.html("<b>Soil Type:</b> Silt<br><br><b>Clay Content:</b> 0-12.5%<br><b>Silt Content:</b> 80-100%<br><b>Sand Content:</b> 0-20%");
             })
             .on("click", () => {
-              const url = "https://ccte-cced-amos.epa.gov/methods_list?matrix=contains_silt";
+              const url = `${amosUrl}/methods_list?matrix=contains_silt`;
               window.open(url, "_blank");
             });
 
@@ -523,7 +535,7 @@
               tooltip.html("<b>Soil Type:</b> Clay Loam<br><br><b>Clay Content:</b> 27.5-40%<br><b>Silt Content:</b> 15-52.5%<br><b>Sand Content:</b> 20-45%");
             })
             .on("click", () => {
-              const url = "https://ccte-cced-amos.epa.gov/methods_list?matrix=contains_clay loam";
+              const url = `${amosUrl}/methods_list?matrix=contains_clay loam`;
               window.open(url, "_blank");
             });
 
@@ -570,7 +582,7 @@
               tooltip.html("<b>Soil Type:</b> Loam<br><br><b>Clay Content:</b> 7.5-27.5%<br><b>Silt Content:</b> 27.5-50%<br><b>Sand Content:</b> 22.5-52.5%");
             })
             .on("click", () => {
-              const url = "https://ccte-cced-amos.epa.gov/methods_list?matrix=contains_loam";
+              const url = `${amosUrl}/methods_list?matrix=contains_loam`;
               window.open(url, "_blank");
             });
 
@@ -619,7 +631,7 @@
               tooltip.html("<b>Soil Type:</b> Sandy Loam<br><br><b>Clay Content:</b> 0-20%<br><b>Silt Content:</b> 0-50%<br><b>Sand Content:</b> 42.5-85%");
             })
             .on("click", () => {
-              const url = "https://ccte-cced-amos.epa.gov/methods_list?matrix=contains_sandy loam";
+              const url = `${amosUrl}/methods_list?matrix=contains_sandy loam`;
               window.open(url, "_blank");
             });
 
@@ -665,7 +677,7 @@
               tooltip.html("<b>Soil Type:</b> Loamy Sand<br><br><b>Clay Content:</b> 0-15%<br><b>Silt Content:</b> 0-30%<br><b>Sand Content:</b> 70-90%");
             })
             .on("click", () => {
-              const url = "https://ccte-cced-amos.epa.gov/methods_list?matrix=contains_loamy sand";
+              const url = `${amosUrl}/methods_list?matrix=contains_loamy sand`;
               window.open(url, "_blank");
             });
 
@@ -712,7 +724,7 @@
               tooltip.html("<b>Soil Type:</b> Sand<br><br><b>Clay Content:</b> 0-10%<br><b>Silt Content:</b> 0-15%<br><b>Sand Content:</b> 85-100%");
             })
             .on("click", () => {
-              const url = "https://ccte-cced-amos.epa.gov/methods_list?matrix=contains_sand";
+              const url = `${amosUrl}/methods_list?matrix=contains_sand`;
               window.open(url, "_blank");
             });
 
@@ -756,7 +768,7 @@
               tooltip.html("<b>Soil Type:</b> Sandy Clay<br><br><b>Clay Content:</b> 35-55%<br><b>Silt Content:</b> 0-20%<br><b>Sand Content:</b> 45-65%");
             })
             .on("click", () => {
-              const url = "https://ccte-cced-amos.epa.gov/methods_list?matrix=contains_sandy clay";
+              const url = `${amosUrl}/methods_list?matrix=contains_sandy clay`;
               window.open(url, "_blank");
             });
 
@@ -806,7 +818,7 @@
               tooltip.html("<b>Soil Type:</b> Sandy Clay Loam<br><br><b>Clay Content:</b> 20-35%<br><b>Silt Content:</b> 0-27.5%<br><b>Sand Content:</b> 45-80%");
             })
             .on("click", () => {
-              const url = "https://ccte-cced-amos.epa.gov/methods_list?matrix=contains_sandy clay loam";
+              const url = `${amosUrl}/methods_list?matrix=contains_sandy clay loam`;
               window.open(url, "_blank");
             });
 

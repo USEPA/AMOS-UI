@@ -65,7 +65,7 @@
     </div>
     <button @click="sendToBatchSearch">Send Selected Substances to Batch Search</button>
   </div>
-  <p v-if="state.searching">Searching -- this may take a moment...</p>
+  <p v-if="state.searching" style="font-size: larger">Searching -- this may take a moment... <i class="mdi mdi-progress-clock mdi-spin"></i></p>
   <p v-else>{{ substances.length }} substances found; {{ filtered_record_count }} are currently displayed.</p>
   <ag-grid-vue
     class="ag-theme-balham"
@@ -94,6 +94,7 @@
   import { imageLinkForSubstance } from '@/assets/common_functions.js'
   import { BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store.js'
   import RecordCountFilter from '@/components/RecordCountFilter.vue'
+  import '@mdi/font/css/materialdesignicons.min.css';
 
   export default {
     data() {

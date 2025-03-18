@@ -34,7 +34,7 @@
     <button @click="sendToBatchSearch">Send Selected Substances to Batch Search</button>
   </div>
   <p v-if="status.search_complete">{{ status.search_type }} search complete for {{ status.searched_term }}. {{ substances.length }} substances found; {{ filtered_record_count }} are currently displayed.</p>
-  <p v-else-if="status.searching">Searching...</p>
+  <p v-else-if="status.searching" style="font-size: larger">Searching... <i class="mdi mdi-progress-clock mdi-spin"></i></p>
   <p v-else>No search has been run.</p>
   <ag-grid-vue
     class="ag-theme-balham"
@@ -69,6 +69,7 @@
   import MassRangeInput from '@/components/MassRangeInput.vue'
   import MassTableFilter from '@/components/MassTableFilter.vue'
   import RecordCountFilter from '@/components/RecordCountFilter.vue'
+  import '@mdi/font/css/materialdesignicons.min.css';
 
   export default {
     data() {

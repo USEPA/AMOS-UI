@@ -27,7 +27,9 @@
         </select>
       </div>
       <br />
-      <p v-if="searching">Searching -- this may take 20-30 seconds...</p>
+      <p v-if="searching" style="font-size: larger">
+        Searching -- this may take 20-30 seconds... <i class="mdi mdi-progress-clock mdi-spin"></i>
+      </p>
       <p v-else-if="!search_complete">This page allows for searching for methods and fact sheets that contain either a given chemical or other chemicals similar to it.  A name, InChIKey, CASRN, or DTXSID can be searched on.</p>
       <p v-else-if="!found_substance">"{{ current_substance }}" was not recognized as a known substance.</p>
       <p v-else-if="dtxsid_counts.length == 0">The substance "{{ current_substance }}" was recognized, however no methods or fact sheets containing it or similar substances for it were found.</p>
@@ -131,6 +133,7 @@
   import StoredPDFDisplay from '@/components/StoredPDFDisplay.vue'
   import SynonymDisambiguation from '@/components/SynonymDisambiguation.vue'
   import '@/styles/main.css'
+  import '@mdi/font/css/materialdesignicons.min.css';
   
   export default{
     data() {

@@ -34,7 +34,7 @@
     </div>
     <div class="half-page-column">
       <div v-if="status.searching">
-        <p>Searching...</p>
+        <p style="font-size: larger">Searching... <i class="mdi mdi-progress-clock mdi-spin"></i></p>
       </div>
       <div v-else-if="error_messages.invalidFormat">
         <BAlert variant="danger" v-model="error_messages.invalidFormat">
@@ -120,6 +120,7 @@
   import MassRangeInput from '@/components/MassRangeInput.vue'
   import MassSpectrumMetadata from '@/components/MassSpectrumMetadata.vue'
   import '@/styles/main.css'
+  import '@mdi/font/css/materialdesignicons.min.css';
 
   export default{
     data() {
