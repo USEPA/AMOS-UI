@@ -516,12 +516,10 @@ export function getFlattenedCvData(cvDataDiscrete, data, sampleGroups) {
   cvDataDiscrete.forEach((feature, featureIndex) => {
     const featureID = feature["FeatureID"];
     const featureData = data.find(obj => obj["Feature ID"] === featureID);
-    //console.log(featureID)
-    //console.log(featureData)
+    
     Object.entries(feature).forEach(([sample, value], k) => {
       // skip over featureID keys
       if (!sample.endsWith("tureID")) {
-        //console.log(sample)
         const sampleIndex = sampleGroups.indexOf(sample.slice(3, sample.length));
         const mrl = Number(featureData["MRL"].toFixed(1));
         const repPercentage = featureData[`Detection Percentage ${sample.slice(3, sample.length)}`];
@@ -531,15 +529,12 @@ export function getFlattenedCvData(cvDataDiscrete, data, sampleGroups) {
         if (Number.isNaN(mrlQuotient)) {
           mrlQuotient = 0;
         }
-        // if (mrlQuotient < 1) {
-        //   featureData[`passMRL${sample.slice(3, sample.length)}`] = false;
-        // }
+        
         let cv = featureData[`CV ${sample.slice(3, sample.length)}`];
         if (cv === '') {
           cv = 'NA';
           mrlQuotient = "NA";
         } else {
-          /* ERROR IS HERE */
           cv = Number(cv.toFixed(3));
         }
 

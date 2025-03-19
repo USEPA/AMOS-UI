@@ -10,34 +10,101 @@
   <p>Caution: This visualization is GPU-intensive, and may lag on some devices.</p>
   <div id="heatmapContainer">
     <canvas id="heatmap"></canvas>
-    <!-- Need to have this dummy element for the canvas-adding function to lock onto, otherwise the page elements end up changing order and getting screwed up on the page. -->
+    <!-- Need to have this dummy element for the canvas-adding function to lock on to, otherwise the page elements end up changing order and getting screwed up on the page. -->
     <div id="dummyChild"></div>
+    <div id="controls" class="heatmap-control-box">
+      <div style="margin: 10px 0px;">
+        <label>Sample Replicate Threshold</label>
+        <div style="display: flex;">
+          <input type="range" id="replicateSampleThreshold" min="0" max="100" step="0.1" v-model.number="minReplicateHitsPercent" class="heatmap-slider-input" @mouseup="thresholdUpdate('minReplicateHitsPercent', 0, 100)">
+          <input type="number" id="replicateSampleThresholdBox" min="0" max="100" step="0.1" v-model.number="minReplicateHitsPercent" class="heatmap-numeric-box-input" @keyup.enter="thresholdUpdate('minReplicateHitsPercent', 0, 100)">
+        </div>
+      </div>
+      <div style="margin: 10px 0px;">
+        <label>Blank Replicate Threshold</label>
+        <div style="display: flex;">
+          <input type="range" id="replicateBlankThreshold" min="0" max="100" step="0.1" v-model.number="minReplicateBlankHitPercent" class="heatmap-slider-input" @mouseup="thresholdUpdate('minReplicateBlankHitPercent', 0, 100)">
+          <input type="number" id="replicateBlankThresholdBox" min="0" max="100" step="0.1" v-model.number="minReplicateBlankHitPercent" class="heatmap-numeric-box-input" @keyup.enter="thresholdUpdate('minReplicateBlankHitPercent', 0, 100)">
+        </div>
+      </div>
+      <div style="margin: 10px 0px;">
+        <label>CV Threshold</label>
+        <div style="display: flex;">
+          <input type="range" id="cvThreshold" min="0" max="3" step="0.01" v-model.number="maxReplicateCvValue" class="heatmap-slider-input" @mouseup="thresholdUpdate('maxReplicateCvValue', 0, 3)">
+          <input type="number" id="cvThresholdBox" min="0" max="3" step="0.01" v-model.number="maxReplicateCvValue" class="heatmap-numeric-box-input" @keyup.enter="thresholdUpdate('maxReplicateCvValue', 0, 3)">
+        </div>
+      </div>
+      <div style="margin: 10px 0px;">
+        <label>MRL Multiplier</label>
+        <div style="display: flex;">
+          <input type="range" id="mrlMultiplier" min="0" max="10" step="1" v-model.number="mrlMult" class="heatmap-slider-input" @mouseup="mrlUpdate">
+          <input type="number" id="mrlMultiplierBox" min="0" max="10" step="1" v-model.number="mrlMult" class="heatmap-numeric-box-input" readonly>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-  import * as dataUtils from '@/assets/heatmapDataUtils.js';
-  import * as heatmapUtils from '@/assets/heatmapUtils.js';
-
   import * as THREE from 'three';
   import * as TWEEN from '@tweenjs/tween.js';
-  import * as XLSX from 'xlsx';
 
+  import * as dataUtils from '@/assets/heatmapDataUtils.js';
+  import * as heatmapUtils from '@/assets/heatmapUtils.js';
+  import '@/styles/occurrence_heatmap.css'
+
+  
   export default {
     data() {
       return {
-        x: 1
+        first_pass: true,
+        minReplicateHitsPercent: 0,
+        minReplicateBlankHitPercent: 0,
+        maxReplicateCvValue: 0,
+        mrlMult: 3
       }
     },
     mounted() {
       this.createOccurrenceHeatmap()
+      this.first_pass = false
     },
     props: {workbook: Object},
     methods: {
+      thresholdUpdate(variable_name, min, max) {
+        if (this[variable_name] < min) {
+          this[variable_name] = min
+        } else if (this[variable_name] > max) {
+          this[variable_name] = max
+        }
+
+        const children = Array.from(document.getElementById("heatmapContainer").children)
+        children.forEach(child => {
+          if (child.id !== "dummyChild" && child.id !== "controls") {
+            child.remove();
+          }
+        });
+
+        this.createOccurrenceHeatmap(null, this.minReplicateHitsPercent, this.minReplicateBlankHitPercent, this.maxReplicateCvValue, this.mrlMult);
+      },
+      mrlUpdate() {
+        if (this.mrlMult < 4) {
+          this.mrlMult = 3
+        } else if (this.mrlMult < 7.5) {
+          this.mrlMult = 5
+        } else {
+          this.mrlMult = 10
+        }
+        
+        const children = Array.from(document.getElementById("heatmapContainer").children)
+        children.forEach(child => {
+          if (child.id !== "dummyChild" && child.id !== "controls") {
+            child.remove();
+          }
+        });
+
+        this.createOccurrenceHeatmap(null, this.minReplicateHitsPercent, this.minReplicateBlankHitPercent, this.maxReplicateCvValue, this.mrlMult);
+      }, 
       createOccurrenceHeatmap(data=null, minSample=null, minBlank=null, maxCv=null, mrlMult=null) {
-        // needed to get event listeners working since they're defined a couple levels down in this function
-        // but the make recursive calls to createOccurrenceHeatmap
-        let createOccurrenceHeatmap = this.createOccurrenceHeatmap
         
         // read in and parse data from files
         var [
@@ -52,7 +119,13 @@
           var minReplicateBlankHitPercent = minBlank;
           var maxReplicateCvValue = maxCv;
           var MrlMult = mrlMult;
+        } else {
+          this.minReplicateHitsPercent = minReplicateHitsPercent
+          this.minReplicateBlankHitPercent = minReplicateBlankHitPercent
+          this.maxReplicateCvValue = maxReplicateCvValue
+          this.mrlMult = MrlMult
         }
+        
         let thresholdData = {
           minReplicateBlankHitPercent,
           minReplicateHitsPercent,
@@ -116,10 +189,10 @@
         ] = dataUtils.getColorCounts(cvDataFlat);
 
         // draw heatmap
-        drawHeatMap();
+        drawHeatMap(this.first_pass);
 
 
-        function drawHeatMap() {
+        function drawHeatMap(first_pass) {
           // await new Promise(r => setTimeout(r, 3000));
           // determine number of rows and columns
           const nRows = cvColHeaders.length;
@@ -237,7 +310,7 @@
           });
           
           // add event listeners for y-axis labels
-          const yAxisLabelDivs = document.querySelectorAll(".yAxisLabel");
+          const yAxisLabelDivs = document.querySelectorAll(".heatmap-y-axis-label");
           yAxisLabelDivs.forEach(label => {
 
             label.addEventListener('mouseenter', (e) => {
@@ -382,165 +455,24 @@
           
           function createControls() {
             const canvasRect = canvas.getBoundingClientRect();
-            const controls = document.createElement('div');
-            controls.id = "controls";
-            controls.style.padding = "10px";
-            controls.style.border = "1px solid black";
-            controls.style.borderRadius = "4px";
-            controls.style.display = "block";
-            controls.style.position = "absolute";
-            controls.style.marginTop = "0px";
+            const controls = document.getElementById("controls")
+            
             controls.style.top = canvasRect.top + height + window.scrollY - paddingHeight*1.65 - 10 + "px";
             controls.style.left = canvasRect.left + canvasRect.width + window.scrollX + 10 + "px"; 
-            controls.style.width = "325px";
-            
-            const sliders = [
-              {id: 'replicateSampleThreshold', label: "Sample Replicate Threshold", min: 0, max: 100, step: 0.1, value: minReplicateHitsPercent},
-              {id: 'replicateBlankThreshold', label: "Blank Replicate Threshold", min: 0, max: 100, step: 0.1, value: minReplicateBlankHitPercent},
-              {id: 'cvThreshold', label: "CV Threshold", min: 0, max: 3, step: 0.01, value: maxReplicateCvValue},
-              {id: 'mrlMultiplier', label: "MRL Multiplier", min: 0, max: 10, step: 1, value: MrlMult}
-            ];
 
-            sliders.forEach(slider => {
-              const sliderContainer = document.createElement('div');
-              sliderContainer.style.margin = "10px auto";
-
-              const label = document.createElement('label');
-              label.innerHTML = slider.label;
-              label.style.display = "inline-block";
-              label.style.width = "200px";
-
-              const input = document.createElement('input');
-              input.type = "range";
-              input.id = slider.id;
-              input.min = slider.min;
-              input.max = slider.max;
-              input.step = slider.step;
-              input.value = slider.value;
-              input.style.width = "200px";
-
-              const inputBox = document.createElement('input');
-              inputBox.type = "number";
-              inputBox.id = slider.id + "Box";
-              inputBox.min = slider.min;
-              inputBox.max = slider.max;
-              inputBox.step = slider.step;
-              inputBox.value = slider.value;
-              inputBox.style.width = "75px";
-              inputBox.style.marginLeft = "10px";
-              inputBox.style.borderRadius = "3px";
-
-              if (inputBox.id === "mrlMultiplierBox") {
-                inputBox.readOnly = true;
-              }
-
-              input.addEventListener('input', () => {
-                if (input.id === "mrlMultiplier") {
-                  if (input.value < 4) {
-                    input.value = 3;
-                  } else if (input.value < 7.5) {
-                    input.value = 5;
-                  } else {
-                    input.value = 10;
-                  }
-                }
-                inputBox.value = input.value;
-              });
-              inputBox.addEventListener('input', () => {
-                if (inputBox.value > slider.max) {
-                  inputBox.value = slider.max;
-                } else if (inputBox.value < slider.min) {
-                  inputBox.value = slider.min;
-                }
-                input.value = inputBox.value;
-              });
-
-              input.addEventListener("mouseup", () => {
-                const minReplicateHitsPercent = parseFloat(document.getElementById("replicateSampleThreshold").value);
-                const minReplicateBlankHitPercent = parseFloat(document.getElementById("replicateBlankThreshold").value);
-                const maxReplicateCvValue = parseFloat(document.getElementById("cvThreshold").value);
-                const mrlMult = parseFloat(document.getElementById("mrlMultiplier").value);
-
-                // const children = Array.from(document.body.children);
-                const children = Array.from(document.getElementById("heatmapContainer").children)
-
-                children.forEach(child => {
-                  if (child.id !== "dummyChild" && child.id !== "controls") {
-                    child.remove();
-                  }
-                });
-
-                createOccurrenceHeatmap(data, minReplicateHitsPercent, minReplicateBlankHitPercent, maxReplicateCvValue, mrlMult);
-              });
-              inputBox.addEventListener('keydown', (event) => {
-                if (event.key === "Enter") {
-                  const minReplicateHitsPercent = parseFloat(document.getElementById("replicateSampleThreshold").value);
-                  const minReplicateBlankHitPercent = parseFloat(document.getElementById("replicateBlankThreshold").value);
-                  const maxReplicateCvValue = parseFloat(document.getElementById("cvThreshold").value);
-                  const mrlMult = parseFloat(document.getElementById("mrlMultiplier").value);
-
-                  // const children = Array.from(document.body.children);
-                  const children = Array.from(document.getElementById("heatmapContainer").children)
-
-                  children.forEach(child => {
-                    if (child.id !== "dummyChild" && child.id !== "controls") {
-                      child.remove();
-                    }
-                  });
-
-                  createOccurrenceHeatmap(data, minReplicateHitsPercent, minReplicateBlankHitPercent, maxReplicateCvValue, mrlMult);
-                }
-              });
-
-              sliderContainer.appendChild(label);
-              sliderContainer.appendChild(input);
-              sliderContainer.appendChild(inputBox);
-              controls.appendChild(sliderContainer);
-            });
-
-            //document.body.appendChild(controls);
-            document.getElementById("heatmapContainer").insertBefore(controls, null);
           }
-
-          const sliderCheck = document.getElementById("replicateSampleThreshold");
-          if (sliderCheck === null) {
+          if (first_pass) {
             createControls();
           }
-          
+
         }
+
       },
     }
   }
 </script>
 
 <style>
-  #controls {
-    margin: auto;
-    margin-top: 0px;
-  }
-  .heatmap-tooltip {
-    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    z-index: 1080;
-  }
-  .yAxisLabel, .heatmap-title {
-    background-color: white;
-    color: black;
-    padding: 3px;
-    border-radius: 3px;
-    transition: color 0.3s ease, background-color 0.3s ease;
-    cursor: pointer;
-  }
-  .heatmap-title {
-    padding: 0px 4px;
-    text-align: center;
-  }
-  #heatmapTitle {
-    font-size: 20px;
-  }
-  span.subTitle {
-    font-size: 20px;
-    pointer-events: none;
-  }
   #heatmapContainer {
     top: 80px;
     margin-top: 60px

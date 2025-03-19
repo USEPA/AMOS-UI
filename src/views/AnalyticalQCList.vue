@@ -4,9 +4,12 @@
 -->
 
 <template>
-  <p>This page lists records from the EPA's Analytical QC project.  There are approximately 36,000 records in total, so it will take a moment to load the full list.  Double-click a row to open the corresponding document in a new tab.</p>
-  <p v-if="status.loading">Loading...</p>
-  <p v-else>{{counts.visible_records}} records {{counts.visible_records == 1 ? "is" : "are"}} currently displayed, covering {{counts.substances}} {{counts.substances == 1 ? "substance" : "substances"}} and {{counts.samples}} {{counts.samples == 1 ? "sample" : "samples"}}.</p>
+  <p>This page lists records from the EPA's Analytical QC project.  Double-click a row to open the corresponding document in a new tab.</p>
+  <div v-if="status.loading">
+    <p>Loading Analytical QC documents...{{ aqc_data.length.toLocaleString() }} of {{ status.full_count.toLocaleString() }} retrieved.</p>
+    <BProgress :value="aqc_data.length" :max="status.full_count" style="margin: 10px;"/>
+  </div>
+  <p v-else> {{ aqc_data.length.toLocaleString() }} documents are present in the database; {{counts.visible_records.toLocaleString()}} {{counts.visible_records == 1 ? "is" : "are"}} currently displayed, covering {{counts.substances.toLocaleString()}} {{counts.substances == 1 ? "substance" : "substances"}} and {{counts.samples.toLocaleString()}} {{counts.samples == 1 ? "sample" : "samples"}}.</p>
   <div class="button-array">
     <button @click="saveFiltersAsURL">Copy filters to clipboard</button>
     <button @click="downloadCurrentTable">Download Table</button>
@@ -31,6 +34,7 @@
 
 <script>
   import axios from 'axios'
+  import { BProgress } from 'bootstrap-vue-next'
 
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
@@ -53,7 +57,7 @@
         COMPTOX_PAGE_URL,
         counts: {samples: 0, substances: 0, visible_records: 0},
         default_column_def: {resizable: true, filter: 'agTextColumnFilter', floatingFilter: true, sortable: true},
-        status: {loading: true},
+        status: {loading: true, full_count: 0},
         SET_FILTER_COLUMNS: ["study", "timepoint", "first_timepoint", "last_timepoint", "stability_call"],
         TEXT_FILTER_COLUMNS: ["internal_id", "dtxsid", "casrn", "molecular formula", "sample_id", "preferred_name", "experiment_date", "annotation", "flags"],
         column_defs: [
@@ -99,31 +103,43 @@
         ]
       }
     },
-    async created() {
-      const response = await axios.get(`${this.BACKEND_LOCATION}/analytical_qc_list/`)
-      this.aqc_data = response.data.results
+    async mounted() {
+      const count_response = await axios.get(`${this.BACKEND_LOCATION}/record_type_count/analytical_qc`)
+      const analytical_qc_count = count_response.data.record_count
+      this.status.full_count = analytical_qc_count
+
+      const BATCH_SIZE = 1000
+      const num_pages = Math.ceil(analytical_qc_count / BATCH_SIZE)
+
+      for (let i = 0; i < num_pages; i++) {
+        const batch_response = await axios.get(`${this.BACKEND_LOCATION}/analytical_qc_pagination/${BATCH_SIZE}/${i*BATCH_SIZE}`)
+        const batch_results = batch_response.data.results
+        this.aqc_data = this.aqc_data.concat(batch_results)
+      }
       this.status.loading = false
+      this.gridApi.onFilterChanged();
+
+      const query_params = Object.keys(this.$route.query)
+      if (query_params.length == 0) {
+        // filter NIST GCMS records out by default if no query parameters were passed
+        var set_filter_values = this.gridApi.getFilterInstance("study").getValues()
+        set_filter_values = set_filter_values.filter(x => x !== "NIST GCMS")
+        this.gridApi.getFilterInstance("study").setModel({type: 'set', values: set_filter_values})
+      } else {
+        const filter_object = queryParamsToFilters(this.$route.query, [], this.SET_FILTER_COLUMNS, this.TEXT_FILTER_COLUMNS)
+        this.gridApi.setFilterModel(filter_object)
+      }
+      this.gridApi.onFilterChanged();
+      this.gridColumnApi.applyColumnState({state: [
+        {colId: "preferred_name", sort: "asc", sortIndex: 0},
+        {colId: "sample_id", sort: "asc", sortIndex: 1}
+      ]})
     },
     methods: {
       onGridReady(params) {
         this.gridApi = params.api
         this.gridColumnApi = params.columnApi
         this.gridApi.onFilterChanged();
-        const query_params = Object.keys(this.$route.query)
-        if (query_params.length == 0) {
-          // filter NIST GCMS records out by default if no query parameters were passed
-          var set_filter_values = this.gridApi.getFilterInstance("study").getValues()
-          set_filter_values = set_filter_values.filter(x => x !== "NIST GCMS")
-          this.gridApi.getFilterInstance("study").setModel({type: 'set', values: set_filter_values})
-        } else {
-          const filter_object = queryParamsToFilters(this.$route.query, [], this.SET_FILTER_COLUMNS, this.TEXT_FILTER_COLUMNS)
-          this.gridApi.setFilterModel(filter_object)
-        }
-        this.gridApi.onFilterChanged();
-        this.gridColumnApi.applyColumnState({state: [
-          {colId: "preferred_name", sort: "asc", sortIndex: 0},
-          {colId: "sample_id", sort: "asc", sortIndex: 1}
-        ]})
       },
       onRowSelected(event){
         1
@@ -182,7 +198,7 @@
         this.gridApi.setFilterModel(null);
       }
     },
-    components: { AgGridVue }
+    components: { AgGridVue, BProgress }
   }
 </script>
 

@@ -1,0 +1,82 @@
+/***** TITLE, SUBTITLE, & LABEL STYLING *****/
+.heatmap-title {
+  border-radius: 3px;
+  transition: color 0.3s ease, background-color 0.3s ease;
+  cursor: pointer;
+  padding: 0px 4px;
+  text-align: center;
+  color: black;
+  font-size: 30px;
+  background-color: transparent;
+  width: auto;
+  display: inline-block;
+  white-space: pre;
+}
+
+.heatmap-subtitle {
+  font-size: 20px;
+  pointer-events: none;
+}
+
+.heatmap-x-axis-label {
+  color: black;
+  font-size: 20px;
+  background-color: transparent;
+  width: auto;
+  display: inline-block;
+}
+
+.heatmap-y-axis-label {
+  padding: 3px;
+  border-radius: 3px;
+  transition: color 0.3s ease, background-color 0.3s ease;
+  cursor: pointer;
+  color: black;
+  font-size: 16px;
+  background-color: transparent;
+  width: auto;
+  display: inline-block;
+}
+
+
+/***** TOOLTIP STYLING *****/
+.heatmap-tooltip, .heatmap-title-tooltip {
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  z-index: 1080;
+  position: absolute;
+  background: black;
+  color: white;
+  padding: 8px;
+  border-radius: 4px;
+  pointer-events: none;
+  white-space: pre;
+  display: none;
+  width: 250px;
+}
+
+.heatmap-title-tooltip {
+  font-size: 20px;
+}
+
+
+/***** OTHER STYLING *****/
+.heatmap-control-box {
+  padding: 10px;
+  border: 1px solid black;
+  border-radius: 4px;
+  display: block;
+  position: absolute;
+  width: 325px;
+  margin: auto;
+  margin-top: 0px;
+}
+
+.heatmap-numeric-box-input {
+  width: 75px;
+  margin-left: 10px;
+  border-radius: 3px;
+}
+
+.heatmap-slider-input {
+  width: 200px;
+}

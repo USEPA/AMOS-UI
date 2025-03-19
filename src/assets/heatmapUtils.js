@@ -228,25 +228,16 @@ export function addTitle(canvas, thresholdData, dimsObject, graphMesh) {
   
   // create and style div
   const titleDiv = document.createElement("div");
-  titleDiv.style.whiteSpace = "pre";
   titleDiv.className = "heatmap-title";
-  titleDiv.style.color = "black";
-  titleDiv.style.fontSize = "30px";
-  titleDiv.style.backgroundColor = 'transparent';
-  titleDiv.style.width = 'auto';
-  titleDiv.style.display = 'inline-block';
 
   // add the innerHTML
   titleDiv.innerHTML = `Occurrence Heatmap\n`;
-  titleDiv.innerHTML += `<span class="subTitle">Sample Rep. Threshold: ${thresholdData.minReplicateHitsPercent}%&emsp; `;
-  titleDiv.innerHTML += `<span class="subTitle">Blank Rep. Threshold: ${thresholdData.minReplicateBlankHitPercent}%&emsp; `;
-  titleDiv.innerHTML += `<span class="subTitle">CV Threshold ${thresholdData.maxReplicateCvValue}&emsp; `;
-  titleDiv.innerHTML += `<span class="subTitle">MRL Multiplier: ${thresholdData.MrlMult}</span>`;
-  
-  // set the position
-  const canvRect = canvas.getBoundingClientRect();
+  titleDiv.innerHTML += `<span class="heatmap-subtitle">Sample Rep. Threshold: ${thresholdData.minReplicateHitsPercent}%&emsp; `;
+  titleDiv.innerHTML += `<span class="heatmap-subtitle">Blank Rep. Threshold: ${thresholdData.minReplicateBlankHitPercent}%&emsp; `;
+  titleDiv.innerHTML += `<span class="heatmap-subtitle">CV Threshold ${thresholdData.maxReplicateCvValue}&emsp; `;
+  titleDiv.innerHTML += `<span class="heatmap-subtitle">MRL Multiplier: ${thresholdData.MrlMult}</span>`;
 
-  let titleX = -(dimsObject.actualWidth / 2) + canvRect.left + dimsObject.paddingWidth; // shift to left of graph
+  let titleX = -(dimsObject.actualWidth / 2) + dimsObject.paddingWidth; // shift to left of graph
   titleX += (dimsObject.width / 2); // center to the actual graph
 
   let titleY = dimsObject.actualHeight; // value of 0 sets top to be `height` below graph?? shift up by this amount
@@ -272,20 +263,12 @@ export function addXAxisLabel(canvas, dimsObject, graphMesh) {
   
   // create and style div
   const labelDiv = document.createElement("div");
-  labelDiv.className = "xAxisLabel";
-  labelDiv.style.color = "black";
-  labelDiv.style.fontSize = "20px";
-  labelDiv.style.backgroundColor = 'transparent';
-  labelDiv.style.width = 'auto';
-  labelDiv.style.display = 'inline-block';
+  labelDiv.className = "heatmap-x-axis-label";
 
   // set text
   labelDiv.textContent = "Feature ID";
-
-  // set position
-  const canvRect = canvas.getBoundingClientRect();
   
-  let labelX = -(dimsObject.actualWidth / 2) + canvRect.left + dimsObject.paddingWidth; // shift to left
+  let labelX = -(dimsObject.actualWidth / 2) + dimsObject.paddingWidth; // shift to left
   labelX += (dimsObject.width / 2); // center to graph
   
   // value of 0 sets top to be `height` below graph?? shift up by this amount and account for padding
@@ -315,12 +298,11 @@ export function addYAxisLabelsAndHorzLines(canvas, sampleGroups, dimsObject, hor
   const yAxisGroup = new THREE.Group()
 
   // iterate over samples to create labels
-  const canvRect = canvas.getBoundingClientRect();
   sampleGroups.forEach((header, index) => {
     
     // create div for label
     const labelDiv = document.createElement("div");
-    labelDiv.className = "yAxisLabel";
+    labelDiv.className = "heatmap-y-axis-label";
 
     // clean sample names by removing underscore suffix 
     if (header[header.length-1] === "_") {
@@ -329,13 +311,6 @@ export function addYAxisLabelsAndHorzLines(canvas, sampleGroups, dimsObject, hor
       labelDiv.textContent = header;
     }
 
-    // style div
-    labelDiv.style.color = "black";
-    labelDiv.style.fontSize = "16px";
-    labelDiv.style.backgroundColor = 'transparent';
-    labelDiv.style.width = 'auto';
-    labelDiv.style.display = 'inline-block';
-
     // calculate width and height of label text
     const [
       labelWidth,
@@ -343,7 +318,7 @@ export function addYAxisLabelsAndHorzLines(canvas, sampleGroups, dimsObject, hor
     ] = getDivDims(labelDiv);
     
     // calculate and set label positions
-    let labelX = canvRect.left + dimsObject.paddingWidth - (dimsObject.actualWidth / 2); // shift to left
+    let labelX = dimsObject.paddingWidth - (dimsObject.actualWidth / 2); // shift to left
     labelX += -(labelWidth / 2) - 16; // right-align labels and add padding
     
     let labelY = (dimsObject.actualHeight / 2) + dimsObject.paddingHeight; // shift up
@@ -419,19 +394,7 @@ export function getVertLines(dimsObject, nFeatures, vertLineGeo, blackMaterial) 
 export function buildTitleTooltip() {
 
   const titleTooltip = document.createElement('div');
-
-  titleTooltip.style.position = 'absolute';
-  titleTooltip.style.background = 'black';
-  titleTooltip.style.color = 'white';
-  titleTooltip.style.padding = '8px';
-  titleTooltip.style.borderRadius = '4px';
-  titleTooltip.style.pointerEvents = 'none';
-  titleTooltip.style.display = 'none';
-  titleTooltip.style.whiteSpace = "pre";
-  titleTooltip.className = "heatmap-tooltip";
-  titleTooltip.id = "heatmapTitle";
-
-  //document.body.appendChild(titleTooltip);
+  titleTooltip.className = "heatmap-title-tooltip";
   document.getElementById("heatmapContainer").insertBefore(titleTooltip, null);
 
   return titleTooltip;
@@ -445,15 +408,7 @@ export function buildTitleTooltip() {
 export function buildYAxisTooltip() {
   
   const yAxisTooltip = document.createElement('div');
-  
-  yAxisTooltip.style.position = 'absolute';
-  yAxisTooltip.style.background = 'black';
-  yAxisTooltip.style.color = 'white';
-  yAxisTooltip.style.padding = '8px';
-  yAxisTooltip.style.borderRadius = '4px';
-  yAxisTooltip.style.pointerEvents = 'none';
   yAxisTooltip.style.display = 'none';
-  yAxisTooltip.style.whiteSpace = "pre";
   yAxisTooltip.className = "heatmap-tooltip";
   
   //document.body.appendChild(yAxisTooltip);
@@ -470,17 +425,7 @@ export function buildYAxisTooltip() {
 export function buildTooltip() {
 
   const tooltip = document.createElement('div');
-
-  tooltip.style.position = 'absolute';
-  tooltip.style.background = 'black';
-  tooltip.style.color = 'white';
-  tooltip.style.padding = '8px';
-  tooltip.style.borderRadius = '4px';
-  tooltip.style.pointerEvents = 'none';
-  tooltip.style.display = 'none';
-  tooltip.style.whiteSpace = "pre";
   tooltip.className = "heatmap-tooltip";
-  tooltip.style.width = "250px";
 
   //document.body.appendChild(tooltip);
   document.getElementById("heatmapContainer").insertBefore(tooltip, null);
@@ -497,7 +442,7 @@ export function buildTooltip() {
  * @param {HTMLDivElement} heatmapTitleDiv Div element for title div.
  * @param {object} dimsObject Object containing dims for graph and cells.
  */
-export function mouseenterTitleEvent(e, samplePassCounts, titleTooltip, heatmapTitleDiv, dimsObject) {
+export function mouseenterTitleEvent(event, samplePassCounts, titleTooltip, heatmapTitleDiv, dimsObject) {
   
   const data = samplePassCounts["total"];
   if (data) {
@@ -958,5 +903,3 @@ export async function zoomTween(
     });
   }
 }
-
-
