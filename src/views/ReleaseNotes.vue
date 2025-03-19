@@ -2,6 +2,16 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2025-03-19</summary>
+    <ul>
+      <!-- NTA --> <li>Made some changes to the occurrence heatmap that should make it a bit quicker and a bit easier to maintain.</li>
+      <!-- NTA --> <li>Restructured the NTA job submission page.</li>
+      <!-- NTA --> <li>Fixed an issue with the run sequence plot erroring out when tracers were only available/found in either ESI+ or ESI-.</li>
+      <!-- NTA --> <li>Added an explicit error to the NTA results page for when a job status check errors out.</li>
+      <li>Added a loading progress bar to the Analytical QC list.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2025-03-07</summary>
     <ul>
       <!-- NTA --> <li>A control for running qNTA has been added to the MS1 job submission page, due to a change on the NTA engine that now requires the existence of that parameter.  The control is currently disabled, however, with a fixed value of "no".</li>
