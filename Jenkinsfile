@@ -7,8 +7,6 @@ pipeline {
         VUE_APP_VERSION = 'DEV'
         VUE_APP_BUILD_DATE = "${BUILD_TIMESTAMP}"
 
-        FRONTEND_LOCATION = "https://amos.sciencedataexperts.com"
-
         IMAGE_NAME = 'amos-ui'
         IMAGE_TAG = 'latest'
     }
@@ -41,7 +39,7 @@ pipeline {
         stage('Dockerize') {
             steps {
                 sh "docker buildx use mybuilder"
-                sh "docker buildx build --platform linux/amd64 --tag ${DOCKER_REGISTRY}/epa/${IMAGE_NAME}:${IMAGE_TAG} --push --build-arg FRONTEND_LOCATION=${FRONTEND_LOCATION} ."
+                sh "docker buildx build --platform linux/amd64 --tag ${DOCKER_REGISTRY}/epa/${IMAGE_NAME}:${IMAGE_TAG} --push ."
             }
         }
 
