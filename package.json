@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build --base=/amos/",
-    "preview": "vite preview"
+    "preview": "vite preview --base=/amos/"
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
