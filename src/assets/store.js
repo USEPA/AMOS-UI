@@ -1,7 +1,6 @@
 import { reactive } from 'vue'
 
 export const APP_MODE = import.meta.env.MODE
-export const FRONTEND_LOCATION = import.meta.env.VITE_FRONTEND_LOCATION
 export const BACKEND_LOCATION = import.meta.env.VITE_FLASK_BACKEND_LOCATION
 export const COMPTOX_PAGE_URL = import.meta.env.VITE_COMPTOX_PAGE_URL
 export const IMAGE_BY_DTXSID_API = import.meta.env.VITE_IMAGE_BY_DTXSID_API
@@ -93,7 +92,7 @@ export const SOURCE_ABBREVIATION_MAPPING = {
 	'Environ. Sci. Eur.': {'full_name': 'Environmental Sciences Europe', 'link': 'https://enveurope.springeropen.com/'},
 	'Environ. Sci. Technol.': {'full_name': 'Environmental Science and Technology', 'link': 'https://pubs.acs.org/journal/esthag'},
 	'Environ. Toxicol. Chem.': {'full_name': 'Environmental Toxicology and Chemistry', 'link': 'https://setac.onlinelibrary.wiley.com/journal/15528618'},
-	'Environ. Sci. Technol.': {'full_name': 'Environmental Science and Technology Letters', 'link': 'https://pubs.acs.org/journal/estlcu'},
+	'Environ. Sci. Technol. Lett.': {'full_name': 'Environmental Science and Technology Letters', 'link': 'https://pubs.acs.org/journal/estlcu'},
 	'Environmental Science': {'link': 'https://www.sciencedirect.com/journal/journal-of-environmental-sciences'},
 	'Environmental Science & Technology': {'link': 'https://pubs.acs.org/journal/esthag'},
 	'Environmental Technology': {'link': 'https://www.tandfonline.com/journals/tent20'},
