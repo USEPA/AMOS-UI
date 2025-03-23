@@ -27,16 +27,16 @@ pipeline {
             }
         }
 
-        stage('Security Scan') {
-            steps {
-                aqua containerRuntime: 'docker', customFlags: '', hideBase: false, hostedImage: '', localImage: 'docker.sciencedataexperts.com/epa/amos-ui', localToken: '', locationType: 'local', notCompliesCmd: '', onDisallowed: 'ignore', policies: '', register: false, registry: '', runtimeDirectory: '', scannerPath: '', showNegligible: false, tarFilePath: ''
-            }
-        }
-
         stage('Dockerize') {
             steps {
                 sh "docker buildx use mybuilder"
                 sh "docker buildx build --platform linux/amd64 --tag ${DOCKER_REGISTRY}/epa/${IMAGE_NAME}:${IMAGE_TAG} --push ."
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                sh "trivy image ${DOCKER_REGISTRY}/epa/${IMAGE_NAME}:${IMAGE_TAG}"
             }
         }
 
