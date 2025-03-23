@@ -27,12 +27,9 @@ pipeline {
             }
         }
 
-        stage('Dependencies check') {
+        stage('Security Scan') {
             steps {
-                catchError(message: 'Dependency check failed', buildResult: 'SUCCESS', stageResult: 'UNSTABLE') {
-                    dependencyCheck additionalArguments: "--nvdApiKey ${NVD_API_KEY} --nodeAuditSkipDevDependencies --disableYarnAudit", odcInstallation: 'OWASP-Dependency-Check'
-                    dependencyCheckPublisher pattern: ''
-                }
+                aqua containerRuntime: 'docker', customFlags: '', hideBase: false, hostedImage: '', localImage: 'docker.sciencedataexperts.com/epa/amos-ui', localToken: '', locationType: 'local', notCompliesCmd: '', onDisallowed: 'ignore', policies: '', register: false, registry: '', runtimeDirectory: '', scannerPath: '', showNegligible: false, tarFilePath: ''
             }
         }
 
