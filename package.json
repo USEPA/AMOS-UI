@@ -20,6 +20,7 @@
     "bootstrap-vue-next": "^0.24.10",
     "d3": "^7.8.2",
     "jszip": "^3.10.1",
+    "test-project": "file:",
     "three": "^0.173.0",
     "vue": "^3.2.37",
     "vue-router": "^4.1.3",
