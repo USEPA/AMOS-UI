@@ -34,7 +34,7 @@
     </div>
     <div class="half-page-column">
       <div v-if="status.searching">
-        <p style="font-size: larger">Searching... <i class="mdi mdi-progress-clock mdi-spin"></i></p>
+        <p style="font-size: larger">Searching... <i class="mdi mdi-progress-clock mdi-spin" /></p>
       </div>
       <div v-else-if="error_messages.invalidFormat">
         <BAlert variant="danger" v-model="error_messages.invalidFormat">

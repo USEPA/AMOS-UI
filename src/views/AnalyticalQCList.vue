@@ -5,7 +5,7 @@
 
 <template>
   <p>This page lists records from the EPA's Analytical QC project.  There are approximately 36,000 records in total, so it will take a moment to load the full list.  Double-click a row to open the corresponding document in a new tab.</p>
-  <p v-if="status.loading">Loading...</p>
+  <p v-if="status.loading">Loading... <i class="mdi mdi-progress-clock mdi-spin"/></p>
   <p v-else>{{counts.visible_records}} records {{counts.visible_records == 1 ? "is" : "are"}} currently displayed, covering {{counts.substances}} {{counts.substances == 1 ? "substance" : "substances"}} and {{counts.samples}} {{counts.samples == 1 ? "sample" : "samples"}}.</p>
   <div class="button-array">
     <button @click="saveFiltersAsURL">Copy filters to clipboard</button>

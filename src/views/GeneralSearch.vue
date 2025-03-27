@@ -14,7 +14,7 @@
   <div class="two-column-page">
     <div class="half-page-column">
       <div>
-        <h1 v-if="still_searching" class="text-that-can-overflow">Searching for "{{$route.params.search_term}}"...</h1>
+        <h1 v-if="still_searching" class="text-that-can-overflow">Searching for "{{$route.params.search_term}}"... <i class="mdi mdi-progress-clock mdi-spin"/></h1>
         <h1 v-else-if="!still_searching & no_substance_match">No substance match found.</h1>
         <div v-else>
           <h1 class="text-that-can-overflow">{{ result_count }} Results for "{{$route.params.search_term}}"</h1>
