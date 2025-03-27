@@ -71,6 +71,7 @@
   import DecisionTree from '@/components/DecisionTree.vue'
   import OccurrenceHeatmap from '@/components/OccurrenceHeatmap.vue'
   import RunSequencePlot from '@/components/RunSequencePlot.vue'
+  import '@mdi/font/css/materialdesignicons.min.css';
 
   export default {
     data() {

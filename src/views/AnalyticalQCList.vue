@@ -42,6 +42,7 @@
   import { filtersToURL, queryParamsToFilters, timestampForFile } from '@/assets/common_functions.js'
   import { ANALYTICAL_QC_CALLS, ANALYTICAL_QC_GRADES, BACKEND_LOCATION, COMPTOX_PAGE_URL } from '@/assets/store.js'
   import '@/styles/main.css'
+  import '@mdi/font/css/materialdesignicons.min.css';
 
   export default {
     data() {
