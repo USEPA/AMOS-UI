@@ -2,6 +2,13 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2025-04-02</summary>
+    <ul>
+      <li>The styling of the functional class visualization has been updated, and a small fix has been added to the ontology.</li>
+      <li>A more thorough description of the Analytical QC project's results has been added to the top of its page.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2025-03-19</summary>
     <ul>
       <!-- NTA --> <li>Made some changes to the occurrence heatmap that should make it a bit quicker and a bit easier to maintain.</li>

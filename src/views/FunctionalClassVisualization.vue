@@ -7,15 +7,22 @@
 -->
 
 <template>
-  <p>This page has a visualization of the classes of functional use classes in the database and the relationships between them.  Hover over one of the circles in the plot to see a description of the analyte class -- this will also highlight any parent or child classes that are in the plot as well.  You can also use the controls on the right to look for specific functional classes, either by going through the full list or using the search bar.</p>
-  <p>Right-clicking on a circle in the graph or an element in the dropdown list on the right will open a menu with links to the method and fact sheet lists that are pre-filtered on the selected functional use.  The visualization can be zoomed in or out.</p>
-  <div class="analyteClassContainer">
-    <svg id="analyteClassSvg" width="100%" height="900"></svg>
-    <div id="rightClickMenu">
-      <a id="rightClickMenuMethods" href="#" target="_blank">Methods List</a>
-      <hr />
-      <a id="rightClickMenuFactSheets" href="#" target="_blank">Fact Sheets List</a>
-    </div>
+  <p>This page has a visualization of the functional use classes from a custom ontology called ChemFuncT, which is used in AMOS to categorize and filter methods and fact sheets.  Hover over one of the circles in the plot to see a description of the analyte class -- this will also highlight any parent or child classes that are in the plot as well.  You can also use the controls on the right to look for specific functional classes, either by going through the full list or using the search bar.  Right-clicking on a circle in the graph or an element in the dropdown list on the right will open a menu with links to the method and fact sheet lists that are pre-filtered on the selected functional use.  The visualization can be zoomed in or out.</p>
+  <p>The ontology itself can be downloaded as either <a href="/ChemFuncT.db">a SQLite database</a> or <a href="/ChemFuncT.xlsx">an Excel workbook</a>.</p>
+  <div class="analyteClassContainer" id="ChemFuncTContainer">
+    <svg id="analyteClassSvg" class="functional_class_viz"></svg>
+  </div>
+  
+  <div id="rightClickMenu">
+    <a id="rightClickMenuMethods" href="#" target="_blank">
+      Methods List
+    </a>
+
+    <hr />
+    
+    <a id="rightClickMenuFactSheets" href="#" target="_blank">
+      Fact Sheets List
+    </a>
   </div>
 </template>
 
@@ -25,16 +32,16 @@
 
   export default {
     mounted() {
-      d3.json("json_with_positions.json") 
+      d3.json("ChemFuncT-nodes_with_positions.json") 
         .then(function(graph) {
 
-        var svg = d3.select('#analyteClassSvg');
-        svg.style("width", '100%');
-        svg.style("height", '900px')
-        var width = +svg.attr("width"),
-          height = +svg.attr("height");
-        
-        svg.attr("class", "functional_class_viz")
+        var svgWidth = 1000;
+        var svgHeight = 700;
+        var svg = d3.select('#analyteClassSvg')
+          .style("width", svgWidth + "px")
+          .style("height", svgHeight + "px");
+      
+        //svg.attr("class", "functional_class_viz")
         
         // add zooming/panning
         let zoom = d3.zoom()
@@ -57,7 +64,7 @@
         function initZoom() {
           d3.select('svg')
             .call(zoom)
-            .call(zoom.transform, d3.zoomIdentity.translate(700, 560).scale(0.15))
+            .call(zoom.transform, d3.zoomIdentity.translate(335, 410).scale(0.1))
         }
 
           var link = svg.append("g")
@@ -66,10 +73,10 @@
             .data(graph.links)
             .enter().append("path")
             .attr('id', function(d) {
-              return `${d.source.id}_to_${d.target.id}`
+              return `${d.source}_to_${d.target}`
             })
             .attr('marker-mid', function(d) {
-              var myId = `arrow_${d.target.id}_${d.source.id}`
+              var myId = `arrow_${d.target}_${d.source}`
               svg.append("svg:defs").append("svg:marker")
               .attr("id", myId)
               .attr("class", "arrow")
@@ -83,19 +90,15 @@
               return `url(#${myId})`
             })
 
-        // define div for tooltip
-        var div = d3.select("body").append("div")
-          .attr("class", "tooltip")
-          .style("opacity", 0)
-
         var class_names = d3.select("div.analyteClassContainer").append("div")
           .attr("class", "class_names")
           .append("p")
-          .text("AMOS Analyte Functional Use Classes")
+          .text("ChemFuncT")
           .style("font-size", "2.2rem")
           .style("padding-left", "20px")
           .style("color", "white")
-        d3.select('div.class_names')
+          .style("margin-bottom", "5px")
+          d3.select('div.class_names')
           .append("div")
           .attr("class", "analyteClassContainer inner")
           .attr("id", "functional_analyteClassContainer")
@@ -106,8 +109,8 @@
           .append("div")
           .text("Functional Class")
           .style("color", "white")
-          .style("font-size", "1.5rem")
-          .style("margin-left", "3px")
+          .style("font-size", "1.4rem")
+          .style("margin-left", "5px")
           .style("margin-top", "auto")
           .style("margin-bottom", "auto")
           .style("color", "lightgray")
@@ -121,10 +124,10 @@
           .attr("id", "parent_legend")
         d3.select('#parent_analyteClassContainer')
           .append("div")
-          .text("Parent Class (On-Hover)")
+          .html("Parent Class<br>(On-Hover)")
           .style("color", "white")
-          .style("font-size", "1.5rem")
-          .style("margin-left", "3px")
+          .style("font-size", "1.4rem")
+          .style("margin-left", "5px")
           .style("margin-top", "auto")
           .style("margin-bottom", "auto")
           .style("color", "lightgray")
@@ -138,10 +141,10 @@
           .attr("id", "focus_legend")
         d3.select('#focus_analyteClassContainer')
           .append("div")
-          .text("Focused Class (On-Hover)")
+          .html("Focused Class<br>(On-Hover)")
           .style("color", "white")
-          .style("font-size", "1.5rem")
-          .style("margin-left", "3px")
+          .style("font-size", "1.4rem")
+          .style("margin-left", "5px")
           .style("margin-top", "auto")
           .style("margin-bottom", "auto")
           .style("color", "lightgray")
@@ -155,10 +158,10 @@
           .attr("id", "child_legend")
         d3.select('#child_analyteClassContainer')
           .append("div")
-          .text("Child Class (On-Hover)")
+          .html("Child Class<br>(On-Hover)")
           .style("color", "white")
-          .style("font-size", "1.5rem")
-          .style("margin-left", "3px")
+          .style("font-size", "1.4rem")
+          .style("margin-left", "5px")
           .style("margin-top", "auto")
           .style("margin-bottom", "auto")
           .style("color", "lightgray")
@@ -168,12 +171,12 @@
           .append('input')
           .attr("type", "text")
           .attr('id', 'class_input')
-          .style("margin-left", "40px")
-          .style("margin-top", "25px")
+          .style("margin-left", "30px")
+          .style("margin-top", "12px")
           .style("margin-bottom", "-20px")
-          .style("width", "300px")
+          .style("width", "220px")
           // .style("height", "50px")
-          .style('font-size', '24px')
+          .style('font-size', '18px')
           .style('padding', '5px')
           .style("border", "2px solid orange")
           .style("border-radius", "4px")
@@ -190,7 +193,7 @@
                   doc.style.fontSize = '0rem';
                 } else {
                 doc.style.display = "grid";
-                doc.style.fontSize = '1.3rem';
+                doc.style.fontSize = '1rem';
                 }
               } else if (name.toLowerCase().includes(search.toLowerCase())) {
                 doc.style.display = "grid";
@@ -199,7 +202,7 @@
                   let newID = docID_split.slice(0,d+1).join('_') + '_classname'
                   var new_doc = document.getElementById(newID);
                   new_doc.style.display = "grid";
-                  new_doc.style.fontSize = "1.3rem"
+                  new_doc.style.fontSize = "1rem"
                 }
               } else {
                 doc.style.fontSize = '0rem'
@@ -210,7 +213,7 @@
 
         var class_names = d3.select("div.class_names")
           .append("ul")
-          .style("margin-top", "30px")
+          .style("margin-top", "20px")
           .selectAll("li")
           .data(graph.nodes.filter(function(d) {
             return d.parents === 'None';
@@ -220,9 +223,9 @@
           .attr("id", (d) => `${d.id.replace(/\s/g, "")}_classname`)
           .attr("z-order", "500")
           .attr('url', (d) => d.url)
-          .style("font-size", "1.3rem")
+          .style("font-size", "1rem")
           .attr("class", 'functional_class')
-          .style("margin-bottom", "5px")
+          .style("margin-bottom", "0px")
           .style("color", "white")
           .style("display", "grid")
 
@@ -267,6 +270,7 @@
 
         d3.selectAll('li.functional_class')
           .on("mouseover", function(d) {
+            var myId = this.id.split("_").slice(-2,-1) + "_node";
             if (this === d.target) {
               d3.select(this)
                 .transition("hover-li")
@@ -277,8 +281,7 @@
                 .transition("hover-li")
                   .duration(300)
                   .style("color", "rgb(255, 150, 150)");
-            }
-            var myId = this.id.split("_").slice(-2,-1) + "_node";
+            } 
             if (this === d.target) {
               d3.select(`.${myId}`)
                 .transition("hover-li")
@@ -293,13 +296,14 @@
                   .duration(600)
                   .attr("r", (d) => d.r)
                 .on("end", function repeat() {
-                  d3.select(`.${myId}`).transition("hover-li")
-                    .duration(600)
-                    .attr("r", () => 110)
-                  .transition("hover-li")
-                    .duration(600)
-                    .attr("r", (d) => d.r)
-                  .on("end", repeat);
+                  d3.select(this)
+                    .transition("hover-li")
+                      .duration(600)
+                      .attr("r", (d) => 110)
+                    .transition("hover-li")
+                      .duration(600)
+                      .attr("r", (d) => d.r)
+                    .on("end", repeat);
                 });
             } else {
               d3.select(`.${myId}`)
@@ -334,7 +338,7 @@
                     doc.style.display = 'grid';
                     d3.select("#"+id)
                       .transition("click-li").duration(200)
-                        .style("font-size", '1.3rem')
+                        .style("font-size", '1rem')
                   } else {
                     d3.select("#"+id)
                       .transition("click-li").duration(200)
@@ -347,7 +351,15 @@
               }
             }
           })
-          .on("contextmenu", function(e) {
+          .on('dblclick', function(d) {
+            var myId = this.id.split("_")[0].replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+            var myURL = filterById(graph.nodes, myId).url
+            window.open(
+              myURL,
+              '_blank'
+            )
+          })
+          .on("contextmenu", function(e, d) {
             if (this === e.target) {
               var posX = e.clientX,
                 posY = e.clientY;
@@ -357,7 +369,15 @@
               menu(posX, posY, methods_url, fact_sheets_url);
             }
             e.preventDefault();
-          })
+          });
+
+        // define div for tooltip
+        var div = d3.select("div.analyteClassContainer").append("div")
+          .attr("class", "tooltip")
+          .style("opacity", 0)
+          .style("z-index", 1000)
+          .style("pointer-events", "none")
+          .style("position", "absolute");
 
         var dragHandler = d3.drag()
           .filter((e) => e.ctrlKey)
@@ -411,12 +431,20 @@
             }
           })
 
+        document.addEventListener("click", function(e) {
+          var i = document.getElementById("rightClickMenu").style;
+          i.opacity = "0";
+          setTimeout(function() {
+            i.visibility = "hidden";
+          }, 501)
+        })
+
         var node = svg.append("g")
           .attr("class", "nodes")
           .selectAll("circle")
           .data(graph.nodes)
           .enter().append("circle")
-          .attr("r", (d) => d.r)
+          .attr("r", (d) => d.r*1.3)
           .attr("class", (d) => `${d.id}_node`)
           .attr('id', (d) => d.id)
           .on("mouseover", function (e) {
@@ -489,14 +517,14 @@
                 var children = "None";
               };
               var description = dat.description;
+              let bbox = d3.select("div.analyteClassContainer").node().getBoundingClientRect();
               div.transition("hover-node")
                 .duration(200)
                 .style("opacity", 1)
               // div.html("<span style='font-size:1.8rem'>" + class_name + "</span><br/>" + description + "<br/><br/><b>Parents:</b> " + parents + "<br/><b>Children:</b> " + children)
-              var rect = document.getElementById('analyteClassSvg').getBoundingClientRect();
               div.html("<span style='font-size:2.2rem'>" + name + "</span><br/><br/><span style='font-size:1.5rem'>" + description + "</span>")
-                .style("left", (rect.left + 5) + "px")		
-                .style("top", (-(rect.bottom - rect.top) - 120) + "px")
+                .style("left", "21px")
+                .style("top", (bbox.bottom - bbox.top - 468) + "px")  // this is a janky number that's hardcoded based on eyeballing stuff
                 .style("line-height", "1.5rem")
             }
           })
@@ -516,33 +544,35 @@
                 .attr("markerWidth", 12)
                 .style("fill", "rgb(255, 203, 131)")
           })
+          // .on('click', function(e, d) {
+          //   if (!e.ctrlKey) {
+          //     var myId = this.id
+          //     var myURL = filterById(graph.nodes, myId).url
+          //     window.open(
+          //       myURL,
+          //       '_blank'
+          //     )
+          //   } 
+          // })
           .on("contextmenu", function(e, d) {
             var posX = e.clientX,
               posY = e.clientY;
-            var methods_url = filterById(graph.nodes, this.id).url;
-            var fact_sheets_url = methods_url.replace('methods_list', 'fact_sheet_list')
+            var methods_url = filterById(graph.nodes, this.id).url + "&";
+            var fact_sheets_url = methods_url.replace('methods_list', 'fact_sheet_list');
             menu(posX, posY, methods_url, fact_sheets_url);
             e.preventDefault();
           })
-          .call(dragHandler)
-        
-        document.addEventListener("click", function(e) {
-          var i = document.getElementById("rightClickMenu").style;
-          i.opacity = "0";
-          setTimeout(function() {
-            i.visibility = "hidden";
-          }, 501)
-        })
+          .call(dragHandler);
 
-        function menu(x, y, urlMethods, urlFactSheets) {
-          var i = document.getElementById("rightClickMenu").style;
-          i.top = y + "px";
-          i.left = x + "px";
-          i.visibility = "visible";
-          i.opacity = "1";
-          document.getElementById("rightClickMenuMethods").href = urlMethods
-          document.getElementById("rightClickMenuFactSheets").href = urlFactSheets
-        }
+          function menu(x, y, urlMethods, urlFactSheets) {
+            var i = document.getElementById("rightClickMenu").style;
+            i.top = y + "px";
+            i.left = x + "px";
+            i.visibility = "visible";
+            i.opacity = "1";
+            document.getElementById("rightClickMenuMethods").href = urlMethods
+            document.getElementById("rightClickMenuFactSheets").href = urlFactSheets
+          }
 
         function filterById(jsonObject, id) {
             return jsonObject.filter(function(jsonObject) {return (jsonObject['id'] == id);})[0];}
@@ -563,9 +593,15 @@
         
         link
           .attr("d", function(d) { 
-            var midX = (Number(d.source.x) + Number(d.target.x))/2
-            var midY = (Number(d.source.y) + Number(d.target.y))/2
-            return `M ${d.source.x} ${d.source.y} L ${midX} ${midY} L ${d.target.x} ${d.target.y}`
+            let sourceNodeData = graph.nodes.filter(function(dNode) {
+              return dNode.id === d.source;
+            })[0];
+            let targetNodeData = graph.nodes.filter(function(dNode) {
+              return dNode.id === d.target;
+            })[0];
+            var midX = (Number(sourceNodeData.x) + Number(targetNodeData.x))/2
+            var midY = (Number(sourceNodeData.y) + Number(targetNodeData.y))/2
+            return `M ${sourceNodeData.x} ${sourceNodeData.y} L ${midX} ${midY} L ${targetNodeData.x} ${targetNodeData.y}`
           })
           .style('opacity', 0)
           .transition("opening-scene")
@@ -577,13 +613,13 @@
           var a = document.createElement("a");
           var file = new Blob([JSON.stringify(graph)], {type: 'text/plain'});
           a.href = URL.createObjectURL(file);
-          a.download = 'json_with_positions.json';
+          a.download = 'ChemFuncT-nodes_with_positions.json';
           a.click();
           URL.revokeObjectURL(a.href)
         }
 
-        /* const button = document.getElementById('savePositionsButton');
-        button.addEventListener('click', download) */
+        // const button = document.getElementById('savePositionsButton');
+        // button.addEventListener('click', download)
       })
 
 

@@ -4,12 +4,101 @@
 -->
 
 <template>
-  <p>This page lists records from the EPA's Analytical QC project.  Double-click a row to open the corresponding document in a new tab.</p>
+  <p>This page lists records from the EPA's Analytical QC project which provides access to gas chromatography-mass spectrometry (GC/MS), liquid chromatography-mass spectrometry (LC/MS), and nuclear magnetic resonance (NMR) data, most of which were measured to support the Tox21/ToxCast bioactivity screening campaigns.  For details regarding the measurement of data, see the publication <a href="https://pubs.acs.org/doi/10.1021/acs.chemrestox.4c00330">"Analytical Quality Evaluation of the Tox21 Compound Library".</a></p>
   <div v-if="status.loading">
     <p>Loading Analytical QC documents...{{ aqc_data.length.toLocaleString() }} of {{ status.full_count.toLocaleString() }} retrieved.</p>
     <BProgress :value="aqc_data.length" :max="status.full_count" style="margin: 10px;"/>
   </div>
-  <p v-else> {{ aqc_data.length.toLocaleString() }} documents are present in the database; {{counts.visible_records.toLocaleString()}} {{counts.visible_records == 1 ? "is" : "are"}} currently displayed, covering {{counts.substances.toLocaleString()}} {{counts.substances == 1 ? "substance" : "substances"}} and {{counts.samples.toLocaleString()}} {{counts.samples == 1 ? "sample" : "samples"}}.</p>
+  <div v-else>
+    <details>
+      <summary>Additional information</summary>
+      <div style="margin: 10px">
+        <p>Understanding a chemical's amenability to solubilization and stability in the vehicle chosen to solubilize the chemical informs on the chemical s applicability domain for <i>in vitro</i> screening. The Analytical QC methods applied here can detect if chemicals will be stable and detectable in solubilization at time points, or provide insight into possible degradation products. Substance-level calls summarize results from analytical quality control (QC) experiments across individual samples, whereas individual samples (hidden by default) may not always be subjected to the same analytical detection methods. Visit the <a href="https://cran.r-project.org/web/packages/tcpl/vignettes/Introduction_Appendices.html#analytical-qc-and-applicability-domain"><code>tcpl</code> library vignette's Analytical QC and Applicability Domain section</a> for more information on logic used to populate pass or caution determination and flags.</p>
+        <p>Measurements are taken at two time points: T0 (a compound has just been taken out of the freezer) and T4 (a compound has been kept at room temperature for four months).</p>
+        <p>The definitions of the grades are as follows:</p>
+        <table class="analyticalqc-grades">
+          <tr>
+            <th>Label</th>
+            <th>Grade</th>
+            <th>Score</th>
+            <th>Definition</th>
+          </tr>
+          <tr>
+            <td class="score-2" rowspan="3">PASS</td>
+            <td class="score-1">A</td>
+            <td class="score-1">1</td>
+            <td>MW confirmed, purity >90%</td>
+          </tr>
+          <tr>
+            <td class="score-2">B</td>
+            <td class="score-2" rowspan="2">2</td>
+            <td>MW confirmed, purity 75-90%</td>
+          </tr>
+          <tr>
+            <td class="score-2">I</td>
+            <td>MW confirmed, two or more isomers detected, combined purity >75%</td>
+          </tr>
+          <tr>
+            <td class="caution" rowspan="10">CAUTION</td>
+            <td class="score-3">C</td>
+            <td class="score-3" rowspan="3">3</td>
+            <td>MW confirmed, purity 50-75%</td>
+          </tr>
+          <tr>
+            <td class="score-3">M</td>
+            <td>DEFINED MIXTURE Two or more components</td>
+          </tr>
+          <tr>
+            <td class="score-3">Z</td>
+            <td>MW confirmed, no purity info</td>
+          </tr>
+          <tr>
+            <td class="score-4">Ac</td>
+            <td class="score-4" rowspan="3">4</td>
+            <td>MW confirmed, purity >90%, low concentration (5-30% of expected value)</td>
+          </tr>
+          <tr>
+            <td class="score-4">Bc</td>
+            <td>MW confirmed, purity 75-90%, low concentration (5-30% of expected value)</td>
+          </tr>
+          <tr>
+            <td class="score-4">Cc</td>
+            <td>MW confirmed, purity 50-75%, low concentration (5-30% of expected value)</td>
+          </tr>
+          <tr>
+            <td class="score-5">D</td>
+            <td class="score-5" rowspan="4">5</td>
+            <td>MW confirmed, purity <50%</td>
+          </tr>
+          <tr>
+            <td class="score-5">F</td>
+            <td>Incorrect MW</td>
+          </tr>
+          <tr>
+            <td class="score-5">Fc</td>
+            <td>Very low concentration (<5% of expected value)</td>
+          </tr>
+          <tr>
+            <td class="score-5">Fns</td>
+            <td>No sample detected</td>
+          </tr>
+          <tr>
+            <td class="ungraded" rowspan="2"></td>
+            <td class="ungraded">U</td>
+            <td class="ungraded"></td>
+            <td>Ungraded</td>
+          </tr>
+          <tr>
+            <td class="withdrawn">W</td>
+            <td class="withdrawn"></td>
+            <td>Sample withdrawn</td>
+          </tr>
+        </table>
+      </div>
+    </details>
+    <br />
+    <p> {{ aqc_data.length.toLocaleString() }} documents are present in the database; {{counts.visible_records.toLocaleString()}} {{counts.visible_records == 1 ? "is" : "are"}} currently displayed, covering {{counts.substances.toLocaleString()}} {{counts.substances == 1 ? "substance" : "substances"}} and {{counts.samples.toLocaleString()}} {{counts.samples == 1 ? "sample" : "samples"}}.</p>
+  </div>
   <div class="button-array">
     <button @click="saveFiltersAsURL">Copy filters to clipboard</button>
     <button @click="downloadCurrentTable">Download Table</button>
@@ -211,5 +300,62 @@
     text-overflow: ellipsis;
     overflow: hidden;
     white-space: nowrap;
+  }
+
+  .analyticalqc-grades {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+
+  .analyticalqc-grades th {
+    border: 1px solid black;
+    padding: 2px 10px;
+    background-color: #FEFF99;
+    text-align: center;
+  }
+
+  .analyticalqc-grades td {
+    border: 1px solid black;
+    padding: 2px 5px;
+  }
+
+  .score-1 {
+    text-align: center;
+    background-color: #00AF50;
+  }
+
+  .score-2 {
+    text-align: center;
+    background-color: #92D14F;
+  }
+
+  .score-3 {
+    text-align: center;
+    background-color: #FFFF00;
+  }
+
+  .score-4 {
+    text-align: center;
+    background-color: #FFC000;
+  }
+
+  .score-5 {
+    text-align: center;
+    background-color: #FE0000;
+  }
+
+  .caution {
+    text-align: center;
+    background-color: #FE9799;
+  }
+
+  .ungraded {
+    text-align: center;
+    background-color: #DADADA;
+  }
+
+  .withdrawn {
+    text-align: center;
+    background-color: #A7A7A7;
   }
 </style>
