@@ -15,21 +15,14 @@ jobs:
       id-token: write
 
     steps: 
-      - name: Set .npmrc Content Environment Variable
-        run: |
-          echo "NPMRC_CONTENT=//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
-          echo "@usepa:registry=https://npm.pkg.github.com/" >> $GITHUB_ENV
-        shell: bash
-
       - name: Run Container Security Scan Action
         uses: USEPA/ccte-container-scan@main
         with:
-          image_name: ccd-ui-security-cs
+          image_name: amos-ui-security-cs
           dockerfile: Dockerfile
-          output_path: ./output/ccd-ui-report.html
-          cleanup_path: /data/watchtower/ccd/container-results/ccd-ui/ccd-ui-report.html
-          watchtower_path: /data/watchtower/ccd/container-results/ccd-ui/ccd-ui-report.html
-          npmrc_content: ${{ env.NPMRC_CONTENT }}
+          output_path: ./output/amos-ui-report.html
+          cleanup_path: /data/watchtower/amos/container-results/amos-ui/amos-ui-report.html
+          watchtower_path: /data/watchtower/amos/container-results/amos-ui/amos-ui-report.html
 
   trufflehog:
     runs-on: ubuntu-latest
@@ -42,11 +35,6 @@ jobs:
   build-and-upload-sbom:
     runs-on: th878
     steps:
-      - name: Set .npmrc Content Environment Variable
-        run: |
-          echo "NPMRC_CONTENT=//npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }}" >> $GITHUB_ENV
-          echo "@usepa:registry=https://npm.pkg.github.com/" >> $GITHUB_ENV 
-        shell: bash
         
       - name: Generate and Upload SBOM
         uses: USEPA/ccte-sbom-generator-vue@main
@@ -54,6 +42,6 @@ jobs:
           node_version: '20'
           server_hostname: 'ccte-api-dependency-track.epa.gov'
           api_key: ${{ secrets.SECRET_OWASP_DT_KEY }}
-          project_name: 'ccd-ui'
+          project_name: 'amos-ui'
           project_version: ${{ github.ref_name }}
-          npmrc_content: ${{ env.NPMRC_CONTENT }}
+      
