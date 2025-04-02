@@ -137,7 +137,7 @@
         this.counts.samples =  new Set(sample_ids).size
       },
       onDoubleClick(event) {
-        window.open(`/view_spectrum_pdf/${event.data.internal_id}`)
+        window.open(`view_spectrum_pdf/${event.data.internal_id}`)
       },
       downloadCurrentTable() {
         this.gridApi.exportDataAsExcel({

@@ -182,7 +182,7 @@
     },
     methods: {
       onDoubleClick(event) {
-        window.open(`/view_method/${event.data.internal_id}`)
+        window.open(`view_method/${event.data.internal_id}`)
       },
       onGridReady(params) {
         this.gridApi = params.api;

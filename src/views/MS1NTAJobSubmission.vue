@@ -395,7 +395,7 @@
         const match = response.data.match(job_id_regex)
         const job_id = match[1]
 
-        this.$router.push(`/ms1_nta/results/${job_id}`)
+        this.$router.push(`ms1_nta/results/${job_id}`)
         
       },
       getDateTime() {

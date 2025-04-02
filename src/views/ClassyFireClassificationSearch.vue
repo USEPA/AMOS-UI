@@ -141,11 +141,11 @@
           {field: 'spectra', headerName: "Spectra", width: 110, sortable: true, filter: RecordCountFilter, filterParams: {record_name: "spectra"}, cellRenderer: params => {
             if (params.data.spectra > 0) {
               const link = document.createElement("a");
-              link.href = this.$router.resolve(`/search/${params.data.dtxsid}?initial_results_tab=spectrum`).href;
+              link.href = this.$router.resolve(`search/${params.data.dtxsid}?initial_results_tab=spectrum`).href;
               link.innerText = params.data.spectra;
               link.addEventListener("click", e => {
                 e.preventDefault();
-                window.open(`/search/${params.data.dtxsid}?initial_results_tab=spectrum`);
+                window.open(`search/${params.data.dtxsid}?initial_results_tab=spectrum`);
               });
               return link;
             } else {
@@ -155,11 +155,11 @@
           {field: 'methods', headerName: "Methods", width: 110, sortable: true, filter: RecordCountFilter, filterParams: {record_name: "methods"}, cellRenderer: params => {
             if (params.data.methods > 0) {
               const link = document.createElement("a");
-              link.href = this.$router.resolve(`/search/${params.data.dtxsid}?initial_results_tab=method`).href;
+              link.href = this.$router.resolve(`search/${params.data.dtxsid}?initial_results_tab=method`).href;
               link.innerText = params.data.methods;
               link.addEventListener("click", e => {
                 e.preventDefault();
-                window.open(`/search/${params.data.dtxsid}?initial_results_tab=method`);
+                window.open(`search/${params.data.dtxsid}?initial_results_tab=method`);
               });
               return link;
             } else {
@@ -169,11 +169,11 @@
           {field: 'fact_sheets', headerName: "Fact Sheets", width: 110, sortable: true, filter: RecordCountFilter, filterParams: {record_name: "fact sheets"}, cellRenderer: params => {
             if (params.data.fact_sheets > 0) {
               const link = document.createElement("a");
-              link.href = this.$router.resolve(`/search/${params.data.dtxsid}?initial_results_tab=fact+sheet`).href;
+              link.href = this.$router.resolve(`search/${params.data.dtxsid}?initial_results_tab=fact+sheet`).href;
               link.innerText = params.data.fact_sheets;
               link.addEventListener("click", e => {
                 e.preventDefault();
-                window.open(`/search/${params.data.dtxsid}?initial_results_tab=fact+sheet`);
+                window.open(`search/${params.data.dtxsid}?initial_results_tab=fact+sheet`);
               });
               return link;
             } else {
@@ -226,7 +226,7 @@
     methods: {
       sendToBatchSearch() {
         const dtxsid_list = this.gridApi.getSelectedRows().map(node => node.dtxsid)
-        const target_href = `/batch_search?dtxsids=${dtxsid_list.join(";")}`
+        const target_href = `batch_search?dtxsids=${dtxsid_list.join(";")}`
         window.open(target_href)
       },
       classificationToURL() {

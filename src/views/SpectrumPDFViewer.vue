@@ -102,11 +102,11 @@
           }},
           {field: 'links', headerName: 'Links', width: 90, cellRenderer: params => {
             const link = document.createElement("a");
-            link.href = this.$router.resolve(`/search/${params.data.dtxsid}`).href;
+            link.href = this.$router.resolve(`search/${params.data.dtxsid}`).href;
             link.innerText = "Search";
             link.addEventListener("click", e => {
               e.preventDefault();
-              this.$router.push(`/search/${params.data.dtxsid}`);
+              this.$router.push(`search/${params.data.dtxsid}`);
             });
             return link;
           }},

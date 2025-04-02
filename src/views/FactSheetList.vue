@@ -114,11 +114,11 @@
           {field: 'analyte', headerName: 'Analyte', flex: 1, tooltipField: 'analyte', cellRenderer: params => {
             if (params.data.count == 1){
               const link = document.createElement("a");
-              link.href = this.$router.resolve(`/search/${params.data.dtxsid}`).href;
+              link.href = this.$router.resolve(`search/${params.data.dtxsid}`).href;
               link.innerText = params.data.analyte;
               link.addEventListener("click", e => {
                 e.preventDefault();
-                this.$router.push(`/search/${params.data.dtxsid}`);
+                this.$router.push(`search/${params.data.dtxsid}`);
               });
               return link;
             } else {
@@ -179,7 +179,7 @@
         }
       },
       onDoubleClick(event) {
-        window.open(`/view_fact_sheet/${event.data.internal_id}`)
+        window.open(`view_fact_sheet/${event.data.internal_id}`)
       },
       async filterBySubstance(identifier) {
         const response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${identifier}`)

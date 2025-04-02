@@ -14,7 +14,7 @@
           <a v-if="pdf_source_url" :href="pdf_source_url" target="_blank">{{pdf_name}}</a>
           <span v-else>{{pdf_name}}</span>
         </h2>
-        <p v-if="has_associated_spectra">This method has spectra associated with it.  Click <router-link :to="`/method_with_spectra/method/${$route.params.internal_id}`">here</router-link> to view.</p>
+        <p v-if="has_associated_spectra">This method has spectra associated with it.  Click <router-link :to="`method_with_spectra/method/${$route.params.internal_id}`">here</router-link> to view.</p>
         <ul v-if="metadata_rows" style="list-style-type: none;">
           <li v-for="r in Object.entries(metadata_rows)"><strong>{{r[0]}}:</strong> {{r[1]}}</li>
         </ul>
@@ -24,10 +24,10 @@
     <div class="half-page-column">
       <div style="margin-bottom:3cm;"></div>
       <div class="tab-bar">
-        <button :class="viewer_mode == 'SubstanceGrid' ? 'active' : ''" @click="updateTab('SubstanceGrid')">Substances ({{ substance_list.length }}) (grid)</button>
-        <button :class="viewer_mode == 'SubstanceTable' ? 'active' : ''" @click="updateTab('SubstanceTable')">Substances ({{ substance_list.length }}) (table)</button>
+        <button :class="viewer_mode === 'SubstanceGrid' ? 'active' : ''" @click="updateTab('SubstanceGrid')">Substances ({{ substance_list.length }}) (grid)</button>
+        <button :class="viewer_mode === 'SubstanceTable' ? 'active' : ''" @click="updateTab('SubstanceTable')">Substances ({{ substance_list.length }}) (table)</button>
       </div>
-      <div v-if="viewer_mode == 'SubstanceGrid'">
+      <div v-if="viewer_mode === 'SubstanceGrid'">
         <button @click="downloadSubstanceGridInfo">Download Substance Info</button>
         <button @click="copySubstancesToClipboard">Copy DTXSID List</button>
         <div class="substance-grid">
@@ -103,11 +103,11 @@
           }},
           {field: 'links', headerName: 'Links', width: 90, cellRenderer: params => {
             const link = document.createElement("a");
-            link.href = this.$router.resolve(`/search/${params.data.dtxsid}`).href;
+            link.href = this.$router.resolve(`search/${params.data.dtxsid}`).href;
             link.innerText = "Search";
             link.addEventListener("click", e => {
               e.preventDefault();
-              this.$router.push(`/search/${params.data.dtxsid}`);
+              this.$router.push(`search/${params.data.dtxsid}`);
             });
             return link;
           }},

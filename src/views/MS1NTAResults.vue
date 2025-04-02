@@ -10,14 +10,14 @@
 
 <template>
   <h4>Status of job {{ $route.params.job_id }}</h4>
-  <p>To access these results later, you can copy <router-link :to="`/ms1_nta/results/${$route.params.job_id}`" target="_blank">this link</router-link> to navigate back to this page.</p>
-  <div v-if="status.job == 'Not found'">
+  <p>To access these results later, you can copy <router-link :to="`ms1_nta/results/${$route.params.job_id}`" target="_blank">this link</router-link> to navigate back to this page.</p>
+  <div v-if="status.job === 'Not found'">
     Job is either in progress or job ID does not exist.  If you were redirected to this page from the submission form, please wait, as running the job can take a while.
   </div>
-  <div v-else-if="status.job == 'Processing'">
+  <div v-else-if="status.job === 'Processing'">
     Job is in progress.
   </div>
-  <div v-else-if="status.job == 'Completed'">
+  <div v-else-if="status.job === 'Completed'">
     <p>Job completed successfully.</p>
     <p>Job start time: {{ job_start_time }}</p>
     <p>Use the buttons below to download the results or to load the results into the browser for use with visualizations.  Result files are stored in a zip file that may be tens of megabytes in size; downloading the file may take a moment.</p>

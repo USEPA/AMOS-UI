@@ -39,16 +39,16 @@
       <br />
       <p>Several other searches and views of data exist, and can be accessed by the navigation bar at the top.  These include:</p>
       <ul>
-        <li>Searching for substances belonging to <router-link to="/classyfire_search">a given ClassyFire classification</router-link>.</li>
-        <li>Searching for substances based on <router-link to="/partial_identifier_search">partial identifiers</router-link> like molecular formula, mass range, name substring, and the first block of the InChIKey.</li>
-        <li>Finding <router-link to="/mass_spectrum_search">mass spectra</router-link> similar to a user-submitted one.</li>
-        <li>Getting a <router-link to="/batch_search">listing of all records</router-link> for a set of substances.</li>
-        <li>Finding methods and fact sheets related to <router-link to="/similar_structure_search">a given substance or a structurally similar one</router-link>.</li>
-        <li>An interactive visualization for examining <router-link to="/functional_class_visualization">the functional use classes</router-link> of substances in methods and fact sheets.</li>
-        <li>Filterable detailed lists of all <router-link to="/fact_sheet_list">fact sheets</router-link> and <router-link to="/methods_list">methods</router-link> available in the database.</li>
+        <li>Searching for substances belonging to <router-link to="classyfire_search">a given ClassyFire classification</router-link>.</li>
+        <li>Searching for substances based on <router-link to="partial_identifier_search">partial identifiers</router-link> like molecular formula, mass range, name substring, and the first block of the InChIKey.</li>
+        <li>Finding <router-link to="mass_spectrum_search">mass spectra</router-link> similar to a user-submitted one.</li>
+        <li>Getting a <router-link to="batch_search">listing of all records</router-link> for a set of substances.</li>
+        <li>Finding methods and fact sheets related to <router-link to="similar_structure_search">a given substance or a structurally similar one</router-link>.</li>
+        <li>An interactive visualization for examining <router-link to="functional_class_visualization">the functional use classes</router-link> of substances in methods and fact sheets.</li>
+        <li>Filterable detailed lists of all <router-link to="fact_sheet_list">fact sheets</router-link> and <router-link to="/methods_list">methods</router-link> available in the database.</li>
       </ul>
       <p>
-        For more information about this app, see the <router-link to="/about">about</router-link> page or
+        For more information about this app, see the <router-link to="about">about</router-link> page or
         <a :href="manualUrl" target="manual">the manual</a>.
       </p>
     </div>
@@ -64,15 +64,15 @@
       go_big_bar() {
         const search_term = this.bigBarSearchTerm.trim()
         if (this.substring_search) {
-          this.$router.push(`/partial_identifier_search?substring_search=${search_term}`)
+          this.$router.push(`partial_identifier_search?substring_search=${search_term}`)
         }
-        else if (this.searchType == "substances") {
+        else if (this.searchType === "substances") {
           this.$router.push({
-            path: `/search/${search_term}`,
+            path: `search/${search_term}`,
             query: {initial_results_tab: this.initial_results_tab}
           })
         } else {
-          this.$router.push(`/record_id_search/${encodeURI(search_term)}`)
+          this.$router.push(`record_id_search/${encodeURI(search_term)}`)
         }
       }
     },
