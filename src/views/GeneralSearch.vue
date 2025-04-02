@@ -14,7 +14,7 @@
   <div class="two-column-page">
     <div class="half-page-column">
       <div>
-        <h1 v-if="still_searching" class="text-that-can-overflow">Searching for "{{$route.params.search_term}}"...</h1>
+        <h1 v-if="still_searching" class="text-that-can-overflow">Searching for "{{$route.params.search_term}}"... <i class="mdi mdi-progress-clock mdi-spin"/></h1>
         <h1 v-else-if="!still_searching & no_substance_match">No substance match found.</h1>
         <div v-else>
           <h1 class="text-that-can-overflow">{{ result_count }} Results for "{{$route.params.search_term}}"</h1>
@@ -156,6 +156,8 @@
   import { AgGridVue } from "ag-grid-vue3"
   import 'ag-grid-enterprise'
   import { LicenseManager } from 'ag-grid-enterprise'
+  import '@mdi/font/css/materialdesignicons.min.css';
+
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
 
   import { imageLinkForSubstance, sourceAbbreviationTooltip } from '@/assets/common_functions.js'

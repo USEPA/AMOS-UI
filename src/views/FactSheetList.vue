@@ -12,7 +12,7 @@
       This is a list of fact sheets available in the database.  Double-click a row in the table to view the fact sheet in a new window.
     </p>
     <div v-if="status.loading">
-      <p>Loading fact sheets...{{ fact_sheet_info.length.toLocaleString() }} of {{ status.full_count.toLocaleString() }} retrieved.</p>
+      <p>Loading fact sheets... {{ fact_sheet_info.length.toLocaleString() }} of {{ status.full_count.toLocaleString() }} retrieved.</p>
       <BProgress :value="fact_sheet_info.length" :max="status.full_count" style="margin: 10px;"/>
     </div>
     <p v-else>{{fact_sheet_info.length.toLocaleString()}} fact sheets in total are present in the database; {{ filtered_record_count.toLocaleString() }} {{filtered_record_count == 1 ? "is" : "are"}} currently displayed, covering {{substance_count.toLocaleString()}} {{substance_count == 1 ? "substance" : "substances"}}.</p>

@@ -45,19 +45,19 @@
       <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="run_sequence_plots" @click="loadRunSequencePlots" :disabled="!has_run_sequence">Run Sequence Plot</label>
     </div>
     <div v-if="current_visualization=='cv_scatterplot'">
-      <p v-if="status.loading_viz">Loading...</p>
+      <p v-if="status.loading_viz">Loading... <i class="mdi mdi-progress-clock mdi-spin"/></p>
       <img v-else :src="scatterplot_image_blob" />
     </div>
     <div v-else-if="current_visualization=='decision_tree'">
-      <p v-if="status.loading_viz">Loading...</p>
+      <p v-if="status.loading_viz">Loading... <i class="mdi mdi-progress-clock mdi-spin"/></p>
       <DecisionTree v-else :parametersCSVString="csv_strings.parameters" :resultsCSVString="csv_strings.results" />
     </div>
     <div v-else-if="current_visualization=='occurrence_heatmap'">
-      <p v-if="status.loading_viz">Loading...</p>
+      <p v-if="status.loading_viz">Loading... <i class="mdi mdi-progress-clock mdi-spin"/></p>
       <OccurrenceHeatmap v-else :workbook="excel_workbook" />
     </div>
     <div v-else-if="current_visualization=='run_sequence_plots'">
-      <p v-if="status.loading_viz">Loading...</p>
+      <p v-if="status.loading_viz">Loading... <i class="mdi mdi-progress-clock mdi-spin"/></p>
       <RunSequencePlot v-else :workbook="excel_workbook" />
     </div>
   </div>
@@ -71,6 +71,7 @@
   import DecisionTree from '@/components/DecisionTree.vue'
   import OccurrenceHeatmap from '@/components/OccurrenceHeatmap.vue'
   import RunSequencePlot from '@/components/RunSequencePlot.vue'
+  import '@mdi/font/css/materialdesignicons.min.css';
 
   export default {
     data() {
