@@ -12,7 +12,7 @@
     <li>A range of (monoisotopic) molecular masses.</li>
   </ul>
   <div style="display: flex">
-    <input v-if="search_type != 'mass_range_search'" @keyup.enter="runPartialSearch" placeholder="Search..." size="60" v-model="search_term">
+    <input v-if="search_type !== 'mass_range_search'" @keyup.enter="runPartialSearch" placeholder="Search..." size="60" v-model="search_term">
     <div v-else>
       <MassRangeInput ref="massInput"/>
       &nbsp;
@@ -20,7 +20,7 @@
     <BFormSelect v-model="search_type" :options="search_type_options" size="sm" style="width: auto; padding: 0 2em 0 0.5em;"/>  <!-- width needs to be set to fix height issues for some reason -->
     <button @click="runPartialSearch">Search</button>
   </div>
-  <p v-if="search_type == 'mass_range_search'">Note: the size of the window in the mass range search is constrained to 0.5 Da or 25 ppm, as appropriate.  Input values larger than these will be coerced to the maximum values.</p>
+  <p v-if="search_type === 'mass_range_search'">Note: the size of the window in the mass range search is constrained to 0.5 Da or 25 ppm, as appropriate.  Input values larger than these will be coerced to the maximum values.</p>
   <br />
   <input type="checkbox" id="multicomponent-substance-toggle" v-model="show_multicomponent_substances" @change="updateTableFilters">
   <label for="multicomponent-substance-toggle">Show multicomponent substances</label>
@@ -113,7 +113,7 @@
           }},
           {field: 'casrn', headerName: 'CASRN', width: 120},
           {field: 'preferred_name', headerName: 'Preferred Name', sortable: true, sort: 'asc', flex: 1, cellStyle: params => {
-            if (this.search_type == "substring_search" & !params.value.toLowerCase().includes(this.search_term.toLowerCase())) {
+            if (this.search_type === "substring_search" && !params.value.toLowerCase().includes(this.search_term.toLowerCase())) {
               return {'font-style': 'italic'}
             }
           }},
@@ -178,7 +178,7 @@
         if (search_types.includes(param)) {
           this.querySearch = true
           this.search_type = param
-          if (param == "mass_range_search") {
+          if (param === "mass_range_search") {
             const mass_search_params = this.$route.query[param].split("_")
             this.mass_search_override = {
               mass_target: Number(mass_search_params[0]),
@@ -195,7 +195,7 @@
     async mounted() {
       // if there are query parameters in the URL, run the search; the mass range search requires some special handling
       if (this.querySearch) {
-        if (this.search_type == "mass_range_search") {
+        if (this.search_type === "mass_range_search") {
           this.$refs.massInput.$data.mass_target = this.mass_search_override.mass_target
           this.$refs.massInput.$data.mass_error = this.mass_search_override.mass_error
           this.$refs.massInput.$data.mass_error_type = this.mass_search_override.mass_error_type
@@ -209,18 +209,18 @@
         this.status.search_complete = false
 
         var response = null
-        if (this.search_type == "mass_range_search") {
+        if (this.search_type === "mass_range_search") {
           const [lower_limit, upper_limit] = this.$refs.massInput.calculateRange()
           if (lower_limit === null) {
             // add an error case later
           }
           response = await axios.post(`${this.BACKEND_LOCATION}/${this.search_type}/`, {upper_mass_limit: upper_limit, lower_mass_limit: lower_limit})
-          this.status.searched_term = `${this.$refs.massInput.$data.mass_target} Da +/- ${this.$refs.massInput.$data.mass_error} ${this.$refs.massInput.$data.mass_error_type=='da' ? 'Da' : 'ppm'}`
+          this.status.searched_term = `${this.$refs.massInput.$data.mass_target} Da +/- ${this.$refs.massInput.$data.mass_error} ${this.$refs.massInput.$data.mass_error_type==='da' ? 'Da' : 'ppm'}`
         } else {
           response = await axios.get(`${this.BACKEND_LOCATION}/${this.search_type}/${this.search_term}`)
           this.status.searched_term = this.search_term
         }
-        this.status.search_type = this.search_type_options.find(x => x["value"]==this.search_type)["text"]
+        this.status.search_type = this.search_type_options.find(x => x["value"]===this.search_type)["text"]
 
         var substances = response.data.substances
         for (let i=0; i<substances.length; i++) {
@@ -228,8 +228,8 @@
         }
         this.substances = substances
         
-        this.gridColumnApi.setColumnsVisible(['synonyms'], this.search_type == "substring_search")
-        if (this.search_type == "mass_range_search") {
+        this.gridColumnApi.setColumnsVisible(['synonyms'], this.search_type === "substring_search")
+        if (this.search_type === "mass_range_search") {
           this.gridColumnApi.applyColumnState({state: [
             {colId: "spectra", sort: "desc", sortIndex: 0}
           ]})
@@ -246,7 +246,7 @@
       },
       searchToURL() {
         var query_param = ""
-        if (this.search_type == "mass_range_search") {
+        if (this.search_type === "mass_range_search") {
           query_param = `${this.$refs.massInput.$data.mass_target}_${this.$refs.massInput.$data.mass_error}_${this.$refs.massInput.$data.mass_error_type}`
         } else {
           query_param = `${this.search_term}`
@@ -291,11 +291,11 @@
       },
       sendToBatchSearch() {
         const dtxsid_list = this.gridApi.getSelectedRows().map(node => node.dtxsid)
-        const target_href = `/batch_search?dtxsids=${dtxsid_list.join(";")}`
+        const target_href = `batch_search?dtxsids=${dtxsid_list.join(";")}`
         window.open(target_href)
       },
       onDoubleClick(event) {
-        window.open(`/search/${event.data.dtxsid}`)
+        window.open(`search/${event.data.dtxsid}`)
       },
       isExternalFilterPresent() {
         return true
