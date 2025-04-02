@@ -2,12 +2,12 @@ name: Security Workflows
 
 on:
   push:
-    branches: [ dev, staging ]
+    branches: [ dev, staging, dev-1058 ]
     tags: [ 'v*.*.*' ]
    
 jobs:
   container-scan:
-    runs-on: th878
+    runs-on: th879
     environment: ${{ github.head_ref || github.ref_name }}
     permissions:
       contents: read
@@ -33,7 +33,7 @@ jobs:
         base_branch: ${{ github.event.repository.default_branch }}
 
   build-and-upload-sbom:
-    runs-on: th878
+    runs-on: th879
     steps:
         
       - name: Generate and Upload SBOM
