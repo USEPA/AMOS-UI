@@ -91,7 +91,7 @@ class ClassHierarchy:
                                           "parents": parent_list,
                                           "children": children_list,
                                           "description": row['Definition'],
-                                          "url": f"https://ccte-cced-amos.epa.gov/methods_list?chemical_class=contains_{row['Class'].replace(' ', '%20')}"})
+                                          "url": f"https://amos.sciencedataexperts.com/amos/methods_list?chemical_class=contains_{row['Class'].replace(' ', '%20')}"})
                 for p in parent_list:
                     out_dict['links'].append({"target": row['Class'], "source": p, 
                                               "target_r": target_r})
@@ -104,7 +104,7 @@ class ClassHierarchy:
                                           "parents": "None",
                                           "children": children_list,
                                           "description": row['Definition'],
-                                          "url": f"https://ccte-cced-amos.epa.gov/methods_list?chemical_class=contains_{row['Class'].replace(' ', '%20')}"})
+                                          "url": f"https://amos.sciencedataexperts.com/amos/methods_list?chemical_class=contains_{row['Class'].replace(' ', '%20')}"})
                 
         # now export our dictionary as JSON
         with open("analyte_hierarchy.json", "w") as outfile: 
