@@ -1,0 +1,47 @@
+name: Security Workflows 
+
+on:
+  push:
+    branches: [ dev, staging ]
+    tags: [ 'v*.*.*' ]
+   
+jobs:
+  container-scan:
+    runs-on: th879
+    environment: ${{ github.head_ref || github.ref_name }}
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps: 
+      - name: Run Container Security Scan Action
+        uses: USEPA/ccte-container-scan@main
+        with:
+          image_name: amos-ui-security-cs
+          dockerfile: Dockerfile
+          output_path: ./output/amos-ui-report.html
+          cleanup_path: /data/watchtower/amos/container-results/amos-ui/amos-ui-report.html
+          watchtower_path: /data/watchtower/amos/container-results/amos-ui/amos-ui-report.html
+
+  trufflehog:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Run Scan
+      uses: USEPA/ccte-secret-scan@main
+      with:
+        base_branch: ${{ github.event.repository.default_branch }}
+
+  build-and-upload-sbom:
+    runs-on: th879
+    steps:
+        
+      - name: Generate and Upload SBOM
+        uses: USEPA/ccte-sbom-generator-vue@main
+        with:
+          node_version: '20'
+          server_hostname: 'ccte-api-dependency-track.epa.gov'
+          api_key: ${{ secrets.SECRET_OWASP_DT_KEY }}
+          project_name: 'amos-ui'
+          project_version: ${{ github.ref_name }}
+      

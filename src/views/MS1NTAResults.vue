@@ -27,6 +27,9 @@
       <!-- <button @click="combineSheets()">Test Operation</button>  -->
     </div>
   </div>
+  <div v-else-if="status.job == 'Error'">
+    <p>There was an error in retrieving job information.</p>
+  </div>
   <div v-else>
     <p>Job did not complete successfully.</p>
     <p>Job start time: {{ job_start_time }}</p>
@@ -92,13 +95,18 @@
       const timerFunc = (t) => new Promise(resolve => setTimeout(resolve, t))
 
       const status_url = "https://qed-dev.edap-cluster.com/nta/ms1/status/" + this.$route.params.job_id
-      var response = await axios.get(status_url)
+      var response = await axios.get(status_url).catch((e) => {
+        this.status.job = "Error"
+        return
+      })
+      if (this.status.job == "Error") {
+        return
+      }
       while ((response.data.status == "Processing") || (response.data.status == "Not found")){
         console.log("Checking...")
         await timerFunc(5000)
         response = await axios.get(status_url)
       }
-      
       this.job_start_time = response.data.start_time
       this.status.job = response.data.status
       this.error_info = response.data.error_info
