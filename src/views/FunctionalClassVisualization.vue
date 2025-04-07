@@ -38,7 +38,7 @@
       }
     },
     mounted() {
-      d3.json("ChemFuncT-nodes_with_positions.json")
+      d3.json(this.store.showInterpretNTA ? "ChemFuncT-nodes_with_positions.json" : "ChemFuncT-nodes_with_positions-sde.json")
         .then(function(graph) {
 
         var svgWidth = 1000;
