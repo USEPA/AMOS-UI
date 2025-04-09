@@ -19,7 +19,7 @@
         records pertaining to a substance.
       </p>
       <div style="display: flex">
-        <input @keyup.enter="go_big_bar()" id="big-search-bar" name="big-search-bar" :placeholder="searchType == 'substances' ? 'Search name, InChIKey, DTXSID, or CASRN...' : 'Search record ID...'" size="60" v-model="bigBarSearchTerm">
+        <input @keyup.enter="go_big_bar()" id="big-search-bar" name="big-search-bar" :placeholder="searchType === 'substances' ? 'Search name, InChIKey, DTXSID, or CASRN...' : 'Search record ID...'" size="60" v-model="bigBarSearchTerm">
         <BFormSelect v-model="searchType" :options="searchTypeOptions" size="sm" style="width: auto; padding: 0 2em 0 0.5em;"/>  <!-- width needs to be set to fix height issues for some reason -->
         <button @click="go_big_bar()">Search</button>
       </div>
@@ -90,7 +90,7 @@
     },
     computed: {
       manualUrl() {
-        return store.showInterpretNTA ?
+        return store.internalDeployment ?
             "https://work.epa.gov/ccte/amos-analytical-methods-and-open-spectral-database-help" :
             "https://www.epa.gov/comptox-tools/amos-analytical-methods-and-open-spectral-database-help"
       },

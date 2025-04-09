@@ -4,8 +4,9 @@ export const APP_MODE = import.meta.env.MODE
 export const BACKEND_LOCATION = import.meta.env.VITE_FLASK_BACKEND_LOCATION
 export const COMPTOX_PAGE_URL = import.meta.env.VITE_COMPTOX_PAGE_URL
 export const IMAGE_BY_DTXSID_API = import.meta.env.VITE_IMAGE_BY_DTXSID_API
+export const INTERNAL_DEPLOYMENT = !!import.meta.env.VITE_INTERNAL_DEPLOYMENT
 
-console.log({BACKEND_LOCATION, COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API})
+console.log({BACKEND_LOCATION, COMPTOX_PAGE_URL, IMAGE_BY_DTXSID_API, INTERNAL_DEPLOYMENT})
 
 export const ANALYTE_MAPPING = {
     SVOCs: "Semi-volatile organic compounds",
@@ -343,5 +344,5 @@ export const ELEMENTS = {
 
 export const store = reactive({
     showHeaderAndFooter: false,
-	showInterpretNTA: false,
+	internalDeployment: INTERNAL_DEPLOYMENT,
 })

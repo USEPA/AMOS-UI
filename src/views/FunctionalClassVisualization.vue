@@ -38,7 +38,7 @@
       }
     },
     mounted() {
-      d3.json(this.store.showInterpretNTA ? "ChemFuncT-nodes_with_positions.json" : "ChemFuncT-nodes_with_positions-sde.json")
+      d3.json(this.store.internalDeployment ? "ChemFuncT-nodes_with_positions.json" : "ChemFuncT-nodes_with_positions-sde.json")
         .then(function(graph) {
 
         var svgWidth = 1000;
@@ -581,7 +581,7 @@
           }
 
         function filterById(jsonObject, id) {
-            return jsonObject.filter(function(jsonObject) {return (jsonObject['id'] == id);})[0];}
+            return jsonObject.filter(function(jsonObject) {return (jsonObject['id'] === id);})[0];}
 
         function randomNumber(min, max) {
           return Math.floor(Math.random() * (max-min) + min);

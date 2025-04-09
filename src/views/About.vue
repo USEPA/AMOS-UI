@@ -94,7 +94,7 @@ export default {
   },
   computed: {
     manualUrl() {
-      return store.showInterpretNTA ?
+      return store.internalDeployment ?
           "https://work.epa.gov/ccte/amos-analytical-methods-and-open-spectral-database-help" :
           "https://www.epa.gov/comptox-tools/amos-analytical-methods-and-open-spectral-database-help"
     },

@@ -35,7 +35,7 @@
         <BDropdownItem to="/similar_structure_search">Similar Structure Search</BDropdownItem>
       </BNavItemDropdown>
       &emsp;
-      <BNavItemDropdown v-if="store.showInterpretNTA" class="nav-dropdown" text="INTERPRET NTA">
+      <BNavItemDropdown v-if="store.internalDeployment" class="nav-dropdown" text="INTERPRET NTA">
         <BDropdownItem to="/nta_home">NTA Home</BDropdownItem>
         <BDropdownItem to="/ms1_nta/submit">MS1 Job Submission</BDropdownItem>
       </BNavItemDropdown>
@@ -50,7 +50,7 @@
         <BDropdownItem to="/about">About this App</BDropdownItem>
         <BDropdownItem to="/contact">Contact Info</BDropdownItem>
         <BDropdownItem to="/data_sources">Data Sources</BDropdownItem>
-        <BDropdownItem v-if="store.showInterpretNTA" to="/related_applications">Related Applications</BDropdownItem>
+        <BDropdownItem v-if="store.internalDeployment" to="/related_applications">Related Applications</BDropdownItem>
         <BDropdownItem to="/release_notes">Release Notes</BDropdownItem>
       </BNavItemDropdown>
       &emsp;

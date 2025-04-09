@@ -5,7 +5,7 @@
 <template>
   <p>AMOS is one of a number of EPA applications that organize and show data on substances. Below are several more.</p>
 
-  <template v-if="store.showInterpretNTA">
+  <template v-if="store.internalDeployment">
     <h5><a href="https://ccte-cced-aqcv2.epa.gov/" target="_blank">Analytical QC</a></h5>
     <p>A collection of experimental data and expert assessments on nearly 10,000 substances of interest to the Tox21
       project, a multi-agency research collaboration working on rapid and efficient analysis of the effects of
@@ -28,7 +28,7 @@
   <p>A collection of smaller applications geared toward displaying and predicting hazard, safety, and ToxPrint chemotype
     information.</p>
 
-  <template v-if="store.showInterpretNTA">
+  <template v-if="store.internalDeployment">
     <h5><a href="https://ccte-cced-chemster.epa.gov" target="_blank">ChemSTER (Chemical Space to Explorable
       Representations)</a></h5>
     <p>This application allows users to compare the characteristics of various EPA-based or user-supplied lists of
@@ -63,7 +63,7 @@ export default {
   },
   computed: {
     cimUrl() {
-      return this.store.showInterpretNTA ?
+      return this.store.internalDeployment ?
           "https://ccte-cced-cheminformatics.epa.gov/" :
           "https://hcd.rtpnc.epa.gov/#/hazard";
     }
