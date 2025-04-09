@@ -34,8 +34,7 @@ jobs:
 
   build-and-upload-sbom:
     runs-on: th879
-    steps:
-        
+    steps:  
       - name: Generate and Upload SBOM
         uses: USEPA/ccte-sbom-generator-vue@main
         with:
