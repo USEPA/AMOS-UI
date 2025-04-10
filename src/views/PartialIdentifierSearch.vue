@@ -4,7 +4,7 @@
   This page runs searches for substances based on identifiers that can match more than one substance -- potentially many substances.  Searches can be done on four identifiers:
   <ul>
     <li>Substring of a substance name.  This will search for recognized synonyms that contain the substring as well.</li>
-    <li>The first block of a substance's InChIKey.</li>
+    <li>The first block of a substance's InChIKey.  Either the first block of an InChIKey by itself or an entire key will be accepted.</li>
     <li>
       The exact molecular formula of a substance in <a href="https://en.wikipedia.org/wiki/Chemical_formula#Hill_system">Hill form</a>.
       <help-icon style="vertical-align:middle;" tooltipText="Hill form lists the number of carbon atoms, then the number of hydrogen atoms, then counts of all other atoms in alphabetical order, with single-letter abbreviations coming before two-letter ones that start with the same letter (e.g., 'B' before 'Be').  If no carbon is present, all atoms (including hydrogen) are listed alphabetically.  For example, C2H5Br, BrClH2Si, and H2O4S are in Hill form." />
@@ -22,6 +22,12 @@
   </div>
   <p v-if="search_type === 'mass_range_search'">Note: the size of the window in the mass range search is constrained to 0.5 Da or 25 ppm, as appropriate.  Input values larger than these will be coerced to the maximum values.</p>
   <br />
+  <div v-if="status.search_term_error">
+    <BAlert variant="danger" v-model="status.search_term_error">
+      {{ status.search_term_error_message }}
+    </BAlert>
+    <br />
+  </div>
   <input type="checkbox" id="multicomponent-substance-toggle" v-model="show_multicomponent_substances" @change="updateTableFilters">
   <label for="multicomponent-substance-toggle">Show multicomponent substances</label>
   <br />
@@ -54,7 +60,7 @@
 
 <script>
   import axios from 'axios'
-  import { BFormSelect } from 'bootstrap-vue-next'
+  import { BAlert, BFormSelect } from 'bootstrap-vue-next'
 
   import 'ag-grid-community/styles/ag-grid.css'
   import 'ag-grid-community/styles/ag-theme-balham.css'
@@ -74,6 +80,8 @@
   export default {
     data() {
       return {
+        FULL_INCHIKEY_MATCH: /^[A-Z]{14}-[A-Z]{8}[SN][A-Z]-[A-Z]$/,
+        FIRST_BLOCK_MATCH: /^[A-Z]{14}$/,
         querySearch: false,
         mass_search_override: null,
         BACKEND_LOCATION,
@@ -93,7 +101,7 @@
           {value: "mass_range_search", text: "Monoisotopic mass range"}
         ],
         substances: [],
-        status: {search_complete: false, searching: false, searched_term: "", search_type: ""},
+        status: {search_complete: false, searching: false, searched_term: "", search_type: "", search_term_error: false, search_term_error_message: ""},
         columnDefs: [{field:'image', headerName:'Structure', checkboxSelection: true, headerCheckboxSelection: true, floatingFilter: false, autoHeight: true, width: 120, wrapText: true, cellRenderer: (params) => {
             if (params.data.image_link) {
               var image = document.createElement('img');
@@ -212,10 +220,22 @@
         if (this.search_type === "mass_range_search") {
           const [lower_limit, upper_limit] = this.$refs.massInput.calculateRange()
           if (lower_limit === null) {
-            // add an error case later
+            // TODO: add an error case
           }
           response = await axios.post(`${this.BACKEND_LOCATION}/${this.search_type}/`, {upper_mass_limit: upper_limit, lower_mass_limit: lower_limit})
           this.status.searched_term = `${this.$refs.massInput.$data.mass_target} Da +/- ${this.$refs.massInput.$data.mass_error} ${this.$refs.massInput.$data.mass_error_type==='da' ? 'Da' : 'ppm'}`
+        } else if (this.search_type == "inchikey_first_block_search") {
+          this.status.search_term_error = false
+          if (this.search_term.search(this.FULL_INCHIKEY_MATCH) !== -1) {
+            response = await axios.get(`${this.BACKEND_LOCATION}/${this.search_type}/${this.search_term.slice(0,14)}`)
+            this.status.searched_term = this.search_term.slice(0, 14)
+          } else if (this.search_term.search(this.FIRST_BLOCK_MATCH) !== -1) {
+            response = await axios.get(`${this.BACKEND_LOCATION}/${this.search_type}/${this.search_term}`)
+            this.status.searched_term = this.search_term
+          } else {
+            this.status.search_term_error = true
+            this.status.search_term_error_message = "Search term for InChIKey first block search is invalid -- search term should be either the 14-letter first block of an InChIKey or an entire key."
+          }
         } else {
           response = await axios.get(`${this.BACKEND_LOCATION}/${this.search_type}/${this.search_term}`)
           this.status.searched_term = this.search_term
@@ -233,12 +253,12 @@
           this.gridColumnApi.applyColumnState({state: [
             {colId: "spectra", sort: "desc", sortIndex: 0}
           ]})
-      } else {
-          this.gridColumnApi.applyColumnState({state: [
-          {colId: "methods", sort: "desc", sortIndex: 0},
-          {colId: "fact_sheets", sort: "desc", sortIndex: 1},
-          {colId: "spectra", sort: "desc", sortIndex: 2}
-        ]})
+        } else {
+            this.gridColumnApi.applyColumnState({state: [
+            {colId: "methods", sort: "desc", sortIndex: 0},
+            {colId: "fact_sheets", sort: "desc", sortIndex: 1},
+            {colId: "spectra", sort: "desc", sortIndex: 2}
+          ]})
         }
         this.gridApi.onFilterChanged()
         this.status.search_complete = true
@@ -272,6 +292,12 @@
         this.search_term = ""
         this.mass_target = null
         this.mass_error = null
+      },
+      validateInChIKeyInput(input) {
+        const FULL_INCHIKEY_MATCH = /^[A-Z]{14}-[A-Z]{8}[SN][A-Z]-[A-Z]$/
+        const FIRST_BLOCK_MATCH = /^[A-Z]{14}$/
+        console.log((input.search(FULL_INCHIKEY_MATCH) != -1) | (input.search(FIRST_BLOCK_MATCH) != -1))
+        return (input.search(FULL_INCHIKEY_MATCH) != -1) | (input.search(FIRST_BLOCK_MATCH) != -1)
       },
       downloadSearchResults() {
         let visible_columns = this.gridColumnApi.getAllDisplayedColumns().map(x => x.colId)
@@ -313,7 +339,7 @@
         this.updateRecordCounts()
       }
     },
-    components: {AgGridVue, BFormSelect, HelpIcon, MassRangeInput, MassTableFilter, RecordCountFilter}
+    components: {AgGridVue, BAlert, BFormSelect, HelpIcon, MassRangeInput, MassTableFilter, RecordCountFilter}
   }
 </script>
 

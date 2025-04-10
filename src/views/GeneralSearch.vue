@@ -135,7 +135,7 @@
       <MassSpectrumDisplay v-else-if="view_type == 'Mass Spectrum'" :internalID="selected_row_data.internal_id" displayAdditionalInfo />
       <NMRSpectrumDisplay v-else-if="view_type == 'NMR Spectrum'" :internalID="selected_row_data.internal_id" />
       <IRSpectrumDisplay v-else-if="view_type == 'IR Spectrum'" :internalID="selected_row_data.internal_id" />
-      <StoredPDFDisplay v-else-if="view_type == 'PDF'" :internalID="selected_row_data.internal_id" :recordType="selected_row_data.record_type" displayAdditionalInfo/>
+      <StoredPDFDisplay v-else-if="view_type == 'PDF'" :internalID="selected_row_data.internal_id" :recordType="selected_row_data.record_type.toLowerCase()" displayAdditionalInfo/>
       <p class="info-paragraph" v-else>This database does not contain anything for this record.  Click the hyperlink in the "Record Type" column to be directed to the source.</p>
     </div>
     <BModal size="xl" v-model="disambiguation.inchikey">
@@ -187,7 +187,6 @@
         no_substance_match: false,
         has_image: true,
         image_link: "",
-        tooltipShowDelay: 500,
         BACKEND_LOCATION,
         COMPTOX_PAGE_URL,
         METHOD_DOCUMENT_TYPES,

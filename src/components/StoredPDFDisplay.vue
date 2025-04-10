@@ -199,9 +199,10 @@
         document.body.removeChild(textarea)
       },
       getDocumentHref(record_type) {
-        if (record_type == "Fact Sheet") {
+        console.log(record_type)
+        if (record_type==="fact sheet") {
           return `/view_fact_sheet/${this.internalID}`
-        } else if (record_type == "Method") {
+        } else if (record_type==="method") {
           return `/view_method/${this.internalID}`
         } else {
           return `/view_spectrum_pdf/${this.internalID}`

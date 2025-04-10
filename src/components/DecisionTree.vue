@@ -201,7 +201,6 @@
 
       try {
         let init_parameter_data = d3.csvParse(this.parametersCSVString)
-
         // update the default parameters of the "A" thresholds
         for (let iRow in init_parameter_data) {
           let row = init_parameter_data[iRow];
@@ -217,7 +216,7 @@
             }
           }
         }
-
+        
         // Data validation
         //// Blank Replicate
         if (countData["A"]["threshold"]["blankRep"] > thresholdData["repMax"]) {
@@ -232,14 +231,14 @@
         } else if (countData["A"]["threshold"]["rep"] < thresholdData["repMin"]) {
           countData["A"]["threshold"]["rep"] = thresholdData["repMin"];
         }
-
+        
         //// CV
         if (countData["A"]["threshold"]["cv"] > thresholdData["cvMax"]) {
           countData["A"]["threshold"]["cv"] = thresholdData["cvMax"];
         } else if (countData["A"]["threshold"]["cv"] < thresholdData["cvMin"]) {
           countData["A"]["threshold"]["cv"] = thresholdData["cvMin"];
         }
-
+        
         //// MRL
         if (countData["A"]["threshold"]["mrl"] < 4) {
           countData["A"]["threshold"]["mrl"] = 3;
@@ -252,7 +251,7 @@
       catch(err) {
         console.log('No default parameter file found')
       }
-
+      
       let data = d3.csvParse(this.resultsCSVString)
       /**
        * For updating the plots on toggle button clicks, and on threshold parameter changes.
@@ -635,7 +634,7 @@
        *********************************/
 
       // get counts based on current 
-      countData = get_counts(countData)
+      countData = get_counts(countData)    //ERROR IS HERE
 
       tableCreate(countData, false)
       createOccTree(countData, 'occTreeABox', 'occTreeASVG', "A")

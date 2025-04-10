@@ -14,9 +14,9 @@
       </div>
       &emsp;
       <input v-model="searchTerm" name="search-term" title="General search input field" type="text" @keyup.enter="go()">
+      <!-- width needs to be set to fix height issues for some reason -->
       <BFormSelect v-model="searchType" :options="searchTypeOptions" size="sm"
                    style="width: auto; padding: 0 2em 0 0.5em;"/>
-      <!-- width needs to be set to fix height issues for some reason -->
       <button @click="go()">Search</button>
     </div>
     <div class="nav-bar-right">
@@ -35,11 +35,13 @@
         <BDropdownItem to="/similar_structure_search">Similar Structure Search</BDropdownItem>
       </BNavItemDropdown>
       &emsp;
-      <BNavItemDropdown v-if="store.internalDeployment" class="nav-dropdown" text="INTERPRET NTA">
-        <BDropdownItem to="/nta_home">NTA Home</BDropdownItem>
-        <BDropdownItem to="/ms1_nta/submit">MS1 Job Submission</BDropdownItem>
-      </BNavItemDropdown>
-      &emsp;
+      <div v-if="store.internalDeployment">
+        <BNavItemDropdown class="nav-dropdown" text="INTERPRET NTA">
+          <BDropdownItem to="/nta_home">NTA Home</BDropdownItem>
+          <BDropdownItem to="/ms1_nta/submit">MS1 Job Submission</BDropdownItem>
+        </BNavItemDropdown>
+        &emsp;
+      </div>
       <BNavItemDropdown class="nav-dropdown" text="Other Pages">
         <BDropdownItem to="/functional_class_visualization">Functional Class Visualization</BDropdownItem>
         <BDropdownItem to="/mass_spectrum_comparison">Mass Spectrum Comparison</BDropdownItem>
