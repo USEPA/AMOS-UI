@@ -1,47 +1,81 @@
-name: Security Workflows 
+# This is a basic workflow to help you get started with Actions
+
+name: Generate SBOM
 
 on:
   push:
-    branches: [ dev, staging ]
+    branches: [ "dev", dev-1058 ]
     tags: [ 'v*.*.*' ]
-   
+
+env:
+  BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+
 jobs:
-  container-scan:
-    runs-on: th879
-    environment: ${{ github.head_ref || github.ref_name }}
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-
-    steps: 
-      - name: Run Container Security Scan Action
-        uses: USEPA/ccte-container-scan@main
-        with:
-          image_name: amos-ui-security-cs
-          dockerfile: Dockerfile
-          output_path: ./output/amos-ui-report.html
-          cleanup_path: /data/watchtower/amos/container-results/amos-ui/amos-ui-report.html
-          watchtower_path: /data/watchtower/amos/container-results/amos-ui/amos-ui-report.html
-
-  trufflehog:
+  build:
     runs-on: ubuntu-latest
     steps:
-    - name: Run Scan
-      uses: USEPA/ccte-secret-scan@main
-      with:
-        base_branch: ${{ github.event.repository.default_branch }}
+    
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Nodejs and npm
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
 
-  build-and-upload-sbom:
+      - name: Setup yarn
+        run: npm install -g yarn
+
+      #- name: Install dependencies
+       # run: yarn install
+
+      - name: Setup Nodejs with yarn caching
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+          cache: yarn
+          
+      - name: Install packages
+        run: yarn install --ignore-scripts
+  
+      - name: mkdir
+        run: mkdir bom
+
+      - name: Create SBOM with CycloneDX
+        uses: CycloneDX/gh-node-module-generatebom@v1
+        with: 
+          output: './bom/bom.xml'
+
+      - name: Upload bom.xml artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bom-artifact
+          path: bom/bom.xml
+          
+  upload:
+    needs: build
     runs-on: th879
     steps:
-        
-      - name: Generate and Upload SBOM
-        uses: USEPA/ccte-sbom-generator-vue@main
+    
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download bom.xml artifact
+        uses: actions/download-artifact@v4
         with:
-          node_version: '20'
-          server_hostname: 'ccte-api-dependency-track.epa.gov'
-          api_key: ${{ secrets.SECRET_OWASP_DT_KEY }}
-          project_name: 'amos-ui'
-          project_version: ${{ github.ref_name }}
-      
+          name: bom-artifact
+          
+      - name: LS -LA
+        run: ls -la
+        
+      - name: Upload BOM to Dependency Track
+        uses: DependencyTrack/gh-upload-sbom@v2.1.0
+        with:
+          serverHostname: 'ccte-api-dependency-track.epa.gov'
+          apiKey: ${{ secrets.SECRET_OWASP_DT_KEY }}
+          protocol: https
+          projectName: 'amos-ui'
+          projectVersion: ${{ env.BRANCH_NAME }}
+          bomFilename: "./bom.xml"
+          autoCreate: true       
+ 
