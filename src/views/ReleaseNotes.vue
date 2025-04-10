@@ -2,6 +2,13 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2025-04-10</summary>
+    <ul>
+      <li>The 'InChIKey first block' search will now accept a full InChIKey (and will just take the first block).  A warning message was added for when the input is clearly not formatted as either a first block or a whole InChIKey.</li>
+      <li>Made a fix to how the internal links are generated on the PDF displays in the general search and similar structure search.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2025-04-02</summary>
     <ul>
       <li>The styling of the functional class visualization has been updated, and a small fix has been added to the ontology.</li>
