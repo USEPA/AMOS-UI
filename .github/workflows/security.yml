@@ -26,8 +26,8 @@ jobs:
       - name: Setup yarn
         run: npm install -g yarn
 
-      - name: Install dependencies
-        run: yarn install
+     # - name: Install dependencies
+      #  run: yarn install
 
       - name: Setup Nodejs with yarn caching
         uses: actions/setup-node@v3
