@@ -36,7 +36,9 @@ jobs:
           cache: yarn
           
       - name: Install packages
-        run: yarn install --ignore-scripts
+        run: | 
+          yarn install
+          yarn install --ignore-scripts
   
       - name: mkdir
         run: mkdir bom
