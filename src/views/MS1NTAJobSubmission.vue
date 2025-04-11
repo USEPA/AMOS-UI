@@ -416,7 +416,7 @@
         // new endpoint-hitting code
         //const response = await axios.post("https://qed-dev.edap-cluster.com/nta/ms1/api/run", payload, {headers: {'Content-Type': 'multipart/form-data'}})
 
-        this.$router.push(`ms1_nta/results/${job_id}`)
+        this.$router.push(`/ms1_nta/results/${job_id}`)
         
       },
       getDateTime() {
