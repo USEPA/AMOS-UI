@@ -40,7 +40,7 @@
                 </tr>
                 <tr>
                   <td><button class="copy-button" title="Copy InChIKey" @click="copyToClipboard(substance_info.indigo_inchikey ? substance_info.indigo_inchikey : substance_info.jchem_inchikey)">⎘</button></td>
-                  <td><strong>InChIKey:</strong> <router-link :to="`partial_identifier_search?inchikey_first_block_search=${displayed_inchikey.first_block}`" target="_blank">{{displayed_inchikey.first_block}}</router-link>{{displayed_inchikey.remainder}}</td>
+                  <td><strong>InChIKey:</strong> <router-link :to="`/partial_identifier_search?inchikey_first_block_search=${displayed_inchikey.first_block}`" target="_blank">{{displayed_inchikey.first_block}}</router-link>{{displayed_inchikey.remainder}}</td>
                 </tr>
                 <tr>
                   <td></td>
