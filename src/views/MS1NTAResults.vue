@@ -10,9 +10,9 @@
 
 <template>
   <h4>Status of job {{ $route.params.job_id }}</h4>
-  <p>To access these results later, you can copy <router-link :to="`ms1_nta/results/${$route.params.job_id}`" target="_blank">this link</router-link> to navigate back to this page.</p>
+  <p>To access these results later, you can copy <router-link :to="`/ms1_nta/results/${$route.params.job_id}`" target="_blank">this link</router-link> to navigate back to this page.</p>
   <div v-if="status.job === 'Not found'">
-    Job is either in progress or job ID does not exist.  If you were redirected to this page from the submission form, please wait, as running the job can take a while.
+    Job is either in progress or job ID does not exist.  If you were redirected to this page from the submission form, please wait, as running the job can take a while and it may be a few minutes before a status can be retrieved.
   </div>
   <div v-else-if="status.job === 'Processing'">
     Job is in progress.

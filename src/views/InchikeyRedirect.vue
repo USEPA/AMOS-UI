@@ -12,10 +12,10 @@
 
 <template>
   <div v-if="search_complete">
-    <p v-if="exact_match">An exact match for the InChIKey "<router-link :to="`search/${this.$route.params.inchikey}`">{{$route.params.inchikey}}</router-link>" was found under the name {{ matched_inchikey_substance_name }}.  However, several other InChIKeys with the same first block were discovered, if you were looking for one of those.  Click on the InChIKey to be directed to search results for that substance.</p>
+    <p v-if="exact_match">An exact match for the InChIKey "<router-link :to="`/search/${this.$route.params.inchikey}`">{{$route.params.inchikey}}</router-link>" was found under the name {{ matched_inchikey_substance_name }}.  However, several other InChIKeys with the same first block were discovered, if you were looking for one of those.  Click on the InChIKey to be directed to search results for that substance.</p>
     <p v-else>An exact match for the InChIKey "{{$route.params.inchikey}}" was not found.  However, several other InChIKeys with the same first block were discovered, if you were looking for one of those.  Click on the InChIKey to be directed to search results for that substance.</p>
     <ul>
-      <li v-for="ui in unique_inchikeys"><router-link :to="`search/${ui.jchem_inchikey}`">{{ui.jchem_inchikey}}</router-link> ({{ui.preferred_name}})</li>
+      <li v-for="ui in unique_inchikeys"><router-link :to="`/search/${ui.jchem_inchikey}`">{{ui.jchem_inchikey}}</router-link> ({{ui.preferred_name}})</li>
   </ul>
   </div>
   <div v-else>

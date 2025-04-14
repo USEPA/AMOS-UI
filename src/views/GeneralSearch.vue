@@ -104,7 +104,7 @@
         <p v-if="no_substance_match">There is no substance in this database that matches the search term "{{$route.params.search_term}}" -- if something should be here, please check the search term for typos.</p>
         <div v-else-if="all_results.length==0">
           <p>The search term "{{$route.params.search_term}}" matches a substance in the database; however, no data records were found.</p>
-          <p>If you are looking for methods containing the searched substance, you can run a search for methods with similar structures <router-link :to="`similar_structure_search?search_term=${$route.params.search_term}`">here</router-link>.</p>
+          <p>If you are looking for methods containing the searched substance, you can run a search for methods with similar structures <router-link :to="`/similar_structure_search?search_term=${$route.params.search_term}`">here</router-link>.</p>
         </div>
         <div v-else>
           <div class="tab-bar">

@@ -14,7 +14,7 @@
           <a v-if="pdf_source_url" :href="pdf_source_url" target="_blank">{{pdf_name}}</a>
           <span v-else>{{pdf_name}}</span>
         </h2>
-        <p v-if="has_associated_spectra">This method has spectra associated with it.  Click <router-link :to="`method_with_spectra/method/${$route.params.internal_id}`">here</router-link> to view.</p>
+        <p v-if="has_associated_spectra">This method has spectra associated with it.  Click <router-link :to="`/method_with_spectra/method/${$route.params.internal_id}`">here</router-link> to view.</p>
         <ul v-if="metadata_rows" style="list-style-type: none;">
           <li v-for="r in Object.entries(metadata_rows)"><strong>{{r[0]}}:</strong> {{r[1]}}</li>
         </ul>
