@@ -15,11 +15,11 @@
             <h5>Spectrum #1</h5>
             <textarea type="text" class="batch-search-input" rows="20" columns="35" v-model="spectrum_box_1"></textarea>
           </div>
-          <div v-if="dtxsid_mode" class="search-inputs" style="padding-left: 100px">
-            <p>Database Spectra</p>
+          <div v-if="dtxsid_mode" class="search-inputs" style="padding-left: 30px">
+            <h5>Database Spectra</h5>
             <ag-grid-vue
               class="ag-theme-balham"
-              style="height:486px; width:600px"
+              style="height:486px; width:500px"
               :columnDefs="column_defs"
               :rowData="database_spectra"
               rowSelection="single"
@@ -55,7 +55,7 @@
           <button @click="display_both_spectra()">Display Both</button>
         </div>
       </div>
-      <div class="info-container" style="padding-left: 100px; width: 44vw">
+      <div class="info-container" style="padding-left: 70px; width: 44vw">
         <div v-if="spectrum_display == 'single'">
           <SingleMassSpectrumPlot :spectrum="spectrum1" :spectrum_name="plot_title" :peak_threshold="peak_threshold"/>
           <br />
@@ -118,9 +118,9 @@
         similarity: {window: 0.05, type: "da"},
         error_messages: {invalid_format: false, bad_spectrum_input_name: ""},
         column_defs: [
-          {field: "dtxsid", headerName: "DTXSID", width: 140},
-          {field: "name", headerName: "Name", width: 140, cellRenderer: params => {return this.substance_mapping[params.data.dtxsid]}},
-          {field: "description", headerName: "Description", flex: 1}
+          {field: "dtxsid", headerName: "DTXSID", width: 120},
+          {field: "name", headerName: "Name", width: 120, cellRenderer: params => {return this.substance_mapping[params.data.dtxsid]}},
+          {field: "description", headerName: "Description", flex: 1, tooltipField: "description"}
         ]
       }
     },

@@ -97,7 +97,7 @@
           </div>
         </div>
         <div style="width: 60%; display: flex; align-items: center;">
-          <button v-if="!still_searching" @click="downloadResultsAsExcel">Download Results</button>
+          <button v-if="!still_searching" @click="downloadResultsAsExcel">Download Displayed Results</button>
         </div>
       </div>
       <div v-if="!still_searching">
@@ -257,7 +257,6 @@
     methods: {
       onGridReady(params) {
         this.gridApi = params.api
-        this.gridColumnApi = params.columnApi
         
         // Sometimes we might want to pre-select a row when the all_results load; this logic takes care of it
         if (typeof(this.$route.query.initial_row_selected) === "string") {
@@ -356,25 +355,36 @@
       updateTab(tabName) {
         this.result_table_view_mode = tabName
         if (tabName === "fact sheet"){
-          this.gridColumnApi.setColumnsVisible(['count'], true)
-          this.gridColumnApi.setColumnsVisible(['method_number', 'method_type', 'methodologies', 'record_type', 'spectrum_rating'], false)
-          this.gridColumnApi.applyColumnState({state: [{colId: 'count', sort: 'asc'}]})
+          this.gridApi.setColumnsVisible(['count'], true)
+          this.gridApi.setColumnsVisible(['method_number', 'method_type', 'methodologies', 'record_type', 'spectrum_rating'], false)
+          this.gridApi.setColumnFilterModel('method_number', null)
+          this.gridApi.setColumnFilterModel('method_type', null)
+          this.gridApi.setColumnFilterModel('methodologies', null)
+          this.gridApi.setColumnFilterModel('record_type', null)
+          this.gridApi.setColumnFilterModel('spectrum_rating', null)
+          this.gridApi.applyColumnState({state: [{colId: 'count', sort: 'asc'}]})
         } else if (tabName === "spectrum") {
-          this.gridColumnApi.setColumnsVisible(['methodologies', 'spectrum_rating'], true)
-          this.gridColumnApi.setColumnsVisible(['count', 'method_number', 'method_type', 'record_type'], false)
-          this.gridColumnApi.applyColumnState({state: [{colId: 'count', sort: null}]})
+          this.gridApi.setColumnsVisible(['methodologies', 'spectrum_rating'], true)
+          this.gridApi.setColumnsVisible(['count', 'method_number', 'method_type', 'record_type'], false)
+          this.gridApi.setColumnFilterModel('count', null)
+          this.gridApi.setColumnFilterModel('method_number', null)
+          this.gridApi.setColumnFilterModel('method_type', null)
+          this.gridApi.setColumnFilterModel('record_type', null)
+          this.gridApi.applyColumnState({state: [{colId: 'count', sort: null}]})
         } else if (tabName === "method") {
-          this.gridColumnApi.setColumnsVisible(['count', 'method_number', 'method_type', 'methodologies'], true)
-          this.gridColumnApi.setColumnsVisible(['record_type', 'spectrum_rating'], false)
-          this.gridColumnApi.applyColumnState({state: [{colId: 'count', sort: 'asc'}]})
-          if (this.record_type_counts.method == 0) {
-            this.gridApi.value.showLoadingOverlay()
-          }
+          this.gridApi.setColumnsVisible(['count', 'method_number', 'method_type', 'methodologies'], true)
+          this.gridApi.setColumnsVisible(['record_type', 'spectrum_rating'], false)
+          this.gridApi.setColumnFilterModel('record_type', null)
+          this.gridApi.setColumnFilterModel('spectrum_rating', null)
+          this.gridApi.applyColumnState({state: [{colId: 'count', sort: 'asc'}]})
         } else {
           // "All" case
-          this.gridColumnApi.setColumnsVisible(['count', 'methodologies', 'record_type'], true)
-          this.gridColumnApi.setColumnsVisible(['method_number', 'method_type', 'spectrum_rating'], false)
-          this.gridColumnApi.applyColumnState({state: [{colId: 'count', sort: null}]})
+          this.gridApi.setColumnsVisible(['count', 'methodologies', 'record_type'], true)
+          this.gridApi.setColumnsVisible(['method_number', 'method_type', 'spectrum_rating'], false)
+          this.gridApi.setColumnFilterModel('method_number', null)
+          this.gridApi.setColumnFilterModel('method_type', null)
+          this.gridApi.setColumnFilterModel('spectrum_rating', null)
+          this.gridApi.applyColumnState({state: [{colId: 'count', sort: null}]})
         }
         this.gridApi.onFilterChanged()
         this.gridApi.sizeColumnsToFit()
