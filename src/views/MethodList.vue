@@ -41,6 +41,7 @@
       @filter-changed="onFilterChanged"
       :tooltipShowDelay="500"
       :suppressCopyRowsToClipboard="true"
+      :animateRows="false"
     ></ag-grid-vue>
     <br />
     <p>Some usage notes:</p>
@@ -160,10 +161,7 @@
       }
     },
     async created() {
-      /* const path = `${this.BACKEND_LOCATION}/method_list`
-      const response = await axios.get(path)
-      this.method_info = response.data.results
-      this.status.loading = false */
+      const timerFunc = (t) => new Promise(resolve => setTimeout(resolve, t))
 
       const count_response = await axios.get(`${this.BACKEND_LOCATION}/record_type_count/methods`)
       const method_count = count_response.data.record_count
@@ -177,6 +175,8 @@
         const batch_results = batch_response.data.results
         this.method_info = this.method_info.concat(batch_results)
       }
+      // pause for half a second to make sure the last batch of data is properly loaded
+      await timerFunc(500)
       this.status.loading = false
       this.gridApi.onFilterChanged();
     },
@@ -186,12 +186,11 @@
       },
       onGridReady(params) {
         this.gridApi = params.api;
-        this.gridColumnApi = params.columnApi;
         
         // load query parameters
         if (Object.keys(this.$route.query).includes("full_table")) {
           this.full_table_filter = this.$route.query["full_table"]
-          this.gridApi.setQuickFilter(this.full_table_filter)
+          this.gridApi.setGridOption('quickFilterText', this.full_table_filter)
         }
         const filter_object = queryParamsToFilters(this.$route.query, this.NUMERIC_COLUMNS, [], this.TEXT_COLUMNS)
         this.gridApi.setFilterModel(filter_object)
@@ -200,7 +199,7 @@
       },
       saveFiltersAsURL() {
         const current_filters = this.gridApi.getFilterModel();
-        var url = filtersToURL(window.location.origin + this.$route.path, current_filters)
+        var url = filtersToURL(window.location.origin + "/amos" + this.$route.path, current_filters)
         if (this.full_table_filter) {
           url = url + `full_table=${this.full_table_filter}`
         }
@@ -227,7 +226,7 @@
         this.substance_count = count_response.data.count
       },
       quickFilter(input) {
-        this.gridApi.setQuickFilter(input)
+        this.gridApi.setGridOption('quickFilterText', input)
       },
       async downloadSubstancesInMethods() {
         const internal_id_list = Array(this.filtered_record_count).fill().map((_,idx) => this.gridApi.getDisplayedRowAtIndex(idx).data.internal_id)
@@ -241,7 +240,7 @@
         })
       },
       downloadCurrentTable() {
-        var visible_columns = this.gridColumnApi.getAllDisplayedColumns().map(x => x.colId)
+        var visible_columns = this.gridApi.getAllDisplayedColumns().map(x => x.colId)
         visible_columns.push("link")
         this.gridApi.exportDataAsExcel({
           fileName: `method_list_${timestampForFile()}.xlsx`,
@@ -250,6 +249,7 @@
       },
       resetFilters() {
         this.gridApi.setFilterModel(null);
+        this.full_table_filter = ""
         this.quickFilter("")
       },
     },

@@ -199,7 +199,6 @@
         document.body.removeChild(textarea)
       },
       getDocumentHref(record_type) {
-        console.log(record_type)
         if (record_type==="fact sheet") {
           return `/view_fact_sheet/${this.internalID}`
         } else if (record_type==="method") {

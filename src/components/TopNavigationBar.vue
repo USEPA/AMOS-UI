@@ -10,7 +10,7 @@
     <div class="nav-bar-left">
       <div style="text-align: start;">
         <router-link to="/" style="font-size: larger">AMOS</router-link>
-        <div style="font-size: smaller">Version: 2025-04-10</div>
+        <div style="font-size: smaller">Version: 2025-04-16</div>
       </div>
       &emsp;
       <input v-model="searchTerm" name="search-term" title="General search input field" type="text" @keyup.enter="go()">

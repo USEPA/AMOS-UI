@@ -2,6 +2,14 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2025-04-16</summary>
+    <ul>
+      <li>A backend update of the a library broke tables on a lot of pages; most of those have now been fixed.</li>
+      <li>The ability to filter by molecular formula has been added to the MS1 NTA job page.</li>
+      <li>To temporarily work around an issue with the retrieval of NTA results files, a "Download Only" button has been added for now.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2025-04-10</summary>
     <ul>
       <li>The 'InChIKey first block' search will now accept a full InChIKey (and will just take the first block).  A warning message was added for when the input is clearly not formatted as either a first block or a whole InChIKey.</li>

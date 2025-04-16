@@ -13,7 +13,7 @@
     <details>
       <summary>Additional information</summary>
       <div style="margin: 10px">
-        <p>Understanding a chemical's amenability to solubilization and stability in the vehicle chosen to solubilize the chemical informs on the chemical s applicability domain for <i>in vitro</i> screening. The Analytical QC methods applied here can detect if chemicals will be stable and detectable in solubilization at time points, or provide insight into possible degradation products. Substance-level calls summarize results from analytical quality control (QC) experiments across individual samples, whereas individual samples (hidden by default) may not always be subjected to the same analytical detection methods. Visit the <a href="https://cran.r-project.org/web/packages/tcpl/vignettes/Introduction_Appendices.html#analytical-qc-and-applicability-domain"><code>tcpl</code> library vignette's Analytical QC and Applicability Domain section</a> for more information on logic used to populate pass or caution determination and flags.</p>
+        <p>Understanding a chemical's amenability to solubilization and stability in the vehicle chosen to solubilize the chemical informs on the chemical's applicability domain for <i>in vitro</i> screening. The Analytical QC methods applied here can detect if chemicals will be stable and detectable in solubilization at time points, or provide insight into possible degradation products. Substance-level calls summarize results from analytical quality control (QC) experiments across individual samples, whereas individual samples (hidden by default) may not always be subjected to the same analytical detection methods. Visit the <a href="https://cran.r-project.org/web/packages/tcpl/vignettes/Introduction_Appendices.html#analytical-qc-and-applicability-domain"><code>tcpl</code> library vignette's Analytical QC and Applicability Domain section</a> for more information on logic used to populate pass or caution determination and flags.</p>
         <p>Measurements are taken at two time points: T0 (a compound has just been taken out of the freezer) and T4 (a compound has been kept at room temperature for four months).</p>
         <p>The definitions of the grades are as follows:</p>
         <table class="analyticalqc-grades">
@@ -118,6 +118,7 @@
     @filter-changed="onFilterChanged"
     :tooltipShowDelay="500"
     :suppressCopyRowsToClipboard="true"
+    :animateRows="false"
   ></ag-grid-vue>
 </template>
 
@@ -194,6 +195,8 @@
       }
     },
     async mounted() {
+      const timerFunc = (t) => new Promise(resolve => setTimeout(resolve, t))
+
       const count_response = await axios.get(`${this.BACKEND_LOCATION}/record_type_count/analytical_qc`)
       const analytical_qc_count = count_response.data.record_count
       this.status.full_count = analytical_qc_count
@@ -206,21 +209,23 @@
         const batch_results = batch_response.data.results
         this.aqc_data = this.aqc_data.concat(batch_results)
       }
+      // pause for half a second to make sure the last batch of data is properly loaded
+      await timerFunc(500)
       this.status.loading = false
       this.gridApi.onFilterChanged();
 
       const query_params = Object.keys(this.$route.query)
       if (query_params.length == 0) {
         // filter NIST GCMS records out by default if no query parameters were passed
-        var set_filter_values = this.gridApi.getFilterInstance("study").getValues()
-        set_filter_values = set_filter_values.filter(x => x !== "NIST GCMS")
-        this.gridApi.getFilterInstance("study").setModel({type: 'set', values: set_filter_values})
+        const study_filter = await this.gridApi.getColumnFilterInstance("study")
+        var set_filter_values = study_filter.getFilterKeys().filter(x => x !== "NIST GCMS")
+        this.gridApi.setColumnFilterModel("study", {type: 'set', values: set_filter_values})
       } else {
         const filter_object = queryParamsToFilters(this.$route.query, [], this.SET_FILTER_COLUMNS, this.TEXT_FILTER_COLUMNS)
         this.gridApi.setFilterModel(filter_object)
       }
       this.gridApi.onFilterChanged();
-      this.gridColumnApi.applyColumnState({state: [
+      this.gridApi.applyColumnState({state: [
         {colId: "preferred_name", sort: "asc", sortIndex: 0},
         {colId: "sample_id", sort: "asc", sortIndex: 1}
       ]})
@@ -228,7 +233,6 @@
     methods: {
       onGridReady(params) {
         this.gridApi = params.api
-        this.gridColumnApi = params.columnApi
         this.gridApi.onFilterChanged();
       },
       onRowSelected(event){
@@ -251,7 +255,7 @@
       },
       saveFiltersAsURL() {
         const all_filters = this.gridApi.getFilterModel();
-        const base_url = window.location.origin + this.$route.path
+        const base_url = window.location.origin + "/amos" + this.$route.path
         const url = filtersToURL(base_url, all_filters)
         
         // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I

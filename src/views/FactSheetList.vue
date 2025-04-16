@@ -49,6 +49,7 @@
       :doesExternalFilterPass="doesExternalFilterPass"
       :tooltipShowDelay="400"
       :suppressCopyRowsToClipboard="true"
+      :animateRows="false"
     ></ag-grid-vue>
     <BModal size="xl" v-model="disambiguation.inchikey">
       <InchikeyDisambiguation :searchedKey="substance_identifier" :substances="possible_substances" :record_counts="record_counts_by_dtxsid" @inchikeySelected="disambiguate" />
@@ -135,10 +136,7 @@
     },
 
     async created() {
-      /* const path = `${this.BACKEND_LOCATION}/fact_sheet_list`
-      const response = await axios.get(path)
-      this.fact_sheet_info = response.data.results
-      this.status.loading = false */
+      const timerFunc = (t) => new Promise(resolve => setTimeout(resolve, t))
 
       const count_response = await axios.get(`${this.BACKEND_LOCATION}/record_type_count/fact_sheets`)
       const fact_sheet_count = count_response.data.record_count
@@ -152,6 +150,8 @@
         const batch_results = batch_response.data.results
         this.fact_sheet_info = this.fact_sheet_info.concat(batch_results)
       }
+      // pause for half a second to make sure the last batch of data is properly loaded
+      await timerFunc(500)
       this.status.loading = false
       this.gridApi.onFilterChanged();
     },
@@ -159,12 +159,11 @@
     methods: {
       onGridReady(params) {
         this.gridApi = params.api;
-        this.gridColumnApi = params.columnApi;
         
         // load query parameters
         if (Object.keys(this.$route.query).includes("full_table")) {
           this.full_table_filter = this.$route.query["full_table"]
-          this.gridApi.setQuickFilter(this.full_table_filter)
+          this.gridApi.setGridOption('quickFilterText', this.full_table_filter)
         }
         const filter_object = queryParamsToFilters(this.$route.query, this.NUMERIC_COLUMNS, [], this.TEXT_COLUMNS)
         this.gridApi.setFilterModel(filter_object)
@@ -232,7 +231,7 @@
       },
       saveFiltersAsURL() {
         const current_filters = this.gridApi.getFilterModel();
-        var url = filtersToURL(window.location.origin + this.$route.path, current_filters)
+        var url = filtersToURL(window.location.origin + "/amos" + this.$route.path, current_filters)
         if (this.full_table_filter) {
           url = url + `full_table=${this.full_table_filter}`
         }
@@ -259,7 +258,7 @@
         this.substance_count = count_response.data.count
       },
       quickFilter(input) {
-        this.gridApi.setQuickFilter(input)
+        this.gridApi.setGridOption('quickFilterText', input)
       },
       async downloadSubstancesInDocs() {
         const internal_id_list = Array(this.filtered_record_count).fill().map((_,idx) => this.gridApi.getDisplayedRowAtIndex(idx).data.internal_id)
@@ -274,10 +273,11 @@
       },
       resetFilters() {
         this.gridApi.setFilterModel(null);
+        this.full_table_filter = ""
         this.quickFilter("")
       },
       downloadCurrentTable() {
-        var columns = this.gridColumnApi.getAllDisplayedColumns().map(x => x.colId)
+        var columns = this.gridApi.getAllDisplayedColumns().map(x => x.colId)
         if (!columns.includes("link")) {
           columns.push("link")
         }
