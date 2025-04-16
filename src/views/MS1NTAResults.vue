@@ -47,19 +47,19 @@
       <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="occurrence_heatmap" @click="loadOccurrenceHeatmap">Occurrence Heatmap</label>
       <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="run_sequence_plots" @click="loadRunSequencePlots" :disabled="!has_run_sequence">Run Sequence Plot</label>
     </div>
-    <div v-if="current_visualization=='cv_scatterplot'">
+    <div v-if="current_visualization==='cv_scatterplot'">
       <p v-if="status.loading_viz">Loading... <i class="mdi mdi-progress-clock mdi-spin"/></p>
       <img v-else :src="scatterplot_image_blob" />
     </div>
-    <div v-else-if="current_visualization=='decision_tree'">
+    <div v-else-if="current_visualization==='decision_tree'">
       <p v-if="status.loading_viz">Loading... <i class="mdi mdi-progress-clock mdi-spin"/></p>
       <DecisionTree v-else :parametersCSVString="csv_strings.parameters" :resultsCSVString="csv_strings.results" />
     </div>
-    <div v-else-if="current_visualization=='occurrence_heatmap'">
+    <div v-else-if="current_visualization==='occurrence_heatmap'">
       <p v-if="status.loading_viz">Loading... <i class="mdi mdi-progress-clock mdi-spin"/></p>
       <OccurrenceHeatmap v-else :workbook="excel_workbook" />
     </div>
-    <div v-else-if="current_visualization=='run_sequence_plots'">
+    <div v-else-if="current_visualization==='run_sequence_plots'">
       <p v-if="status.loading_viz">Loading... <i class="mdi mdi-progress-clock mdi-spin"/></p>
       <RunSequencePlot v-else :workbook="excel_workbook" />
     </div>
@@ -68,8 +68,8 @@
 
 <script>
   import axios from 'axios'
-  import * as JSZip from 'jszip'
-  import * as XLSX from 'xlsx'
+  import JSZip from 'jszip'
+  import XLSX from 'xlsx'
 
   import DecisionTree from '@/components/DecisionTree.vue'
   import OccurrenceHeatmap from '@/components/OccurrenceHeatmap.vue'
@@ -97,12 +97,11 @@
       const status_url = "https://qed-dev.edap-cluster.com/nta/ms1/status/" + this.$route.params.job_id
       var response = await axios.get(status_url).catch((e) => {
         this.status.job = "Error"
-        return
       })
-      if (this.status.job == "Error") {
+      if (this.status.job === "Error") {
         return
       }
-      while ((response.data.status == "Processing") || (response.data.status == "Not found")){
+      while ((response.data.status === "Processing") || (response.data.status === "Not found")){
         console.log("Checking...")
         await timerFunc(5000)
         response = await axios.get(status_url)
