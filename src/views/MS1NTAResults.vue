@@ -69,7 +69,7 @@
 
 <script>
   import axios from 'axios'
-  import * as JSZip from 'jszip'
+  import JSZip from 'jszip'
   import * as XLSX from 'xlsx'
 
   import DecisionTree from '@/components/DecisionTree.vue'
