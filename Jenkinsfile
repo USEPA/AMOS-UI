@@ -9,8 +9,6 @@ pipeline {
 
         IMAGE_NAME = 'amos-ui'
         IMAGE_TAG = 'latest'
-
-        VITE_INTERNAL_DEPLOYMENT=true
     }
 
     stages {
