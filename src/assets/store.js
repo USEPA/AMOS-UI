@@ -345,5 +345,5 @@ export const ELEMENTS = {
 
 export const store = reactive({
     showHeaderAndFooter: false,
-	internalDeployment: true,
+	internalDeployment: INTERNAL_DEPLOYMENT,
 })
