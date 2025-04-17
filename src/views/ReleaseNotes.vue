@@ -6,7 +6,7 @@
     <ul>
       <li>A backend update of the a library broke tables on a lot of pages; most of those have now been fixed.</li>
       <li>The ability to filter by molecular formula has been added to the MS1 NTA job page.</li>
-      <li>To temporarily work around an issue with the retrieval of NTA results files, a "Download Only" button has been added for now.</li>
+      <!-- <li>To temporarily work around an issue with the retrieval of NTA results files, a "Download Only" button has been added for now.</li> -->
     </ul>
   </details>
   <details>
