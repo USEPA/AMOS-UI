@@ -75,6 +75,7 @@
     :rowData="substances"
     @grid-ready="onGridReady"
     @filter-changed="onFilterChanged"
+    @row-double-clicked="onDoubleClick"
     rowSelection="multiple"
     :suppressCopyRowsToClipboard="true"
   ></ag-grid-vue>
@@ -231,7 +232,7 @@
       },
       classificationToURL() {
         const parameters = `kingdom=${this.kingdom}&superclass=${this.superklass}&class=${this.klass}&subclass=${this.subklass}`
-        const url = `${window.location.origin}${this.$route.path}?${parameters}`
+        const url = `${window.location.origin}/amos${this.$route.path}?${parameters}`
 
         // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
         // can't get that to work in this app, though, since it apparently requires a secured connection and the
@@ -250,10 +251,9 @@
       },
       onGridReady(params) {
         this.gridApi = params.api
-        this.gridColumnApi = params.columnApi
         this.gridApi.onFilterChanged()
 
-        this.gridColumnApi.applyColumnState({state: [
+        this.gridApi.applyColumnState({state: [
           {colId: "methods", sort: "desc", sortIndex: 0},
           {colId: "fact_sheets", sort: "desc", sortIndex: 1},
           {colId: "spectra", sort: "desc", sortIndex: 2}
@@ -284,6 +284,7 @@
         this.subklass = ""
       },
       async getSubstances() {
+        const timerFunc = (t) => new Promise(resolve => setTimeout(resolve, t))
         this.state.searching = true
         const response = await axios.post(`${this.BACKEND_LOCATION}/substances_for_classification/`, {kingdom: this.kingdom, superklass: this.superklass, klass: this.klass, subklass: this.subklass})
         var found_substances = response.data.substances
@@ -292,6 +293,7 @@
           found_substances[i]["data_available"] = found_substances[i].count > 0 ? "Yes" : "No"
         }
         this.substances = found_substances
+        await timerFunc(200)
         this.state.searching = false
         this.gridApi.onFilterChanged()
       },
@@ -312,6 +314,9 @@
           fileName: `classyfire_${this.kingdom}-${this.superklass}-${this.klass}-${this.subklass}.xlsx`,
           columnKeys: ['dtxsid', 'casrn', 'preferred_name', 'monoisotopic_mass', 'molecular_formula']
         })
+      },
+      onDoubleClick(event) {
+        window.open(`search/${event.data.dtxsid}`)
       }
     },
     components: {AgGridVue, BAlert, RecordCountFilter}

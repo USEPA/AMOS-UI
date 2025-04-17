@@ -55,6 +55,7 @@
     :doesExternalFilterPass="doesExternalFilterPass"
     rowSelection="multiple"
     :suppressCopyRowsToClipboard="true"
+    :animateRows="false"
   ></ag-grid-vue>
 </template>
 
@@ -213,6 +214,7 @@
     },
     methods: {
       async runPartialSearch() {
+        const timerFunc = (t) => new Promise(resolve => setTimeout(resolve, t))
         this.status.searching = true
         this.status.search_complete = false
 
@@ -248,18 +250,20 @@
         }
         this.substances = substances
         
-        this.gridColumnApi.setColumnsVisible(['synonyms'], this.search_type === "substring_search")
+        this.gridApi.setColumnsVisible(['synonyms'], this.search_type === "substring_search")
         if (this.search_type === "mass_range_search") {
-          this.gridColumnApi.applyColumnState({state: [
+          this.gridApi.applyColumnState({state: [
             {colId: "spectra", sort: "desc", sortIndex: 0}
           ]})
         } else {
-            this.gridColumnApi.applyColumnState({state: [
+            this.gridApi.applyColumnState({state: [
             {colId: "methods", sort: "desc", sortIndex: 0},
             {colId: "fact_sheets", sort: "desc", sortIndex: 1},
             {colId: "spectra", sort: "desc", sortIndex: 2}
           ]})
         }
+        // pause for half a second
+        await timerFunc(500)
         this.gridApi.onFilterChanged()
         this.status.search_complete = true
         this.status.searching = false
@@ -300,7 +304,7 @@
         return (input.search(FULL_INCHIKEY_MATCH) != -1) | (input.search(FIRST_BLOCK_MATCH) != -1)
       },
       downloadSearchResults() {
-        let visible_columns = this.gridColumnApi.getAllDisplayedColumns().map(x => x.colId)
+        let visible_columns = this.gridApi.getAllDisplayedColumns().map(x => x.colId)
 
         this.gridApi.exportDataAsExcel({
           fileName: `${this.search_type}.xlsx`,

@@ -23,6 +23,7 @@
     :rowData="source_info"
     rowSelection="single"
     :suppressCopyRowsToClipboard="true"
+    :animateRows="false"
     @grid-ready="onGridReady"
   ></ag-grid-vue>
 </template>
@@ -77,10 +78,9 @@
     methods: {
       onGridReady(params) {
         this.gridApi = params.api;
-        this.gridColumnApi = params.columnApi;
       },
       quickFilter(input) {
-        this.gridApi.setQuickFilter(input)
+        this.gridApi.setGridOption('quickFilterText', input)
       },
     },
     components: {AgGridVue, DataSourceDetails, HelpIcon}

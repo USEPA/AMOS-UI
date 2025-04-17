@@ -85,7 +85,7 @@
     </div>
   </div>
   <!-- Modal window that displays the spectrum in an AG Grid table.-->
-  <BModal v-model="show_modal.table">
+  <BModal id="spectrum_table" v-model="show_modal.table">
     <ag-grid-vue
       class="ag-theme-balham"
       style="height:600px; width:100%"
@@ -93,6 +93,7 @@
       :rowData="spectrumAsRows(row_data.spectrum)"
       rowSelection="single"
       :suppressCopyRowsToClipboard="true"
+      :animateRows="false"
     ></ag-grid-vue>
     <button @click="copySpectrum()">Copy to Clipboard</button>
   </BModal>
@@ -147,7 +148,7 @@
             return "<a href='" + this.$router.resolve(`search/${params.value}`).href + "' target='_blank'>" + params.value + "</a> (" + this.substance_mapping[params.value] + ")"
           }},
           {field: 'similarity', headerName: "Similarity", width: 100, sort: "desc", aggFunc: 'max', cellRenderer:'agGroupCellRenderer', cellRendererParams: {
-            innerRenderer: params => {return params.value.toFixed(4)}
+            innerRenderer: params => {if (params.value !== null){return params.value.toFixed(4)}}
           }},
           {field: 'description', headerName: 'Description', flex: 1},
           {field: 'internal_id', headerName: 'Internal ID', hide: true}
@@ -201,7 +202,10 @@
         }
       },
       onFilterChanged() {
-        this.visible_info.spectra = this.gridApi.getModel().rootNode.allChildrenCount
+        //this.visible_info.spectra = this.gridApi.getModel().rootNode.allChildrenCount
+        var spectrum_count = 0
+        this.gridApi.forEachNodeAfterFilter(x => {spectrum_count += x.childrenAfterFilter ? x.childrenAfterFilter.length : 0})
+        this.visible_info.spectra = spectrum_count
         this.visible_info.substances = this.gridApi.getDisplayedRowCount()
       },
       isExternalFilterPresent() {
@@ -209,6 +213,23 @@
       }, 
       doesExternalFilterPass(node) {
         return node.data.similarity > this.min_spectrum_similarity
+      },
+      copySpectrum() {
+        const spectrum_string = "m/z Intensity\n" + this.row_data.spectrum.map(x => `${x[0]} ${x[1]}`).join("\n");
+        // NOTE: the preferred way to copy to clipboard is apparently "navigator.clipboard.writeText()" these days. I
+        // can't get that to work in this app, though, since it apparently requires a secured connection and the
+        // deployed version of this app doesn't have that.  So I'm sticking to this technically-depricated solution that
+        // I pulled out of CompTox's code, since it apparently works there.
+        const textarea = document.createElement('textarea')
+        textarea.value = spectrum_string
+        document.getElementById("spectrum_table").appendChild(textarea)
+        textarea.select()
+        try {
+          document.execCommand('copy')
+        } catch (err) {
+          console.log('Cannot copy: ' + err)
+        }
+        document.getElementById("spectrum_table").removeChild(textarea)
       },
       spectrumAsRows(selected_spectrum) {
         return selected_spectrum.map(function(x){return {"m/z":x[0], "intensity":x[1]}})

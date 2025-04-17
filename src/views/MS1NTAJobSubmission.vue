@@ -17,7 +17,7 @@
   <BAccordion free>
     <BAccordionItem title="Input Files" :button-class="{highlightError: errors.no_input_file}" visible>
       <div style="display: flex; align-items: center; padding-bottom: 10px">
-        Run quantitative NTA (qNTA) Analysis &nbsp; <BFormSelect v-model="do_qnta" :options="yes_no_options" size="sm" style="width: auto;" disabled/> &nbsp; (Temporarily disabled)
+        Run quantitative NTA (qNTA) Analysis &nbsp; <BFormSelect v-model="do_qnta" :options="yes_no_options" size="sm" style="width: auto;"/>
       </div>
       <table class="nostripe job-submission-input-table">
         <tr>
@@ -66,11 +66,11 @@
         </tr>
         <tr>
           <th>qNTA surrogate file:</th>
-          <td><input type="file" id="qnta_surrogate" :disabled="do_qnta == 'no'"> (Temporarily disabled)</td>
+          <td><input type="file" id="qnta_surrogate_file" :disabled="do_qnta == 'no'"></td>
         </tr>
         <tr>
           <th>qNTA external validation file:</th>
-          <td><input type="file" id="qnta_validation" :disabled="do_qnta == 'no'"> (Temporarily disabled)</td>
+          <td><input type="file" id="qnta_validation_file" disabled> (Temporarily disabled)</td>
         </tr>
       </table>
     </BAccordionItem>
@@ -235,6 +235,10 @@
           <td><input type="number" step="0.1" v-model="max_replicate_cv"></td>
         </tr>
         <tr>
+          <th>Filter on CV values?</th>
+          <td><BFormSelect v-model="filter_on_cv_values" :options="yes_no_options" size="sm" style="width: auto;"/></td>
+        </tr>
+        <tr>
           <th>
             MRL standard deviation multiplier:
             <HelpIcon tooltipText="The minimum reporting limit (MRL) for each chemical feature is calculated as: <br /> x<sub>b</sub>&#177;(σ*y) <br /> where x<sub>b</sub> is the mean abundance of the chemical feature in the blanks, σ is the standard deviation of the chemical feature in the blanks, and y is the selected multiplier." :html="true" />
@@ -270,7 +274,7 @@
           Search Cheminformatics Hazard Module for toxicity data:
           <HelpIcon tooltipText="Whether candidate chemicals from DSSTox should have Hazard Information pulled down from the Cheminformatics Hazard module." />
         </th>
-        <td><BFormSelect v-model="search_hcd" :options="yes_no_options" size="sm" style="width: auto;" @change="hcd_dsstox"/></td>
+        <td><BFormSelect v-model="search_hcd" :options="yes_no_options" size="sm" style="width: auto;" @change="forceHcdDsstox"/></td>
       </tr>
       <tr>
         <th>
@@ -280,6 +284,12 @@
         <td><BFormSelect v-model="dsstox_search_mode" :options="search_mode_options" size="sm" style="width: auto;"/></td>
       </tr>
       </table>
+    </BAccordionItem>
+    <BAccordionItem title="Molecular Formula Filtering" visible>
+      <div style="display: flex; align-items: center; padding-bottom: 10px;">
+        Fitler by molecular formula range &nbsp; <BFormSelect v-model="do_atom_filtering" :options="yes_no_options" size="sm" style="width: auto;" />
+      </div>
+      <FormulaRangeInput ref="formulaInput"/>
     </BAccordionItem>
   </BAccordion>
   <div style="padding: 10px;">
@@ -295,13 +305,15 @@
 <script>
   import axios from 'axios'
   import { BAccordion, BAccordionItem, BAlert, BFormSelect } from 'bootstrap-vue-next'
-  import { toRaw } from 'vue'
-
+  
+  //import { INTERPRET_API_KEY } from '@/assets/store.js'
+  import FormulaRangeInput from '@/components/FormulaRangeInput.vue'
   import HelpIcon from '@/components/HelpIcon.vue'
 
   export default {
     data() {
       return {
+        //INTERPRET_API_KEY,
         mass_unit_options: ["Da", "ppm"],
         mrl_std_multiplier_options: ['3', '5', '10'],
         search_mode_options: ['mass', 'formula'],
@@ -332,11 +344,13 @@
         minimum_retention_time: 0.0,
         na_value: "",
         errors: {any: false, no_project_name: false, no_input_file: false},
-        do_qnta: "no"
+        do_qnta: "no",
+        filter_on_cv_values: "yes",
+        do_atom_filtering: "no"
       }
     },
     methods: {
-      hcd_dsstox() {
+      forceHcdDsstox() {
         if (this.search_hcd == 'yes') {
           this.search_dsstox = 'yes'
         }
@@ -406,17 +420,21 @@
           search_mode: this.dsstox_search_mode,
           na_val: this.na_value,
           do_qnta: this.do_qnta,
+          qnta_input: document.getElementById("qnta_surrogate_file").files[0],
+          atom_ranges: this.$refs.formulaInput.$data.current_elements,
+          do_atom_filtering: this.do_atom_filtering
         }
         
         const response = await axios.postForm("https://qed-dev.edap-cluster.com/nta/ms1/external/input/", payload)
         const job_id_regex = /Job ID: ([A-Za-z0-9]*)/
         const match = response.data.match(job_id_regex)
         const job_id = match[1]
-        
-        // new endpoint-hitting code
-        //const response = await axios.post("https://qed-dev.edap-cluster.com/nta/ms1/api/run", payload, {headers: {'Content-Type': 'multipart/form-data'}})
-
         this.$router.push(`/ms1_nta/results/${job_id}`)
+        
+        // new endpoint-hitting code; waiting on Josh to add API endpoint envar
+        // const response = await axios.post("https://qed-dev.edap-cluster.com/nta/ms1/api/run", payload, {headers: {'Content-Type': 'multipart/form-data', 'X-API-Key': this.INTERPRET_API_KEY}})
+        // this.$router.push(`/ms1_nta/results/${response.data.job_id}`)
+
         
       },
       getDateTime() {
@@ -469,7 +487,7 @@
         document.getElementById('tracer_file').value = null
       }
     },
-    components: { BAccordion, BAccordionItem, BAlert, BFormSelect, HelpIcon }
+    components: { BAccordion, BAccordionItem, BAlert, BFormSelect, FormulaRangeInput, HelpIcon }
   }
 </script>
 
