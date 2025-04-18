@@ -21,11 +21,11 @@
     <p>Job completed successfully.</p>
     <p>Job start time: {{ job_start_time }}</p>
     <p>Use the buttons below to download the results or to load the results into the browser for use with visualizations.  Result files are stored in a zip file that may be tens of megabytes in size; downloading the file may take a moment.</p>
-    <p>NOTE: Due to temporary issues, the "Load Results" and "Download Results File" buttons may not work and visualizations may be inaccessible.  Use the "Only Download" button to retrieve the file instead.</p>
+    <!-- <p>NOTE: Due to temporary issues, the "Load Results" and "Download Results File" buttons may not work and visualizations may be inaccessible.  Use the "Only Download" button to retrieve the file instead.</p> -->
     <div>
       <button @click="loadResultsFile($route.params.job_id)">Load Results</button>
       <button @click="downloadResults($route.params.job_id)">Download Results File (ZIP)</button>
-      <button @click="downloadOnly($route.params.job_id)">Only Download (Temporary)</button>
+      <!-- <button @click="downloadOnly($route.params.job_id)">Only Download (Temporary)</button> -->
     </div>
   </div>
   <div v-else-if="status.job == 'Error'">
