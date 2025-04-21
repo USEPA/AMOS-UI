@@ -9,6 +9,7 @@
 -->
 
 <template>
+  <p>For more information about INTERPRET NTA, see <a href="https://whitehead-heather.github.io/INTERPRETNTA/#ms1-data-processing-workflow" target="_blank">this manual.</a></p>
   <div style="padding: 10px;">
     <label><strong>Project name:</strong> &nbsp; <input type="text" v-model="project_name"></label>
     &nbsp; <HelpIcon style="vertical-align:middle;" tooltipText="Enter a unique name for each new NTA job run." />
@@ -207,7 +208,7 @@
         </tr>
       </table>
     </BAccordionItem>
-    <BAccordionItem title="QA/QC Paramters" visible>
+    <BAccordionItem title="QA/QC Parameters" visible>
       <table class="nostripe job-submission-input-table">
         <tr>
           <th>
@@ -287,7 +288,7 @@
     </BAccordionItem>
     <BAccordionItem title="Molecular Formula Filtering" visible>
       <div style="display: flex; align-items: center; padding-bottom: 10px;">
-        Fitler by molecular formula range &nbsp; <BFormSelect v-model="do_atom_filtering" :options="yes_no_options" size="sm" style="width: auto;" />
+        Filter by molecular formula range &nbsp; <BFormSelect v-model="do_atom_filtering" :options="yes_no_options" size="sm" style="width: auto;" />
       </div>
       <FormulaRangeInput ref="formulaInput"/>
     </BAccordionItem>

@@ -3,6 +3,7 @@
   <ul>
     <li><router-link to="/ms1_nta/submit/">MS1 Job Submission</router-link>: Runs NTA on user-supplied spectral data.</li>
   </ul>
+  <p>For more information about INTERPRET NTA, see <a href="https://whitehead-heather.github.io/INTERPRETNTA/#ms1-data-processing-workflow" target="_blank">this manual.</a></p>
 </template>
 
 <script>
