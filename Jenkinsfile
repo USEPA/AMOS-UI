@@ -28,8 +28,8 @@ pipeline {
         }
 
         stage('Dockerize') {
-			withCredentials([string(credentialsId: 'INTERPRET_API_KEY', variable: 'INTERPRET_API_KEY')]) {
-				steps {
+			steps {
+				withCredentials([string(credentialsId: 'INTERPRET_API_KEY', variable: 'INTERPRET_API_KEY')]) {
 					sh "docker buildx use mybuilder"
 					sh "docker buildx build --platform linux/amd64 --tag ${DOCKER_REGISTRY}/epa/${IMAGE_NAME}:${IMAGE_TAG} --build-arg INTERNAL_DEPLOYMENT=false --build-arg INTERPRET_API_KEY=$INTERPRET_API_KEY --push ."
 				}
