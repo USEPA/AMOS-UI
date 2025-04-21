@@ -21,7 +21,7 @@ COPY . .
 
 RUN npm install
 
-RUN npm run build
+RUN env && npm run build
 
 FROM nginx:alpine
 
