@@ -28,3 +28,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           image_name: ${{ github.repository }}-${{ github.head_ref || github.ref_name }}
           env_text: ${{vars.ENV_TEXT}}
+          build_args: | 
+            VITE_INTERNAL_DEPLOYMENT=true
+            VITE_INTERPRET_API_KEY=tSCcCm8uzP4CVWm_Eshpx8DqBrhBS1xuGik1t9HD0X0
+          
