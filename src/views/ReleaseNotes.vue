@@ -2,6 +2,16 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2025-04-22</summary>
+    <ul>
+      <li>Fixed a few tables that were still broken after the last update.</li>
+      <li>A search field has been added to the general search results which filters on the full results table.</li>
+      <li>The results table in the general search will now clear any fields that are hidden by switching between record type filters (spectra/fact sheets/methods/all)</li>
+      <li>Fixed a few typos.</li>
+      <!--NTA--> <li>A new visualization has been added to the MS1 NTA results -- the strip plot, which gives substance-level views of some surrogate statistics.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2025-04-16</summary>
     <ul>
       <li>A backend update of the a library broke tables on a lot of pages; most of those have now been fixed.</li>
