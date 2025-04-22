@@ -128,12 +128,15 @@
         const res = await axios.get("https://qed-dev.edap-cluster.com/nta/ms1/api/output/" + job_id, {responseType: "blob", headers: {'X-API-Key': INTERPRET_API_KEY}})
         this.zip_blob = res.data
 
-        const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
-        const workbook = XLSX.read(excel_array, {WTF: true})
-        if (workbook.SheetNames.includes("Run Sequence (pos)") || workbook.SheetNames.includes("Run Sequence (neg)")) {
+        const qaqc_array = await this.extractFileFromWorkbook(/QAQC\.xlsx$/, "arrayBuffer")
+        const qaqc_workbook = XLSX.read(qaqc_array, {WTF: true})
+        if (qaqc_workbook.SheetNames.includes("Run Sequence (pos)") || qaqc_workbook.SheetNames.includes("Run Sequence (neg)")) {
           this.viz_selection.has_run_sequence = true
         }
-        if (workbook.SheetNames.includes("Surrogate Detection Statistics")) {
+
+        const qnta_array = await this.extractFileFromWorkbook(/qNTA\.xlsx$/, "arrayBuffer")
+        const qnta_workbook = XLSX.read(qnta_array, {WTF: true})
+        if (qnta_workbook.SheetNames.includes("Surrogate Detection Statistics")) {
           this.viz_selection.has_surrogate_statistics = true
         }
 
@@ -174,7 +177,7 @@
       async loadDecisionTree() {
         this.status.loading_viz = true
         this.current_visualization = "decision_tree"
-        const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
+        const excel_array = await this.extractFileFromWorkbook(/QAQC\.xlsx/, "arrayBuffer")
         const workbook = XLSX.read(excel_array)
 
         const worksheet_names = workbook.SheetNames
@@ -199,21 +202,21 @@
       async loadOccurrenceHeatmap() {
         this.status.loading_viz = true
         this.current_visualization = "occurrence_heatmap"
-        const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
+        const excel_array = await this.extractFileFromWorkbook(/QAQC\.xlsx/, "arrayBuffer")
         this.excel_workbook = XLSX.read(excel_array)
         this.status.loading_viz = false
       },
       async loadRunSequencePlots() {
         this.status.loading_viz = true
         this.current_visualization = "run_sequence_plots"
-        const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
+        const excel_array = await this.extractFileFromWorkbook(/QAQC\.xlsx/, "arrayBuffer")
         this.excel_workbook = XLSX.read(excel_array)
         this.status.loading_viz = false
       },
       async loadStripPlot() {
         this.status.loading_viz = true
         this.current_visualization = "strip_plot"
-        const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
+        const excel_array = await this.extractFileFromWorkbook(/qNTA\.xlsx/, "arrayBuffer")
         this.excel_workbook = XLSX.read(excel_array)
         //this.json_data = XLSX.utils.sheet_to_json("Surrogate Detection Statistics");
         this.status.loading_viz = false
