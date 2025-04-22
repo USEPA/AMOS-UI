@@ -67,7 +67,7 @@
     </div>
     <div v-else-if="current_visualization==='strip_plot'">
       <p v-if="status.loading_viz">Loading... <i class="mdi mdi-progress-clock mdi-spin"/></p>
-      <StripPlot v-else :jsonData="excel_workbook" />
+      <StripPlot v-else :workbook="excel_workbook" />
     </div>
   </div>
 </template>
@@ -97,7 +97,7 @@
         status: {job: "Not found", retrieving_file: false, file_retrieved: false, loading_viz: false},
         csv_strings: {parameters: "", results: ""},
         excel_workbook: null,
-        json_data: null,
+        //json_data: null,
         viz_selection: {has_run_sequence: false, has_surrogate_statistics: false}
       }
     },
@@ -215,7 +215,7 @@
         this.current_visualization = "strip_plot"
         const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
         this.excel_workbook = XLSX.read(excel_array)
-        this.json_data = XLSX.utils.sheet_to_json("Surrogate Detection Statistics");
+        //this.json_data = XLSX.utils.sheet_to_json("Surrogate Detection Statistics");
         this.status.loading_viz = false
       }
     },
