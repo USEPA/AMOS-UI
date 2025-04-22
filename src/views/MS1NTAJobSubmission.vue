@@ -307,14 +307,14 @@
   import axios from 'axios'
   import { BAccordion, BAccordionItem, BAlert, BFormSelect } from 'bootstrap-vue-next'
   
-  //import { INTERPRET_API_KEY } from '@/assets/store.js'
+  import { INTERPRET_API_KEY } from '@/assets/store.js'
   import FormulaRangeInput from '@/components/FormulaRangeInput.vue'
   import HelpIcon from '@/components/HelpIcon.vue'
 
   export default {
     data() {
       return {
-        //INTERPRET_API_KEY,
+        INTERPRET_API_KEY,
         mass_unit_options: ["Da", "ppm"],
         mrl_std_multiplier_options: ['3', '5', '10'],
         search_mode_options: ['mass', 'formula'],
@@ -426,15 +426,15 @@
           do_atom_filtering: this.do_atom_filtering
         }
         
-        const response = await axios.postForm("https://qed-dev.edap-cluster.com/nta/ms1/external/input/", payload)
+        /* const response = await axios.postForm("https://qed-dev.edap-cluster.com/nta/ms1/external/input/", payload)
         const job_id_regex = /Job ID: ([A-Za-z0-9]*)/
         const match = response.data.match(job_id_regex)
         const job_id = match[1]
-        this.$router.push(`/ms1_nta/results/${job_id}`)
+        this.$router.push(`/ms1_nta/results/${job_id}`) */
         
         // new endpoint-hitting code; waiting on Josh to add API endpoint envar
-        // const response = await axios.post("https://qed-dev.edap-cluster.com/nta/ms1/api/run", payload, {headers: {'Content-Type': 'multipart/form-data', 'X-API-Key': this.INTERPRET_API_KEY}})
-        // this.$router.push(`/ms1_nta/results/${response.data.job_id}`)
+        const response = await axios.post("https://qed-dev.edap-cluster.com/nta/ms1/api/run", payload, {headers: {'Content-Type': 'multipart/form-data', 'X-API-Key': this.INTERPRET_API_KEY}})
+        this.$router.push(`/ms1_nta/results/${response.data.job_id}`)
 
         
       },

@@ -46,7 +46,8 @@
       <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="cv_scatterplot" @click="loadCVScatterplot">CV Scatterplot</label>
       <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="decision_tree" @click="loadDecisionTree">Decision Tree</label>
       <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="occurrence_heatmap" @click="loadOccurrenceHeatmap">Occurrence Heatmap</label>
-      <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="run_sequence_plots" @click="loadRunSequencePlots" :disabled="!has_run_sequence">Run Sequence Plot</label>
+      <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="run_sequence_plots" @click="loadRunSequencePlots" :disabled="!viz_selection.has_run_sequence">Run Sequence Plot</label>
+      <label style="padding: 5px;"><input type="radio" v-model="selected_visualization" value="strip_plot" @click="loadStripPlot" :disabled="!viz_selection.has_surrogate_statistics">Strip Plot</label>
     </div>
     <div v-if="current_visualization==='cv_scatterplot'">
       <p v-if="status.loading_viz">Loading... <i class="mdi mdi-progress-clock mdi-spin"/></p>
@@ -64,6 +65,10 @@
       <p v-if="status.loading_viz">Loading... <i class="mdi mdi-progress-clock mdi-spin"/></p>
       <RunSequencePlot v-else :workbook="excel_workbook" />
     </div>
+    <div v-else-if="current_visualization==='strip_plot'">
+      <p v-if="status.loading_viz">Loading... <i class="mdi mdi-progress-clock mdi-spin"/></p>
+      <StripPlot v-else :jsonData="excel_workbook" />
+    </div>
   </div>
 </template>
 
@@ -72,14 +77,17 @@
   import JSZip from 'jszip'
   import XLSX from 'xlsx'
 
+  import { INTERPRET_API_KEY } from '@/assets/store.js'
   import DecisionTree from '@/components/DecisionTree.vue'
   import OccurrenceHeatmap from '@/components/OccurrenceHeatmap.vue'
   import RunSequencePlot from '@/components/RunSequencePlot.vue'
+  import StripPlot from '@/components/StripPlot.vue'
   import '@mdi/font/css/materialdesignicons.min.css';
 
   export default {
     data() {
       return {
+        INTERPRET_API_KEY,
         job_start_time: "",
         error_info: "",
         scatterplot_image_blob: null,
@@ -89,14 +97,16 @@
         status: {job: "Not found", retrieving_file: false, file_retrieved: false, loading_viz: false},
         csv_strings: {parameters: "", results: ""},
         excel_workbook: null,
-        has_run_sequence: false
+        json_data: null,
+        viz_selection: {has_run_sequence: false, has_surrogate_statistics: false}
       }
     },
     async created() {
       const timerFunc = (t) => new Promise(resolve => setTimeout(resolve, t))
 
-      const status_url = "https://qed-dev.edap-cluster.com/nta/ms1/status/" + this.$route.params.job_id
-      var response = await axios.get(status_url).catch((e) => {
+      //const status_url = "https://qed-dev.edap-cluster.com/nta/ms1/status/" + this.$route.params.job_id
+      const status_url = "https://qed-dev.edap-cluster.com/nta/ms1/api/status/" + this.$route.params.job_id
+      var response = await axios.get(status_url, {headers: {'X-API-Key': INTERPRET_API_KEY}}).catch((e) => {
         this.status.job = "Error"
       })
       if (this.status.job === "Error") {
@@ -105,7 +115,7 @@
       while ((response.data.status === "Processing") || (response.data.status === "Not found")){
         console.log("Checking...")
         await timerFunc(5000)
-        response = await axios.get(status_url)
+        response = await axios.get(status_url, {headers: {'X-API-Key': INTERPRET_API_KEY}})
       }
       this.job_start_time = response.data.start_time
       this.status.job = response.data.status
@@ -114,13 +124,17 @@
     methods: {
       async loadResultsFile(job_id) {
         this.status.retrieving_file = true
-        const res = await axios.get("https://qed-dev.edap-cluster.com/nta/ms1/results/toxpi/" + job_id, {responseType: "blob"})
+        //const res = await axios.get("https://qed-dev.edap-cluster.com/nta/ms1/results/toxpi/" + job_id, {responseType: "blob"})
+        const res = await axios.get("https://qed-dev.edap-cluster.com/nta/ms1/api/output/" + job_id, {responseType: "blob", headers: {'X-API-Key': INTERPRET_API_KEY}})
         this.zip_blob = res.data
 
         const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
-        const workbook = XLSX.read(excel_array)
+        const workbook = XLSX.read(excel_array, {WTF: true})
         if (workbook.SheetNames.includes("Run Sequence (pos)") || workbook.SheetNames.includes("Run Sequence (neg)")) {
-          this.has_run_sequence = true
+          this.viz_selection.has_run_sequence = true
+        }
+        if (workbook.SheetNames.includes("Surrogate Detection Statistics")) {
+          this.viz_selection.has_surrogate_statistics = true
         }
 
         this.status.file_retrieved = true
@@ -136,7 +150,7 @@
         link.click()
       },
       async downloadOnly(job_id) {
-        const res = await axios.get("https://qed-dev.edap-cluster.com/nta/ms1/api/output/" + job_id, {responseType: "blob", headers: {'x-api-key': 'tSCcCm8uzP4CVWm_Eshpx8DqBrhBS1xuGik1t9HD0X0'}})
+        const res = await axios.get("https://qed-dev.edap-cluster.com/nta/ms1/api/output/" + job_id, {responseType: "blob", headers: {'X-API-Key': INTERPRET_API_KEY}})
         let link = document.createElement('a')
         link.href = window.URL.createObjectURL(res.data)
         link.download = `${job_id}.zip`
@@ -195,8 +209,16 @@
         const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
         this.excel_workbook = XLSX.read(excel_array)
         this.status.loading_viz = false
+      },
+      async loadStripPlot() {
+        this.status.loading_viz = true
+        this.current_visualization = "strip_plot"
+        const excel_array = await this.extractFileFromWorkbook(/xlsx/, "arrayBuffer")
+        this.excel_workbook = XLSX.read(excel_array)
+        this.json_data = XLSX.utils.sheet_to_json("Surrogate Detection Statistics");
+        this.status.loading_viz = false
       }
     },
-    components: { DecisionTree, OccurrenceHeatmap, RunSequencePlot }
+    components: { DecisionTree, OccurrenceHeatmap, RunSequencePlot, StripPlot }
   }
 </script>

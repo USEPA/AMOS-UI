@@ -79,25 +79,33 @@
           </div>
         </div>
       </div>
-      <div v-if="all_results.length > 0" style="display: flex; flex-direction: row;">
-        <div style="width: 40%">
-          <div>
-            <input type="checkbox" id="single-point-spectra" v-model="result_filters.single_point_spectra" @change="updateCheckboxFilters">
-            <label for="single-point-spectra">Include single-point spectra</label>
+      <div v-if="all_results.length > 0">
+        <div style="display: flex; flex-direction: row;">
+          <div style="width: 40%">
+            <div>
+              <input type="checkbox" id="single-point-spectra" v-model="result_filters.single_point_spectra" @change="updateCheckboxFilters">
+              <label for="single-point-spectra">Include single-point spectra</label>
+            </div>
+            <div>
+              <input type="checkbox" id="ms-ready" v-model="result_filters.ms_ready" @change="updateCheckboxFilters">
+              <label for="ms-ready">Include MS-Ready methods</label>
+              &nbsp;
+              <help-icon style="vertical-align:middle;" tooltipText="MS-Ready refers to a standardization of substances by collapsing isomers, salts, isotopes, etc., into a single form, identifiable by having the same first block of their InChIKey.  Selecting this will include methods from substances with the same MS-Ready form." />
+            </div>
+            <div>
+              <input type="checkbox" id="external_links" v-model="result_filters.external_links" @change="updateCheckboxFilters">
+              <label for="external_links">Include external links</label>
+            </div>
           </div>
-          <div>
-            <input type="checkbox" id="ms-ready" v-model="result_filters.ms_ready" @change="updateCheckboxFilters">
-            <label for="ms-ready">Include MS-Ready methods</label>
-            &nbsp;
-            <help-icon style="vertical-align:middle;" tooltipText="MS-Ready refers to a standardization of substances by collapsing isomers, salts, isotopes, etc., into a single form, identifiable by having the same first block of their InChIKey.  Selecting this will include methods from substances with the same MS-Ready form." />
-          </div>
-          <div>
-            <input type="checkbox" id="external_links" v-model="result_filters.external_links" @change="updateCheckboxFilters">
-            <label for="external_links">Include external links</label>
+          <div style="width: 60%; display: flex; align-items: center;">
+            <button v-if="!still_searching" @click="downloadResultsAsExcel">Download Displayed Results</button>
           </div>
         </div>
-        <div style="width: 60%; display: flex; align-items: center;">
-          <button v-if="!still_searching" @click="downloadResultsAsExcel">Download Displayed Results</button>
+        <div style="padding: 10px 5px">
+          <label for="full-table-filter">Full Table Filter</label> &nbsp;
+          <input type="text" v-model="full_table_filter" name="full-table-filter" @keyup="quickFilter(full_table_filter)">
+          &nbsp;
+          <help-icon style="vertical-align:middle;" tooltipText="The contents of this field act as a filter on all columns in the table, returning all results where the filter appears in any field." />
         </div>
       </div>
       <div v-if="!still_searching">
@@ -200,6 +208,7 @@
         additional_sources: [],
         result_filters: {ms_ready: false, single_point_spectra: true, external_links: false},
         displayed_inchikey: {first_block: "", remainder: ""},
+        full_table_filter: "",
         columnDefs: [
           {field: 'methodologies', headerName: 'Methodology', sortable: true, sort: 'asc', filter: 'agTextColumnFilter', floatingFilter: true, width: 140, suppressSizeToFit: true},
           {field: 'source', headerName: 'Source', sortable: true, width: 110, suppressSizeToFit: true, filter: 'agTextColumnFilter', floatingFilter: true, cellRenderer: params => {
@@ -453,6 +462,9 @@
           console.log('Cannot copy: ' + err)
         }
         document.body.removeChild(textarea)
+      },
+      quickFilter(input) {
+        this.gridApi.setGridOption('quickFilterText', input)
       }
     },
     async created() {
