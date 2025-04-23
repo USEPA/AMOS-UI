@@ -320,8 +320,8 @@
         }
 
         // filter out result types based on selected tab
-        if (this.result_table_view_mode != "all") {
-          return node.data.record_type.toLowerCase() == this.result_table_view_mode
+        if (this.result_table_view_mode !== "all") {
+          return node.data.record_type.toLowerCase() === this.result_table_view_mode
         }
 
         return true
@@ -364,44 +364,33 @@
       updateTab(tabName) {
         this.result_table_view_mode = tabName
         if (tabName === "fact sheet"){
-          this.gridApi.setColumnsVisible(['count'], true)
-          this.gridApi.setColumnsVisible(['method_number', 'method_type', 'methodologies', 'record_type', 'spectrum_rating'], false)
-          this.gridApi.setColumnFilterModel('method_number', null)
-          this.gridApi.setColumnFilterModel('method_type', null)
-          this.gridApi.setColumnFilterModel('methodologies', null)
-          this.gridApi.setColumnFilterModel('record_type', null)
-          this.gridApi.setColumnFilterModel('spectrum_rating', null)
+          this.toggleVisibleColumns(['count'], ['method_number', 'method_type', 'methodologies', 'record_type', 'spectrum_rating'])
           this.gridApi.applyColumnState({state: [{colId: 'count', sort: 'asc'}]})
         } else if (tabName === "spectrum") {
-          this.gridApi.setColumnsVisible(['methodologies', 'spectrum_rating'], true)
-          this.gridApi.setColumnsVisible(['count', 'method_number', 'method_type', 'record_type'], false)
-          this.gridApi.setColumnFilterModel('count', null)
-          this.gridApi.setColumnFilterModel('method_number', null)
-          this.gridApi.setColumnFilterModel('method_type', null)
-          this.gridApi.setColumnFilterModel('record_type', null)
+          this.toggleVisibleColumns(['methodologies', 'spectrum_rating'], ['count', 'method_number', 'method_type', 'record_type'])
           this.gridApi.applyColumnState({state: [{colId: 'count', sort: null}]})
         } else if (tabName === "method") {
-          this.gridApi.setColumnsVisible(['count', 'method_number', 'method_type', 'methodologies'], true)
-          this.gridApi.setColumnsVisible(['record_type', 'spectrum_rating'], false)
-          this.gridApi.setColumnFilterModel('record_type', null)
-          this.gridApi.setColumnFilterModel('spectrum_rating', null)
+          this.toggleVisibleColumns(['count', 'method_number', 'method_type', 'methodologies'], ['record_type', 'spectrum_rating'])
           this.gridApi.applyColumnState({state: [{colId: 'count', sort: 'asc'}]})
         } else {
           // "All" case
-          this.gridApi.setColumnsVisible(['count', 'methodologies', 'record_type'], true)
-          this.gridApi.setColumnsVisible(['method_number', 'method_type', 'spectrum_rating'], false)
-          this.gridApi.setColumnFilterModel('method_number', null)
-          this.gridApi.setColumnFilterModel('method_type', null)
-          this.gridApi.setColumnFilterModel('spectrum_rating', null)
+          this.toggleVisibleColumns(['count', 'methodologies', 'record_type'], ['method_number', 'method_type', 'spectrum_rating'])
           this.gridApi.applyColumnState({state: [{colId: 'count', sort: null}]})
         }
         this.gridApi.onFilterChanged()
         this.gridApi.sizeColumnsToFit()
       },
+      toggleVisibleColumns(cols_to_show, cols_to_hide) {
+        this.gridApi.setColumnsVisible(cols_to_show, true)
+        this.gridApi.setColumnsVisible(cols_to_hide, false)
+        for (let c of cols_to_hide) {
+          this.gridApi.setColumnFilterModel(c, null)
+        }
+      },
       determineTabBarClass(tab_label) {
-        if (this.record_type_counts[tab_label] == 0) {
+        if (this.record_type_counts[tab_label] === 0) {
           return "disabled"
-        } else if (this.result_table_view_mode == tab_label) {
+        } else if (this.result_table_view_mode === tab_label) {
           return "active"
         } else {
           return ""
@@ -427,7 +416,7 @@
       },
       async ms_ready_toggle() {
         if (this.result_filters.ms_ready) {
-          if (this.ms_ready_search_run == false) {
+          if (this.ms_ready_search_run === false) {
             const response = await axios.get(`${this.BACKEND_LOCATION}/get_ms_ready_methods/${this.substance_info.jchem_inchikey}`)
             const main_ids = this.results.substance.map(x => x.internal_id)
             this.results.ms_ready = response.data.results.filter(x => !main_ids.includes(x.internal_id))
@@ -483,9 +472,9 @@
         const dtxsids = this.possible_substances.map(ps => ps.dtxsid)
         this.record_counts_by_dtxsid = await axios.post(`${this.BACKEND_LOCATION}/record_counts_by_dtxsid/`, {dtxsids: dtxsids})
         this.record_counts_by_dtxsid = this.record_counts_by_dtxsid.data
-        if (ambiguity_type == "inchikey") {
+        if (ambiguity_type === "inchikey") {
           this.disambiguation.inchikey = true
-        } else if (ambiguity_type == "synonym") {
+        } else if (ambiguity_type === "synonym") {
           this.disambiguation.synonym = true
         }
       } else {
@@ -493,7 +482,7 @@
         const search_results = await axios.get(`${this.BACKEND_LOCATION}/search/${response.data.substances.dtxsid}`)
         const additional_source_results = await axios.get(`${this.BACKEND_LOCATION}/additional_sources_for_substance/${response.data.substances.dtxsid}`)
         const classyfire = await axios.get(`${this.BACKEND_LOCATION}/get_classification_for_dtxsid/${response.data.substances.dtxsid}`)
-        if ((classyfire.status == 200) & (classyfire.data.kingdom !== null)) {
+        if ((classyfire.status === 200) & (classyfire.data.kingdom !== null)) {
           this.classification = classyfire.data
         }
         const functional_use_response = await axios.get(`${this.BACKEND_LOCATION}/functional_uses_for_dtxsid/${response.data.substances.dtxsid}`)

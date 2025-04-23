@@ -128,16 +128,20 @@
         const res = await axios.get("https://qed-dev.edap-cluster.com/nta/ms1/api/output/" + job_id, {responseType: "blob", headers: {'X-API-Key': INTERPRET_API_KEY}})
         this.zip_blob = res.data
 
+        // get info from QA/QC file to set flags
         const qaqc_array = await this.extractFileFromWorkbook(/QAQC\.xlsx$/, "arrayBuffer")
-        const qaqc_workbook = XLSX.read(qaqc_array, {WTF: true})
+        const qaqc_workbook = XLSX.read(qaqc_array)
         if (qaqc_workbook.SheetNames.includes("Run Sequence (pos)") || qaqc_workbook.SheetNames.includes("Run Sequence (neg)")) {
           this.viz_selection.has_run_sequence = true
         }
 
+        // check for qNTA file & set flags appropriately
         const qnta_array = await this.extractFileFromWorkbook(/qNTA\.xlsx$/, "arrayBuffer")
-        const qnta_workbook = XLSX.read(qnta_array, {WTF: true})
-        if (qnta_workbook.SheetNames.includes("Surrogate Detection Statistics")) {
-          this.viz_selection.has_surrogate_statistics = true
+        if (qnta_array !== null) {
+          const qnta_workbook = XLSX.read(qnta_array)
+          if (qnta_workbook.SheetNames.includes("Surrogate Detection Statistics")) {
+            this.viz_selection.has_surrogate_statistics = true
+          }
         }
 
         this.status.file_retrieved = true
@@ -162,9 +166,17 @@
       async extractFileFromWorkbook(file_regex, file_type="blob") {
         const zip = new JSZip()
         const zip_content = await zip.loadAsync(this.zip_blob)
-        const target_filename = zip_content.file(file_regex)[0].name
-        const target_file = await zip_content.file(target_filename).async(file_type)
-        return target_file
+        const file_matches = zip_content.file(file_regex)
+        if (file_matches.length===0) {
+          return null
+        } else if (file_matches.length===1) {
+          const target_filename = file_matches[0].name
+          const target_file = await zip_content.file(target_filename).async(file_type)
+          return target_file
+        } else {
+          console.log(`${file_matches.length} matches for regex ${file_regex} were found.`)
+          return null
+        }
       },
       async loadCVScatterplot() {
         this.status.loading_viz = true
