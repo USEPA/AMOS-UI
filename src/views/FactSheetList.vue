@@ -119,7 +119,7 @@
               link.innerText = params.data.analyte;
               link.addEventListener("click", e => {
                 e.preventDefault();
-                this.$router.push(`search/${params.data.dtxsid}`);
+                this.$router.push(`/search/${params.data.dtxsid}`);
               });
               return link;
             } else {

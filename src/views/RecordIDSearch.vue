@@ -28,17 +28,17 @@
       const response = await axios.get(`${this.BACKEND_LOCATION}/record_id_search/${internal_id}`)
       const record_type = response.data.record_type
       if (record_type === "Fact Sheet") {
-        this.$router.push(`view_fact_sheet/${internal_id}`)
+        this.$router.push(`/view_fact_sheet/${internal_id}`)
       } else if (record_type === "Method") {
-        this.$router.push(`view_method/${internal_id}`)
+        this.$router.push(`/view_method/${internal_id}`)
       } else if (record_type === "Spectrum") {
         const data_type = response.data.data_type
         if (data_type === "Mass Spectrum") {
-          this.$router.push(`view_mass_spectrum/${internal_id}`)
+          this.$router.push(`/view_mass_spectrum/${internal_id}`)
         } else if (data_type === "NMR Spectrum") {
-          this.$router.push(`view_nmr_spectrum/${internal_id}`)
+          this.$router.push(`/view_nmr_spectrum/${internal_id}`)
         } else if (data_type === "PDF") {
-          this.$router.push(`view_spectrum_pdf/${internal_id}`)
+          this.$router.push(`/view_spectrum_pdf/${internal_id}`)
         } else {
           this.external_link = response.data.link
         }

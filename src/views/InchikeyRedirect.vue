@@ -45,13 +45,13 @@
       this.search_complete = true
       
       if (response.data.unique_inchikeys.length === 1 & response.data.inchikey_present){
-        this.$router.push({path: `search/${this.$route.params.inchikey}`})
+        this.$router.push({path: `/search/${this.$route.params.inchikey}`})
       } else if (response.data.unique_inchikeys.length > 1) {
         this.exact_match = response.data.inchikey_present
         this.matched_inchikey_substance_name = response.data.unique_inchikeys.find(i => i.jchem_inchikey === this.$route.params.inchikey).preferred_name
         this.unique_inchikeys = response.data.unique_inchikeys.filter(i => i.jchem_inchikey !== this.$route.params.inchikey)
       } else {
-        this.$router.push({path: `search/${this.$route.params.inchikey}`})
+        this.$router.push({path: `/search/${this.$route.params.inchikey}`})
       }
     }
   }

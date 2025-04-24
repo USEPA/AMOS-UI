@@ -64,7 +64,7 @@
       go_big_bar() {
         const search_term = this.bigBarSearchTerm.trim()
         if (this.substring_search) {
-          this.$router.push(`partial_identifier_search?substring_search=${search_term}`)
+          this.$router.push(`/partial_identifier_search?substring_search=${search_term}`)
         }
         else if (this.searchType === "substances") {
           this.$router.push({
@@ -72,7 +72,7 @@
             query: {initial_results_tab: this.initial_results_tab}
           })
         } else {
-          this.$router.push(`record_id_search/${encodeURI(search_term)}`)
+          this.$router.push(`/record_id_search/${encodeURI(search_term)}`)
         }
       }
     },

@@ -397,7 +397,7 @@
         }
       },
       disambiguate(dtxsid) {
-        this.$router.push(`search/${dtxsid}`)
+        this.$router.push(`/search/${dtxsid}`)
       },
       postSortRows(params) {
         // Any node with a missing (null-valued) description will get booted to the end of the sorted list.
