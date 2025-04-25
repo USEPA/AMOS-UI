@@ -422,7 +422,7 @@
           na_val: this.na_value,
           do_qnta: this.do_qnta,
           qnta_input: document.getElementById("qnta_surrogate_file").files[0],
-          atom_ranges: this.$refs.formulaInput.$data.current_elements,
+          atom_ranges: JSON.stringify(this.$refs.formulaInput.$data.current_elements),
           do_atom_filtering: this.do_atom_filtering
         }
         
