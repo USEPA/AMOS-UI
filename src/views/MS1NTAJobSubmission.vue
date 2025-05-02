@@ -432,7 +432,8 @@
           qnta_input: document.getElementById("qnta_surrogate_file").files[0],
           atom_ranges: JSON.stringify(this.$refs.formulaInput.$data.current_elements),
           do_atom_filtering: this.do_atom_filtering,
-          return_nods: this.return_nods
+          return_nods: this.return_nods,
+          filter_cv: this.filter_on_cv_values
         }
         
         /* const response = await axios.postForm("https://qed-dev.edap-cluster.com/nta/ms1/external/input/", payload)
