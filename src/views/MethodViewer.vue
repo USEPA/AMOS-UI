@@ -7,7 +7,7 @@
 -->
 
 <template>
-  <div class="two-column-page">
+  <div class="two-column-page" v-if="method_found">
     <div class="half-page-column">
       <div class="results-header" style="overflow: auto;">
         <h2 v-if="pdf_name">
@@ -53,6 +53,10 @@
       <p v-else>Illegal value for 'viewer_mode' selected.  Current value is {{viewer_mode}}.</p>
     </div>
   </div>
+  <div v-else class="padded-error-message">
+    <br />
+    <p>No method matching the given ID was found.</p>
+  </div>
 </template>
 
 <script>
@@ -83,6 +87,8 @@
         BACKEND_LOCATION,
         COMPTOX_PAGE_URL,
         pdf_source_url: null,
+        method_found: true,
+        target_pdf_url: "",
         column_defs: [
           {field:'image', headerName:'Structure', autoHeight: true, width: 100, cellRenderer: (params) => {
             if (params.data.image_link) {
@@ -123,13 +129,19 @@
         this.pdf_source_url = response.data.result.link
       }
       this.loadPDF()
-      this.findDTXSIDs()
+      if (this.method_found) {
+        this.findDTXSIDs()
+      }
     },
 
     methods: {
       async loadPDF(){
         this.target_pdf_url = encodeURI(`${this.BACKEND_LOCATION}/get_pdf/method/${this.$route.params.internal_id}`)
         const response = await axios.get(`${this.BACKEND_LOCATION}/get_pdf_metadata/method/${this.$route.params.internal_id}`)
+        if (response.status!==200) {
+          this.method_found = false
+          return
+        }
         this.pdf_name = response.data.pdf_name
         this.metadata_rows = response.data.metadata_rows
         this.has_associated_spectra = response.data.has_associated_spectra

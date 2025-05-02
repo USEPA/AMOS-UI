@@ -20,6 +20,10 @@
   text-decoration: underline dashed;
 }
 
+.padded-error-message {
+  height: 400px
+}
+
 .substance-highlight {
   background-color: #bce6fc !important;
   /*font-weight: bold !important;*/

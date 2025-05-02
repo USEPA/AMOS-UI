@@ -134,6 +134,7 @@
             :doesExternalFilterPass="doesExternalFilterPass"
             :postSortRows="postSortRows"
             :suppressCopyRowsToClipboard="true"
+            :animateRows="false"
           ></ag-grid-vue>
         </div>
       </div>

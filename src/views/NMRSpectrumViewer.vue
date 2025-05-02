@@ -5,7 +5,7 @@
 -->
 
 <template>
-  <div class="two-column-page">
+  <div class="two-column-page" v-if="spectrum_found">
     <div class="half-page-column">
       <p>Below is a plot of the selected NMR spectrum.  Use the mouse wheel to zoom in and out or double click to zoom in.  Hover over the plot with the mouse to see individual points; this may lag somewhat for larger spectra (64k points or so).  Intensities are scaled so that the maximum is 10.</p>
       <NMRSpectrumPlot :spectrum="spectrum" />
@@ -30,6 +30,10 @@
       <p v-else>No metadata available.</p>
     </div>
   </div>
+  <div v-else class="padded-error-message">
+    <br />
+    <p>No NMR spectrum matching the given ID was found.</p>
+  </div>
 </template>
 
 <script>
@@ -53,11 +57,17 @@
         temperature: null,
         solvent: "",
         metadata: {},
-        substance_info: {}
+        substance_info: {},
+        spectrum_found: true
       }
     },
     async created() {
       const dtxsid_response = await axios.get(`${this.BACKEND_LOCATION}/find_dtxsids/${this.$route.params.internal_id}`)
+      console.log(dtxsid_response)
+      if (dtxsid_response.data.substance_list.length === 0) {
+        this.spectrum_found = false
+        return
+      }
       const dtxsid = dtxsid_response.data.substance_list[0].dtxsid
       const substance_response = await axios.get(`${this.BACKEND_LOCATION}/get_substances_for_search_term/${dtxsid}`)
       this.substance_info = substance_response.data.substances

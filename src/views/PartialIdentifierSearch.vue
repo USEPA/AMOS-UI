@@ -31,6 +31,9 @@
   <input type="checkbox" id="multicomponent-substance-toggle" v-model="show_multicomponent_substances" @change="updateTableFilters">
   <label for="multicomponent-substance-toggle">Show multicomponent substances</label>
   <br />
+  <input type="checkbox" id="metadataless-toggle" v-model="show_metadataless" @change="updateTableFilters">
+  <label for="metadataless-toggle">Show substances with zero metadata</label>
+  <br />
   <div style="display: flex; flex-direction: row; justify-content: space-between">
     <div>
       <button @click="searchToURL">Copy Search to URL</button>
@@ -95,6 +98,7 @@
         search_term: "",
         search_type: "substring_search",
         show_multicomponent_substances: false,
+        show_metadataless: true,
         search_type_options: [
           {value: "substring_search", text: "Name substring"},
           {value: "inchikey_first_block_search", text: "InChIKey first block"},
@@ -336,11 +340,15 @@
             return false
           }
         }
+        if (!this.show_metadataless) {
+          if ((node.data.source_count === 0 && node.data.patent_count === 0 & node.data.literature_count === 0)) {
+            return false
+          }
+        }
         return true
       },
       updateTableFilters() {
         this.gridApi.onFilterChanged()
-        this.updateRecordCounts()
       }
     },
     components: {AgGridVue, BAlert, BFormSelect, HelpIcon, MassRangeInput, MassTableFilter, RecordCountFilter}

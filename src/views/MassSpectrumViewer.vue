@@ -7,7 +7,7 @@
 
 
 <template>
-  <div class="two-column-page">
+  <div v-if="spectrum_found" class="two-column-page">
     <div class="half-page-column">
       <p>Below is a plot of the spectrum as intensities versus mass-to-charge ratios (m/z).  Click and drag over a section of the horizontal axis to zoom; double click to zoom back out.  Intensities are scaled so that the highest peak has a value of 100.</p>
       <SingleMassSpectrumPlot :spectrum="spectrum" />
@@ -44,7 +44,10 @@
       <MassSpectrumMetadata v-if="spectrum_metadata" :spectrumMetadata=spectrum_metadata />
       <p v-else>No metadata available.</p>
     </div>
-    
+  </div>
+  <div v-else class="padded-error-message">
+    <br />
+    <p>No mass spectrum matching the given ID was found.</p>
   </div>
 </template>
 
@@ -79,6 +82,7 @@
         substance_info: {},
         image_link: "",
         BACKEND_LOCATION,
+        spectrum_found: true,
         column_defs: [
           {field:'m/z', headerName:'m/z', flex: 1, sortable: true},
           {field:'intensity', headerName:'Peak Intensity', flex: 1, sortable: true}
@@ -112,6 +116,10 @@
       // Get spectrum
       const path = `${this.BACKEND_LOCATION}/get_mass_spectrum/${this.$route.params.internal_id}`
       const response = await axios.get(path)
+      if (response.status!==200) {
+        this.spectrum_found = false
+        return
+      }
       this.spectrum = response.data.spectrum
       this.spectral_entropy = response.data.spectral_entropy
       this.normalized_entropy = response.data.normalized_entropy

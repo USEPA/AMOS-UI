@@ -260,30 +260,37 @@
           </div></td>
         </tr>
         <tr>
-        <th>
-          Search DSSTox for possible structures:
-          <HelpIcon tooltipText="Whether to compare masses of features that pass QA/QC filtering to those in DSSTox to identify candidate chemicals." />
-        </th>
-        <td>
-          <div style="display: flex; align-items: center;">
-            <BFormSelect v-model="search_dsstox" :options="yes_no_options" size="sm" style="width: auto;" :disabled="search_hcd=='yes'"/><div v-if="search_hcd=='yes'">&nbsp; Required for Cheminformatics Hazard Module data.</div>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <th>
-          Search Cheminformatics Hazard Module for toxicity data:
-          <HelpIcon tooltipText="Whether candidate chemicals from DSSTox should have Hazard Information pulled down from the Cheminformatics Hazard module." />
-        </th>
-        <td><BFormSelect v-model="search_hcd" :options="yes_no_options" size="sm" style="width: auto;" @change="forceHcdDsstox"/></td>
-      </tr>
-      <tr>
-        <th>
-          Search DSSTox by:
-          <HelpIcon tooltipText="How to search for candidates in DSSTox.  When mass is selected, the masses of features that pass QA/QC are used. When formula is selected, the molecular formula for features that pass QA/QC are used. " />
-        </th>
-        <td><BFormSelect v-model="dsstox_search_mode" :options="search_mode_options" size="sm" style="width: auto;"/></td>
-      </tr>
+          <th>
+            Search DSSTox for possible structures:
+            <HelpIcon tooltipText="Whether to compare masses of features that pass QA/QC filtering to those in DSSTox to identify candidate chemicals." />
+          </th>
+          <td>
+            <div style="display: flex; align-items: center;">
+              <BFormSelect v-model="search_dsstox" :options="yes_no_options" size="sm" style="width: auto;" :disabled="search_hcd=='yes'"/><div v-if="search_hcd=='yes'">&nbsp; Required for Cheminformatics Hazard Module data.</div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <th>
+            Search Cheminformatics Hazard Module for toxicity data:
+            <HelpIcon tooltipText="Whether candidate chemicals from DSSTox should have Hazard Information pulled down from the Cheminformatics Hazard module." />
+          </th>
+          <td><BFormSelect v-model="search_hcd" :options="yes_no_options" size="sm" style="width: auto;" @change="forceHcdDsstox"/></td>
+        </tr>
+        <tr>
+          <th>
+            Search DSSTox by:
+            <HelpIcon tooltipText="How to search for candidates in DSSTox.  When mass is selected, the masses of features that pass QA/QC are used. When formula is selected, the molecular formula for features that pass QA/QC are used. " />
+          </th>
+          <td><BFormSelect v-model="dsstox_search_mode" :options="search_mode_options" size="sm" style="width: auto;"/></td>
+        </tr>
+        <tr>
+          <th>
+            Return chemical candidates without any data sources?
+            <HelpIcon tooltipText="Whether to include candidates that don't have any appearances in other metadata." />
+          </th>
+          <td><BFormSelect v-model="return_nods" :options="yes_no_options" size="sm" style="width: auto;"/></td>
+        </tr>
       </table>
     </BAccordionItem>
     <BAccordionItem title="Molecular Formula Filtering" visible>
@@ -347,7 +354,8 @@
         errors: {any: false, no_project_name: false, no_input_file: false},
         do_qnta: "no",
         filter_on_cv_values: "yes",
-        do_atom_filtering: "no"
+        do_atom_filtering: "no",
+        return_nods: "yes"
       }
     },
     methods: {
@@ -378,7 +386,7 @@
         // check that there's at least one file submitted or the test files are being run
         const num_positive_files = document.getElementById("pos_mode_file").files.length
         const num_negative_files = document.getElementById("neg_mode_file").files.length
-        if (num_positive_files==0 && num_negative_files==0 && this.run_test_files=="no") {
+        if (num_positive_files===0 && num_negative_files===0 && this.run_test_files==="no") {
           this.errors.any = true
           this.errors.no_input_file = true
         }
@@ -423,7 +431,8 @@
           do_qnta: this.do_qnta,
           qnta_input: document.getElementById("qnta_surrogate_file").files[0],
           atom_ranges: JSON.stringify(this.$refs.formulaInput.$data.current_elements),
-          do_atom_filtering: this.do_atom_filtering
+          do_atom_filtering: this.do_atom_filtering,
+          return_nods: this.return_nods
         }
         
         /* const response = await axios.postForm("https://qed-dev.edap-cluster.com/nta/ms1/external/input/", payload)
@@ -432,7 +441,7 @@
         const job_id = match[1]
         this.$router.push(`/ms1_nta/results/${job_id}`) */
         
-        // new endpoint-hitting code; waiting on Josh to add API endpoint envar
+        // new endpoint-hitting code
         const response = await axios.post("https://qed-dev.edap-cluster.com/nta/ms1/api/run", payload, {headers: {'Content-Type': 'multipart/form-data', 'X-API-Key': this.INTERPRET_API_KEY}})
         this.$router.push(`/ms1_nta/results/${response.data.job_id}`)
 
