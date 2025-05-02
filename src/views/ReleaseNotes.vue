@@ -2,6 +2,15 @@
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>
   <details>
+    <summary>2025-05-02</summary>
+    <ul>
+      <li>Fixed an issue with the functional use classification not displaying under certain circumstances.</li>
+      <li>Added an option to PartialIdentifierSearch to hide substances that don't appear in metadata counts.</li>
+      <li>Added error messages to pages for viewing individual fact sheets, methods, and spectra for when one of those pages tries to get a non-existent record (or a record of the wrong type).</li>
+      <!--NTA--><li>Added an input for choosing whether to consider data source-less compounds to the NS1 NTA job submission.</li>
+    </ul>
+  </details>
+  <details>
     <summary>2025-04-22</summary>
     <ul>
       <li>Fixed a few tables that were still broken after the last update.</li>
