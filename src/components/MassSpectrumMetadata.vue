@@ -2,7 +2,9 @@
   This component is meant to be a stamdard display of spectrum metadata, mostly dividing it along the lines of
   chromatography versus spectrometry, with some additional useful fields appended.
 
-  This component takes one prop -- spectrumMetadata, a JSON object containing the metadata.
+  This component takes one prop:
+  - spectrumMetadata: A JSON object containing the metadata.  Keys should have either strings or numbers as values,
+    except for the Chromatography and Spectrometry fields, which have values of JSON objects.  Required.
 -->
 
 <template>
@@ -34,7 +36,7 @@
         x: 1
       }
     },
-    props: {spectrumMetadata: Object},
+    props: {spectrumMetadata: {type: Object, required: true}},
     methods: {
       copyMetadata() {
         const chromatography = Object.entries(this.spectrumMetadata.Chromatography).map(x => `- ${x[0]}: ${x[1]}`).join("\n")

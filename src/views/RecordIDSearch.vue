@@ -1,5 +1,6 @@
 <!--
-  This page is effectively a redirect/error catcher for searching by record ID.
+  This page is used in a search by record ID; it will either redirect to a viewer page for the record type if the ID is
+  found the database, or it will display an error message if no record with that ID was found.
 
   It takes one URL parameter, the ID of the record in question.
 -->

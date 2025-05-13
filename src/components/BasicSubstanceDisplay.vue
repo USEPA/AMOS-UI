@@ -1,3 +1,16 @@
+<!--
+  This component provides a basic display of information about a substance, including identifiers, a display of the
+  structure (if available), ClassyFire classification (if available), and the functional use classes associated with it
+  (if available).
+
+  This component takes three props:
+  - substanceInfo: A JSON object including the DTXSID, preferred name, CASRN, InChIKey(s), formula, monoisotopic mass,
+    and a flag for whether the substance has an image in CompTox.  Required.
+  - classification: A JSON object containing the four levels of classification for ClassyFire.  See the
+    ClassyFireDisplay component for more information.
+  - functionalUses: Delimited string listing all functional use classes.
+-->
+
 <template>
   <div class="chemical-box">
     <div class="chemical-image-highlight">
@@ -58,7 +71,7 @@
   import '@/styles/main.css'
 
   export default {
-    props: {substanceInfo: Object, classification: Object, functionalUses: String},
+    props: {substanceInfo: {type: Object, required: true}, classification: Object, functionalUses: String},
     data() {
       return {
         COMPTOX_PAGE_URL,

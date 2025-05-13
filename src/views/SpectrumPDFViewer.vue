@@ -2,8 +2,8 @@
   This page is a viewer for a spectrum PDF and its accompanying substance list.  Functionally, it is
   essentially the StoredPDFDisplay component, split out across a full webpage.
 
-  This page takes no query parameters and one URL route parameter, internal_id, which is the
-  database ID of the fact sheet you are trying to view.
+  This page takes no query parameters and one URL route parameter:
+  - internal_id: The database ID of the spectrum PDF of interest.
 -->
 
 <template>
@@ -47,6 +47,7 @@
           rowSelection="single"
           @grid-ready="onGridReady"
           :suppressCopyRowsToClipboard="true"
+          :animateRows="false"
         ></ag-grid-vue>
       </div>
       <p v-else>Illegal value for 'viewer_mode' selected.  Current value is {{viewer_mode}}.</p>

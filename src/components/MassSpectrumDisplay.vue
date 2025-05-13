@@ -3,9 +3,9 @@
   information.
 
   This component takes two props:
-  - internalID, a string corresponding to a unique ID in the database for a spectrum (with data in the database)
-  - displayAdditionalInfo, a boolean value that partially controls whether text indicating that the spectrum is
-    assocated with a method is displayed
+  - internalID: The database ID of the spectrum of interest.  Required.
+  - displayAdditionalInfo: A boolean flag to indicate whether to display a message if there is a method associated with
+    the mass spectrum.
 -->
 
 <template>
@@ -38,6 +38,7 @@
         :rowData="spectrumAsRows(spectrum)"
         rowSelection="single"
         :suppressCopyRowsToClipboard="true"
+        :animateRows="false"
       ></ag-grid-vue>
       <button @click="copySpectrum">Copy to Clipboard</button>
     </BModal>
@@ -85,7 +86,7 @@
         ]
       }
     },
-    props: {internalID: String, displayAdditionalInfo: Boolean},
+    props: {internalID: {type: String, required: true}, displayAdditionalInfo: Boolean},
     watch: {
       internalID(){
         this.getSpectrumData()

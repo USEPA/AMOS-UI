@@ -1,9 +1,6 @@
 <!--
-  This page is an adaptation/copy of the job submission page from the NTA WebApp, designed to allow the submission of
-  jobs to the NTA application's backend.
-
-  As of this writing, the code is currently hitting some enpoints for the original NTA web application as a pseudo-API;
-  a more proper API is expected to follow in the future.
+  This page is an adaptation of the job submission page from the NTA WebApp, designed to allow the submission of jobs to
+  the NTA application's backend.
 
   There are no URL or query parameters associated with this page.
 -->
@@ -436,7 +433,8 @@
           filter_cv: this.filter_on_cv_values
         }
         
-        /* const response = await axios.postForm("https://qed-dev.edap-cluster.com/nta/ms1/external/input/", payload)
+        /*  Old endpoint-hitting code
+        const response = await axios.postForm("https://qed-dev.edap-cluster.com/nta/ms1/external/input/", payload)
         const job_id_regex = /Job ID: ([A-Za-z0-9]*)/
         const match = response.data.match(job_id_regex)
         const job_id = match[1]

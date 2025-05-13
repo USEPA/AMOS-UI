@@ -1,3 +1,13 @@
+<!--
+  This component is an input for an atomic mass range, with a reference value in Daltons and a window in either Daltons
+  or parts per million.
+
+  The calculated mass range currently must be extracted by assigning a ref to the component's infovation in the
+  template, and then using this.$refs.<ref name>.calculateRange() to extract the computed mass range.
+
+  This component does not take any props.
+-->
+
 <template>
   <input type="text" v-model.number="mass_target"> Da ± &nbsp;<input type="text" v-model.number="mass_error" @focusout="constrainMassError">
   &nbsp;

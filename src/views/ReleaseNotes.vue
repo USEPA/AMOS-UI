@@ -1,3 +1,9 @@
+<!--
+  This is a list of release notes for AMOS as various updates have been made.
+
+  It takes no URL route or query parameters.
+-->
+
 <template>
   <p>Below is a changelog for the AMOS application.  Updates to the database are on a different cycle and are currently not tracked here.</p>
   <p>Note: The 2024-06-20 release was not the first release of AMOS, just the earliest mentioned here.</p>

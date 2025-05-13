@@ -1,5 +1,6 @@
 <!--
-  This is a simple about page for the app, intended to contain a more complete description of its data and functionality than the front page.
+  This is a simple about page for the AMOS, intended to contain a more complete description of its data and
+  functionality than the front page.
 
   There are no URL route or query parameters associated with this page.
 -->

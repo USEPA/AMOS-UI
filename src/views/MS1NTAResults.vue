@@ -1,11 +1,10 @@
 <!--
-  This page is for allowing the download of results from an MS1 NTA job.  The job submission page will redirect to this
-  page once a job ID has been determined.  This page can also be reloaded later on, in order to re-download the results
-  of a job completed days or months ago.
+  This page is for seeing the status of an MS1 INTERPRET NTA job, and downloading the results or viewing visualizations
+  of the data once the job has completed.  The job submission page will redirect to this page once a job ID has been
+  retrieved.  This page can also be reloaded later on, in order to re-download the results of a previously-completed
+  job.
 
   It takes one URL parameter -- the job ID -- and no query parameters.
-
-  Successful job to test: VGPFO4KJ
 -->
 
 <template>
@@ -21,7 +20,6 @@
     <p>Job completed successfully.</p>
     <p>Job start time: {{ job_start_time }}</p>
     <p>Use the buttons below to download the results or to load the results into the browser for use with visualizations.  Result files are stored in a zip file that may be tens of megabytes in size; downloading the file may take a moment.</p>
-    <!-- <p>NOTE: Due to temporary issues, the "Load Results" and "Download Results File" buttons may not work and visualizations may be inaccessible.  Use the "Only Download" button to retrieve the file instead.</p> -->
     <div>
       <button @click="loadResultsFile($route.params.job_id)">Load Results</button>
       <button @click="downloadResults($route.params.job_id)">Download Results File (ZIP)</button>

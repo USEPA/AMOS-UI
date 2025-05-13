@@ -1,3 +1,10 @@
+<!--
+  This page runs a search for mass spectra in the database.  Potential spectra are filtered by a mass range for the
+  substance and a methodology filter (GC/MS or LC/MS); individual spectra are then compared against the user spectrum
+  and sorted by entropy similarity.
+
+  This page does not take any URL route or query parameters.
+-->
 <template>
   <p>This page is for searching the database for mass spectra similar to a user-supplied one.  Currently, this is just being done by mass (with a margin of error) and the methodology of the spectrum.  The prepopulated values below are an example using a caffeine spectrum copied directly from the database.</p>
   <div class="two-column-page">
@@ -68,6 +75,7 @@
           :doesExternalFilterPass="doesExternalFilterPass"
           :autoGroupColumnDef="autoGroupColumnDef"
           :suppressCopyRowsToClipboard="true"
+          :animateRows="false"
         ></ag-grid-vue>
         <br />
         <div v-if="any_row_selected" style="display: flex; flex-direction: column; align-items: center">

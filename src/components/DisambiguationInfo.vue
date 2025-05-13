@@ -3,8 +3,9 @@
   the primary display element of the disambiguation modals for synonym and InChIKey searches.
 
   This component takes two props:
-  - substance_info: an object containing information on the substance.
-  - record_info: an object containing counts of how many records of each type are available in AMOS for the given substance.
+  - substance_info: A JSON object containing the substance name, DTXSID, CASRN, InChiKey(s), formula, mass, and whether
+    there is an image in CompTox for the structure.  Required.
+  - record_info: An object containing counts of how many records of each type are available in AMOS for the substance.
 -->
 
 <template>
@@ -42,7 +43,7 @@
   import '@/styles/main.css'
 
   export default {
-    props: {substance_info: Object, record_info: Object},
+    props: {substance_info: {type: Object, required: true}, record_info: Object},
     data() {
       return {
         displayed_inchikey: {first_block: "", remainder: ""},

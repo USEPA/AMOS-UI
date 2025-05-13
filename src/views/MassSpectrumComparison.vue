@@ -1,8 +1,10 @@
 <!--
-  This page is used for loading a spectrum and displaying it.  The long-term intent is likely to involve comparisons
-  with another spectrum in the database, but for now it just loads a spectrum supplied in a text box.
+  This page is used viewing and comparing one or two spectra.  Optionally, spectra from the database can replace one of
+  the user input fields, and comparisons can be run against those spectra.
 
-  There are no URL route or query parameters associated with this page.
+  There is one query parameter available:
+  - dtxsids: A string containing a semicolon-delimited list of DTXSIDs.  If present, the second user input field will be
+    replaced with a table listing all mass spectra available for those DTXSIDs.
 -->
 
 <template>
@@ -26,6 +28,7 @@
               @row-selected="display_database_spectrum"
               @first-data-rendered="onGridReady"
               :suppressCopyRowsToClipboard="true"
+              :animateRows="false"
             ></ag-grid-vue>
           </div>
           <div v-else class="search-inputs" style="padding-left: 100px">
@@ -126,8 +129,9 @@
     },
     async created() {
       if (this.$route.query.dtxsids) {
+        // may want to get rid of spectrum parameter check, I don't know if anyone is using it
         this.dtxsid_mode = true
-        this.dtxsids = this.$route.query.dtxsids.split(",")
+        this.dtxsids = this.$route.query.dtxsids.split(";")
         const response = await axios.post(`${this.BACKEND_LOCATION}/mass_spectra_for_substances/`, {dtxsids: this.dtxsids})
         this.database_spectra = response.data.spectra
         this.substance_mapping = response.data.substance_mapping

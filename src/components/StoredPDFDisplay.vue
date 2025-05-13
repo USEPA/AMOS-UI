@@ -3,9 +3,12 @@
   with two possible views for the substance(s) that the document references.
 
   This component takes two props:
-  - internalID, a string that matches the internal ID of a PDF document in the database
-  - recordType, a string that should have a value of either "method" or "fact sheet", which is sent to the Flask backend
-    for determining which table contains the PDF
+  - internalID: The database ID for the PDF of interest.  Required.
+  - recordType: A string with a value of either "method", "fact sheet", or "spectrum".  Used to determine where in the
+    database the record is.  Required.
+  - displayAdditionalInfo:  Boolean flag to determine whether to display certain additional information about the
+    document.
+  - highlightSubstances:  A list of DTXSIDs to highlight in the substance table and grid views.
 -->
 
 <template>
@@ -54,6 +57,7 @@
         :suppressCopyRowsToClipboard="true"
         :isExternalFilterPresent="isExternalFilterPresent"
         :doesExternalFilterPass="doesExternalFilterPass"
+        :animateRows="false"
       ></ag-grid-vue>
     </div>
     <p v-else>Illegal value for 'viewer_mode' selected.  Current value is {{viewer_mode}}.</p>
@@ -125,7 +129,7 @@
         }
       }
     },
-    props: {internalID: String, recordType: String, displayAdditionalInfo: Boolean, highlightedSubstances: {type: Array, default: []}},
+    props: {internalID: {type: String, required: true}, recordType: {type: String, required: true}, displayAdditionalInfo: Boolean, highlightedSubstances: {type: Array, default: []}},
     watch: {
       internalID(){
         this.metadata_rows = {}

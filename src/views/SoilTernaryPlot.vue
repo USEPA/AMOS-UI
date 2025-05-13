@@ -1,3 +1,10 @@
+<!--
+  This page is a interactive visualization of the USDA soil texture classification ternary plot.  Individual regions of
+  the plot link out to the methods list.
+
+  This plot takes no query or route parameters.
+-->
+
 <template>
   <p>This is an interactable ternary plot showing the composition of the USDA's soil texture classifications.  Hover over a region in the plot to see composition details in the tooltip next to the plot.  Click on a region of the plot to view all methods using the selected soil type as a matrix.</p>
   <p>The particle sizes for the different types of media are:</p>

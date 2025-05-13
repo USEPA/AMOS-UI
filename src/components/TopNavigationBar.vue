@@ -1,6 +1,6 @@
 <!--
-  This component is used to organize links that go to various pages on the app.  It also contains a search bar for the
-  general search.
+  This component represents the navigation bar used on top of each page in AMOS.  It includes links to the other pages
+  in AMOS as well as an additional search bar for the general search.
 
   This component takes no props.
 -->

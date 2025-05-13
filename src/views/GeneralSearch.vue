@@ -2,12 +2,12 @@
   This page displays the records that correspond to a single searched substance in a table, and will display information
   about the searched substance and any record in the all_results that is selected.
 
-  This page can take one URL route parameter and four optional query parameters.  The route parameter is:
-  - search_term: the term searched for; can be either a name, an InChIKey, a CASRN, or a DTXSID
+  This page takes one URL route parameter and two optional query parameters.  The route parameter is:
+  - search_term: The name, InChIKey, CASRN, or DTXSID searched on.
   The query parameters are:
-  - initial_results_tab: preselects which record type tab is selected.  If not supplied, all all_results will be shown
-  - initial_row_selected: the internal ID of a record; if this parameter exists, the page will try to preselect this
-    record's row once the table is loaded
+  - initial_results_tab: Preselects which record type tab is selected.  If not supplied, all results will be shown.
+  - initial_row_selected: The internal ID of a record; if it exists, the page will preselect this record's row once the
+    table is loaded.
 -->
 
 <template>

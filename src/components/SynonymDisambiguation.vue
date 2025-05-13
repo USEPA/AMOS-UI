@@ -4,11 +4,11 @@
   information boxes will fire an event that the parent page can capture and act upon.
 
   This component takes three props:
-  - synonym: the searched synonym.
-  - substances: an object containing a list of substances from the database.  Individual elements should have the
-  elements needed by the DisambiguationInfo component.
-  - record_info: an object containing information on how many records of each type exist for each substance.  Keys to
-  the top-level object are DTXSIDs, while the values are other dictionaries containing the result types.
+  - synonym: The searched synonym.  Required.
+  - substances: An array of JSON objects, with each one containing information on a substance in the database.  See the
+    DisambiguationInfo component for the necessary fields.  Required.
+  - record_info: An object containing information on how many records of each type exist for each substance.  Keys to
+    the top-level object are DTXSIDs, while the values are JSON objects containing the result types.
 -->
 
 <template>
@@ -37,7 +37,7 @@
         this.$emit("synonymSelected", dtxsid)
       }
     },
-    props: {substances: Object, synonym: String, record_counts: Object},
+    props: {substances: {type: Object, required: true}, synonym: {type: String, required: true}, record_counts: Object},
     components: {DisambiguationInfo}
   }
 </script>

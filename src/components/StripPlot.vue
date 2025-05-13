@@ -1,3 +1,10 @@
+<!--
+  This component is a visualization of INTERPRET NTA results, plotting and sorting per-candidate data by response factor.
+
+  This component takes one prop:
+  - workbook: A workbook object created by the XLSX library.
+-->
+
 <template>
   <div id="strip-plots-container"></div>
 </template>

@@ -1,3 +1,7 @@
+<!--
+  This is a basic contact page for AMOS.
+-->
+
 <template>
   <h3>Contact Information</h3>
   <p>

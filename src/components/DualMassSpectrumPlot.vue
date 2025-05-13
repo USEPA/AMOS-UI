@@ -1,3 +1,24 @@
+<!--
+  This is a D3 plot that shows two mass spectra in a mirrored position, i.e., both with the zero point on the same axis
+  in the middle, one side with peaks going up, and one side with peaks going down.  Options allow peaks to change color
+  based on their proximity to peaks in the other plot, or if they're below a given threshold intensity.
+
+  All spectra are assumed to have a maximum intensity of 100.
+
+  This component takes seven props:
+  - spectrum1: One of the spectra to compare.  Default color is light blue.  Requried.
+  - spectrum2: The other spectrum to compare.  Default color is orange.  Required.
+  - spectrum1_name: Name of the first spectrum.  Will appear as a label on the plot and in the on-hover peak
+    information.  Required.
+  - spectrum2_name: Name of the second spectrum.  Will appear as a label on the plot and in the on-hover peak
+    information.  Required.
+  - peak_threshold: Minimum threshold for a peak to be considered "relevant".  Peaks below this threshold will be
+    recolored to a light gray and will be ignored by the peak window check.
+  - window_size: Size of the m/z window used to determine whether a peak in one plot is similar to a peak in the other
+    plot.  Similar peaks will be colored dark blue.
+  - window_type: Units for window_size; valid options are "da" and "ppm".
+-->
+
 <template>
   <div class="graph-container">
     <h5>Mass Spectrum Comparison</h5>
@@ -16,7 +37,15 @@
         x: 1
       }
     },
-    props: {spectrum1: Array, spectrum2: Array, spectrum1_name: String, spectrum2_name: String, peak_threshold: {type: Number, default: 0}, window_size: {type: Number, default: 0}, window_type: {type: String, default: "da"}},
+    props: {
+      spectrum1: {type: Array, required: true},
+      spectrum2: {type: Array, required: true},
+      spectrum1_name: {type: String, required: true},
+      spectrum2_name: {type: String, required: true},
+      peak_threshold: {type: Number, default: 0},
+      window_size: {type: Number, default: 0},
+      window_type: {type: String, default: "da"}
+    },
     mounted() {
       // this can't be used in created() since the svg element needs to be rendered before the plot can be created
       this.createDualMassSpectrumPlot()

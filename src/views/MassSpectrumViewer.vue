@@ -2,7 +2,8 @@
   This page displays a single mass spectrum, along with its associated metadata and information about the substance it
   is describing.  It is largely similar to the MassSpectrumDisplay component, but spread out over a full page.
 
-  This page takes one URL parameter, the internal ID of the spectrum you're looking for.
+  This page takes one URL parameter:
+  - internalID: The database ID of the spectrum of interest.
 -->
 
 
@@ -32,6 +33,7 @@
           :rowData="spectrumAsRows(spectrum)"
           rowSelection="single"
           :suppressCopyRowsToClipboard="true"
+          :animateRows="false"
         ></ag-grid-vue>
         <button @click="copySpectrum()">Copy to Clipboard</button>
       </BModal>

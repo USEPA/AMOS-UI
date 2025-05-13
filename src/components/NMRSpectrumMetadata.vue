@@ -1,8 +1,9 @@
 <!--
-  This component is meant to be a stamdard display of spectrum metadata, mostly dividing it along the lines of
-  chromatography versus spectrometry, with some additional useful fields appended.
+  This component displays metadata about an NMR spectrum.
 
-  This component takes one prop -- spectrumMetadata, a JSON object containing the metadata.
+  This component takes one prop:
+  - spectrumMetadata: A JSON object containing the metadata, consisting of key-value pairs where the values are numbers
+    or text.
 -->
 
 <template>

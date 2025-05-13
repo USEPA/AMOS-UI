@@ -1,7 +1,8 @@
 <!--
   This page shows results for a structure similarity search.  An individual substance is searched for (by name, DTXSID,
   CASRN, or InChIKey) and the search returns all methods and fact sheets which contain either the searched substance or
-  at least one substance that is sufficiently similar to the searched substance.
+  at least one substance that is sufficiently similar to the searched substance.  A list of the similar substances
+  themselves is also included.
 
   This page takes no URL route or query parameters.
 -->
@@ -63,6 +64,7 @@
             :doesExternalFilterPass="doesExternalFilterPass"
             :suppressCopyRowsToClipboard="true"
             :defaultColDef="defaultColDef"
+            :animateRows="false"
           ></ag-grid-vue>
           <ag-grid-vue v-if="tab_viewer_mode == 'Fact Sheets'"
             class="ag-theme-balham"
@@ -79,6 +81,7 @@
             :doesExternalFilterPass="doesExternalFilterPass"
             :suppressCopyRowsToClipboard="true"
             :defaultColDef="defaultColDef"
+            :animateRows="false"
           ></ag-grid-vue>
           <ag-grid-vue v-if="tab_viewer_mode == 'Substances'"
             class="ag-theme-balham"
@@ -89,6 +92,7 @@
             @row-selected="substancesRowSelected"
             :getRowClass="getRowClass"
             :suppressCopyRowsToClipboard="true"
+            :animateRows="false"
           ></ag-grid-vue>
         </div>
       </div>

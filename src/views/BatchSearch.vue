@@ -1,8 +1,9 @@
 <!--
   This page is used for batch searching substances by DTXSID -- and only by DTXSID -- and returning information on the
-  records in an Excel workbook.
+  records in an Excel workbook.  The output file can include both substance- and record-level supplemental information.
 
-  There are no URL route or query parameters associated with this page.
+  This page can accept one query parameter:
+  - dtxsids: A string containing a semicolon-delimited list of DTXSIDs.
 -->
 
 <template>

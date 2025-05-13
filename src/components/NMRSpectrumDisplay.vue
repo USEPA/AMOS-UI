@@ -3,7 +3,7 @@
   along with some supplemental information.
 
   This component takes one prop:
-  - internalID, a string corresponding to a unique ID in the database for a spectrum (with data in the database)
+  - internalID: The database ID of the NMR spectrum in question.  Required.
 -->
 
 <template>
@@ -55,7 +55,7 @@
         BACKEND_LOCATION
       }
     },
-    props: {internalID: String},
+    props: {internalID: {type: String, required: true}},
     watch: {
       async internalID(){
         await this.getNMRSpectrum()

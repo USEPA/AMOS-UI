@@ -1,15 +1,15 @@
 <!--
   This component is meant to be used as a modal dialog box when an InChIKey search returns multiple substances with the
-  same first block.  It is essentially a list of information about the individual substances, and clicking on one of the
-  information boxes will fire an event that the parent page can capture and act upon.  If there is an exact match to the
-  searched InChIKey, that will be highlighted by moving it to the top of the result list.
+  same first block.  It lists information about the individual substances; clicking on one of the information boxes will
+  fire an event that the parent page can capture and act upon.  If there is an exact match to the searched InChIKey, it
+  will be highlighted by moving it to the top of the result list.
 
   This component takes three props:
-  - searched_key: the searched InChIKey.
-  - substances: an object containing a list of substances from the database.  Individual elements should have the
-  elements needed by the DisambiguationInfo component.
-  - record_info: an object containing information on how many records of each type exist for each substance.  Keys to
-  the top-level object are DTXSIDs, while the values are other dictionaries containing the result types.
+  - searched_key: The searched InChIKey.  Required.
+  - substances: A JSON object containing a list of substances from the database.  Individual elements should have the
+    keys needed by the DisambiguationInfo component.  Required.
+  - record_info: A JSON object containing information on how many records of each type exist for each substance.  Keys
+    to the top-level object are DTXSIDs, while the values are other dictionaries containing the result types.
 -->
 
 <template>
@@ -60,7 +60,7 @@
         this.$emit("inchikeySelected", dtxsid)
       }
     },
-    props: {substances: Object, searchedKey: String, record_counts: Object},
+    props: {substances: {type: Object, required: true}, searchedKey: {type: String, required: true}, record_counts: Object},
     components: {DisambiguationInfo}
   }
 </script>

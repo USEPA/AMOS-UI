@@ -1,3 +1,9 @@
+<!--
+  This is intended as a landing and information page for INTERPRET NTA.
+
+  It takes no URL route or query parameters.
+-->
+
 <template>
   <p>INTERPRET NTA (<strong>Inter</strong>face for the <strong>P</strong>rocessing, <strong>R</strong>eview, and <strong>T</strong>ranslation of NTA data) is a module of AMOS with a focus on non-targeted analysis (NTA) work.  Below is a list of that functionality.</p>
   <ul>

@@ -1,3 +1,11 @@
+<!--
+  This component constructs an input field that allows specifying a range of counts of atoms as a filter for molecular
+  formulae.  Information from this component currently must be extracted by assigning a ref to the component's
+  invocation in the template, and then using this.$refs.<ref name>.$data.current_elements to extract the information.
+
+  This component takes no props.
+-->
+
 <template>
   <p>Use the below fields to select a range of molecular formulae to search for.  Minimum values can go down to 0, and maximum values can go up to 100.</p>
   <p>Current formula requirements: {{ current_formula }}</p>

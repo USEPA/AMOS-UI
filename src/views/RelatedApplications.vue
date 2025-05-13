@@ -1,5 +1,7 @@
 <!--
-  This page is a list of EPA-built pplications which may be of interest to users of AMOS.  This page takes no query or URL parameters.
+  This page is a list of EPA-built pplications which may be of interest to users of AMOS.
+  
+  This page takes no query or URL parameters.
 -->
 
 <template>

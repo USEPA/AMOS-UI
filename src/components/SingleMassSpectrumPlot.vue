@@ -1,8 +1,11 @@
 <!--
-  This component is used to display a plot of a single mass spectrum.
+  This component plots a single mass spectrum.
 
-  This component takes one prop:
-  - spectrum, the mass spectrum in the form of a list of m/z-intensity pairs
+  This component takes three props:
+  - spectrum: The mass spectrum, in the form of a list of m/z-intensity pairs, sorted by increasing m/z.  Peaks should
+    be scaled so that their maximum intensity is 100.  Required.
+  - spectrum_name: Name of the spectrum to display on the plot.  Defaults to "Mass Spectrum".
+  - peak_threshold: Threshold intensity below which peaks in the plot will be greyed out.
 -->
 
 <template>
@@ -23,7 +26,7 @@
         x: 1
       }
     },
-    props: {spectrum: Array, spectrum_name: {type: String, default: "Mass Spectrum"}, peak_threshold: {type: Number, default: 0}},
+    props: {spectrum: {type: Array, required: true}, spectrum_name: {type: String, default: "Mass Spectrum"}, peak_threshold: {type: Number, default: 0}},
     mounted() {
       // this can't be used in created() since the svg element needs to be rendered before the plot can be created
       this.createSingleMassSpectrumPlot()

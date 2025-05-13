@@ -1,4 +1,10 @@
+<!--
+  This page runs searches for substances using identifiers that are not necessarily unique to one substance -- mass
+  ranges, substrings, InChIKey first blocks, and molecular formula.
 
+  There are some query parameters that can be used to automatically run a search.  Use the "Copy Search to URL" button
+  to copy the current search as a URL with those query parameters.
+-->
 
 <template>
   This page runs searches for substances based on identifiers that can match more than one substance -- potentially many substances.  Searches can be done on four identifiers:

@@ -3,8 +3,8 @@
   the DTXSID, and the EPA-preferred name.
 
   This component takes two props:
-  - dtxsid, the full DTXSID of the substance
-  - preferred_name, the EPA-preferred name of the substance
+  - substance_info: A JSON object containing the preferred name, DTXSID, and a link for the image.  Required.
+  - highlight: Boolean flag for whether to highlight the tile by coloring the background.
 -->
 
 <template>
@@ -35,7 +35,7 @@
         this.image_link = imageLinkForSubstance(this.substance_info.dtxsid, this.substance_info.image_in_comptox)
       }
     },
-    props: {substance_info: Object, highlight: Boolean}
+    props: {substance_info: {type: Object, required: true}, highlight: Boolean}
   }
 </script>
 

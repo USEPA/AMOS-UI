@@ -1,3 +1,11 @@
+<!--
+  This page is intended to be used as a submission page for an MS2 job for INTERPRET NTA.  It is based on the similar
+  page used on the original site.
+
+  The functionality of this page may be merged into the MS1 submission page at some point in the future; as such, it is
+  currently not accessible in AMOS.
+-->
+
 <template>
   <table class="nostripe input-table">
     <thead>

@@ -1,9 +1,12 @@
 <!--
-  This component is used to display a plot of an NMR spectrum stored directly in the database (as opposed to a PDF),
-  along with some supplemental information.
+  This component is used to display a plot of an NMR spectrum stored directly in the database (as opposed to a PDF).
+  The data is plotted as intensity as a function of frequency shift in PPM.
+
+  Plots with large numbers of points -- 64k or more -- will lag noticably, but should be functional.
 
   This component takes one prop:
-  - internalID, a string corresponding to a unique ID in the database for a spectrum (with data in the database)
+  - spectrum: An array of two-element arrays, where the latter represent frequency-intensity pairs.  Data is assumed to
+    be sorted in ascending order of PPM.  Required.
 -->
 
 <template>
@@ -27,7 +30,7 @@
         x: 1
       }
     },
-    props: {spectrum: Array},
+    props: {spectrum: {type: Array, required: true}},
     watch: {
       spectrum(){
         this.createNMRSpectrumPlot()

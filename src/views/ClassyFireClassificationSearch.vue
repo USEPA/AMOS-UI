@@ -1,10 +1,10 @@
 <!--
-  This page is for locating substances that are members of a ClassyFire classification (the first four levels, at
-  least).
+  This page searches for substances in AMOS's database that match the supplied top four levels of a ClassyFire
+  classificaiton.
 
   This page accepts four URL query parameters -- sending a kingdom, superclass, class, and subclass will pre-start a
-  search for that classification.  Note that all four parameters must be passed, otherwise the parameters will be
-  ignored.
+  search for that classification.  All four parameters must be passed for the search to start, otherwise the parameters
+  will be ignored.
 -->
 
 <template>
@@ -78,6 +78,7 @@
     @row-double-clicked="onDoubleClick"
     rowSelection="multiple"
     :suppressCopyRowsToClipboard="true"
+    :animateRows="false"
   ></ag-grid-vue>
 </template>
 

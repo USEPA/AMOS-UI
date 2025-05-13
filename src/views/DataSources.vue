@@ -1,6 +1,6 @@
 <!--
-  This page is meant to list off the major data sources in the app.  Sources that add only one or a few methods to the
-  database are excluded, as this page would become rather lengthy otherwise.
+  This page is meant to list off the major data sources in the app.  Not all sources used in the database are limited --
+  current limits were set at a minimum of 40 methods or 100 total records.
 
   This page takes no route or query parameters.
 -->
@@ -39,7 +39,6 @@
   LicenseManager.setLicenseKey('CompanyName=US EPA,LicensedGroup=Multi,LicenseType=MultipleApplications,LicensedConcurrentDeveloperCount=5,LicensedProductionInstancesCount=0,AssetReference=AG-010288,ExpiryDate=3_December_2022_[v2]_MTY3MDAyNTYwMDAwMA==4abffeb82fbc0aaf1591b8b7841e6309')
   
   import { BACKEND_LOCATION } from '@/assets/store.js'
-  import DataSourceDetails from '@/components/DataSourceDetails.vue'
   import HelpIcon from '@/components/HelpIcon.vue'
 
   export default {
@@ -53,7 +52,6 @@
           {field: 'full_name', headerName: 'Source Name', flex: 1.5, wrapText: true, sort: 'asc', filter: 'agTextColumnFilter', cellRenderer: params => {
             return "<a href='" + params.data.url + "' target='_blank'>" + params.data.full_name + "</a>"
           }},
-          /*{field: 'source_ids', headerName: 'AMOS IDs', flex: 0.5},*/
           {field: 'category', headerName: 'Category', filter: 'agSetColumnFilter', flex: 1},
           {field: 'description', headerName: 'Description', flex: 1.5, wrapText: true, filter: 'agTextColumnFilter', autoHeight: true},
           {field: 'substances', headerName: '# Substances', width: 120, filter: 'agNumberColumnFilter', cellRenderer: params => {
@@ -83,7 +81,7 @@
         this.gridApi.setGridOption('quickFilterText', input)
       },
     },
-    components: {AgGridVue, DataSourceDetails, HelpIcon}
+    components: {AgGridVue, HelpIcon}
   }
 </script>
 

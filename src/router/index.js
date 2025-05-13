@@ -25,6 +25,7 @@ const routes = [
   {path: "/related_applications", name: "Related Applications", component: ()=>import('../views/RelatedApplications.vue')},
   {path: "/classyfire_search", name: "ClassyFire Search", component: ()=>import('../views/ClassyFireClassificationSearch.vue')},
   {path: "/test_viz", name: "Test Viz", component: ()=>import('../views/TestViz.vue')},
+  {path: "/test_viz2", name: "Test Viz2", component: ()=>import('../views/TestViz2.vue')},
   {path: "/release_notes", name: "Release Notes", component: ()=>import('../views/ReleaseNotes.vue')},
   {path: "/record_id_search/:internal_id", name: "Record ID Search", component: ()=>import('../views/RecordIDSearch.vue')},
   {path: "/partial_identifier_search/", name: "Partial Identifier Search", component: ()=>import('../views/PartialIdentifierSearch.vue')},

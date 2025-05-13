@@ -1,12 +1,12 @@
 <!--
-  This page is used to display a method with associated spectra.  The page that results when accessing it by a method
-  should appear the same as one that results when it is accessed by one of the method's spectra.
+  This page gives a side-by-side display of a method and spectra that are directly associated with it.  The same output
+  will be accessible regardless of whether a method or one of its' related spectra are specified in the URL.
 
   This page has two URL route parameters and no query parameters.  The URL route parameters are:
-  - by_type: either 'method' or 'spectrum'; a parameter passed to the Flask backend to know whether we're starting with
-    a method that has spectra or a single spectrum that belongs to a method
-  - internal_id: a string that is the internal ID of the record; it can be the ID of a method or a spectrum, so long as
-    it's paired with the appropriate value of by_type
+  - by_type: Either 'method' or 'spectrum'; whether the initial database ID being considered belongs to a spectrum or a
+    method.
+  - internal_id: A database ID; it can be the ID of a method or a spectrum, so long as it's paired with the appropriate
+    value of by_type.
 -->
 
 <template>
@@ -27,6 +27,7 @@
             @row-selected="onRowSelected"
             @row-double-clicked="onDoubleClick"
             :suppressCopyRowsToClipboard="true"
+            :animateRows="false"
           ></ag-grid-vue>
       </div>
     </div>
@@ -78,9 +79,6 @@
       }
     },
     methods: {
-      dummy() {
-        1
-      },
       onDoubleClick(event) {
         this.spectrum_internal_id = event.data.internal_id
         this.show_modal = true

@@ -1,3 +1,10 @@
+<!--
+  This component is a custom AG Grid filter for a mass range table column.  Interactivity is handled by standard AG Grid
+  methods in the below code.
+  
+  This component does not take any props.
+-->
+
 <template>
   <div>
     Filter mode:

@@ -1,9 +1,12 @@
 <!--
-  This component is used to display a plot of an infrared spectrum stored in the database, along with some supplemental
-  information.
+  This component is used to display a D3 plot of an infrared spectrum stored in the database, along with some
+  supplemental information.
+
+  The plot is scaled so that the maximum intensity is 100.  The horizontal axis is in units of wavenumber, with the
+  value decreasing from left to right.
 
   This component takes one prop:
-  - internalID, a string corresponding to a unique ID in the database for a spectrum (with data in the database)
+  - internalID: The database ID of the IR spectrum to view.  Required.
 -->
 
 <template>
@@ -45,7 +48,7 @@
         BACKEND_LOCATION
       }
     },
-    props: {internalID: String},
+    props: {internalID: {type: String, required: true}},
     watch: {
       async internalID(){
         await this.getIRSpectrum()
@@ -91,7 +94,6 @@
         var width = svg.attr("width")
         var height = svg.attr("height")
         const margins = {right: 40, left: 40, top: 40, bottom: 40}
-        const margin = 40
 
         svg.selectAll("*").remove();
 
@@ -107,7 +109,7 @@
 
         // make the axis labels
         svg.append("text").attr("x", width/2).attr("y", height - margins.bottom/4).attr("text-anchor", "middle").attr("fill", "currentColor").text("Wavenumber (1/cm)")
-        svg.append("text").attr("transform", "rotate(-90)").attr("x", -height/2).attr("y", margin/4).attr("text-anchor", "middle").attr("fill", "currentColor").text("Intensity")
+        svg.append("text").attr("transform", "rotate(-90)").attr("x", -height/2).attr("y", margins.left/4).attr("text-anchor", "middle").attr("fill", "currentColor").text("Intensity")
         
         const clippingRect = svg.append("clipPath").attr("id", "clippy").append("rect").attr("width", width - margins.left - margins.right).attr("height", height - margins.top - margins.bottom).attr("transform", `translate(${margins.left}, ${margins.top})`).attr("fill", "none")
         
@@ -130,7 +132,7 @@
         svg.call(zoom)
 
         // add description text to the plot
-        focus.append("text").attr("class", "locationtext").attr("text-anchor", "end").attr("x", width).attr("y", margin/2)
+        focus.append("text").attr("class", "locationtext").attr("text-anchor", "end").attr("x", width).attr("y", margins.left/2)
 
         // the rect is the selection area for the cursor, while the rest of this block is implementing the mouseover functionality
         svg.append("rect").attr("width", width - margins.left - margins.right).attr("height", height - margins.top - margins.bottom).attr("transform", `translate(${margins.left}, ${margins.top})`).style("fill", "none").style("pointer-events", "all")

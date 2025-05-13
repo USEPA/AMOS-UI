@@ -1,3 +1,11 @@
+<!--
+  This component is a visualization for INTERPRET NTA.  It is designed to give a visual breakdown of occurrence- and feature-level data, along the lines of whether they were kept or removed by multiple thresholds.
+
+  This component takes two props:
+  - parametersCSVString: A comma-delimited string version of the information from the 'Analysis Parameters' sheet in the QA/QC result workbook.
+  - resultsCSVString: A comma-delimited string version of the (concatenated if necessary) detection statistics sheets in the QA/QC results workbook.
+-->
+
 <template>
   <details style="padding: 10px;">
     <summary>About this visualization</summary>
@@ -110,7 +118,7 @@
         x: 1
       }
     },
-    props: {parametersCSVString: String, resultsCSVString: String},
+    props: {parametersCSVString: {type: String, required: true}, resultsCSVString: {type: String, required: true}},
     mounted() {
       var showingOccurrence = true;
       var showingIcicle = false;

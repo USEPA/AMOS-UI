@@ -1,3 +1,11 @@
+<!--
+  This component is a filter for AG Grid tables that allows for selecting whether to show rows of a table that contain
+  zeroes, non-zeroes, or both for a given table field.
+
+  This component takes no props; however, a record_name field is required and must be passed by the AG Grid column
+  definition.
+-->
+
 <template>
   <div>
     <p>Show...</p>

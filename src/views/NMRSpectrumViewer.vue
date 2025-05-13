@@ -1,7 +1,8 @@
 <!--
   This page is for viewing an individual NMR spectrum.
 
-  It takes one route parameter, the internal ID of the NMR spectrum.
+  This page takes one URL parameter:
+  - internalID: The database ID of the spectrum of interest.
 -->
 
 <template>

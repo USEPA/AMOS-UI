@@ -1,9 +1,9 @@
 <!--
-  This page displays a D3 visualization of the various analyte classes that appear in AMOS's methods, and how they
-  relate to each other.  The nodes in this visualization link back to the methods list, pre-populating the "Analyte"
-  field there with the selected analyte.
+  This page displays a D3 visualization of the functional use classes that appear in AMOS's methods and how they relate
+  to each other.  The nodes in this visualization link back to the methods and fact sheet lists, pre-populating the
+  "Functional Uses" field with the selected functional use class.
 
-  Updating the data can be done using the HierarchyHelper.py script in the src/assets folder.
+  This page takes no URL route or query parameters.
 -->
 
 <template>
