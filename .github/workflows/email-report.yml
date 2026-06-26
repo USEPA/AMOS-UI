@@ -10,7 +10,7 @@ env:
 
 jobs:
     send-email:
-        runs-on: "th878"
+        runs-on: "th879"
         steps:
         - name: Email latest report
           uses: USEPA/email-report@main
@@ -18,10 +18,10 @@ jobs:
                 report_path: ${{ env.REPORT_DIR }}/amos-ui-report.html
                 recipients: ${{ vars.REPORT_RECIPIENTS }}
                 sender: ${{ vars.REPORT_SENDER }}
-                subject: "ccddashboard-ui  Scan Report"
+                subject: "amos-ui container scanning results"
                 body: |
                     Hello,
 
-                    Please find attached the ccddashboard-ui  scan report.
+                    Please find attached the amos-ui container scan report.
 
                     Best regards.
