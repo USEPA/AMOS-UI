@@ -4,7 +4,9 @@ on:
   push:
     branches: [ dev, staging ]
     tags: [ 'v*.*.*' ]
-   
+  schedule:
+    - cron: '00 9 * * 1,3,5'
+
 jobs:
   container-scan:
     runs-on: th879
@@ -22,7 +24,7 @@ jobs:
           dockerfile: Dockerfile
           output_path: ./output/amos-ui-report.html
           cleanup_path: /data/watchtower/amos/container-results/amos-ui/amos-ui-report.html
-          watchtower_path: /data/watchtower/amos/container-results/amos-ui/amos-ui-report.html
+          watchtower_path: /data/watchtower/amos/container-results/amos-ui
 
   trufflehog:
     runs-on: ubuntu-latest
